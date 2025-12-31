@@ -842,8 +842,8 @@
                 const jobsRef = collection(db, "jobs");
                 
                 // Firestore Query Construction
-                if (type === 'recommended') q = query(jobsRef, where("listingType", "==", "Urgent"), limit(10));
-                else if (type === 'guaranteed') q = query(jobsRef, where("listingType", "==", "Guaranteed"), limit(10));
+                if (type === 'Recommended') q = query(jobsRef, where("listingType", "==", "Urgent"), limit(10));
+                else if (type === 'Quaranteed') q = query(jobsRef, where("listingType", "==", "Guaranteed"), limit(10));
                 else q = query(jobsRef, limit(15)); // Default Recent
 
                 const snap = await getDocs(q);
@@ -1140,3 +1140,4 @@
     </script>
 </body>
 </html>
+
