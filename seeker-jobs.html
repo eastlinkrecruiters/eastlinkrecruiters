@@ -698,10 +698,6 @@
                 }
 
             } catch(e) { console.error("Limit check error", e); }
-            
-            // Reload jobs to ensure buttons update based on new limit calculation
-            // We call loadJobs separately in init, but if called dynamically:
-            // loadJobs(); 
         }
 
         async function loadJobs() {
@@ -788,13 +784,7 @@
                         salaryDisplay = j.salary ? `KES ${j.salary}` : 'Competitive';
                     }
 
-                    // 4. Activity Indicator (Simulated)
-                    const appliedCount = Math.floor(Math.random() * 40) + 5; 
-                    const activityHTML = isNew 
-                        ? `<div class="hot-activity"><i class="fas fa-fire"></i> ${appliedCount} applied today</div>` 
-                        : '';
-
-                    // 5. Match Ring (AI Feature)
+                    // 4. Match Ring (AI Feature)
                     const matchScore = Math.floor(Math.random() * (98 - 70 + 1) + 70); 
                     const matchColor = matchScore > 85 ? 'var(--success)' : 'var(--gold-base)';
                     const matchRingHTML = `
@@ -823,7 +813,6 @@
                         </div>
                         
                         <div class="card-body">
-                            ${activityHTML}
                             <div class="c-info">
                                 <h3>${j.title}</h3>
                                 <p>${j.company || 'Confidential'} ${verifiedTick}</p>
@@ -1023,3 +1012,4 @@
     </script>
 </body>
 </html>
+
