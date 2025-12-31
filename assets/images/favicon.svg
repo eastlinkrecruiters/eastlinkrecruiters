@@ -1,0 +1,48 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gold Gradient for the Border and V-Shape -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FCD34D;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#F59E0B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B45309;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Dark Blue Gradient for the Shield Background -->
+    <radialGradient id="blueGrad" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" style="stop-color:#0f172a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#020617;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+
+  <!-- 1. The Shield Shape (Background + Gold Border) -->
+  <!-- Outer Gold Border -->
+  <path d="M256 20 C 100 20, 40 80, 40 160 C 40 320, 150 420, 256 492 C 362 420, 472 320, 472 160 C 472 80, 412 20, 256 20 Z" 
+        fill="url(#blueGrad)" 
+        stroke="url(#goldGrad)" 
+        stroke-width="25"/>
+        
+  <!-- Inner Gold Pinstripe (The thin line inside the border) -->
+  <path d="M256 50 C 120 50, 70 100, 70 160 C 70 300, 160 390, 256 460 C 352 390, 442 300, 442 160 C 442 100, 392 50, 256 50 Z" 
+        fill="none" 
+        stroke="url(#goldGrad)" 
+        stroke-width="4" 
+        opacity="0.8"/>
+
+  <!-- 2. The "V" Arrow Graphic -->
+  <!-- Left arm with chain illusion bumps -->
+  <path d="M120 160 L 256 290 L 392 150 L 370 170 L 256 250 L 150 170 Z" 
+        fill="url(#goldGrad)"/>
+        
+  <!-- The Arrowhead tip on the right -->
+  <path d="M392 150 L 350 155 L 380 185 Z" fill="url(#goldGrad)"/>
+
+  <!-- 3. The Chain Links (Stylized Ovals inside the V) -->
+  <g transform="translate(150, 160) rotate(20)">
+      <ellipse cx="0" cy="0" rx="30" ry="12" fill="none" stroke="url(#goldGrad)" stroke-width="6" />
+      <ellipse cx="45" cy="5" rx="30" ry="12" fill="none" stroke="url(#goldGrad)" stroke-width="6" />
+      <ellipse cx="90" cy="0" rx="30" ry="12" fill="none" stroke="url(#goldGrad)" stroke-width="6" />
+  </g>
+
+  <!-- 4. Text "EASTLINK" (Optional - usually too small for favicons, but included for completeness) -->
+  <text x="50%" y="360" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="55" fill="#FFFFFF" letter-spacing="2">EASTLINK</text>
+</svg>
