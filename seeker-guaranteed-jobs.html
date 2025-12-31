@@ -575,8 +575,6 @@
                     validJobsCount++;
                     
                     // --- 1. Dynamic Tier Badges ---
-                    // Since this is the Guaranteed page, we prioritize the Guaranteed badge,
-                    // but we can check listingType if needed.
                     let badgeHTML = '';
                     const rawType = (job.listingType || 'Guaranteed').toLowerCase();
                     
@@ -617,16 +615,12 @@
                         const initial = (job.company || 'C').charAt(0).toUpperCase();
                         logoHTML = `<div class="c-logo-fallback">${initial}</div>`;
                     }
-                    // Verified tick for Guaranteed jobs
                     const verifiedTick = `<i class="fas fa-check-circle verified-tick" title="Verified Employer"></i>`;
 
                     // --- 4. Activity Indicator ---
                     const isNew = (Date.now() - (job.postedAt?.seconds*1000)) < (3 * 24 * 60 * 60 * 1000);
-                    const appliedCount = Math.floor(Math.random() * 50) + 10;
-                    const activityHTML = `<div class="hot-activity"><i class="fas fa-fire"></i> ${appliedCount} applied today</div>`;
                     
                     // --- 5. Match Ring ---
-                    // High match for guaranteed/vetted jobs
                     const matchScore = Math.floor(Math.random() * (99 - 85 + 1) + 85); 
                     const matchColor = matchScore > 90 ? 'var(--gold-base)' : 'var(--success)';
                     const matchRingHTML = `
@@ -649,7 +643,6 @@
                             <div class="card-head">
                                 <div class="c-logo">${logoHTML}</div>
                                 <div class="c-info">
-                                    ${activityHTML}
                                     <div style="margin-bottom:0;">
                                         <h3>${job.title}</h3>
                                         <p>${job.company} ${verifiedTick}</p>
@@ -764,3 +757,4 @@
     </script>
 </body>
 </html>
+
