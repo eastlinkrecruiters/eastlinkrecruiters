@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Outflow Console | EastLink Admin</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0F172A">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Executive Theme */
+            --bg-body: #0F172A;       
+            --bg-card: rgba(30, 41, 59, 0.65);
+            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.95);
+            --bg-input: rgba(255, 255, 255, 0.07);
+            --bg-hover: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8; 
+            --gold-base: #D97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --neon-purple: #8b5cf6;
+            --success: #10B981;
+            --danger: #EF4444;
+            --blue: #3B82F6;
+            
+            /* COMPACT HEADER SETTINGS */
+            --sidebar-width: 260px; 
+            --header-height: 60px;
+            
+            --radius: 16px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background-image: url('assets/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+            transition: background 0.3s ease;
+        }
+
+        /* Utils & Glassmorphism */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            width: 100%;
+            overflow: hidden; /* For tables */
+        }
+        
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 20px; z-index: 1000;
+        }
+        
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        
+        .logo { 
+            font-family: var(--font-head); 
+            font-weight: 700; color: var(--text-main); font-size: 1.15rem;
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; 
+            display: flex; align-items: center; 
+        }
+        .logo span { color: var(--gold-base); }
+        .admin-badge { 
+            font-family: var(--font-body); font-size: 0.55rem; background: var(--bg-input); 
+            border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; 
+            margin-left: 8px; color: var(--text-muted); letter-spacing: 0.5px;
+        }
+        
+        .hamburger { font-size: 1.2rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        /* Header Actions - Compact */
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+        .icon-btn { 
+            width: 32px; height: 32px;
+            display: grid; place-items: center; border-radius: 8px; font-size: 0.9rem;
+            color: var(--text-muted); cursor: pointer; transition: all 0.3s var(--ease-bounce); position: relative;
+        }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); }
+        
+        .notification-badge { 
+            position: absolute; top: 2px; right: 2px; 
+            min-width: 14px; height: 14px; 
+            background: var(--danger); border-radius: 10px; 
+            font-size: 0.55rem; color: white; font-weight: 700;
+            display: none; place-items: center; justify-content: center;
+            padding: 0 3px; border: 2px solid var(--bg-card);
+        }
+        
+        .profile-widget {
+            width: 34px; height: 34px;
+            position: relative; cursor: pointer;
+            transition: transform 0.3s; margin-left: 4px; flex-shrink: 0;
+            background: var(--bg-input); border-radius: 10px; display: grid; place-items: center;
+            border: 1px solid var(--border-color); color: var(--gold-base); font-size: 0.9rem;
+        }
+        .profile-widget:hover { background: var(--bg-hover); }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 15px 0; overflow-y: auto; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+        .nav-group { padding: 0 20px; margin-bottom: 15px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-item { 
+            display: flex; align-items: center; padding: 10px 12px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.85rem; transition: all 0.3s ease; border-radius: 8px; margin-bottom: 2px;
+        }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
+        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
+        .nav-item i { width: 22px; text-align: center; margin-right: 8px; }
+        
+        /* --- MAIN --- */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 25px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
+        
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 998; backdrop-filter: blur(4px); }
+
+        /* --- PAGE SPECIFIC STYLES --- */
+        
+        /* KPI Strip */
+        .kpi-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
+        .kpi-card { 
+            padding: 20px; display: flex; flex-direction: column; justify-content: space-between; 
+            cursor: pointer; position: relative; overflow: hidden; min-height: 120px; transition: 0.3s;
+        }
+        .kpi-card:hover { transform: translateY(-5px); border-color: var(--gold-base); }
+        .kpi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: var(--text-muted); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.5px; }
+        .kpi-value { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--text-main); }
+        .kpi-trend { font-size: 0.75rem; margin-top: 5px; color: var(--text-muted); }
+        
+        .liquidity-alert { border-color: rgba(239, 68, 68, 0.5); background: rgba(239, 68, 68, 0.05); }
+        .liquidity-alert .kpi-value { color: var(--danger); }
+
+        /* Table Toolbar */
+        .table-toolbar {
+            display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color); background: rgba(255,255,255,0.02);
+        }
+        .toolbar-actions { display: flex; gap: 10px; }
+        
+        .filter-select { 
+            padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; 
+            font-size: 0.85rem; background: var(--bg-body); color: var(--text-main); cursor: pointer; 
+        }
+
+        .btn-action {
+            background: rgba(255,255,255,0.05); color: var(--text-main); padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border-color);
+            font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; 
+            transition: 0.3s;
+        }
+        .btn-action:hover { background: var(--bg-hover); border-color: var(--gold-base); }
+        .btn-action.export { color: var(--success); border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.1); }
+        .btn-action.export:hover { background: var(--success); color: white; }
+
+        /* Table */
+        .table-responsive { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th, td { padding: 16px 24px; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; vertical-align: middle; }
+        th { background: rgba(255,255,255,0.02); font-weight: 700; color: var(--text-muted); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+
+        /* Status Badges */
+        .status-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; font-family: var(--font-mono); border: 1px solid transparent; }
+        .st-pending { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); border-color: rgba(217, 119, 6, 0.2); }
+        .st-success { background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.2); }
+        .st-refunded, .st-rejected { background: rgba(239, 68, 68, 0.1); color: var(--danger); border-color: rgba(239, 68, 68, 0.2); }
+
+        /* Row Actions */
+        .row-action-btn { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border-color); background: transparent; cursor: pointer; color: var(--text-muted); transition: 0.2s; font-size: 0.8rem; font-weight: 600; margin-right: 5px; }
+        .row-action-btn:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+        .btn-pay { color: var(--success); border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.05); }
+        .btn-pay:hover { background: var(--success); color: white; }
+        .btn-reject { color: var(--danger); border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.05); }
+        .btn-reject:hover { background: var(--danger); color: white; }
+
+        /* Modal */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
+        .modal-card { background: var(--bg-card); width: 100%; max-width: 450px; border-radius: var(--radius); border: 1px solid var(--border-color); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); overflow: hidden; animation: fadeInDown 0.3s ease-out; }
+        .modal-header { padding: 20px 25px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); }
+        .modal-body { padding: 25px; }
+        .modal-footer { padding: 20px 25px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 10px; background: rgba(255,255,255,0.02); }
+        
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 8px; color: var(--text-muted); }
+        .input-control { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; background: rgba(0,0,0,0.3); color: var(--text-main); font-family: var(--font-body); outline: none; }
+        .input-control:focus { border-color: var(--gold-base); }
+        select.input-control option { background: var(--bg-body); color: var(--text-main); }
+
+        /* PWA Popup */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 20px 10px; width: 100%; max-width: 100vw; overflow-x: hidden; }
+            .kpi-strip { grid-template-columns: 1fr; }
+            .hamburger { display: block; }
+            .header-left { gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="admin-dashboard.html" class="logo">East<span>Link</span> <span class="admin-badge">ADMIN</span></a>
+        </div>
+        
+        <div class="header-actions">
+            <!-- Messages -->
+            <div class="icon-btn" onclick="location.href='admin-support.html'" title="Support Tickets">
+                <i class="fa-solid fa-envelope"></i>
+                <div class="notification-badge" id="msg-badge">0</div>
+            </div>
+            
+            <!-- Notifications -->
+            <div class="icon-btn" onclick="location.href='admin-notifications.html'" title="System Alerts">
+                <i class="fa-solid fa-bell"></i>
+                <div class="notification-badge" id="notif-badge">0</div>
+            </div>
+            
+            <!-- Profile -->
+            <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Analytics</div>
+            <a href="admin-dashboard.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        </div>
+        
+        <div class="nav-group">
+            <div class="nav-label">User Management</div>
+            <a href="admin-users.html" class="nav-item"><i class="fa-solid fa-users"></i> Manage Users</a>
+            <a href="admin-plans.html" class="nav-item"><i class="fa-solid fa-tags"></i> Manage Plans</a>
+            <a href="admin-referrals.html" class="nav-item"><i class="fa-solid fa-share-nodes"></i> Referrals</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Jobs & Service</div>
+            <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
+            <a href="admin-guaranteed-jobs.html" class="nav-item link-pro"><i class="fa-solid fa-certificate" style="color:var(--gold-base);"></i> Guaranteed Jobs</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="admin-deposits.html" class="nav-item"><i class="fa-solid fa-arrow-down" style="color:var(--success);"></i> Deposits</a>
+            <a href="admin-withdrawals.html" class="nav-item active"><i class="fa-solid fa-arrow-up" style="color:var(--danger);"></i> Withdrawals</a>
+            <a href="admin-deposit-issues.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> Errors</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">System</div>
+            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
+            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
+            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- MAIN -->
+    <main>
+        <!-- Page Title -->
+        <div class="animate__animated animate__fadeInDown" style="margin-bottom: 20px;">
+            <h1 style="font-family:var(--font-head); font-size:1.6rem;">Outflow Console</h1>
+            <p style="color:var(--text-muted); font-size:0.9rem;">Process withdrawal requests and manage liability.</p>
+        </div>
+
+        <!-- KPI Strip -->
+        <div class="kpi-strip animate__animated animate__fadeInUp">
+            <div class="glass-panel kpi-card liquidity-alert">
+                <div class="kpi-header">PENDING LIABILITY <i class="fas fa-exclamation-circle" style="color:var(--danger)"></i></div>
+                <div class="kpi-value" id="val-pending-amount">Ksh 0</div>
+                <div class="kpi-trend" style="color:var(--danger);">Total unpaid requests</div>
+            </div>
+            
+            <div class="glass-panel kpi-card">
+                <div class="kpi-header">QUEUE SIZE <i class="fas fa-list-ol" style="color:var(--text-muted)"></i></div>
+                <div class="kpi-value" id="val-pending-count">0</div>
+                <div class="kpi-trend">Requests awaiting action</div>
+            </div>
+
+            <div class="glass-panel kpi-card">
+                <div class="kpi-header">TOTAL PAID OUT <i class="fas fa-hand-holding-dollar" style="color:var(--success)"></i></div>
+                <div class="kpi-value" id="val-total-out" style="color:var(--success);">Ksh 0</div>
+                <div class="kpi-trend">Lifetime successful withdrawals</div>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="glass-panel animate__animated animate__fadeInUp animate__delay-1s">
+            <div class="table-toolbar">
+                <div style="font-weight:700; color:var(--text-main); font-size:0.95rem;">Request Queue</div>
+                <div class="toolbar-actions">
+                    <button class="btn-action export" onclick="exportCSV()">
+                        <i class="fas fa-file-csv"></i> Export Batch
+                    </button>
+                    <select id="filter" class="filter-select" onchange="filterTable()">
+                        <option value="pending">Pending Only</option>
+                        <option value="all">All History</option>
+                    </select>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table id="wd-table">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>User Information</th>
+                            <th>Destination (Mobile)</th>
+                            <th>Amount</th>
+                            <th>Fee / Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <tr><td colspan="7" style="text-align:center; padding:50px; color:var(--text-muted); font-style:italic;">Loading requests...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- REFUND MODAL -->
+    <div class="modal-overlay" id="refundModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 style="margin:0; color:var(--text-main); font-family:var(--font-head);">Refund Transaction</h3>
+                <i class="fas fa-times" onclick="closeModals()" style="cursor:pointer; color:var(--text-muted);"></i>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px; line-height:1.5;">
+                    The deducted funds will be returned to the user's wallet immediately. This action cannot be undone.
+                </p>
+                <input type="hidden" id="ref-tx-id">
+                <input type="hidden" id="ref-user-id">
+                
+                <div class="input-group">
+                    <label>Reason for Refund</label>
+                    <select id="ref-reason" class="input-control">
+                        <option value="Invalid Phone Number">Invalid Phone Number</option>
+                        <option value="Network Failure">Network Failure</option>
+                        <option value="Suspected Fraud">Suspected Fraud</option>
+                        <option value="User Request">User Request</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label>Additional Notes (Internal)</label>
+                    <textarea id="ref-notes" rows="3" class="input-control" placeholder="Optional notes..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-action" onclick="closeModals()" style="border:1px solid var(--border-color);">Cancel</button>
+                <button class="btn-action" onclick="confirmRefund()" style="background:var(--danger); color:white; border:none;">Process Refund</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install Admin App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add to home screen for quick access.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, collection, doc, getDoc, updateDoc, addDoc, query, where, onSnapshot, orderBy, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+
+        // --- UI UTILS ---
+        window.toggleSidebar = () => { 
+            document.getElementById('sidebar').classList.toggle('active'); 
+            document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
+        };
+        
+        window.logout = () => {
+            if(confirm("Confirm Log Out?")) {
+                signOut(auth).then(() => window.location.href = 'signin.html');
+            }
+        };
+
+        window.closeModals = () => document.getElementById('refundModal').classList.remove('active');
+
+        // --- APP LOGIC ---
+        let allTx = [], userCache = {};
+
+        onAuthStateChanged(auth, async (user) => {
+            if(!user) { window.location.href = 'signin.html'; return; }
+            initBadges();
+            loadWithdrawals();
+        });
+
+        function loadWithdrawals() {
+            // Note: Use simple query to avoid needing composite indexes immediately, or create index if console prompts
+            const q = query(collection(db, "transactions"), where("type", "==", "withdrawal"), orderBy("timestamp", "desc"));
+            
+            onSnapshot(q, async (snap) => {
+                allTx = [];
+                let pendingCount = 0, pendingLiability = 0, totalOut = 0;
+
+                const uids = [...new Set(snap.docs.map(d => d.data().userId))];
+                await fetchUserNames(uids);
+
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    const amt = Number(d.amount) || 0;
+                    
+                    if(d.status === 'pending') {
+                        pendingCount++;
+                        pendingLiability += amt;
+                    }
+                    if(d.status === 'success' || d.status === 'completed') totalOut += amt;
+                    
+                    allTx.push({ id: doc.id, ...d, userName: userCache[d.userId] || "Loading..." });
+                });
+
+                document.getElementById('val-pending-amount').innerText = `Ksh ${pendingLiability.toLocaleString()}`;
+                document.getElementById('val-pending-count').innerText = pendingCount;
+                document.getElementById('val-total-out').innerText = `Ksh ${totalOut.toLocaleString()}`;
+                
+                filterTable();
+            });
+        }
+
+        async function fetchUserNames(uids) {
+            const toFetch = uids.filter(id => !userCache[id]);
+            if(toFetch.length === 0) return;
+            for(const uid of toFetch) {
+                try {
+                    const uSnap = await getDoc(doc(db, "users", uid));
+                    userCache[uid] = uSnap.exists() ? (uSnap.data().companyName || uSnap.data().fullName || "User") : "Deleted User";
+                } catch(e) {}
+            }
+        }
+
+        window.filterTable = () => {
+            const filter = document.getElementById('filter').value;
+            const list = filter === 'all' ? allTx : allTx.filter(t => t.status === 'pending');
+            renderTable(list);
+        };
+
+        function renderTable(data) {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+            
+            if(data.length === 0) { 
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; opacity:0.5;">No requests found.</td></tr>`; 
+                return; 
+            }
+
+            data.forEach(tx => {
+                const date = tx.timestamp ? new Date(tx.timestamp.seconds*1000).toLocaleDateString('en-GB', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : 'Processing';
+                const phone = tx.details?.phone || 'N/A';
+                const provider = (tx.details?.provider || 'Mobile').toUpperCase();
+                const fee = Number(tx.fee || 0);
+                const totalDeducted = Number(tx.totalDeducted || (tx.amount + fee));
+                
+                let actions = '-';
+                if(tx.status === 'pending') {
+                    actions = `
+                        <button class="row-action-btn btn-pay" onclick="markPaid('${tx.id}', '${tx.userId}', ${tx.amount}, '${phone}')" title="Confirm Payment">
+                            <i class="fas fa-check"></i> Pay
+                        </button>
+                        <button class="row-action-btn btn-reject" onclick="openRefund('${tx.id}', '${tx.userId}')" title="Refund/Reject">
+                            <i class="fas fa-undo"></i> Refund
+                        </button>
+                    `;
+                }
+
+                // Determine badge class
+                let badgeClass = 'st-pending';
+                if(tx.status === 'success' || tx.status === 'completed') badgeClass = 'st-success';
+                else if(tx.status === 'refunded' || tx.status === 'rejected') badgeClass = 'st-refunded';
+
+                tbody.innerHTML += `
+                    <tr class="animate__animated animate__fadeIn">
+                        <td style="color:var(--text-muted); font-family:var(--font-mono); font-size:0.8rem;">${date}</td>
+                        <td>
+                            <div style="font-weight:600; color:var(--text-main); font-size:0.95rem;">${tx.userName}</div>
+                            <div style="font-size:0.75rem; color:var(--text-muted);">ID: ...${tx.userId.slice(-5)}</div>
+                        </td>
+                        <td>
+                            <div style="font-family:var(--font-mono); font-weight:600; color:var(--gold-base); letter-spacing:0.5px;">${phone}</div>
+                            <div style="font-size:0.7rem; color:var(--text-muted); font-weight:600;">${provider}</div>
+                        </td>
+                        <td style="font-weight:700; font-family:var(--font-display); font-size:1rem;">Ksh ${Number(tx.amount).toLocaleString()}</td>
+                        <td style="font-size:0.8rem;">
+                            <div style="color:var(--text-muted);">Fee: ${fee}</div>
+                            <div style="font-weight:600;">Total: ${totalDeducted.toLocaleString()}</div>
+                        </td>
+                        <td><span class="status-badge ${badgeClass}">${tx.status}</span></td>
+                        <td>${actions}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // --- ACTIONS ---
+        window.markPaid = async (txId, userId, amount, phone) => {
+            if(!confirm(`Confirm you have MANUALLY sent Ksh ${amount} to ${phone}? This will complete the transaction record.`)) return;
+            try {
+                await updateDoc(doc(db, "transactions", txId), { 
+                    status: 'success', 
+                    adminProcessedAt: serverTimestamp() 
+                });
+                
+                // Notify User
+                await addDoc(collection(db, "notifications"), {
+                    userId: userId, 
+                    title: "Withdrawal Sent", 
+                    message: `Funds (Ksh ${amount}) have been sent to your mobile number (${phone}).`, 
+                    type: "transaction", 
+                    read: false, 
+                    timestamp: serverTimestamp()
+                });
+
+                Toastify({ text: "Marked as Paid Successfully", duration: 3000, style: { background: "#10B981" } }).showToast();
+            } catch(e) { 
+                console.error(e); 
+                Toastify({text: "Error updating DB: " + e.message, style:{background:"#EF4444"}}).showToast(); 
+            }
+        };
+
+        window.openRefund = (id, uid) => {
+            document.getElementById('ref-tx-id').value = id;
+            document.getElementById('ref-user-id').value = uid;
+            document.getElementById('refundModal').classList.add('active');
+        };
+
+        window.confirmRefund = async () => {
+            const txId = document.getElementById('ref-tx-id').value;
+            const userId = document.getElementById('ref-user-id').value;
+            const reason = document.getElementById('ref-reason').value;
+            const notes = document.getElementById('ref-notes').value;
+            const fullReason = notes ? `${reason} - ${notes}` : reason;
+
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const userRef = doc(db, "users", userId);
+                    const txRef = doc(db, "transactions", txId);
+                    
+                    const userDoc = await transaction.get(userRef);
+                    const txDoc = await transaction.get(txRef);
+                    
+                    if(!txDoc.exists()) throw "Transaction not found";
+                    if(!userDoc.exists()) throw "User profile not found";
+
+                    const txData = txDoc.data();
+                    if(txData.status !== 'pending') throw "Transaction already processed";
+
+                    const refundAmount = txData.totalDeducted || (txData.amount + (txData.fee || 0));
+                    const currentBal = userDoc.data().walletBalance || 0;
+                    const newBal = currentBal + refundAmount;
+
+                    // Update User Wallet
+                    transaction.update(userRef, { walletBalance: newBal });
+                    
+                    // Update Transaction Status
+                    transaction.update(txRef, { 
+                        status: 'refunded', 
+                        refundReason: fullReason, 
+                        adminProcessedAt: serverTimestamp() 
+                    });
+                    
+                    // Add Notification
+                    const notifRef = doc(collection(db, "notifications"));
+                    transaction.set(notifRef, {
+                        userId: userId, 
+                        title: "Withdrawal Refunded", 
+                        message: `Ksh ${refundAmount.toLocaleString()} has been returned to your wallet. Reason: ${fullReason}`, 
+                        type: "alert", 
+                        read: false, 
+                        timestamp: serverTimestamp()
+                    });
+                });
+                
+                closeModals();
+                Toastify({ text: "Refund Processed Successfully", duration: 3000, style: { background: "#3B82F6" } }).showToast();
+            } catch(e) {
+                console.error("Refund Error:", e);
+                Toastify({ text: "Refund Failed: " + e, duration: 4000, style: { background: "#EF4444" } }).showToast();
+            }
+        };
+
+        window.exportCSV = () => {
+            const pending = allTx.filter(t => t.status === 'pending');
+            if(pending.length === 0) return Toastify({text: "No pending payouts to export", style:{background:"#EF4444"}}).showToast();
+
+            let csvContent = "data:text/csv;charset=utf-8,MobileNumber,Amount,Name,Provider\n";
+            pending.forEach(tx => {
+                const phone = tx.details?.phone || "";
+                csvContent += `${phone},${tx.amount},"${tx.userName}",${tx.details?.provider || 'M-PESA'}\n`;
+            });
+
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csvContent));
+            link.setAttribute("download", "payouts_" + new Date().toISOString().slice(0,10) + ".csv");
+            document.body.appendChild(link);
+            link.click();
+        };
+
+        function initBadges() {
+            const txQ = query(collection(db, "transactions"), where("status", "==", "pending"));
+            onSnapshot(txQ, (snap) => {
+                const count = snap.size;
+                const badge = document.getElementById('notif-badge');
+                if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
+                else badge.style.display = 'none';
+            });
+            
+            const msgQ = query(collection(db, "support_tickets"), where("status", "==", "open"));
+             onSnapshot(msgQ, (snap) => {
+                const count = snap.size;
+                const badge = document.getElementById('msg-badge');
+                if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
+                else badge.style.display = 'none';
+            });
+        }
+
+        // --- PWA LOGIC ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('pwa-install-popup').style.display = 'block';
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('pwa-install-popup').style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            document.getElementById('pwa-install-popup').style.display = 'none';
+        };
+
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
+        }
+    </script>
+</body>
+</html>

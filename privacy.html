@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en" style="background-color: #020617; color-scheme: dark;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Privacy Policy | EastLink Recruiters</title>
+    
+    <!-- PWA Manifest & Favicon (Updated Paths) -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
+    <meta name="theme-color" content="#020617">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        /* =========================================
+           THEME VARIABLES
+           ========================================= */
+        :root {
+            --primary: #f59e0b;
+            --primary-dark: #d97706;
+            --bg: #020617; 
+            --bg-glass-70: rgba(15, 23, 42, 0.9); /* Increased opacity for better readability */
+            --text: #F8FAFC;
+            --text-muted: #94A3B8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --header-height: 80px;
+            --transition: all 0.3s ease;
+            --radius: 16px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        
+        /* FORCE DARK BACKGROUND */
+        html {
+            background-color: #020617;
+            scroll-behavior: smooth;
+            scroll-padding-top: 120px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            /* Fallback image handling - Relative Path */
+            background-image: url('./assets/images/background.png');
+            background-attachment: fixed;
+            background-position: center;
+            background-size: cover;
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        /* Scrollbar Fix */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 5px; border: 2px solid var(--bg); }
+
+        h1, h2, h3, .brand-font { font-family: 'Cinzel', serif; }
+        a { text-decoration: none; color: inherit; transition: var(--transition); }
+        
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* HEADER */
+        header {
+            position: fixed; top: 0; width: 100%; height: var(--header-height);
+            z-index: 1000; background: var(--bg-glass-70);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .nav-inner { height: 100%; display: flex; justify-content: space-between; align-items: center; }
+
+        .header-logo-text {
+            font-family: 'Cinzel', serif; font-size: 1.4rem; font-weight: 700; 
+            color: var(--text); letter-spacing: 1px; display: flex; align-items: center; gap: 12px;
+        }
+        .header-logo-text span { color: var(--primary); }
+
+        .menu-trigger {
+            display: inline-flex; align-items: center; gap: 12px; cursor: pointer;
+            padding: 8px 20px; border-radius: 99px;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);
+            color: var(--text); font-size: 0.75rem; font-weight: 600;
+        }
+
+        /* MOBILE MENU */
+        .menu-overlay {
+            position: fixed; inset: 0; 
+            background: #020617; /* Solid color for mobile menu to prevent transparency issues */
+            z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: 0.3s;
+        }
+        .menu-overlay.active { opacity: 1; pointer-events: all; }
+        
+        .close-menu {
+            position: absolute; top: 30px; right: 30px;
+            width: 44px; height: 44px; border-radius: 50%;
+            border: 1px solid var(--border-color); color: var(--text-muted);
+            display: grid; place-items: center; cursor: pointer; font-size: 1.2rem;
+        }
+        .menu-links { text-align: center; display: flex; flex-direction: column; gap: 25px; }
+        .menu-link { font-family: 'Cinzel', serif; font-size: 2rem; font-weight: 700; color: var(--text); }
+        .menu-actions { margin-top: 50px; display: flex; gap: 15px; }
+
+        /* CONTENT */
+        .page-intro {
+            padding: calc(var(--header-height) + 40px) 0 40px; 
+            text-align: center; border-bottom: 1px solid var(--border-color);
+            margin-bottom: 60px;
+        }
+        .page-intro h2 { font-size: 2.5rem; margin-bottom: 10px; color: var(--text); }
+
+        .docs-layout {
+            display: grid; grid-template-columns: 280px 1fr; gap: 60px; padding-bottom: 80px;
+            align-items: start;
+        }
+
+        .docs-sidebar {
+            position: sticky; top: 120px; height: fit-content;
+            background: var(--bg-glass-70); border: 1px solid var(--border-color);
+            padding: 30px; border-radius: var(--radius);
+        }
+        .toc-list li { list-style: none; margin-bottom: 10px; }
+        .toc-link { font-size: 0.9rem; color: var(--text-muted); display: block; padding: 8px 15px; border-left: 2px solid transparent; }
+        .toc-link.active { color: var(--text); border-left-color: var(--primary); background: rgba(255,255,255,0.03); }
+
+        .docs-content {
+            background: var(--bg-glass-70); padding: 50px; border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+        }
+        .section-block { margin-bottom: 50px; }
+        .section-block h2 { font-size: 1.8rem; color: var(--text); margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
+        .section-block h3 { font-size: 1.2rem; color: var(--primary); margin: 30px 0 15px; font-weight: 600; }
+        .section-block p, .section-block ul { color: var(--text-muted); margin-bottom: 15px; line-height: 1.8; }
+        .highlight-box { background: rgba(245, 158, 11, 0.1); border-left: 4px solid var(--primary); padding: 25px; border-radius: 8px; margin: 30px 0; }
+        .highlight-box p { margin: 0; color: var(--text); }
+
+        /* FOOTER */
+        footer { background: var(--bg-glass-70); border-top: 1px solid var(--border-color); padding-top: 4rem; margin-top: auto; }
+        .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; margin-bottom: 4rem; }
+        .f-col h4 { font-size: 0.9rem; color: var(--text); margin-bottom: 1.5rem; font-weight: 700; text-transform: uppercase; font-family: 'Cinzel', serif; }
+        .f-col ul { list-style: none; }
+        .f-col ul li { margin-bottom: 12px; }
+        .f-col a { color: var(--text-muted); font-size: 0.9rem; }
+        .social-links { display: flex; gap: 10px; margin-top: 25px; }
+        .s-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-muted); display: grid; place-items: center; }
+        .copyright { border-top: 1px solid var(--border-color); padding: 2rem 0; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+
+        @media (max-width: 900px) {
+            .docs-layout { grid-template-columns: 1fr; }
+            .docs-sidebar { display: none; }
+            .docs-content { padding: 30px; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 600px) {
+            .footer-grid { grid-template-columns: 1fr; }
+            .page-intro h2 { font-size: 1.8rem; }
+            .header-logo-text div { display: none; } /* Show only icon on very small screens to save space */
+        }
+    </style>
+</head>
+<body style="background-color: #020617;">
+
+    <!-- Scroll Progress -->
+    <div id="scroll-progress" style="position: fixed; top: 0; left: 0; height: 3px; background: var(--primary); z-index: 2000; width: 0%;"></div>
+
+    <!-- HEADER -->
+    <header id="header">
+        <div class="container nav-inner">
+            <a href="index.html" class="header-logo-text">
+                <img src="./assets/images/logo.png" style="height:35px; width:auto;" alt="Logo">
+                <div style="display:block;">EAST<span>LINK</span></div>
+            </a>
+            <div class="menu-trigger" onclick="toggleMenu()">
+                <span>MENU</span>
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- MENU OVERLAY -->
+    <div class="menu-overlay" id="menuOverlay">
+        <div class="close-menu" onclick="toggleMenu()"><i class="fas fa-times"></i></div>
+        <div class="menu-links">
+            <a href="index.html" class="menu-link">Home</a>
+            <a href="about.html" class="menu-link">About Us</a>
+            <a href="contact.html" class="menu-link">Contact</a>
+        </div>
+        <div class="menu-actions">
+            <a href="signin.html" class="btn" style="color:white; border:1px solid var(--border-color); border-radius:50px; padding:12px 30px; text-decoration:none;">Sign In</a>
+            <a href="signup.html" class="btn" style="background:var(--primary); color:black; border-radius:50px; padding:12px 30px; font-weight:700; text-decoration:none;">Join Now</a>
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <main>
+        <div class="container">
+            
+            <!-- Page Intro -->
+            <div class="page-intro">
+                <h2 class="brand-font">Privacy Policy</h2>
+                <p>Effective Date: <span id="date-display" style="color:var(--primary); font-weight:600;">January 1, 2025</span></p>
+            </div>
+
+            <div class="docs-layout">
+                
+                <!-- Sidebar -->
+                <aside class="docs-sidebar">
+                    <div class="toc-title">Table of Contents</div>
+                    <ul class="toc-list">
+                        <li><a href="#intro" class="toc-link active">1. Introduction</a></li>
+                        <li><a href="#collection" class="toc-link">2. Information We Collect</a></li>
+                        <li><a href="#usage" class="toc-link">3. How We Use Data</a></li>
+                        <li><a href="#sharing" class="toc-link">4. Data Sharing</a></li>
+                        <li><a href="#security" class="toc-link">5. Data Security</a></li>
+                        <li><a href="#rights" class="toc-link">6. User Rights</a></li>
+                        <li><a href="#contact" class="toc-link">7. Contact Us</a></li>
+                    </ul>
+                </aside>
+
+                <!-- Main Text Content -->
+                <article class="docs-content">
+                    
+                    <div id="intro" class="section-block">
+                        <h2 class="brand-font">1. Introduction</h2>
+                        <p>At EastLink Recruiters ("EastLink," "we," "us," or "our"), we value your trust and are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website and use our recruitment services.</p>
+                        <p>Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access the site.</p>
+                    </div>
+
+                    <div id="collection" class="section-block">
+                        <h2 class="brand-font">2. Information We Collect</h2>
+                        <h3>2.1 Personal Data</h3>
+                        <p>We may collect personally identifiable information that you voluntarily provide to us when registering, such as your name, email address, phone number, and professional resume/CV details.</p>
+                        
+                        <h3>2.2 Usage Data</h3>
+                        <p>Our servers automatically collect information when you access the Site, such as your IP address, browser type, operating system, access times, and the pages you have viewed directly before and after accessing the Site.</p>
+
+                        <div class="highlight-box">
+                            <p><strong>Note on Sensitive Data:</strong> We do not knowingly collect sensitive data such as political opinions, religious beliefs, or health status unless required for specific background checks authorized by you.</p>
+                        </div>
+                    </div>
+
+                    <div id="usage" class="section-block">
+                        <h2 class="brand-font">3. How We Use Your Information</h2>
+                        <p>Having accurate information about you permits us to provide you with a smooth, efficient, and customized experience. Specifically, we may use information collected about you via the Site to:</p>
+                        <ul>
+                            <li>Create and manage your account.</li>
+                            <li>Match Job Seekers with potential Employers.</li>
+                            <li>Process payments and refunds.</li>
+                            <li>Send you email notifications regarding your account or job alerts.</li>
+                            <li>Prevent fraudulent transactions and monitor against theft.</li>
+                        </ul>
+                    </div>
+
+                    <div id="sharing" class="section-block">
+                        <h2 class="brand-font">4. Data Sharing</h2>
+                        <p>We may share information we have collected about you in certain situations. Your information may be disclosed as follows:</p>
+                        <ul>
+                            <li><strong>With Employers:</strong> We share Job Seeker profiles (excluding contact info until a match is made) with Employers for recruitment purposes.</li>
+                            <li><strong>Third-Party Service Providers:</strong> We may share information with third parties that perform services for us, such as payment processing (Stripe/M-Pesa), data analysis, email delivery, and hosting services.</li>
+                            <li><strong>By Law or to Protect Rights:</strong> If we believe the release of information about you is necessary to respond to legal process, to investigate or remedy potential violations of our policies, or to protect the rights, property, and safety of others.</li>
+                        </ul>
+                    </div>
+
+                    <div id="security" class="section-block">
+                        <h2 class="brand-font">5. Data Security</h2>
+                        <p>We use administrative, technical, and physical security measures to help protect your personal information. While we have taken reasonable steps to secure the personal information you provide to us, please be aware that despite our efforts, no security measures are perfect or impenetrable, and no method of data transmission can be guaranteed against any interception or other type of misuse.</p>
+                    </div>
+
+                    <div id="rights" class="section-block">
+                        <h2 class="brand-font">6. User Rights</h2>
+                        <p>Depending on your location, you may have the following rights regarding your personal data:</p>
+                        <ul>
+                            <li><strong>Right to Access:</strong> Request copies of your personal data.</li>
+                            <li><strong>Right to Rectification:</strong> Request correction of any inaccurate information.</li>
+                            <li><strong>Right to Erasure:</strong> Request that we delete your personal data ("Right to be Forgotten").</li>
+                        </ul>
+                        <p>To exercise these rights, please contact us using the information provided below.</p>
+                    </div>
+
+                    <div id="contact" class="section-block">
+                        <h2 class="brand-font">7. Contact Us</h2>
+                        <p>If you have questions or comments about this Privacy Policy, please contact us at:</p>
+                        <p>
+                            <strong>Email:</strong> <a href="mailto:eastlinkrecruiters@gmail.com" style="color:var(--primary); font-weight:600;">eastlinkrecruiters@gmail.com</a><br>
+                            <strong>Phone:</strong> <a href="tel:+254781842387" style="color:var(--primary); font-weight:600;">+254 781 842 387</a><br>
+                            <strong>Address:</strong> Nairobi, Kenya
+                        </p>
+                    </div>
+
+                </article>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="f-col">
+                    <div class="logo" style="margin-bottom:20px; font-weight:700; font-size:1.4rem; display:flex; align-items:center; gap:10px; font-family: 'Cinzel', serif;">
+                        <img src="./assets/images/logo.png" style="height:35px; width:auto;" alt="EastLink">
+                        <div style="color:white;">EAST<span style="color:var(--primary);">LINK</span></div>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.6;">The leading platform for professional recruitment. We ensure quality, trust, and speed.</p>
+                    <div class="social-links">
+                        <a href="#" id="link-fb" class="s-btn" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" id="link-in" class="s-btn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" id="link-tw" class="s-btn" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="#" id="link-ig" class="s-btn" target="_blank"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="f-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="services.html">Our Services</a></li>
+                        <li><a href="careers.html">Careers</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="f-col">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="signin.html">Client Portal</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">&copy; <span id="year"></span> EastLink Recruitment Solutions. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" style="
+        display: none; 
+        position: fixed; bottom: 20px; right: 20px; 
+        background: rgba(15, 23, 42, 0.95); 
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        backdrop-filter: blur(12px);
+        padding: 20px; border-radius: 16px; 
+        z-index: 10000; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        max-width: 320px; animation: slideUp 0.5s ease-out;
+    ">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+            <img src="./assets/images/logo.png" style="width:50px; height:50px; border-radius:10px;">
+            <div>
+                <h4 style="color:#fff; margin:0; font-family:'Cinzel', serif;">Install EastLink</h4>
+                <p style="color:#94A3B8; margin:5px 0 0; font-size:0.8rem;">Add to Home Screen for fast access.</p>
+            </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button id="pwa-dismiss" style="flex:1; padding:10px; background:transparent; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:8px; cursor:pointer;">Later</button>
+            <button id="pwa-install-btn" style="flex:1; padding:10px; background:linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border:none; color:#000; font-weight:700; border-radius:8px; cursor:pointer;">Install</button>
+        </div>
+    </div>
+    <style>@keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }</style>
+
+    <!-- SCRIPTS -->
+    <script>
+        // --- BASIC UI ---
+        document.getElementById("year").textContent = new Date().getFullYear();
+        document.getElementById('date-display').innerText = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        window.toggleMenu = () => {
+            const menu = document.getElementById('menuOverlay');
+            menu.classList.toggle('active');
+            document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : 'auto';
+        };
+
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            const progressBar = document.getElementById("scroll-progress");
+            if(progressBar) progressBar.style.width = scrolled + "%";
+        });
+
+        // --- TOC SPY ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    document.querySelectorAll('.toc-link').forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href').substring(1) === entry.target.id) {
+                            link.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, { threshold: 0.2, rootMargin: "-20% 0px -50% 0px" });
+
+        document.querySelectorAll('.section-block').forEach(section => {
+            observer.observe(section);
+        });
+
+        // --- PWA LOGIC START ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('SW Registered'))
+                    .catch(err => console.log('SW Failed', err));
+            });
+        }
+        let deferredPrompt;
+        const pwaPopup = document.getElementById('pwa-install-popup');
+        const installBtn = document.getElementById('pwa-install-btn');
+        const dismissBtn = document.getElementById('pwa-dismiss');
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            setTimeout(() => { pwaPopup.style.display = 'block'; }, 3000);
+        });
+        installBtn.addEventListener('click', (e) => {
+            pwaPopup.style.display = 'none';
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => { deferredPrompt = null; });
+            }
+        });
+        dismissBtn.addEventListener('click', () => { pwaPopup.style.display = 'none'; });
+        window.addEventListener('appinstalled', () => { pwaPopup.style.display = 'none'; });
+        // --- PWA LOGIC END ---
+    </script>
+
+    <!-- FIREBASE (Error Handled) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        
+        try {
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+
+            async function loadSocials() {
+                try {
+                    const docRef = doc(db, "site_settings", "general"); 
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        if(data.facebook) document.getElementById('link-fb').href = data.facebook;
+                        if(data.linkedin) document.getElementById('link-in').href = data.linkedin;
+                        if(data.twitter) document.getElementById('link-tw').href = data.twitter;
+                        if(data.instagram) document.getElementById('link-ig').href = data.instagram;
+                    }
+                } catch (e) { console.log("Socials failed to load"); }
+            }
+            loadSocials();
+        } catch (e) {
+            console.log("Firebase failed to load, page continuing.");
+        }
+    </script>
+</body>
+</html>

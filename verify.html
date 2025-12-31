@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Verify Email | EastLink Recruiters</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0F172A">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons & Animation & Toast -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        /* =========================================
+           THEME VARIABLES (DARK/DASHBOARD THEME)
+           ========================================= */
+        :root {
+            --bg-body: #0F172A;       
+            --bg-card: rgba(30, 41, 59, 0.65);
+            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.95);
+            
+            --primary: #D97706; /* Gold Base */
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            
+            /* Text Colors */
+            --text: #F8FAFC;
+            --text-muted: #94A3B8;
+            
+            --border-color: rgba(255, 255, 255, 0.12);
+            --transition: all 0.3s ease;
+            --radius: 16px;
+            
+            --success: #10B981;
+            --danger: #EF4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            background-image: url('assets/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            
+            /* Center Content */
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            padding: 20px;
+        }
+
+        h1, h2, h3, .brand-font { font-family: 'Cinzel', serif; }
+        a { text-decoration: none; color: inherit; transition: var(--transition); }
+
+        /* --- VERIFICATION CARD --- */
+        .auth-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius); 
+            padding: 50px 40px; 
+            width: 100%; max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Branding inside card */
+        .card-brand {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            margin-bottom: 30px; font-size: 1.4rem; font-weight: 700; color: var(--text);
+        }
+        .card-brand span { color: var(--primary); }
+        .card-brand img { height: 35px; width: auto; }
+
+        /* Icon Animation */
+        .icon-container { position: relative; width: 100px; height: 100px; margin: 0 auto 30px; }
+        .icon-bg {
+            position: absolute; inset: 0; background: rgba(217, 119, 6, 0.1);
+            border-radius: 50%; border: 1px solid rgba(217, 119, 6, 0.3);
+            display: flex; align-items: center; justify-content: center; z-index: 2;
+        }
+        .icon-bg i { font-size: 2.5rem; color: var(--primary); }
+        
+        /* Radar Pulse Effect */
+        .pulse-ring {
+            position: absolute; inset: 0; border-radius: 50%; border: 1px solid var(--primary);
+            opacity: 0; z-index: 1; animation: pulse 2s infinite;
+        }
+        .pulse-ring:nth-child(2) { animation-delay: 0.5s; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(1.5); opacity: 0; } }
+
+        h1 { font-size: 1.8rem; margin-bottom: 15px; color: var(--text); }
+        p.desc { color: var(--text-muted); margin-bottom: 10px; font-size: 1rem; line-height: 1.6; }
+        
+        .email-highlight { 
+            color: var(--primary); font-weight: 600; 
+            background: rgba(217, 119, 6, 0.1); 
+            padding: 4px 12px; border-radius: 6px; 
+            border: 1px solid rgba(217, 119, 6, 0.2);
+        }
+
+        /* Actions */
+        .action-area { margin-top: 40px; }
+        
+        .btn-inbox {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; padding: 16px; border-radius: 50px; border: none;
+            background: var(--gold-gradient); color: #000; font-weight: 700; font-size: 1rem;
+            cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
+            text-decoration: none;
+        }
+        .btn-inbox:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(217, 119, 6, 0.4); }
+
+        .resend-area { margin-top: 25px; font-size: 0.9rem; color: var(--text-muted); }
+        .btn-resend { 
+            color: var(--text); font-weight: 600; cursor: pointer; text-decoration: underline; 
+            transition: 0.3s; background: none; border: none; padding: 0; font-size: 0.9rem; 
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-resend:hover { color: var(--primary); }
+        .btn-resend:disabled { color: var(--text-muted); opacity: 0.5; cursor: not-allowed; text-decoration: none; }
+
+        .back-link {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            margin-top: 25px; color: var(--text-muted); font-size: 0.9rem; font-weight: 500;
+        }
+        .back-link:hover { color: var(--primary); }
+
+        /* Loader */
+        #preloader {
+            position: fixed; inset: 0; background: var(--bg-body); z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.5s ease;
+        }
+
+        /* PWA Popup */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--primary);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+    </style>
+</head>
+<body>
+
+    <!-- PRELOADER -->
+    <div id="preloader">
+        <div style="text-align:center;">
+            <img src="assets/images/logo.png" style="width:70px; height:auto; margin-bottom:20px;">
+            <div style="width:150px; height:2px; background:rgba(255,255,255,0.1); overflow:hidden; border-radius:2px;">
+                <div style="width:100%; height:100%; background:var(--gold-gradient); animation:loading 1.5s infinite ease-in-out; transform-origin:left;"></div>
+            </div>
+            <style>@keyframes loading { 0% { transform: scaleX(0); } 50% { transform: scaleX(1); } 100% { transform: scaleX(0); transform-origin:right; } }</style>
+        </div>
+    </div>
+
+    <!-- MAIN CARD -->
+    <div class="auth-card" data-aos="zoom-in">
+        
+        <!-- Branding (Since header is gone) -->
+        <div class="card-brand brand-font">
+            <img src="assets/images/logo.png" alt="Logo">
+            <div>EAST<span>LINK</span></div>
+        </div>
+
+        <!-- Pulse Animation -->
+        <div class="icon-container">
+            <div class="pulse-ring"></div>
+            <div class="pulse-ring"></div>
+            <div class="icon-bg">
+                <i class="fas fa-envelope-open-text"></i>
+            </div>
+        </div>
+
+        <h1 class="brand-font">Verify Your Email</h1>
+        <p class="desc">We've sent a verification link to:</p>
+        <p class="desc"><span class="email-highlight" id="userEmail">loading...</span></p>
+        <p class="desc" style="font-size: 0.9rem; margin-top: 20px; opacity: 0.8; border-top:1px solid var(--border-color); padding-top:20px;">
+            Click the link in that email to activate your account. <br>This page will auto-refresh once verified.
+        </p>
+
+        <div class="action-area">
+            <!-- Dynamic Link Button -->
+            <a href="#" id="inboxBtn" class="btn-inbox" target="_blank">
+                <i class="fas fa-paper-plane"></i> <span id="inboxText">Open Email App</span>
+            </a>
+
+            <div class="resend-area">
+                Didn't receive it? 
+                <button id="resendBtn" class="btn-resend" onclick="resendVerification()">Resend Email</button>
+                <span id="timer" style="display:none; color:var(--primary); font-weight:600;">(60s)</span>
+            </div>
+            
+            <a href="signin.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Login</a>
+        </div>
+
+    </div>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add EastLink to home screen.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, sendEmailVerification, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // --- INIT UI ---
+        AOS.init({ duration: 800, offset: 50, once: true });
+
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            preloader.style.opacity = '0';
+            setTimeout(() => preloader.style.display = 'none', 500);
+        });
+
+        // --- MAIN VERIFICATION LOGIC ---
+        let currentUser = null;
+        let checkInterval = null;
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('userEmail').innerText = user.email;
+                
+                if (user.emailVerified) {
+                    handleVerified();
+                } else {
+                    configureInboxButton(user.email);
+                    startPolling();
+                }
+            } else {
+                window.location.href = 'signin.html';
+            }
+        });
+
+        // --- SMART INBOX BUTTON ---
+        function configureInboxButton(email) {
+            const btn = document.getElementById('inboxBtn');
+            const txt = document.getElementById('inboxText');
+            const domain = email.split('@')[1].toLowerCase();
+
+            if (domain.includes('gmail.com')) {
+                btn.href = "https://mail.google.com/mail/u/0/#search/from%3Aeastlink%20verification";
+                txt.innerText = "Open Gmail";
+            } else if (domain.includes('outlook.com') || domain.includes('hotmail.com')) {
+                btn.href = "https://outlook.live.com/mail/0/inbox";
+                txt.innerText = "Open Outlook";
+            } else if (domain.includes('yahoo.com')) {
+                btn.href = "https://mail.yahoo.com";
+                txt.innerText = "Open Yahoo Mail";
+            } else {
+                btn.href = `mailto:`;
+                txt.innerText = "Open Email App";
+            }
+        }
+
+        // --- AUTO-POLLING ---
+        function startPolling() {
+            checkInterval = setInterval(async () => {
+                if (auth.currentUser) {
+                    await auth.currentUser.reload();
+                    if (auth.currentUser.emailVerified) {
+                        clearInterval(checkInterval);
+                        handleVerified();
+                    }
+                }
+            }, 3000);
+        }
+
+        // --- SUCCESS HANDLER ---
+        function handleVerified() {
+            showToast("Email Verified Successfully! Redirecting...", "success");
+            const card = document.querySelector('.auth-card');
+            card.style.opacity = '0.5';
+            card.style.pointerEvents = 'none';
+            document.querySelector('.pulse-ring').style.display = 'none';
+            
+            setTimeout(() => {
+                window.location.href = 'signin.html';
+            }, 2000);
+        }
+
+        // --- RESEND LOGIC WITH COOLDOWN ---
+        window.resendVerification = async () => {
+            const btn = document.getElementById('resendBtn');
+            const timerSpan = document.getElementById('timer');
+
+            if (btn.disabled) return;
+
+            try {
+                await sendEmailVerification(currentUser);
+                showToast("Verification email sent!", "success");
+                
+                btn.disabled = true;
+                btn.innerText = "Wait to resend";
+                timerSpan.style.display = "inline";
+                
+                let timeLeft = 60;
+                const timerId = setInterval(() => {
+                    timeLeft--;
+                    timerSpan.innerText = `(${timeLeft}s)`;
+                    if (timeLeft <= 0) {
+                        clearInterval(timerId);
+                        btn.disabled = false;
+                        btn.innerText = "Resend Email";
+                        timerSpan.style.display = "none";
+                    }
+                }, 1000);
+
+            } catch (error) {
+                console.error(error);
+                let msg = "Could not send email.";
+                if(error.code === 'auth/too-many-requests') msg = "Too many requests. Please wait.";
+                showToast(msg, "error");
+            }
+        };
+
+        function showToast(msg, type) {
+            let bg = type === 'error' ? "linear-gradient(to right, #EF4444, #B91C1C)" : "linear-gradient(to right, #10B981, #059669)";
+            Toastify({ 
+                text: msg, 
+                duration: 3000, 
+                gravity: "top", 
+                position: "center", 
+                style: { 
+                    background: bg, 
+                    borderRadius:'12px', 
+                    fontWeight:'600',
+                    color: '#ffffff',
+                    boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
+                } 
+            }).showToast();
+        }
+
+        // --- PWA LOGIC ---
+        let deferredPrompt;
+        const pwaPopup = document.getElementById('pwa-install-popup');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if(!localStorage.getItem('pwaDismissed')) {
+                pwaPopup.style.display = 'flex';
+            }
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                pwaPopup.style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            pwaPopup.style.display = 'none';
+            localStorage.setItem('pwaDismissed', 'true');
+        };
+
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./service-worker.js");
+        }
+    </script>
+</body>
+</html>

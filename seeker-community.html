@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EastLink Community</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#111B21">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Segoe+UI+Emoji&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* WhatsApp Dark Theme Variables */
+            --wa-bg: #0b141a;
+            --wa-header: #1f2c34;
+            --wa-panel: #111b21;
+            --wa-bubble-in: #202c33;
+            --wa-bubble-out: #005c4b;
+            --wa-accent: #00a884;
+            --wa-text-main: #e9edef;
+            --wa-text-sec: #8696a0;
+            --wa-danger: #ef4444;
+            
+            /* App Brand Colors (For PWA Popup) */
+            --gold-base: #D97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            
+            --header-height: 60px;
+            --font-body: 'Inter', 'Segoe UI Emoji', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--wa-bg); 
+            color: var(--wa-text-main); 
+            height: 100vh; 
+            overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--wa-header); 
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 15px; z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn { 
+            color: var(--wa-text-main); font-size: 1.2rem; cursor: pointer; 
+            width: 40px; height: 40px; display: grid; place-items: center; 
+            border-radius: 50%; transition: 0.2s; text-decoration: none;
+        }
+        .nav-btn:active { background: rgba(255,255,255,0.1); }
+
+        .group-info { 
+            flex: 1; display: flex; align-items: center; gap: 10px; 
+            margin: 0 10px; cursor: pointer; overflow: hidden; 
+        }
+        .group-avatar { 
+            width: 40px; height: 40px; border-radius: 50%; 
+            background: linear-gradient(135deg, #00a884, #005c4b); 
+            display: grid; place-items: center; font-size: 1.2rem; color: white; flex-shrink: 0;
+        }
+        .group-text h3 { font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .group-text p { font-size: 0.75rem; color: var(--wa-text-sec); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* --- MAIN CHAT AREA --- */
+        main {
+            margin-top: var(--header-height);
+            flex: 1; position: relative; display: flex; flex-direction: column;
+            background-color: var(--wa-bg);
+            background-image: url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png");
+            background-size: 400px;
+            opacity: 1;
+        }
+        /* Dark overlay for background image */
+        main::before {
+            content: ''; position: absolute; inset: 0; background: rgba(11, 20, 26, 0.92); pointer-events: none;
+        }
+
+        /* --- JOIN OVERLAY (Gatekeeping) --- */
+        .join-overlay {
+            position: absolute; inset: 0; background: var(--wa-bg); z-index: 50; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            text-align: center; padding: 30px;
+        }
+        .join-card { max-width: 400px; padding: 30px; background: var(--wa-panel); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .join-icon { font-size: 3rem; color: var(--wa-accent); margin-bottom: 20px; }
+        .join-btn { 
+            background: var(--wa-accent); color: #111b21; padding: 12px 32px; 
+            border-radius: 24px; border: none; font-weight: 600; font-size: 1rem; 
+            cursor: pointer; margin-top: 20px; width: 100%;
+        }
+        
+        /* --- MESSAGES LIST --- */
+        .chat-container {
+            flex: 1; overflow-y: auto; padding: 20px 5%; 
+            display: flex; flex-direction: column; gap: 2px;
+            position: relative; z-index: 1; scroll-behavior: smooth;
+        }
+        .chat-container::-webkit-scrollbar { width: 6px; }
+        .chat-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+
+        /* Date Divider */
+        .date-divider {
+            align-self: center; background: var(--wa-header); color: var(--wa-text-sec);
+            padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; margin: 15px 0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2); text-transform: uppercase;
+        }
+
+        /* Message Row */
+        .msg-row { 
+            display: flex; width: 100%; position: relative; margin-bottom: 4px;
+        }
+        .msg-row.sent { justify-content: flex-end; }
+        .msg-row.received { justify-content: flex-start; }
+        .msg-row.group-start { margin-top: 8px; } /* Gap between different users */
+
+        /* Bubble */
+        .bubble {
+            max-width: 80%; padding: 6px 8px 8px 9px; border-radius: 8px; position: relative;
+            font-size: 0.95rem; line-height: 1.4; min-width: 80px; color: var(--wa-text-main);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.15); word-wrap: break-word;
+        }
+        
+        /* Tails */
+        .msg-row.group-start.sent .bubble { border-top-right-radius: 0; }
+        .msg-row.group-start.sent .bubble::before {
+            content: ""; position: absolute; top: 0; right: -8px; width: 0; height: 0;
+            border: 8px solid transparent; border-top-color: var(--wa-bubble-out); border-right: 0; margin-top: -0px;
+        }
+        
+        .msg-row.group-start.received .bubble { border-top-left-radius: 0; }
+        .msg-row.group-start.received .bubble::before {
+            content: ""; position: absolute; top: 0; left: -8px; width: 0; height: 0;
+            border: 8px solid transparent; border-top-color: var(--wa-bubble-in); border-left: 0; margin-top: -0px;
+        }
+
+        .sent .bubble { background: var(--wa-bubble-out); }
+        .received .bubble { background: var(--wa-bubble-in); }
+
+        /* Sender Name (Only in Group Start Received) */
+        .sender-name { 
+            font-size: 0.8rem; font-weight: 600; margin-bottom: 2px; display: none; 
+            cursor: pointer; color: #53bdeb; /* Default blueish */
+        }
+        .msg-row.group-start.received .sender-name { display: block; }
+        .admin-tag { font-size: 0.65rem; border: 1px solid var(--wa-accent); color: var(--wa-accent); border-radius: 4px; padding: 0 4px; margin-left: 5px; }
+
+        /* Message Metadata */
+        .msg-meta { 
+            float: right; margin-left: 8px; margin-top: 4px; display: flex; align-items: flex-end; gap: 4px; opacity: 0.7; 
+        }
+        .time { font-size: 0.7rem; color: var(--wa-text-sec); }
+        .checks { font-size: 0.75rem; color: #53bdeb; } /* Blue ticks */
+        .checks.pending { color: var(--wa-text-sec); }
+
+        /* Reply Context */
+        .reply-context {
+            background: rgba(0,0,0,0.2); border-left: 4px solid var(--wa-accent);
+            padding: 6px; border-radius: 4px; margin-bottom: 4px; cursor: pointer; display: flex; flex-direction: column;
+        }
+        .reply-context strong { font-size: 0.8rem; color: var(--wa-accent); }
+        .reply-context span { font-size: 0.8rem; color: var(--wa-text-sec); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* --- INPUT AREA --- */
+        .chat-footer {
+            background: var(--wa-header); padding: 8px 10px; display: flex; align-items: flex-end; gap: 8px; 
+            z-index: 20; position: relative; min-height: 62px;
+        }
+        
+        /* Reply Bar */
+        .active-reply-bar {
+            position: absolute; bottom: 100%; left: 0; width: 100%; background: var(--wa-panel);
+            padding: 10px; border-left: 5px solid var(--wa-accent); display: none;
+            justify-content: space-between; align-items: center; z-index: 15;
+            animation: slideUp 0.2s ease; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .active-reply-bar.show { display: flex; }
+
+        .input-wrapper {
+            flex: 1; background: var(--wa-panel); border-radius: 8px; display: flex; align-items: center; 
+            padding: 8px 12px; min-height: 42px;
+        }
+        
+        textarea { 
+            width: 100%; border: none; outline: none; resize: none; 
+            font-family: inherit; font-size: 1rem; background: transparent; 
+            color: var(--wa-text-main); max-height: 100px; overflow-y: auto;
+        }
+
+        .footer-icon { 
+            color: var(--wa-text-sec); font-size: 1.3rem; padding: 8px; 
+            cursor: pointer; transition: 0.2s; 
+        }
+        .footer-icon:hover { color: var(--wa-text-main); }
+        
+        .btn-send { 
+            width: 45px; height: 45px; border-radius: 50%; 
+            background: var(--wa-accent); color: #111b21; 
+            display: grid; place-items: center; border: none; 
+            font-size: 1.2rem; cursor: pointer; margin-bottom: 2px;
+        }
+
+        /* Scroll FAB */
+        .scroll-bottom-btn {
+            position: absolute; bottom: 80px; right: 15px; width: 40px; height: 40px;
+            background: var(--wa-panel); color: var(--wa-text-sec); border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3); display: none; place-items: center;
+            cursor: pointer; z-index: 90; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .scroll-bottom-btn.show { display: grid; animation: fadeIn 0.2s; }
+        .new-msg-badge {
+            position: absolute; top: -5px; right: -5px; background: var(--wa-accent); 
+            color: #111b21; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; font-weight: bold;
+        }
+
+        /* Context Menu (Long Press/Right Click) */
+        .ctx-menu {
+            position: fixed; background: var(--wa-header); border-radius: 6px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 2000; display: none;
+            overflow: hidden; min-width: 150px;
+        }
+        .ctx-item { padding: 12px 20px; color: var(--wa-text-main); cursor: pointer; font-size: 0.95rem; }
+        .ctx-item:hover { background: rgba(255,255,255,0.05); }
+
+        /* PWA Popup - Gold Brand Style to distinguish from Chat UI */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(31, 44, 52, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: var(--wa-text-sec); cursor: pointer; }
+
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <a href="javascript:history.back()" class="nav-btn" title="Back">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        
+        <div class="group-info" onclick="showGroupInfo()">
+            <div class="group-avatar"><i class="fas fa-users"></i></div>
+            <div class="group-text">
+                <h3>EastLink Recruiters</h3>
+                <p id="subtitle">Tap for group info</p>
+            </div>
+        </div>
+
+        <a href="seeker-dashboard.html" class="nav-btn" title="Dashboard">
+            <i class="fas fa-th-large"></i>
+        </a>
+    </header>
+
+    <!-- MAIN AREA -->
+    <main>
+        <!-- Join Gatekeeping -->
+        <div class="join-overlay" id="join-screen">
+            <div class="join-card animate__animated animate__zoomIn">
+                <i class="fas fa-lock join-icon"></i>
+                <h2 style="color:var(--wa-text-main); margin-bottom:10px;">Restricted Access</h2>
+                <p style="color:var(--wa-text-sec); margin-bottom:20px;">
+                    This community is for approved professionals only. 
+                </p>
+                <button class="join-btn" id="btn-join" onclick="requestJoin()">Request to Join</button>
+                <div id="status-pending" style="display:none; margin-top:20px; color:#fbbf24;">
+                    <i class="fas fa-clock"></i> Approval Pending
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat UI -->
+        <div id="chat-ui" style="display:none; flex-direction:column; height:100%;">
+            <div class="chat-container" id="chat-box">
+                <!-- Messages injected via JS -->
+            </div>
+
+            <!-- Scroll FAB -->
+            <div class="scroll-bottom-btn" id="scroll-fab" onclick="scrollToBottom()">
+                <i class="fas fa-angle-double-down"></i>
+                <span class="new-msg-badge" id="new-msg-count" style="display:none;">0</span>
+            </div>
+
+            <!-- Reply Preview -->
+            <div class="active-reply-bar" id="reply-bar">
+                <div style="flex:1; overflow:hidden;">
+                    <div style="color:var(--wa-accent); font-weight:bold; font-size:0.8rem; margin-bottom:2px;" id="reply-sender">Sender</div>
+                    <div style="color:var(--wa-text-sec); font-size:0.8rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" id="reply-text">Message</div>
+                </div>
+                <i class="fas fa-times" style="padding:10px; cursor:pointer; color:var(--wa-text-sec);" onclick="cancelReply()"></i>
+            </div>
+
+            <!-- Input -->
+            <div class="chat-footer">
+                <i class="far fa-smile footer-icon"></i>
+                <i class="fas fa-plus footer-icon" title="Attach"></i>
+                
+                <div class="input-wrapper">
+                    <textarea id="msg-input" rows="1" placeholder="Message"></textarea>
+                </div>
+                
+                <button class="btn-send" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Context Menu -->
+    <div class="ctx-menu" id="ctx-menu">
+        <div class="ctx-item" id="ctx-reply">Reply</div>
+        <div class="ctx-item" id="ctx-copy" onclick="copyMessage()">Copy</div>
+        <div class="ctx-item" id="ctx-delete" style="color:var(--wa-danger); display:none;">Delete</div>
+    </div>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
+                <div style="font-size:0.8rem; color:var(--wa-text-sec);">Add EastLink to home screen.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, orderBy, limit, addDoc, onSnapshot, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let userData = {};
+        let replyContext = null;
+        let selectedMsgId = null;
+        let selectedMsgText = null;
+
+        // DOM Elements
+        const chatBox = document.getElementById('chat-box');
+        const msgInput = document.getElementById('msg-input');
+        const scrollFab = document.getElementById('scroll-fab');
+        const ctxMenu = document.getElementById('ctx-menu');
+
+        // Auto-Resize Input
+        msgInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        // --- AUTH & GATEKEEPING ---
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'signin.html'; return; }
+            currentUser = user;
+
+            const docRef = doc(db, "users", user.uid);
+            onSnapshot(docRef, (docSnap) => {
+                if(docSnap.exists()) {
+                    userData = docSnap.data();
+                    checkStatus(userData.communityStatus);
+                }
+            });
+        });
+
+        function checkStatus(status) {
+            const joinScreen = document.getElementById('join-screen');
+            const chatUI = document.getElementById('chat-ui');
+            
+            if(status === 'approved') {
+                joinScreen.style.display = 'none';
+                chatUI.style.display = 'flex';
+                loadChat();
+                loadOnlineCount();
+            } else {
+                joinScreen.style.display = 'flex';
+                chatUI.style.display = 'none';
+                if(status === 'pending') {
+                    document.getElementById('btn-join').style.display = 'none';
+                    document.getElementById('status-pending').style.display = 'block';
+                }
+            }
+        }
+
+        window.requestJoin = async () => {
+            const btn = document.getElementById('btn-join');
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sending...';
+            await updateDoc(doc(db, "users", currentUser.uid), { communityStatus: 'pending' });
+            // Simulation for Demo
+            setTimeout(async () => {
+                 await updateDoc(doc(db, "users", currentUser.uid), { communityStatus: 'approved' });
+            }, 3000);
+        };
+
+        // --- CHAT RENDERING ENGINE ---
+        function loadChat() {
+            const q = query(collection(db, "community_messages"), orderBy("timestamp", "asc"), limit(60));
+            
+            onSnapshot(q, (snapshot) => {
+                // Detect scroll position
+                const isAtBottom = (chatBox.scrollHeight - chatBox.scrollTop <= chatBox.clientHeight + 150);
+                
+                chatBox.innerHTML = ''; // Clear to re-render smartly (simpler for date dividers)
+                let lastDate = '';
+                let lastSenderId = '';
+
+                snapshot.forEach(doc => {
+                    const msg = doc.data();
+                    const msgDate = msg.timestamp ? new Date(msg.timestamp.toDate()).toDateString() : new Date().toDateString();
+                    
+                    // Date Divider Logic
+                    if(msgDate !== lastDate) {
+                        const div = document.createElement('div');
+                        div.className = 'date-divider';
+                        div.innerText = getDateLabel(msgDate);
+                        chatBox.appendChild(div);
+                        lastDate = msgDate;
+                        lastSenderId = ''; // Reset grouping on new day
+                    }
+
+                    renderMessage(doc.id, msg, lastSenderId);
+                    lastSenderId = msg.senderId;
+                });
+
+                // Smart Scroll
+                if(isAtBottom) {
+                    scrollToBottom();
+                } else {
+                    if(!snapshot.metadata.hasPendingWrites) showNewMsgIndicator();
+                }
+            });
+        }
+
+        function getDateLabel(dateStr) {
+            const d = new Date(dateStr);
+            const today = new Date();
+            const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
+
+            if(d.toDateString() === today.toDateString()) return "Today";
+            if(d.toDateString() === yesterday.toDateString()) return "Yesterday";
+            return d.toLocaleDateString();
+        }
+
+        function renderMessage(id, msg, prevSenderId) {
+            if(msg.isDeleted) return;
+
+            const isMe = msg.senderId === currentUser.uid;
+            const isGroupStart = (msg.senderId !== prevSenderId); // New bubble group
+            
+            const div = document.createElement('div');
+            div.className = `msg-row ${isMe ? 'sent' : 'received'} ${isGroupStart ? 'group-start' : ''}`;
+            div.id = `msg-${id}`;
+            
+            // Context Menu Events
+            div.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                openContextMenu(e, id, msg, isMe);
+            });
+
+            // Auto-Linker
+            const linkifiedText = msg.text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#53bdeb; text-decoration:underline;">$1</a>');
+
+            let replyHtml = '';
+            if(msg.replyTo) {
+                replyHtml = `
+                <div class="reply-context" onclick="scrollToMsg('${msg.replyTo.id}')">
+                    <strong>${msg.replyTo.name}</strong>
+                    <span>${msg.replyTo.text}</span>
+                </div>`;
+            }
+
+            const timeStr = msg.timestamp ? msg.timestamp.toDate().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '...';
+            const checkIcon = isMe ? `<i class="fas fa-check-double checks"></i>` : '';
+
+            // Pick color for sender name (random consistent hash)
+            const nameColors = ['#e542a3', '#53bdeb', '#00a884', '#d97706'];
+            const colorIdx = msg.senderId.charCodeAt(msg.senderId.length-1) % 4;
+            const nameStyle = `color:${nameColors[colorIdx]}`;
+
+            const isAdmin = (msg.senderId === 'ADMIN_ID_HERE'); // Logic for admin tag
+
+            div.innerHTML = `
+                <div class="bubble">
+                    ${(!isMe && isGroupStart) ? `<div class="sender-name" style="${nameStyle}">${msg.senderName} ${isAdmin ? '<span class="admin-tag">Admin</span>':''}</div>` : ''}
+                    ${replyHtml}
+                    <div class="msg-text">${linkifiedText}</div>
+                    <div class="msg-meta">
+                        <span class="time">${timeStr}</span>
+                        ${checkIcon}
+                    </div>
+                </div>
+            `;
+
+            chatBox.appendChild(div);
+        }
+
+        // --- SENDING MESSAGES ---
+        window.sendMessage = async () => {
+            const text = msgInput.value.trim();
+            if(!text) return;
+
+            // Toxicity Filter (Simple)
+            const forbidden = ['idiot', 'stupid', 'scam', 'hate'];
+            if(forbidden.some(w => text.toLowerCase().includes(w))) {
+                Toastify({ text: "Message blocked: Respect community guidelines.", style: { background: "#ef4444" } }).showToast();
+                return;
+            }
+
+            const payload = {
+                text: text,
+                senderId: currentUser.uid,
+                senderName: userData.fullName || "Member",
+                timestamp: serverTimestamp(),
+                isDeleted: false,
+                replyTo: replyContext ? { id: replyContext.id, name: replyContext.name, text: replyContext.text } : null
+            };
+
+            try {
+                msgInput.value = '';
+                msgInput.style.height = 'auto';
+                cancelReply();
+                await addDoc(collection(db, "community_messages"), payload);
+                scrollToBottom();
+            } catch(e) { console.error(e); }
+        };
+
+        // --- INTERACTIONS ---
+        window.scrollToBottom = () => {
+            chatBox.scrollTop = chatBox.scrollHeight;
+            scrollFab.classList.remove('show');
+            document.getElementById('new-msg-count').style.display = 'none';
+        };
+
+        function showNewMsgIndicator() {
+            scrollFab.classList.add('show');
+            const badge = document.getElementById('new-msg-count');
+            badge.style.display = 'block';
+            badge.innerText = "!";
+        }
+
+        // Scroll Detection for FAB
+        chatBox.addEventListener('scroll', () => {
+            if(chatBox.scrollTop + chatBox.clientHeight >= chatBox.scrollHeight - 100) {
+                scrollFab.classList.remove('show');
+            } else {
+                scrollFab.classList.add('show');
+            }
+        });
+
+        // Context Menu Logic
+        function openContextMenu(e, id, msg, isMe) {
+            selectedMsgId = id;
+            selectedMsgText = msg.text;
+            
+            ctxMenu.style.display = 'block';
+            ctxMenu.style.top = `${e.clientY}px`;
+            
+            // Adjust Left/Right to not go offscreen
+            if(e.clientX > window.innerWidth - 150) ctxMenu.style.left = `${e.clientX - 150}px`;
+            else ctxMenu.style.left = `${e.clientX}px`;
+
+            document.getElementById('ctx-delete').style.display = isMe ? 'block' : 'none';
+
+            // Reply Action
+            document.getElementById('ctx-reply').onclick = () => {
+                replyContext = { id: id, name: msg.senderName, text: msg.text };
+                document.getElementById('reply-bar').classList.add('show');
+                document.getElementById('reply-sender').innerText = msg.senderName;
+                document.getElementById('reply-text').innerText = msg.text;
+                msgInput.focus();
+                closeCtx();
+            };
+
+            // Delete Action
+            document.getElementById('ctx-delete').onclick = async () => {
+                if(confirm("Delete for everyone?")) {
+                    await updateDoc(doc(db, "community_messages", id), { isDeleted: true });
+                }
+                closeCtx();
+            };
+        }
+
+        window.copyMessage = () => {
+            navigator.clipboard.writeText(selectedMsgText);
+            closeCtx();
+            Toastify({ text: "Copied", style: { background: "#1f2c34", color:"white" }, duration: 1000 }).showToast();
+        }
+
+        function closeCtx() { ctxMenu.style.display = 'none'; }
+        document.addEventListener('click', (e) => { if(!e.target.closest('.ctx-menu')) closeCtx(); });
+
+        window.cancelReply = () => {
+            replyContext = null;
+            document.getElementById('reply-bar').classList.remove('show');
+        };
+
+        window.scrollToMsg = (id) => {
+            const el = document.getElementById(`msg-${id}`);
+            if(el) {
+                el.scrollIntoView({behavior: "smooth", block: "center"});
+                el.querySelector('.bubble').style.background = "#2a3942"; // Flash highlight
+                setTimeout(() => el.querySelector('.bubble').style.background = "", 1000);
+            }
+        };
+
+        window.showGroupInfo = () => {
+            Toastify({ text: "EastLink Professionals: 5,402 Members", style: { background: "#00a884" } }).showToast();
+        };
+
+        function loadOnlineCount() {
+            // Simulation
+            const sub = document.getElementById('subtitle');
+            setInterval(() => {
+                sub.innerText = `${Math.floor(Math.random() * (300 - 200) + 200)} online`;
+            }, 5000);
+        }
+
+        // PWA Logic
+        let deferredPrompt;
+        const pwaPopup = document.getElementById('pwa-install-popup');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if(!localStorage.getItem('pwaDismissed')) {
+                pwaPopup.style.display = 'flex';
+            }
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                pwaPopup.style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            pwaPopup.style.display = 'none';
+            localStorage.setItem('pwaDismissed', 'true');
+        };
+
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./service-worker.js");
+        }
+
+    </script>
+</body>
+</html>

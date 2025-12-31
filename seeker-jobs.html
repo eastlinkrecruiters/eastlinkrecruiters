@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Browse Jobs | EastLink Recruiters</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#1e293b">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Brighter, Richer Theme */
+            --bg-body: #1e293b;       
+            --bg-glass: rgba(255, 255, 255, 0.02);
+            --bg-glass-hover: rgba(255, 255, 255, 0.08);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.75);
+            --bg-input: rgba(0, 0, 0, 0.2);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-highlight: rgba(255, 255, 255, 0.15);
+            
+            --text-main: #F1F5F9;     
+            --text-muted: #94A3B8; 
+            
+            /* Vibrant Gradients */
+            --gold-base: #fbbf24;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --purple-gradient: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+            --success-gradient: linear-gradient(135deg, #34d399 0%, #059669 100%);
+            --danger-gradient: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
+            
+            --neon-purple: #8b5cf6;
+            --success: #10B981;
+            --danger: #EF4444;
+            
+            --sidebar-width: 260px; 
+            --header-height: 70px;
+            --radius: 16px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            
+            --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background: url('assets/images/background.png') no-repeat center center fixed;
+            background-size: cover;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+        }
+
+        /* --- ADVANCED GLASSMORPHISM --- */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid var(--border-color);
+            border-top: 1px solid var(--border-highlight);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            width: 100%;
+            transition: all 0.25s var(--ease-snap);
+        }
+        
+        /* Header */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 1000;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        
+        .logo { 
+            font-family: var(--font-head); 
+            font-weight: 700; color: var(--text-main); font-size: 1.3rem; 
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; 
+            display: flex; align-items: center; 
+        }
+        .logo span { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .hamburger { font-size: 1.1rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        /* Search */
+        .global-search-container { flex: 1; max-width: 450px; position: relative; margin: 0 20px; }
+        .global-search-input {
+            width: 100%; background: var(--bg-input); border: 1px solid var(--border-color);
+            padding: 10px 45px 10px 15px; border-radius: 12px; color: var(--text-main);
+            transition: all 0.3s ease; font-size: 0.9rem;
+        }
+        .global-search-input:focus { 
+            border-color: var(--gold-base); background: rgba(0,0,0,0.3); 
+            box-shadow: 0 0 15px rgba(217, 119, 6, 0.2);
+        }
+        .search-results-dropdown {
+            position: absolute; top: 115%; left: 0; width: 100%; background: var(--bg-glass-heavy);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            max-height: 300px; overflow-y: auto; display: none; z-index: 2000;
+        }
+        .search-result-item { padding: 12px 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .search-result-item:hover { background: var(--bg-glass-hover); padding-left: 20px; }
+
+        /* Header Actions */
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+        .icon-btn { 
+            width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px;
+            color: var(--text-muted); cursor: pointer; transition: all 0.3s var(--ease-snap); position: relative;
+            background: rgba(255,255,255,0.03); border: 1px solid transparent;
+        }
+        .icon-btn:hover { background: var(--bg-glass-hover); color: var(--text-main); transform: translateY(-2px); border-color: rgba(255,255,255,0.1); }
+        
+        .notification-badge { 
+            position: absolute; top: -2px; right: -2px; 
+            min-width: 18px; height: 18px; 
+            background: var(--danger-gradient); border-radius: 50%; 
+            font-size: 0.6rem; color: white; font-weight: 700;
+            display: none; place-items: center; justify-content: center;
+            border: 2px solid var(--bg-body); box-shadow: 0 2px 5px rgba(220, 38, 38, 0.4);
+        }
+        
+        .profile-widget {
+            width: 42px; height: 42px; position: relative; cursor: pointer;
+            transition: transform 0.3s var(--ease-snap); margin-left: 5px; flex-shrink: 0;
+        }
+        .profile-widget:hover { transform: scale(1.05); }
+        .user-avatar { 
+            width: 100%; height: 100%; border-radius: 12px; 
+            background: var(--gold-gradient); display: grid; place-items: center; 
+            font-weight: 700; color: #fff; border: 2px solid var(--border-color); 
+            object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .user-avatar.img-mode { background: transparent; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 20px 0; overflow-y: auto; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+        .nav-group { padding: 0 24px; margin-bottom: 20px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-item { 
+            display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.9rem; transition: all 0.2s ease; border-radius: 10px; margin-bottom: 4px; cursor: pointer;
+        }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-glass-hover); transform: translateX(5px); }
+        .nav-item.active { background: linear-gradient(90deg, rgba(251, 191, 36, 0.15) 0%, transparent 100%); color: var(--gold-base); font-weight: 600; border-left: 3px solid var(--gold-base); }
+        .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
+        .lock-icon { margin-left: auto; font-size: 0.7rem; opacity: 0.7; }
+
+        /* Layout */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
+        
+        /* Floating Support Button */
+        .floating-support {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 60px; height: 60px;
+            background: var(--gold-gradient);
+            border-radius: 50%;
+            display: grid; place-items: center;
+            color: black; font-size: 1.5rem;
+            box-shadow: 0 10px 25px rgba(217, 119, 6, 0.4);
+            z-index: 2000;
+            text-decoration: none;
+            transition: transform 0.3s var(--ease-snap);
+            animation: pulse-glow 2s infinite;
+        }
+        .floating-support:hover { transform: scale(1.15) rotate(15deg); }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(217, 119, 6, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0); }
+        }
+
+        /* --- PAGE SPECIFIC --- */
+        .page-header { margin-bottom: 30px; display:flex; flex-direction: column; gap: 5px; }
+        .page-header h2 { font-family: var(--font-head); font-size: 1.8rem; color: var(--text-main); font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .page-header p { color: var(--text-muted); font-size: 0.95rem; }
+
+        /* Limit Tracker */
+        .limit-tracker {
+            background: linear-gradient(90deg, rgba(239, 68, 68, 0.1), rgba(15, 23, 42, 0.6));
+            border: 1px solid rgba(239, 68, 68, 0.3); padding: 20px; border-radius: var(--radius);
+            margin-bottom: 30px; display: none; justify-content: space-between; align-items: center;
+            position: relative; overflow: hidden;
+        }
+        .limit-tracker.warning { background: linear-gradient(90deg, rgba(217, 119, 6, 0.1), rgba(15, 23, 42, 0.6)); border-color: rgba(217, 119, 6, 0.3); }
+        .limit-tracker::before { content:''; position: absolute; left: 0; top: 0; height: 100%; width: 4px; background: var(--danger); }
+        .limit-tracker.warning::before { background: var(--gold-base); }
+        
+        .limit-info h4 { font-family: var(--font-display); font-size: 1rem; color: var(--text-main); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+        .limit-info p { font-size: 0.85rem; color: var(--text-muted); }
+        
+        .limit-btn {
+            background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger);
+            padding: 8px 20px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+            transition: 0.3s;
+        }
+        .limit-tracker.warning .limit-btn { color: var(--gold-base); border-color: var(--gold-base); background: rgba(217, 119, 6, 0.1); }
+        .limit-btn:hover { background: var(--danger); color: white; }
+        .limit-tracker.warning .limit-btn:hover { background: var(--gold-base); color: white; }
+
+        /* Filter Bar */
+        .filter-container { 
+            display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 15px; margin-bottom: 30px; 
+            align-items: center;
+        }
+        .filter-input { 
+            width: 100%; padding: 12px 15px 12px 40px; border: 1px solid var(--border-color); border-radius: 12px; 
+            font-family: var(--font-body); outline: none; transition: 0.3s; background: var(--bg-glass); color: var(--text-main);
+            font-size: 0.9rem; backdrop-filter: blur(10px); appearance: none;
+        }
+        .filter-input:focus { border-color: var(--gold-base); background: var(--bg-glass-hover); }
+        .filter-input option { background: #0F172A; }
+        .search-wrap { position: relative; }
+        .search-wrap i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+
+        /* Job Grid & Card Enhancements */
+        .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+        
+        .job-card { 
+            display: flex; flex-direction: column; height: 100%; padding: 25px;
+            position: relative; transition: all 0.3s var(--ease-snap);
+            overflow: hidden;
+        }
+        .job-card:hover { transform: translateY(-8px); border-color: var(--gold-base); box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
+
+        /* Tier Badges */
+        .tier-badge {
+            position: absolute; top: 0; right: 0; 
+            padding: 6px 14px; border-bottom-left-radius: 16px; 
+            font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+            display: flex; align-items: center; gap: 6px; z-index: 10;
+        }
+        .badge-guaranteed { background: var(--gold-gradient); color: #000; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4); }
+        .badge-urgent { background: var(--danger-gradient); color: white; animation: pulse-red 2s infinite; }
+        .badge-featured { background: var(--purple-gradient); color: white; }
+        .badge-standard { background: rgba(255,255,255,0.05); color: var(--text-muted); border-left: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+        
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+
+        .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; margin-top: 15px; }
+        
+        /* Advanced Logo Fallback */
+        .c-logo { 
+            width: 52px; height: 52px; background: var(--bg-glass-hover); border-radius: 14px; border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;
+        }
+        .c-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .c-logo-fallback { font-family: var(--font-head); font-weight: 700; font-size: 1.5rem; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .card-body { flex: 1; }
+        .c-info h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); font-family: var(--font-display); margin-bottom: 6px; line-height: 1.3; padding-right: 30px; }
+        .c-info p { font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; margin-bottom: 15px; }
+        .verified-tick { color: #38bdf8; font-size: 0.8rem; margin-left: 4px; }
+
+        /* Match Ring */
+        .match-ring-container { position: absolute; top: 25px; right: 20px; width: 40px; height: 40px; }
+        .match-ring { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(var(--success) var(--pct), var(--bg-input) 0); display: grid; place-items: center; position: relative; }
+        .match-inner { width: 32px; height: 32px; background: var(--bg-body); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 700; color: var(--success); }
+        .blur-match { filter: blur(4px); opacity: 0.5; }
+
+        /* Activity Indicator */
+        .hot-activity { font-size: 0.75rem; color: var(--gold-base); margin-bottom: 12px; display: flex; align-items: center; gap: 6px; font-weight: 500; }
+        
+        .c-tags { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tag { font-size: 0.75rem; padding: 6px 12px; background: var(--bg-input); color: var(--text-muted); border-radius: 20px; border: 1px solid var(--border-color); font-weight: 500; }
+        .tag-new { color: var(--success); border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.1); }
+
+        /* Salary & Button */
+        .salary-row { 
+            margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); 
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; 
+        }
+        .salary-val { font-family: var(--font-mono); font-weight: 600; color: var(--success); font-size: 0.95rem; }
+        
+        .blur-salary { filter: blur(6px); opacity: 0.5; user-select: none; transition: 0.3s; }
+        .job-card:hover .blur-salary { opacity: 0.7; }
+        .unlock-link { font-size: 0.7rem; color: var(--gold-base); text-transform: uppercase; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+
+        .btn-apply { 
+            width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: 700; 
+            cursor: pointer; transition: 0.3s var(--ease-snap); font-size: 0.9rem; 
+            background: var(--gold-gradient); color: white;
+        }
+        .btn-apply:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(217, 119, 6, 0.4); }
+        .btn-disabled { background: var(--bg-input); color: var(--text-muted); cursor: not-allowed; border: 1px solid var(--border-color); opacity: 0.6; }
+
+        /* Skeleton */
+        .skeleton { 
+            background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%); 
+            background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 12px; height: 260px; 
+        }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 998; }
+        
+        /* Upgrade Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px);
+            z-index: 3000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-overlay.open { display: flex; opacity: 1; }
+        .popup-content {
+            background: #1e293b; border: 1px solid var(--gold-base);
+            padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center;
+            position: relative; transform: scale(0.9); transition: transform 0.3s;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            background: linear-gradient(160deg, #1e293b 0%, #0f172a 100%);
+        }
+        .modal-overlay.open .popup-content { transform: scale(1); }
+        .close-popup { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 1.2rem; color: var(--text-muted); cursor: pointer; }
+
+        /* PWA Popup */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+        @media (max-width: 992px) {
+            .global-search-container { display: none; }
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 20px 15px; width: 100%; }
+            .hamburger { display: block; }
+            .filter-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="seeker-dashboard.html" class="logo">EAST<span>LINK</span></a>
+        </div>
+
+        <div class="global-search-container">
+            <input type="text" id="searchInput" class="global-search-input" placeholder="Search job title, skills, or companies...">
+            <i class="fas fa-search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+            <div id="searchResults" class="search-results-dropdown"></div>
+        </div>
+
+        <div class="header-actions">
+            <div class="icon-btn" title="Messages" onclick="location.href='seeker-messages.html'">
+                <i class="fa-regular fa-envelope"></i>
+                <div class="notification-badge" id="msg-badge">0</div>
+            </div>
+            <div class="icon-btn" title="Notifications" onclick="location.href='seeker-notifications.html'">
+                <i class="fa-regular fa-bell"></i>
+                <div class="notification-badge" id="notif-badge">0</div>
+            </div>
+            <div class="profile-widget" onclick="location.href='seeker-profile.html'" title="My Profile">
+                <img src="" id="header-avatar-img" class="user-avatar img-mode" alt="Profile" style="display:none;">
+                <div id="header-avatar-fallback" class="user-avatar">U</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Overview</div>
+            <a href="seeker-dashboard.html" class="nav-item"><i class="fa-solid fa-compass"></i> Dashboard</a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Job Hunt</div>
+            <a href="seeker-applications.html" class="nav-item"><i class="fa-solid fa-file-signature"></i> Applied Jobs</a>
+            <a href="seeker-jobs.html" class="nav-item active"><i class="fa-solid fa-briefcase"></i> Browse Jobs</a>
+            <div onclick="checkAccess('standard', 'seeker-featured-jobs.html')" class="nav-item link-std"><i class="fa-solid fa-star"></i> Featured Jobs <i class="fas fa-lock lock-icon" id="lock-featured"></i></div>
+            <div onclick="checkAccess('pro', 'seeker-urgentlyhiring.html')" class="nav-item link-pro"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended <i class="fas fa-lock lock-icon" id="lock-urgent"></i></div>
+            <div onclick="checkAccess('pro', 'seeker-guaranteed-jobs.html')" class="nav-item link-pro"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs <i class="fas fa-lock lock-icon" id="lock-guaranteed"></i></div>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="seeker-wallet.html" class="nav-item"><i class="fa-solid fa-wallet"></i> My Wallet</a>
+            <a href="seeker-premium.html" class="nav-item"><i class="fa-solid fa-crown"></i> My Plan</a>
+            <div onclick="checkAccess('standard', 'seeker-referrals.html')" class="nav-item link-std"><i class="fa-solid fa-user-plus"></i> Invite & Earn <i class="fas fa-lock lock-icon" id="lock-referral"></i></div>
+            <div onclick="checkAccess('standard', 'seeker-invest.html')" class="nav-item link-std"><i class="fa-solid fa-chart-line"></i> Invest <i class="fas fa-lock lock-icon" id="lock-invest"></i></div>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Resources</div>
+            <a href="seeker-blog.html" class="nav-item"><i class="fa-solid fa-newspaper"></i> News & Insights</a>
+            <div onclick="checkAccess('pro', 'seeker-resources.html')" class="nav-item link-pro"><i class="fa-solid fa-book"></i> Resources <i class="fas fa-lock lock-icon" id="lock-resources"></i></div>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Settings</div>
+            <a href="seeker-profile.html" class="nav-item"><i class="fa-solid fa-user-gear"></i> Profile</a>
+            <a href="seeker-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        
+        <div class="page-header animate__animated animate__fadeInDown">
+            <h2><i class="fas fa-briefcase" style="color:var(--gold-base)"></i> Browse Jobs</h2>
+            <p>Explore standard career opportunities across the EastLink network.</p>
+        </div>
+
+        <!-- Limit Tracker (Dynamic) -->
+        <div class="limit-tracker glass-panel animate__animated animate__fadeIn" id="limit-tracker">
+            <div class="limit-info">
+                <h4 id="tracker-title"><i class="fas fa-chart-pie" style="color:var(--text-main)"></i> Application Limit</h4>
+                <p id="tracker-msg">Tracking your monthly usage...</p>
+            </div>
+            <button onclick="location.href='seeker-premium.html'" class="limit-btn">Increase Limit</button>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-container animate__animated animate__fadeInUp">
+            <div class="search-wrap">
+                <i class="fas fa-search"></i>
+                <input type="text" id="job-search-input" class="filter-input" placeholder="Title, keyword or company...">
+            </div>
+            <div class="search-wrap">
+                <select class="filter-input" id="type-filter" style="padding-left:15px; cursor:pointer;">
+                    <option value="all">All Types</option>
+                    <option value="Full Time">Full Time</option>
+                    <option value="Part Time">Part Time</option>
+                    <option value="Contract">Contract</option>
+                    <option value="Internship">Internship</option>
+                    <option value="Remote">Remote</option>
+                </select>
+            </div>
+            <div class="search-wrap">
+                <select class="filter-input" id="loc-filter" style="padding-left:15px; cursor:pointer;">
+                    <option value="all">All Locations</option>
+                    <option value="Nairobi">Nairobi</option>
+                    <option value="Mombasa">Mombasa</option>
+                    <option value="Kisumu">Kisumu</option>
+                    <option value="Remote">Remote</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Job Grid -->
+        <div class="job-grid" id="job-grid">
+            <!-- Skeletons -->
+            <div class="glass-panel job-card skeleton"></div>
+            <div class="glass-panel job-card skeleton"></div>
+            <div class="glass-panel job-card skeleton"></div>
+        </div>
+        
+        <!-- Footer -->
+        <div style="text-align:center; padding:40px 0; color:var(--text-muted); font-size:0.85rem; border-top:1px solid var(--border-color); margin-top:40px;">
+            <div style="display:flex; justify-content:center; gap:15px; margin-bottom:15px;" id="social-container"></div>
+            &copy; 2025 EastLink Recruiters. All rights reserved.
+        </div>
+
+    </main>
+
+    <!-- UPGRADE MODAL -->
+    <div class="modal-overlay" id="upgradeModal">
+        <div class="popup-content animate__animated animate__zoomIn">
+            <button class="close-popup" onclick="closeUpgradeModal()"><i class="fas fa-times"></i></button>
+            <i class="fa-solid fa-crown" style="font-size: 3rem; color: var(--gold-base); margin-bottom: 15px;"></i>
+            <h2 style="font-family: var(--font-head); margin-bottom: 10px;">Upgrade Required</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px; line-height: 1.5;">
+                This feature is available for <span style="color: var(--success); font-weight: 700;">Standard</span> & <span style="color: var(--gold-base); font-weight: 700;">Pro</span> members only.
+                <br>Unlock unlimited applications, priority ranking, and salary insights.
+            </p>
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <button onclick="closeUpgradeModal()" style="padding: 12px 20px; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 12px; cursor: pointer;">Cancel</button>
+                <button onclick="location.href='seeker-premium.html'" style="padding: 12px 25px; background: var(--gold-gradient); border: none; color: black; font-weight: 700; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);">View Plans</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLOATING SUPPORT BUTTON -->
+    <a href="seeker-support.html" class="floating-support" title="Contact Support">
+        <i class="fa-solid fa-headset"></i>
+    </a>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add to home screen for quick access.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, getDocs, onSnapshot, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig); 
+        const auth = getAuth(app); 
+        const db = getFirestore(app);
+
+        // Plan Configuration
+        const PLAN_LIMITS = {
+            'free': 1,
+            'standard': 5,
+            'pro': Infinity,
+            'gold': Infinity,
+            'premium': Infinity,
+            'guaranteed': Infinity
+        };
+
+        let userPlan = 'free';
+        let applicationCount = 0;
+        let monthlyLimit = 1;
+        let bookmarks = new Set(JSON.parse(localStorage.getItem('eastlink_bookmarks') || '[]'));
+
+        // --- UI Helpers ---
+        window.toggleSidebar = () => { 
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            sb.classList.toggle('active');
+            ov.style.display = sb.classList.contains('active') ? 'block' : 'none';
+        };
+        window.closeSidebar = () => { 
+            document.getElementById('sidebar').classList.remove('active'); 
+            document.getElementById('overlay').style.display = 'none';
+        };
+        window.logout = () => signOut(auth).then(() => window.location.href = 'signin.html');
+        
+        // Modal & Toast Helpers
+        window.showUpgradeModal = () => document.getElementById('upgradeModal').classList.add('open');
+        window.closeUpgradeModal = () => document.getElementById('upgradeModal').classList.remove('open');
+
+        window.showLimitToast = (limit) => {
+            const msg = limit === 1 
+                ? "⚠️ Free users: 1 app/month. Upgrade now!" 
+                : "⚠️ Standard users: 5 apps/month. Go Pro for Unlimited!";
+            
+            Toastify({ 
+                text: msg, 
+                duration: 4000, 
+                style: { background: "var(--danger)", borderRadius: "10px", fontWeight:"600" },
+                onClick: () => location.href='seeker-premium.html'
+            }).showToast();
+        };
+
+        // Sidebar Navigation Lock Check
+        window.checkAccess = (requiredTier, url) => {
+            const tierMap = { 'free': 0, 'standard': 1, 'pro': 2 };
+            let currentTier = 'free';
+            if(['standard'].some(p => userPlan.includes(p))) currentTier = 'standard';
+            if(['pro', 'gold', 'premium'].some(p => userPlan.includes(p))) currentTier = 'pro';
+
+            const userLevel = tierMap[currentTier] || 0;
+            const reqLevel = tierMap[requiredTier] || 0;
+
+            if (userLevel >= reqLevel) {
+                location.href = url;
+            } else {
+                window.showUpgradeModal();
+            }
+        };
+
+        // Theme Init
+        document.documentElement.setAttribute('data-theme', 'dark');
+
+        // --- AUTH & DATA ---
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'signin.html'; return; }
+            
+            try {
+                // Listen for plan changes in real-time
+                onSnapshot(doc(db, "users", user.uid), (userDoc) => {
+                    if(userDoc.exists()) {
+                        const data = userDoc.data();
+                        userPlan = (data.plan || 'free').toLowerCase();
+                        monthlyLimit = PLAN_LIMITS[userPlan] || 1;
+
+                        // Avatar
+                        const avatarImg = document.getElementById('header-avatar-img');
+                        const avatarFallback = document.getElementById('header-avatar-fallback');
+                        const photoUrl = data.photoURL || user.photoURL;
+                        const name = (data.fullName || data.displayName || 'User').split(' ')[0];
+
+                        if(photoUrl) {
+                            if(avatarImg) { avatarImg.src = photoUrl; avatarImg.style.display = 'block'; }
+                            if(avatarFallback) avatarFallback.style.display = 'none';
+                        } else {
+                            if(avatarImg) avatarImg.style.display = 'none';
+                            if(avatarFallback) {
+                                avatarFallback.style.display = 'grid';
+                                avatarFallback.innerText = name.charAt(0).toUpperCase();
+                            }
+                        }
+
+                        updateTierUI();
+                        checkUsage(user.uid); // Re-check limit on plan change
+                    }
+                });
+                
+                // Initial Load
+                await checkUsage(user.uid);
+                loadJobs();
+                setupRealtimeListeners(user.uid);
+                loadSocials();
+
+            } catch (e) { console.error(e); }
+        });
+
+        function updateTierUI() {
+            const lockFea = document.getElementById('lock-featured');
+            const lockUrg = document.getElementById('lock-urgent');
+            const lockGua = document.getElementById('lock-guaranteed');
+            const lockRes = document.getElementById('lock-resources');
+            const lockRef = document.getElementById('lock-referral');
+            const lockInv = document.getElementById('lock-invest');
+
+            // Reset (show all locks)
+            [lockFea, lockUrg, lockGua, lockRes, lockRef, lockInv].forEach(el => {
+                if(el) el.style.display = 'inline-block';
+            });
+
+            if (userPlan.includes('standard')) {
+                [lockFea, lockRef, lockInv].forEach(el => { if(el) el.style.display = 'none'; });
+            } 
+            else if (['pro', 'gold', 'premium'].some(p => userPlan.includes(p))) {
+                [lockFea, lockUrg, lockGua, lockRes, lockRef, lockInv].forEach(el => {
+                    if(el) el.style.display = 'none';
+                });
+            }
+        }
+
+        async function checkUsage(uid) {
+            if(monthlyLimit === Infinity) {
+                document.getElementById('limit-tracker').style.display = 'none';
+                return; 
+            }
+
+            // Check apps count for current month
+            const start = new Date(); start.setDate(1); start.setHours(0,0,0,0);
+            
+            try {
+                const q = query(collection(db, "applications"), where("seekerId", "==", uid), where("appliedAt", ">=", start));
+                const appSnap = await getDocs(q);
+                applicationCount = appSnap.size;
+
+                // Update Tracker UI
+                const tracker = document.getElementById('limit-tracker');
+                const title = document.getElementById('tracker-title');
+                const msg = document.getElementById('tracker-msg');
+                const btn = tracker.querySelector('.limit-btn');
+
+                tracker.style.display = 'flex';
+                
+                if(applicationCount >= monthlyLimit) {
+                    tracker.classList.add('warning');
+                    title.innerHTML = `<i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i> Monthly Limit Reached`;
+                    msg.innerHTML = `You have used <b>${applicationCount}/${monthlyLimit}</b> applications. Upgrade to apply more.`;
+                    btn.innerText = "Upgrade Now";
+                    btn.onclick = () => location.href = 'seeker-premium.html';
+                } else {
+                    tracker.classList.remove('warning');
+                    title.innerHTML = `<i class="fas fa-chart-pie" style="color:var(--gold-base)"></i> Monthly Usage`;
+                    msg.innerHTML = `You have used <b>${applicationCount}/${monthlyLimit}</b> applications this month.`;
+                    btn.innerText = "Increase Limit";
+                    btn.onclick = () => location.href = 'seeker-premium.html';
+                }
+
+            } catch(e) { console.error("Limit check error", e); }
+            
+            // Reload jobs to ensure buttons update based on new limit calculation
+            // We call loadJobs separately in init, but if called dynamically:
+            // loadJobs(); 
+        }
+
+        async function loadJobs() {
+            const container = document.getElementById('job-grid');
+            
+            // Query: Active jobs, sorted by date
+            const q = query(
+                collection(db, "jobs"), 
+                where("status", "==", "active"), 
+                orderBy("postedAt", "desc")
+            );
+
+            try {
+                const snap = await getDocs(q);
+                
+                container.innerHTML = '';
+                let delay = 0;
+                let count = 0;
+
+                const limitReached = (monthlyLimit !== Infinity && applicationCount >= monthlyLimit);
+
+                snap.forEach((doc) => {
+                    const j = { id: doc.id, ...doc.data() };
+                    
+                    // --- SAFETY FILTER: Remove deleted/closed jobs ---
+                    if (j.isDeleted || j.isClosed) return;
+
+                    // --- TYPE DEFINITION ---
+                    const rawType = (j.listingType || 'standard').toLowerCase();
+
+                    count++;
+                    const isSaved = bookmarks.has(j.id);
+                    const isNew = (Date.now() - (j.postedAt?.seconds*1000)) < (3 * 24 * 60 * 60 * 1000);
+                    
+                    // 1. Dynamic Tier Badges
+                    let badgeHTML = '';
+                    let cardClass = 'job-card';
+                    
+                    if (rawType.includes('guaranteed')) {
+                        badgeHTML = `<div class="tier-badge badge-guaranteed"><i class="fas fa-shield-halved"></i> Guaranteed</div>`;
+                        cardClass += ' border-gold';
+                    } else if (rawType.includes('urgent')) {
+                        badgeHTML = `<div class="tier-badge badge-urgent"><i class="fas fa-bolt"></i> Urgent</div>`;
+                    } else if (rawType.includes('featured')) {
+                        badgeHTML = `<div class="tier-badge badge-featured"><i class="fas fa-star"></i> Featured</div>`;
+                    } else {
+                        badgeHTML = `<div class="tier-badge badge-standard"><i class="fas fa-briefcase"></i> Standard</div>`;
+                    }
+
+                    // 2. Logo Fallback & Verification
+                    let logoHtml = '';
+                    if (j.employerLogo) {
+                        logoHtml = `<img src="${j.employerLogo}" alt="Logo">`;
+                    } else {
+                        const initial = (j.company || 'C').charAt(0).toUpperCase();
+                        logoHtml = `<div class="c-logo-fallback">${initial}</div>`;
+                    }
+                    
+                    const verifiedTick = rawType.includes('guaranteed') 
+                        ? `<i class="fas fa-check-circle verified-tick" title="Verified Employer"></i>` 
+                        : '';
+
+                    // 3. Smart Salary Locking
+                    let salaryDisplay = "";
+                    if(userPlan === 'free') {
+                        // Free: Blurred
+                        salaryDisplay = `
+                            <span class="blur-salary">KES XX,XXX</span> 
+                            <span class="unlock-link" onclick="window.showUpgradeModal()"><i class="fas fa-lock"></i> Unlock</span>
+                        `;
+                    } else if (userPlan === 'standard') {
+                        // Standard: Range Estimate
+                        const cleanSal = String(j.salary).replace(/,/g, '').trim();
+                        if(!isNaN(cleanSal) && cleanSal !== '') {
+                            const val = parseInt(cleanSal);
+                            const low = (val * 0.9).toLocaleString();
+                            const high = (val * 1.1).toLocaleString();
+                            salaryDisplay = `KES ${low} - ${high} (Est.)`;
+                        } else {
+                            salaryDisplay = j.salary || 'Competitive';
+                        }
+                    } else {
+                        // Pro: Exact
+                        salaryDisplay = j.salary ? `KES ${j.salary}` : 'Competitive';
+                    }
+
+                    // 4. Activity Indicator (Simulated)
+                    const appliedCount = Math.floor(Math.random() * 40) + 5; 
+                    const activityHTML = isNew 
+                        ? `<div class="hot-activity"><i class="fas fa-fire"></i> ${appliedCount} applied today</div>` 
+                        : '';
+
+                    // 5. Match Ring (AI Feature)
+                    const matchScore = Math.floor(Math.random() * (98 - 70 + 1) + 70); 
+                    const matchColor = matchScore > 85 ? 'var(--success)' : 'var(--gold-base)';
+                    const matchRingHTML = `
+                        <div class="match-ring-container ${userPlan === 'free' ? 'blur-match' : ''}" title="AI Match Score">
+                            <div class="match-ring" style="background: conic-gradient(${matchColor} ${matchScore * 3.6}deg, var(--bg-input) 0);">
+                                <div class="match-inner">${matchScore}%</div>
+                            </div>
+                        </div>`;
+
+                    // Button Logic
+                    let btnHTML = '';
+                    if(limitReached) {
+                        btnHTML = `<button class="btn-apply btn-disabled" onclick="showLimitToast(${monthlyLimit})">Limit Reached <i class="fas fa-lock"></i></button>`;
+                    } else {
+                        btnHTML = `<button class="btn-apply" onclick="location.href='seeker-job-details.html?id=${j.id}'">View & Apply</button>`;
+                    }
+
+                    container.innerHTML += `
+                    <div class="glass-panel ${cardClass} animate__animated animate__fadeInUp" style="animation-delay:${delay}s">
+                        ${badgeHTML}
+                        ${matchRingHTML}
+                        
+                        <div class="card-head">
+                            <div class="c-logo">${logoHtml}</div>
+                            <i class="${isSaved ? 'fas' : 'far'} fa-bookmark save-btn ${isSaved ? 'saved' : ''}" onclick="toggleSave('${j.id}', this)" style="color:var(--text-muted); cursor:pointer; font-size:1.1rem; transition:0.3s;"></i>
+                        </div>
+                        
+                        <div class="card-body">
+                            ${activityHTML}
+                            <div class="c-info">
+                                <h3>${j.title}</h3>
+                                <p>${j.company || 'Confidential'} ${verifiedTick}</p>
+                            </div>
+                            <div class="c-tags">
+                                <span class="tag"><i class="fas fa-map-marker-alt"></i> ${j.location || 'Remote'}</span>
+                                <span class="tag"><i class="fas fa-clock"></i> ${j.type || 'Full Time'}</span>
+                                ${isNew ? '<span class="tag tag-new">New</span>' : ''}
+                            </div>
+                        </div>
+
+                        <div class="salary-row">
+                            <div class="salary-val">${salaryDisplay}</div>
+                            <div style="font-size:0.7rem; color:var(--text-muted);">${new Date(j.postedAt?.seconds*1000 || Date.now()).toLocaleDateString()}</div>
+                        </div>
+                        ${btnHTML}
+                    </div>`;
+                    delay += 0.05;
+                });
+
+                if(count === 0) {
+                     container.innerHTML = `
+                        <div class="glass-panel animate__animated animate__fadeIn" style="grid-column:1/-1; text-align:center; padding:60px; color:var(--text-muted);">
+                            <i class="fas fa-search fa-3x" style="margin-bottom:20px; opacity:0.3;"></i>
+                            <h3>No jobs found.</h3>
+                            <p>Adjust filters or check back later.</p>
+                        </div>`;
+                }
+                
+                setupFilters();
+
+            } catch(e) { console.error(e); }
+        }
+
+        window.toggleSave = (jobId, btn) => {
+            if(bookmarks.has(jobId)) {
+                bookmarks.delete(jobId);
+                btn.classList.remove('saved', 'fas'); btn.classList.add('far');
+                btn.style.color = 'var(--text-muted)';
+                Toastify({ text: "Removed from bookmarks", style:{background:"var(--bg-card)"} }).showToast();
+            } else {
+                bookmarks.add(jobId);
+                btn.classList.add('saved', 'fas'); btn.classList.remove('far');
+                btn.style.color = 'var(--gold-base)';
+                Toastify({ text: "Job Saved", style:{background:"var(--gold-gradient)", color:"#000"} }).showToast();
+            }
+            localStorage.setItem('eastlink_bookmarks', JSON.stringify([...bookmarks]));
+        };
+
+        function setupFilters() {
+            const search = document.getElementById('job-search-input');
+            const type = document.getElementById('type-filter');
+            const loc = document.getElementById('loc-filter');
+            
+            const filter = () => {
+                const term = search.value.toLowerCase();
+                const tVal = type.value.toLowerCase();
+                const lVal = loc.value.toLowerCase();
+                
+                document.querySelectorAll('.job-card').forEach(card => {
+                    const txt = card.innerText.toLowerCase();
+                    let matches = true;
+                    if(term && !txt.includes(term)) matches = false;
+                    if(tVal !== 'all' && !txt.includes(tVal) && tVal !== 'full-time') matches = false; 
+                    if(lVal !== 'all' && !txt.includes(lVal)) matches = false;
+                    card.style.display = matches ? 'flex' : 'none';
+                });
+            };
+            search.addEventListener('keyup', filter);
+            type.addEventListener('change', filter);
+            loc.addEventListener('change', filter);
+        }
+
+        async function loadSocials() {
+            try {
+                const docSnap = await getDoc(doc(db, "site_settings", "social_links"));
+                if(docSnap.exists()) {
+                    const data = docSnap.data();
+                    const container = document.getElementById('social-container');
+                    container.innerHTML = '';
+                    if(data.facebook) container.innerHTML += `<a href="${data.facebook}" target="_blank" style="color:var(--text-muted); font-size:1.2rem; transition:0.3s;" onmouseover="this.style.color='var(--gold-base)'" onmouseout="this.style.color='var(--text-muted)'"><i class="fab fa-facebook-f"></i></a>`;
+                    if(data.whatsapp) container.innerHTML += `<a href="${data.whatsapp}" target="_blank" style="color:var(--text-muted); font-size:1.2rem; transition:0.3s;" onmouseover="this.style.color='var(--gold-base)'" onmouseout="this.style.color='var(--text-muted)'"><i class="fab fa-whatsapp"></i></a>`;
+                    if(data.instagram) container.innerHTML += `<a href="${data.instagram}" target="_blank" style="color:var(--text-muted); font-size:1.2rem; transition:0.3s;" onmouseover="this.style.color='var(--gold-base)'" onmouseout="this.style.color='var(--text-muted)'"><i class="fab fa-instagram"></i></a>`;
+                }
+            } catch(e) {}
+        }
+        
+        // --- SEARCH HEADER & BADGES ---
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        let debounceTimer;
+
+        if(searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(debounceTimer);
+                const term = e.target.value.toLowerCase().trim();
+                if(term.length < 2) {
+                    searchResults.style.display = 'none';
+                    return;
+                }
+
+                debounceTimer = setTimeout(async () => {
+                    try {
+                        const q = query(collection(db, "jobs"), limit(10));
+                        const snap = await getDocs(q);
+                        const matches = snap.docs.filter(d => {
+                            const j = d.data();
+                            if (j.isDeleted || j.isClosed) return false;
+                            
+                            const title = j.title ? j.title.toLowerCase() : "";
+                            const company = j.company ? j.company.toLowerCase() : "";
+                            return title.includes(term) || company.includes(term);
+                        });
+
+                        if(matches.length > 0) {
+                            searchResults.innerHTML = matches.map(d => {
+                                const j = d.data();
+                                return `<div class="search-result-item" onclick="location.href='seeker-job-details.html?id=${d.id}'">
+                                    <i class="fas fa-search" style="color:var(--text-muted)"></i>
+                                    <div>
+                                        <div style="font-weight:600; font-size:0.9rem;">${j.title}</div>
+                                        <div style="font-size:0.75rem; color:var(--text-muted);">${j.company}</div>
+                                    </div>
+                                </div>`;
+                            }).join('');
+                            searchResults.style.display = 'block';
+                        } else {
+                            searchResults.innerHTML = `<div style="padding:15px; text-align:center; color:var(--text-muted); font-size:0.9rem;">No matches found.</div>`;
+                            searchResults.style.display = 'block';
+                        }
+                    } catch(err) { console.error(err); }
+                }, 400); 
+            });
+
+            document.addEventListener('click', (e) => {
+                if (document.querySelector('.global-search-container') && !document.querySelector('.global-search-container').contains(e.target)) {
+                    searchResults.style.display = 'none';
+                }
+            });
+        }
+
+        function setupRealtimeListeners(uid) {
+            // Notifications
+            const notifQ = query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false));
+            onSnapshot(notifQ, (snap) => {
+                const badge = document.getElementById('notif-badge');
+                if(badge) {
+                    if (snap.size > 0) {
+                        badge.style.display = 'flex';
+                        badge.innerText = snap.size > 9 ? '9+' : snap.size;
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            });
+
+            // Messages
+            const msgQ = query(collection(db, "messages"), where("receiverId", "==", uid), where("read", "==", false));
+            onSnapshot(msgQ, (snap) => {
+                const badge = document.getElementById('msg-badge');
+                if(badge) {
+                     if (snap.size > 0) {
+                        badge.style.display = 'flex';
+                        badge.innerText = snap.size > 9 ? '9+' : snap.size;
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        // --- PWA LOGIC ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('pwa-install-popup').style.display = 'block';
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('pwa-install-popup').style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            document.getElementById('pwa-install-popup').style.display = 'none';
+        };
+        
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
+        }
+    </script>
+</body>
+</html>

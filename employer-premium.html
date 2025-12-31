@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Plan | EastLink Recruiters</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#020617">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Theme Variables */
+            --bg-body: #020617;       
+            --bg-card: #0f172a; 
+            --bg-glass: rgba(15, 23, 42, 0.95); 
+            --bg-glass-heavy: rgba(15, 23, 42, 0.98);
+            --bg-input: rgba(255, 255, 255, 0.05);
+            --bg-hover: rgba(255, 255, 255, 0.08);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8; 
+            --gold-base: #D97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --success: #10B981;
+            --danger: #EF4444;
+            
+            --sidebar-width: 260px; 
+            --header-height: 65px;
+            --radius: 12px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background-image: url('assets/images/background.png'); 
+            background-size: cover;
+            background-attachment: fixed;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+        }
+
+        /* --- LAYOUT --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 1000;
+        }
+
+        .logo { font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.2rem; text-decoration: none; display:flex; flex-direction: column; line-height: 1; }
+        .logo span { color: var(--gold-base); }
+        .logo small { font-size: 0.6em; color: var(--text-muted); font-family: var(--font-body); letter-spacing: 1px; margin-top: 3px; font-weight: 400; opacity: 0.8; }
+        
+        .icon-btn { 
+            width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%;
+            color: var(--text-muted); cursor: pointer; transition: 0.2s; position: relative;
+        }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); }
+        
+        .badge { 
+            position: absolute; top: -3px; right: -3px; 
+            background: var(--danger); color: white;
+            font-size: 0.65rem; font-weight: 700;
+            min-width: 16px; height: 16px; 
+            border-radius: 50%; 
+            display: none; align-items: center; justify-content: center;
+            border: 2px solid var(--bg-card);
+            z-index: 10;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 20px 0; 
+            overflow-y: auto; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999;
+            display: flex; flex-direction: column;
+        }
+        .nav-group-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; padding: 0 24px; margin-bottom: 8px; letter-spacing: 1px; margin-top: 20px; }
+        .nav-item { 
+            display: flex; align-items: center; padding: 12px 24px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.9rem; transition: 0.2s; border-left: 3px solid transparent; position: relative;
+        }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); }
+        .nav-item.active { color: var(--gold-base); font-weight: 600; border-left-color: var(--gold-base); background: linear-gradient(90deg, rgba(217,119,6,0.1), transparent); }
+        .nav-item i { width: 25px; margin-right: 10px; text-align: center; }
+        
+        .nav-badge-count { 
+            background: var(--danger); color: #fff; font-size: 0.7rem; padding: 1px 6px; 
+            border-radius: 10px; margin-left: auto; font-weight: 600; display: none;
+        }
+        .nav-lock-icon { margin-left: auto; font-size: 0.8rem; opacity: 0.5; }
+        .nav-item.locked { opacity: 0.5; cursor: not-allowed; pointer-events: none; filter: grayscale(1); }
+
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index:998; display:none; backdrop-filter:blur(3px); }
+
+        /* --- MAIN CONTENT --- */
+        main { 
+            margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 25px; 
+            min-height: calc(100vh - var(--header-height)); width: 100%;
+        }
+        .content-wrapper { max-width: 1400px; margin: 0 auto; width: 100%; }
+
+        /* --- PREMIUM PAGE STYLES --- */
+        .hero-section { text-align: center; margin-bottom: 40px; }
+        .hero-title { font-family: var(--font-head); font-size: 2rem; color: var(--text-main); margin-bottom: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+        .hero-text { color: var(--text-muted); font-size: 0.95rem; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+
+        /* Wallet Banner */
+        .wallet-banner { 
+            background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); padding: 10px 24px; 
+            border-radius: 50px; margin-bottom: 30px; display: inline-flex; align-items: center; 
+            gap: 20px; backdrop-filter: blur(10px); box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+        .wallet-amount { font-family: var(--font-mono); font-size: 1.1rem; color: var(--gold-base); font-weight: 700; letter-spacing: -0.5px; }
+        .btn-deposit-sm { 
+            font-size: 0.75rem; padding: 6px 16px; background: rgba(217, 119, 6, 0.15); 
+            color: var(--gold-base); border: 1px solid rgba(217, 119, 6, 0.4); border-radius: 20px; 
+            text-decoration: none; font-weight: 600; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .btn-deposit-sm:hover { background: var(--gold-base); color: #020617; }
+
+        /* Pricing Grid */
+        .pricing-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
+        
+        .price-card { 
+            background: var(--bg-glass); border: 1px solid var(--border-color); border-radius: var(--radius); 
+            padding: 30px; position: relative; transition: 0.3s; display: flex; flex-direction: column;
+            overflow: hidden; backdrop-filter: blur(16px);
+        }
+        .price-card:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        
+        /* Highlight Card (Growth) */
+        .price-card.highlight { 
+            border: 1px solid var(--gold-base); 
+            background: linear-gradient(180deg, rgba(217,119,6,0.08) 0%, rgba(15, 23, 42, 0.8) 100%);
+        }
+        .price-card.highlight::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold-base), transparent);
+        }
+
+        .plan-badge { 
+            position: absolute; top: 20px; right: 20px; background: var(--gold-gradient); 
+            color: #020617; padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; 
+            font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        .plan-title { font-family: var(--font-head); font-size: 1.4rem; font-weight: 700; color: var(--text-main); margin-bottom: 5px; }
+        .price-box { margin: 20px 0; display: flex; align-items: baseline; }
+        .currency { font-size: 0.9rem; color: var(--text-muted); margin-right: 5px; font-weight: 600; }
+        .amount { font-size: 2.8rem; font-weight: 700; color: var(--text-main); font-family: var(--font-display); line-height: 1; }
+        .duration { color: var(--text-muted); font-size: 0.8rem; margin-left: 5px; }
+        .price-card.highlight .amount { color: var(--gold-base); text-shadow: 0 0 20px rgba(217,119,6,0.3); }
+
+        .features { list-style: none; margin: 25px 0; flex: 1; padding: 0; }
+        .features li { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; color: var(--text-muted); font-size: 0.9rem; }
+        .features i { color: var(--gold-base); font-size: 0.8rem; width: 16px; text-align: center; }
+        .features li.disabled { opacity: 0.5; text-decoration: line-through; }
+        .features li.disabled i { color: var(--text-muted); }
+        .features li strong { color: var(--text-main); font-weight: 600; }
+
+        .btn-select { width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; font-size: 0.9rem; transition: 0.3s; font-family: var(--font-body); text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); }
+        .btn-outline:hover { border-color: var(--text-main); color: var(--text-main); background: var(--bg-hover); }
+        
+        .btn-fill { background: var(--gold-gradient); color: #020617; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3); }
+        .btn-fill:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(217, 119, 6, 0.4); }
+
+        /* Modal */
+        .modal-overlay { 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); 
+            z-index: 2000; align-items: center; justify-content: center; padding: 20px; 
+            transition: opacity 0.2s ease-out; opacity: 0;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-box { 
+            background: var(--bg-card); width: 100%; max-width: 400px; border-radius: 16px; 
+            border: 1px solid var(--border-color); padding: 30px; text-align: center; 
+            transform: scale(0.95); transition: transform 0.2s; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+        .modal-overlay.active .modal-box { transform: scale(1); }
+
+        .modal-icon { font-size: 3rem; color: var(--gold-base); margin-bottom: 20px; display: inline-block; animation: pulse 2s infinite; }
+        .modal-balance { background: var(--bg-input); padding: 15px; border-radius: 12px; margin: 20px 0; border: 1px solid var(--border-color); }
+
+        /* PWA Popup */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+        /* Mobile */
+        @media(max-width: 992px) {
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 15px; width: 100%; }
+            .hero-title { font-size: 1.6rem; }
+            .pricing-container { grid-template-columns: 1fr; }
+        }
+
+        /* Animations */
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.8; } 100% { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <!-- OVERLAY -->
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- HEADER -->
+    <header>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <i class="fas fa-bars" style="font-size:1.2rem; color:var(--text-muted); cursor:pointer; display:block; @media(min-width:993px){display:none;}" onclick="toggleSidebar()"></i>
+            <a href="employer-dashboard.html" class="logo">
+                <span>EastLink</span>
+                <small>PARTNER</small>
+            </a>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+            <!-- Notifications with Badge -->
+            <div class="icon-btn" onclick="location.href='employer-notifications.html'">
+                <i class="fa-regular fa-bell"></i>
+                <div class="badge" id="header-notif-badge"></div>
+            </div>
+
+            <!-- Messages with Badge -->
+            <div class="icon-btn" onclick="location.href='employer-messages.html'">
+                <i class="fa-regular fa-comment-dots"></i>
+                <div class="badge" id="header-msg-badge"></div>
+            </div>
+
+            <!-- Avatar -->
+            <div onclick="location.href='employer-profile.html'" id="header-avatar" style="width:34px; height:34px; background:var(--gold-gradient); border-radius:50%; display:grid; place-items:center; color:white; font-size:0.9rem; font-weight:bold; cursor:pointer; overflow:hidden; border:1px solid var(--border-color);">
+                <i class="fas fa-building"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group-label">Overview</div>
+        <a href="employer-dashboard.html" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+        <a href="employer-post-job.html" class="nav-item"><i class="fas fa-plus-circle"></i> Post a job ad</a>
+        <a href="employer-jobs.html" class="nav-item"><i class="fas fa-briefcase"></i> My jobs</a>
+        
+        <div class="nav-group-label">Candidates & Comms</div>
+        <a href="employer-candidates.html" class="nav-item">
+            <i class="fas fa-users"></i> Manage applicants 
+            <span class="nav-badge-count" id="nav-badge-candidates">0</span>
+        </a>
+        <a href="employer-messages.html" class="nav-item">
+            <i class="fas fa-comment-alt"></i> Messages 
+            <span class="nav-badge-count" id="nav-badge-messages">0</span>
+        </a>
+
+        <div class="nav-group-label">Organization</div>
+        <a href="employer-profile.html" class="nav-item"><i class="fas fa-building"></i> Company profile</a>
+        <a href="employer-wallet.html" class="nav-item"><i class="fas fa-wallet"></i> My wallet</a>
+        <!-- Active Page -->
+        <a href="employer-premium.html" class="nav-item active"><i class="fas fa-crown"></i> My plan</a>
+
+        <div class="nav-group-label">Growth</div>
+        <a href="employer-referrals.html" class="nav-item" id="nav-invite">
+            <i class="fas fa-share-nodes"></i> Invite and earn
+            <i class="fas fa-lock nav-lock-icon" id="lock-invite" style="display:none;"></i>
+        </a>
+        <a href="employer-investment.html" class="nav-item" id="nav-invest">
+            <i class="fas fa-chart-line"></i> Invest
+            <i class="fas fa-lock nav-lock-icon" id="lock-invest" style="display:none;"></i>
+        </a>
+
+        <div class="nav-group-label">Resources</div>
+        <a href="employer-blogs.html" class="nav-item"><i class="fas fa-newspaper"></i> News and insights</a>
+        <a href="employer-resources.html" class="nav-item" id="nav-resources">
+            <i class="fas fa-book"></i> Resources
+            <i class="fas fa-lock nav-lock-icon" id="lock-resources" style="display:none;"></i>
+        </a>
+
+        <div class="nav-group-label">Account</div>
+        <a href="employer-profile.html" class="nav-item"><i class="fas fa-user"></i> My profile</a>
+        <a href="employer-settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+        
+        <div style="margin-top:auto; padding:20px 24px;">
+            <a href="#" onclick="logout()" style="color:var(--danger); text-decoration:none; font-size:0.9rem; display:flex; align-items:center;"><i class="fa-solid fa-right-from-bracket" style="margin-right:10px;"></i> Signout</a>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="content-wrapper">
+            
+            <div class="hero-section animate__animated animate__fadeInDown">
+                <!-- Wallet Banner -->
+                <div class="wallet-banner">
+                    <span style="color:var(--text-muted); font-size:0.8rem; text-transform:uppercase; letter-spacing:1px;">Wallet Balance</span>
+                    <span class="wallet-amount" id="display-balance">Loading...</span>
+                    <a href="employer-wallet.html" class="btn-deposit-sm"><i class="fas fa-plus"></i> Deposit</a>
+                </div>
+
+                <h1 class="hero-title">Scale Your Hiring</h1>
+                <p class="hero-text">Upgrade your plan instantly using your company wallet. Zero paperwork, immediate access.</p>
+            </div>
+
+            <!-- Support Link -->
+            <div style="text-align:center; margin-bottom:30px; font-size:0.85rem; color:var(--text-muted);" class="animate__animated animate__fadeIn">
+                <i class="fas fa-globe"></i> International Payment? <a href="employer-support.html" style="color:var(--gold-base); font-weight:bold; text-decoration:none;">Contact Concierge</a>
+            </div>
+
+            <div class="pricing-container animate__animated animate__fadeInUp">
+                
+                <!-- Starter Plan -->
+                <div class="price-card">
+                    <h3 class="plan-title">Starter</h3>
+                    <div class="price-box">
+                        <span class="currency">KES</span>
+                        <span class="amount">0</span>
+                    </div>
+                    <ul class="features">
+                        <li><i class="fas fa-check"></i> Post 1 Active Job</li>
+                        <li><i class="fas fa-check"></i> Basic Dashboard</li>
+                        <li class="disabled"><i class="fas fa-times"></i> Access CV Database</li>
+                        <li class="disabled"><i class="fas fa-times"></i> Company Verification</li>
+                        <li class="disabled"><i class="fas fa-times"></i> Priority Support</li>
+                    </ul>
+                    <button class="btn-select btn-outline" id="btn-starter">Current Plan</button>
+                </div>
+
+                <!-- Growth Plan (Highlighted) -->
+                <div class="price-card highlight">
+                    <div class="plan-badge">Most Popular</div>
+                    <h3 class="plan-title">Growth</h3>
+                    <div class="price-box">
+                        <span class="currency">KES</span>
+                        <span class="amount">500</span>
+                        <span class="duration">/mo</span>
+                    </div>
+                    <ul class="features">
+                        <li><i class="fas fa-check"></i> <strong>Verified Company Badge</strong></li>
+                        <li><i class="fas fa-check"></i> Post 5 Active Jobs</li>
+                        <li><i class="fas fa-check"></i> Jobs Active for 30 Days</li>
+                        <li><i class="fas fa-check"></i> <strong>CV Database Access</strong> (50 Views)</li>
+                        <li><i class="fas fa-check"></i> Priority Email Support</li>
+                    </ul>
+                    <button class="btn-select btn-fill" id="btn-growth" onclick="confirmUpgrade('growth', 500)">Upgrade to Growth</button>
+                </div>
+
+                <!-- Scale Plan -->
+                <div class="price-card">
+                    <h3 class="plan-title">Scale</h3>
+                    <div class="price-box">
+                        <span class="currency">KES</span>
+                        <span class="amount">1,100</span>
+                        <span class="duration">/mo</span>
+                    </div>
+                    <ul class="features">
+                        <li><i class="fas fa-check"></i> <strong>Unlimited Job Posts</strong></li>
+                        <li><i class="fas fa-check"></i> Unlimited CV Access</li>
+                        <li><i class="fas fa-check"></i> <strong>Featured Jobs</strong> (Top of Search)</li>
+                        <li><i class="fas fa-check"></i> Dedicated Account Manager</li>
+                        <li><i class="fas fa-check"></i> API Access</li>
+                    </ul>
+                    <button class="btn-select btn-outline" style="border-color:var(--gold-base); color:var(--gold-base);" id="btn-scale" onclick="confirmUpgrade('scale', 1100)">Select Scale</button>
+                </div>
+
+            </div>
+
+            <footer style="text-align:center; margin-top:50px; padding:20px; border-top:1px solid var(--border-color); color:var(--text-muted); font-size:0.75rem;">
+                &copy; 2025 EastLink Recruiters. All Rights Reserved.
+            </footer>
+        </div>
+    </main>
+
+    <!-- Payment Confirmation Modal -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-box animate__animated animate__zoomIn">
+            <div style="position: absolute; top: 15px; right: 15px; cursor: pointer; color:var(--text-muted);" onclick="closeModal()">✕</div>
+            
+            <div class="modal-icon"><i class="fas fa-crown"></i></div>
+            
+            <h2 style="color: var(--text-main); font-family:var(--font-head); margin-bottom: 5px;">Confirm Upgrade</h2>
+            <p id="plan-desc" style="color: var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Upgrade to Growth Plan</p>
+            
+            <div class="modal-balance">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:var(--text-muted); font-size:0.9rem;">
+                    <span>Plan Cost:</span>
+                    <span id="cost-txt" style="color:var(--danger); font-weight:700;">KES 500</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; color:var(--text-muted); font-size:0.9rem;">
+                    <span>Available Wallet:</span>
+                    <span id="modal-balance-txt" style="color:var(--success); font-weight:700;">KES 0</span>
+                </div>
+            </div>
+
+            <div id="insufficient-msg" style="display:none; background:rgba(239,68,68,0.1); color:var(--danger); padding:10px; border-radius:8px; margin-bottom:20px; font-size:0.85rem; border:1px solid rgba(239,68,68,0.3);">
+                <i class="fas fa-exclamation-circle"></i> Insufficient funds. Please deposit first.
+            </div>
+
+            <button class="btn-select btn-fill" onclick="processUpgrade()" id="confirmBtn">Confirm & Pay</button>
+            <button onclick="location.href='employer-wallet.html'" class="btn-select btn-outline" id="depositBtn" style="display:none; border-color:var(--gold-base); color:var(--gold-base);">Top Up Wallet</button>
+            
+            <div style="display:none; margin-top:15px; color:var(--gold-base);" id="loader">
+                <i class="fas fa-circle-notch fa-spin fa-2x"></i>
+                <p style="font-size:0.8rem; margin-top:10px; color:var(--text-muted);">Processing Payment...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add EastLink to home screen.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, addDoc, collection, serverTimestamp, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- GLOBAL VARIABLES ---
+        let currentUser = null;
+        let currentBalance = 0;
+        let selectedPlan = null;
+        let selectedAmount = 0;
+
+        // --- UI HELPERS ---
+        window.toggleSidebar = () => {
+            const sb = document.getElementById('sidebar');
+            sb.classList.toggle('active');
+            document.getElementById('overlay').style.display = sb.classList.contains('active') ? 'block' : 'none';
+        };
+        window.closeSidebar = () => {
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('overlay').style.display = 'none';
+        };
+        window.logout = () => signOut(auth).then(() => location.href = 'signin.html');
+        window.closeModal = () => document.getElementById('confirmModal').classList.remove('active');
+
+        // --- AUTH & DATA LOGIC ---
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) return location.href = 'signin.html';
+            currentUser = user;
+            
+            // 1. GET USER DATA
+            onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+                if (!docSnap.exists()) return;
+                const data = docSnap.data();
+                
+                if (data.role !== 'employer') return location.href = 'seeker-dashboard.html';
+
+                // Basic Info
+                if(data.logoUrl) document.getElementById('header-avatar').innerHTML = `<img src="${data.logoUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+                
+                // Wallet & Buttons
+                currentBalance = data.walletBalance || 0;
+                document.getElementById('display-balance').innerText = `KES ${currentBalance.toLocaleString()}`;
+                
+                const plan = (data.plan || data.subscription || 'free').toLowerCase();
+                
+                // Sidebar Locks
+                if(plan === 'free') lockNav('nav-invite', 'lock-invite');
+                else unlockNav('nav-invite', 'lock-invite');
+
+                if(!plan.includes('growth') && !plan.includes('scale')) {
+                    lockNav('nav-invest', 'lock-invest');
+                    lockNav('nav-resources', 'lock-resources');
+                } else {
+                    unlockNav('nav-invest', 'lock-invest');
+                    unlockNav('nav-resources', 'lock-resources');
+                }
+
+                // Badges
+                loadBadges(user.uid);
+
+                // Update UI for Plan Selection
+                updateButtonStates(plan);
+            });
+        });
+
+        // --- NAVIGATION HELPERS ---
+        function lockNav(id, lockId) {
+            const el = document.getElementById(id); const lock = document.getElementById(lockId);
+            if(el) el.classList.add('locked'); if(lock) lock.style.display = 'block';
+        }
+        function unlockNav(id, lockId) {
+            const el = document.getElementById(id); const lock = document.getElementById(lockId);
+            if(el) el.classList.remove('locked'); if(lock) lock.style.display = 'none';
+        }
+
+        // --- BADGE LOGIC ---
+        function loadBadges(uid) {
+            // Messages
+            onSnapshot(query(collection(db, "chats"), where("participants", "array-contains", uid), where("hasUnread", "==", true)), s => {
+                let c = 0; s.docs.forEach(d => { if(d.data().lastSenderId !== uid) c++; });
+                updateBadge('header-msg-badge', c); updateBadge('nav-badge-messages', c);
+            });
+            // Notifications
+            onSnapshot(query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false)), s => {
+                updateBadge('header-notif-badge', s.size);
+            });
+            // Candidates
+            onSnapshot(query(collection(db, "applications"), where("employerId", "==", uid), where("status", "==", "new")), s => {
+                updateBadge('nav-badge-candidates', s.size);
+            });
+        }
+        function updateBadge(id, count) {
+            const el = document.getElementById(id); if(!el) return;
+            el.style.display = count > 0 ? (id.includes('nav') ? 'inline-block' : 'flex') : 'none';
+            el.innerText = count > 9 ? '9+' : count;
+        }
+
+        // --- PLAN & PAYMENT LOGIC ---
+        function updateButtonStates(currentPlan) {
+            const starterBtn = document.getElementById('btn-starter');
+            const growthBtn = document.getElementById('btn-growth');
+            const scaleBtn = document.getElementById('btn-scale');
+
+            // Reset
+            starterBtn.disabled = false; starterBtn.innerText = "Select Starter"; starterBtn.onclick = () => confirmUpgrade('starter', 0);
+            growthBtn.disabled = false; growthBtn.innerText = "Upgrade to Growth"; growthBtn.onclick = () => confirmUpgrade('growth', 500);
+            scaleBtn.disabled = false; scaleBtn.innerText = "Select Scale"; scaleBtn.onclick = () => confirmUpgrade('scale', 1100);
+
+            // Logic
+            if(currentPlan === 'starter' || currentPlan === 'free') {
+                starterBtn.innerText = "Current Plan"; starterBtn.disabled = true; starterBtn.style.opacity = '0.5';
+            } 
+            else if (currentPlan.includes('growth')) {
+                growthBtn.innerText = "Active Plan"; growthBtn.disabled = true; growthBtn.style.background = 'var(--success)'; growthBtn.style.color='white';
+                starterBtn.innerText = "Downgrade";
+            } 
+            else if (currentPlan.includes('scale')) {
+                scaleBtn.innerText = "Active Plan"; scaleBtn.disabled = true; scaleBtn.style.background = 'var(--success)'; scaleBtn.style.color='white';
+                starterBtn.innerText = "Downgrade";
+                growthBtn.innerText = "Downgrade";
+            }
+        }
+
+        window.confirmUpgrade = (plan, amount) => {
+            selectedPlan = plan; selectedAmount = amount;
+            
+            document.getElementById('plan-desc').innerText = `Upgrade to ${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan`;
+            document.getElementById('cost-txt').innerText = `KES ${amount.toLocaleString()}`;
+            document.getElementById('modal-balance-txt').innerText = `KES ${currentBalance.toLocaleString()}`;
+            
+            const confirmBtn = document.getElementById('confirmBtn');
+            const depositBtn = document.getElementById('depositBtn');
+            const msg = document.getElementById('insufficient-msg');
+
+            if (currentBalance < amount) {
+                confirmBtn.style.display = 'none';
+                depositBtn.style.display = 'block';
+                msg.style.display = 'block';
+            } else {
+                confirmBtn.style.display = 'block';
+                depositBtn.style.display = 'none';
+                msg.style.display = 'none';
+            }
+
+            document.getElementById('confirmModal').classList.add('active');
+        };
+
+        window.processUpgrade = async () => {
+            const confirmBtn = document.getElementById('confirmBtn');
+            const loader = document.getElementById('loader');
+
+            confirmBtn.style.display = 'none';
+            loader.style.display = 'block';
+
+            try {
+                // 1. Deduct Balance
+                const newBalance = currentBalance - selectedAmount;
+                await updateDoc(doc(db, "users", currentUser.uid), { walletBalance: newBalance });
+
+                // 2. Add Transaction
+                await addDoc(collection(db, "transactions"), {
+                    userId: currentUser.uid,
+                    role: "employer",
+                    amount: selectedAmount,
+                    type: "payment",
+                    description: `${selectedPlan.toUpperCase()} Plan Subscription`,
+                    plan: selectedPlan,
+                    status: "success",
+                    method: "Wallet",
+                    timestamp: serverTimestamp()
+                });
+
+                // 3. Update User Plan & Limits
+                let limits = {};
+                if(selectedPlan === 'starter') limits = { jobLimit: 1, cvAccess: false, isVerified: false, plan: 'starter' };
+                else if(selectedPlan === 'growth') limits = { jobLimit: 5, cvAccess: true, isVerified: true, plan: 'growth' };
+                else if(selectedPlan === 'scale') limits = { jobLimit: 9999, cvAccess: true, isVerified: true, isFeatured: true, plan: 'scale' };
+
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    subscription: selectedPlan, // Standardizing field name
+                    plan: selectedPlan,         // Redundancy for safety
+                    subscriptionExpiry: new Date(Date.now() + 2592000000), // 30 days
+                    ...limits
+                });
+
+                loader.style.display = 'none';
+                Toastify({ text: "Success! Plan Updated.", style: { background: "var(--success)" } }).showToast();
+                setTimeout(() => window.location.href = 'employer-dashboard.html', 1500);
+
+            } catch (error) {
+                console.error(error);
+                loader.style.display = 'none';
+                confirmBtn.style.display = 'block';
+                Toastify({ text: "Transaction Failed. Try again.", style: { background: "var(--danger)" } }).showToast();
+            }
+        };
+
+        // --- PWA LOGIC ---
+        let deferredPrompt;
+        const pwaPopup = document.getElementById('pwa-install-popup');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if(!localStorage.getItem('pwaDismissed')) {
+                pwaPopup.style.display = 'flex';
+            }
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                pwaPopup.style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            pwaPopup.style.display = 'none';
+            localStorage.setItem('pwaDismissed', 'true');
+        };
+    </script>
+</body>
+</html>

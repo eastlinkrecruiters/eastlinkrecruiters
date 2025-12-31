@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Wallet | EastLink Recruiters</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
+    <meta name="theme-color" content="#0F172A">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    
+    <!-- Libs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            /* Brighter Theme Variables */
+            --bg-body: #0F172A;       
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.95);
+            --bg-input: rgba(255, 255, 255, 0.07);
+            --bg-hover: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8; 
+            --gold-base: #D97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --neon-purple: #8b5cf6;
+            --success: #10B981;
+            --danger: #EF4444;
+            --sidebar-width: 260px; 
+            --header-height: 70px;
+            --radius: 16px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-mono: 'Share Tech Mono', monospace;
+            --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            /* Mesh Gradient Background */
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            background-attachment: fixed;
+            background-size: cover;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+            transition: background 0.3s ease;
+        }
+
+        /* Utils & Glassmorphism */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            width: 100%;
+            transition: transform 0.3s var(--ease-bounce), box-shadow 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Noise Texture for Depth */
+        .glass-panel::before {
+            content: ""; position: absolute; inset:0; opacity: 0.05; pointer-events: none; z-index: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        
+        .text-truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* Header */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 1000;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        
+        .logo { 
+            font-family: var(--font-head); 
+            font-weight: 700; color: var(--text-main); font-size: 1.3rem; 
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; 
+            display: flex; align-items: center; 
+        }
+        .logo span { color: var(--gold-base); }
+        
+        .hamburger { font-size: 1.4rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        /* Search */
+        .global-search-container { flex: 1; max-width: 450px; position: relative; margin: 0 20px; }
+        .global-search-input {
+            width: 100%; background: var(--bg-input); border: 1px solid var(--border-color);
+            padding: 10px 45px 10px 15px; border-radius: 12px; color: var(--text-main);
+            transition: all 0.3s ease; font-size: 0.9rem;
+        }
+        .global-search-input:focus { 
+            border-color: var(--gold-base); background: var(--bg-hover); 
+            box-shadow: 0 0 15px rgba(217, 119, 6, 0.15);
+        }
+        .search-results-dropdown {
+            position: absolute; top: 115%; left: 0; width: 100%; background: var(--bg-glass-heavy);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            max-height: 300px; overflow-y: auto; display: none; z-index: 2000;
+        }
+        .search-result-item { padding: 12px 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .search-result-item:hover { background: var(--bg-hover); padding-left: 20px; }
+
+        /* Header Actions */
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+        .icon-btn { 
+            width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px;
+            color: var(--text-muted); cursor: pointer; transition: all 0.3s var(--ease-bounce); position: relative;
+        }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); transform: translateY(-2px); }
+        
+        .notification-badge { 
+            position: absolute; top: 5px; right: 5px; 
+            min-width: 16px; height: 16px; 
+            background: var(--danger); border-radius: 10px; 
+            font-size: 0.6rem; color: white; font-weight: 700;
+            display: none; place-items: center; justify-content: center;
+            padding: 0 4px; border: 2px solid var(--bg-card);
+        }
+        
+        .profile-widget {
+            width: 42px; height: 42px; position: relative; cursor: pointer;
+            transition: transform 0.3s var(--ease-bounce); margin-left: 5px; flex-shrink: 0;
+        }
+        .profile-widget:hover { transform: scale(1.05); }
+        .user-avatar { 
+            width: 100%; height: 100%; border-radius: 12px; 
+            background: var(--gold-gradient); display: grid; place-items: center; 
+            font-weight: 700; color: #fff; border: 2px solid var(--border-color); 
+            object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .user-avatar.img-mode { background: transparent; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 20px 0; overflow-y: auto; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+        .nav-group { padding: 0 24px; margin-bottom: 20px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-item { 
+            display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.9rem; transition: all 0.3s ease; border-radius: 10px; margin-bottom: 4px;
+        }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
+        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
+        .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
+        
+        /* Layout */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
+        .wallet-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 30px; margin-bottom: 30px; align-items: start; }
+
+        /* --- 3D CARD & FLIP LOGIC --- */
+        .card-perspective { perspective: 1200px; width: 100%; max-width: 500px; margin: 0 auto; position: relative; }
+        .credit-card {
+            width: 100%; aspect-ratio: 1.586/1; position: relative; transform-style: preserve-3d; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
+        }
+        .credit-card.is-flipped { transform: rotateY(180deg); }
+        
+        .card-face {
+            position: absolute; inset: 0; -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            background: linear-gradient(135deg, #1e3a8a 0%, #172554 45%, #0f172a 100%);
+            border-radius: 20px; padding: 25px; color: white; display: flex; flex-direction: column; justify-content: space-between;
+            border: 1px solid rgba(255,255,255,0.2); overflow: hidden;
+        }
+        .card-face.back { transform: rotateY(180deg); padding: 0; justify-content: flex-start; }
+        
+        .card-watermark { position: absolute; inset: 0; background-image: url('./assets/images/logo.png'); background-size: 80%; background-position: center; opacity: 0.15; mix-blend-mode: overlay; }
+        .card-gloss { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(to bottom right, rgba(255,255,255,0.2) 0%, transparent 40%, transparent 100%); transform: rotate(30deg); pointer-events: none; }
+        
+        /* Front Face Elements */
+        .card-top { display: flex; justify-content: space-between; align-items: flex-start; z-index: 5; }
+        .card-logo { font-family: var(--font-head); font-weight: 700; color: var(--gold-base); font-size: 1.2rem; display: flex; align-items: center; gap: 8px; }
+        .card-middle-row { display: flex; align-items: center; margin-top: 15px; z-index: 5; gap: 20px; }
+        .chip { width: 50px; height: 38px; background: linear-gradient(135deg, #d97706 0%, #fcd34d 50%, #b45309 100%); border-radius: 6px; border: 1px solid rgba(255,255,255,0.2); box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); flex-shrink: 0; }
+        .card-holder { font-family: var(--font-mono); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1.5px; color: #e2e8f0; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+        .card-number { font-family: var(--font-mono); font-size: clamp(1.3rem, 2vw, 1.8rem); letter-spacing: 4px; color: white; text-shadow: 0 2px 2px rgba(0,0,0,0.9); margin-top: 15px; margin-bottom: auto; z-index: 5; }
+        .card-bottom { display: flex; justify-content: space-between; align-items: flex-end; z-index: 5; margin-top: 10px; }
+        .balance-display { font-family: var(--font-display); font-size: 1.4rem; color: white; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .cvv-box { text-align: right; cursor: pointer; background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); transition: 0.3s; }
+        .cvv-box:hover { background: rgba(255,255,255,0.1); }
+
+        /* Back Face Elements */
+        .mag-strip { height: 50px; background: #000; margin-top: 30px; width: 100%; }
+        .cvv-strip { background: #fff; color: #000; padding: 10px 15px; font-family: var(--font-mono); text-align: right; width: 80%; margin: 20px auto; border-radius: 4px; font-weight: 700; letter-spacing: 2px; }
+        .back-text { color: #ccc; font-size: 0.6rem; padding: 0 25px; text-align: center; margin-top: auto; margin-bottom: 20px; }
+
+        /* Action Buttons */
+        .action-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; margin-top: 25px; }
+        .btn-wallet-small { background: var(--bg-glass); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px 5px; cursor: pointer; color: var(--text-main); text-align: center; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .btn-wallet-small:hover { transform: translateY(-3px); background: var(--bg-hover); border-color: var(--gold-base); }
+        .btn-wallet-small i { font-size: 1.2rem; }
+        .btn-dep i { color: var(--success); }
+        .btn-wth i { color: var(--danger); }
+        .btn-send i { color: var(--neon-purple); }
+        .btn-inv i { color: var(--gold-base); }
+
+        /* Widgets (Purchasing Power & Vaults) */
+        .wallet-widgets { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; }
+        .widget-box { padding: 20px; display: flex; flex-direction: column; justify-content: space-between; height: 100%; border-left: 3px solid transparent; }
+        .widget-title { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; }
+        
+        .vault-ring { width: 60px; height: 60px; border-radius: 50%; border: 4px solid var(--bg-input); border-top-color: var(--gold-base); display: grid; place-items: center; font-size: 0.75rem; font-weight: 700; }
+        
+        /* History Panel & Skeleton */
+        .history-panel { background: var(--bg-glass); border: 1px solid var(--border-color); border-radius: var(--radius); overflow: hidden; padding-bottom: 15px; width: 100%; transition: 0.3s; }
+        .history-panel:hover { border-color: var(--gold-base); }
+        .history-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .filter-tabs { display: flex; gap: 8px; background: var(--bg-input); padding: 4px; border-radius: 10px; overflow-x: auto; scrollbar-width: none; }
+        .filter-tab { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 6px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; flex-shrink: 0; transition:0.3s; }
+        .filter-tab:hover { color: var(--text-main); }
+        .filter-tab.active { background: var(--bg-card); color: var(--gold-base); }
+        
+        .tx-item { padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; animation: fadeInUp 0.4s ease forwards; opacity: 0; }
+        .tx-item:hover { background: var(--bg-hover); padding-left: 25px; }
+        .tx-icon { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; margin-right: 15px; font-size: 1.1rem; flex-shrink: 0; background-size: cover; background-position: center; }
+
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+        /* Skeleton Loading */
+        .skeleton { background: linear-gradient(90deg, var(--bg-input) 25%, var(--bg-hover) 50%, var(--bg-input) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 6px; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .sk-row { display: flex; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border-color); }
+        .sk-icon { width: 40px; height: 40px; border-radius: 10px; }
+        .sk-text { height: 14px; width: 100px; margin-bottom: 5px; }
+        .sk-sub { height: 10px; width: 60px; }
+        .sk-amt { height: 16px; width: 80px; }
+
+        /* Toggle Switch */
+        .toggle-switch { position: relative; width: 40px; height: 20px; appearance: none; background: var(--bg-input); border-radius: 20px; transition: 0.3s; cursor: pointer; border: 1px solid var(--border-color); }
+        .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; background: var(--text-muted); border-radius: 50%; transition: 0.3s; }
+        .toggle-switch:checked { background: var(--success); border-color: var(--success); }
+        .toggle-switch:checked::after { transform: translateX(20px); background: #fff; }
+
+        /* MODAL STYLES */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 3000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
+        .modal-overlay.open { display: flex; opacity: 1; }
+        .modal-content { background: var(--bg-glass-heavy); border: 1px solid var(--border-color); padding: 30px; border-radius: 20px; width: 90%; max-width: 450px; transform: scale(0.9); transition: transform 0.3s var(--ease-bounce); }
+        .modal-overlay.open .modal-content { transform: scale(1); }
+        
+        .payment-method { background: var(--bg-input); padding: 15px; border-radius: 10px; border: 1px solid var(--border-color); margin-bottom: 10px; display: flex; gap: 15px; align-items: center; transition: 0.2s; cursor: pointer; }
+        .payment-method:hover { background: var(--bg-hover); border-color: var(--gold-base); }
+        .method-logo { width: 40px; height: 40px; background: white; border-radius: 50%; display: grid; place-items: center; overflow: hidden; flex-shrink: 0; }
+        .method-logo img { width: 100%; height: 100%; object-fit: contain; }
+
+        .input-group { margin-bottom: 20px; }
+        .input-label { display: block; font-size: 0.8rem; margin-bottom: 8px; color: var(--text-muted); font-weight: 600; }
+        .input-wrapper { position: relative; }
+        .input-wrapper i { position: absolute; left: 15px; top: 14px; color: var(--gold-base); font-size: 0.9rem; }
+        .modal-input { width: 100%; padding: 12px 15px 12px 40px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-main); font-family: var(--font-body); outline: none; transition: 0.3s; }
+        .modal-input:focus { border-color: var(--gold-base); background: var(--bg-hover); }
+        .btn-submit { width: 100%; padding: 14px; background: var(--gold-gradient); color: white; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(217, 119, 6, 0.4); }
+
+        @media (max-width: 992px) {
+            .global-search-container { display: none; }
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 20px 10px; width: 100%; }
+            .wallet-grid { grid-template-columns: 1fr; }
+            .hamburger { display: block; }
+            .header-left { gap: 10px; }
+            .action-row { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="seeker-dashboard.html" class="logo">EAST<span>LINK</span></a>
+        </div>
+        
+        <div class="global-search-container">
+            <input type="text" id="searchInput" class="global-search-input" placeholder="Search jobs, skills, or companies...">
+            <i class="fas fa-search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+            <div id="searchResults" class="search-results-dropdown"></div>
+        </div>
+
+        <div class="header-actions">
+            <div class="icon-btn" title="Messages" onclick="location.href='seeker-messages.html'">
+                <i class="fa-regular fa-envelope"></i>
+                <div class="notification-badge" id="msg-badge">0</div>
+            </div>
+            <div class="icon-btn" title="Notifications" onclick="location.href='seeker-notifications.html'">
+                <i class="fa-regular fa-bell"></i>
+                <div class="notification-badge" id="notif-badge">0</div>
+            </div>
+            <div class="profile-widget" onclick="location.href='seeker-profile.html'" title="My Profile">
+                <img src="" id="header-avatar-img" class="user-avatar img-mode" alt="Profile" style="display:none;">
+                <div id="header-avatar-fallback" class="user-avatar">U</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Overview</div>
+            <a href="seeker-dashboard.html" class="nav-item"><i class="fa-solid fa-compass"></i> Dashboard</a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Job Hunt</div>
+            <a href="seeker-applications.html" class="nav-item"><i class="fa-solid fa-file-signature"></i> Applied Jobs</a>
+            <a href="seeker-jobs.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Browse Jobs</a>
+            <a href="seeker-featured-jobs.html" class="nav-item link-std"><i class="fa-solid fa-star"></i> Featured Jobs <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-urgentlyhiring.html" class="nav-item link-pro"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-guaranteed-jobs.html" class="nav-item link-pro"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="seeker-wallet.html" class="nav-item active"><i class="fa-solid fa-wallet"></i> My Wallet</a>
+            <a href="seeker-premium.html" class="nav-item"><i class="fa-solid fa-crown"></i> My Plan</a>
+            <a href="seeker-referrals.html" class="nav-item link-std"><i class="fa-solid fa-user-plus"></i> Invite & Earn <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-invest.html" class="nav-item link-std"><i class="fa-solid fa-chart-line"></i> Invest <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Resources</div>
+            <a href="seeker-blog.html" class="nav-item"><i class="fa-solid fa-newspaper"></i> News & Insights</a>
+            <a href="seeker-resources.html" class="nav-item link-pro"><i class="fa-solid fa-book"></i> Resources <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Settings</div>
+            <a href="seeker-profile.html" class="nav-item"><i class="fa-solid fa-user-gear"></i> Profile</a>
+            <a href="seeker-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="closeSidebar()" style="position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:998; display:none; backdrop-filter:blur(2px);"></div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div style="margin-bottom:30px; display:flex; justify-content:space-between; align-items:end;">
+            <div>
+                <h1 class="animate__animated animate__fadeInDown" style="font-family:var(--font-head); font-size:1.8rem;">My Wallet</h1>
+                <p class="animate__animated animate__fadeInDown animate__delay-1s" style="color:var(--text-muted);">Secure financial overview.</p>
+            </div>
+            <!-- Auto Recharge Toggle -->
+            <div class="animate__animated animate__fadeInDown animate__delay-1s" style="display:flex; align-items:center; gap:10px; font-size:0.8rem; color:var(--text-muted);">
+                <span>Auto-Recharge</span>
+                <input type="checkbox" class="toggle-switch" title="Auto-deposit KES 1000 if balance < 200">
+            </div>
+        </div>
+
+        <div class="wallet-grid">
+            
+            <!-- LEFT: CARD & ACTIONS -->
+            <div style="display:flex; flex-direction:column; gap:25px;">
+                <!-- 3D Card with FLIP -->
+                <div class="card-perspective animate__animated animate__zoomIn">
+                    <div class="credit-card" id="creditCard3D">
+                        <!-- FRONT FACE -->
+                        <div class="card-face">
+                            <div class="card-gloss"></div>
+                            <div class="card-watermark"></div>
+                            <div class="card-top">
+                                <div class="card-logo"><i class="fas fa-gem"></i> EASTLINK</div>
+                                <i class="fas fa-wifi" style="font-size:1.5rem; transform:rotate(90deg); opacity:0.8;"></i>
+                            </div>
+                            <div class="card-middle-row">
+                                <div class="chip"></div>
+                                <span class="card-holder" id="card-holder-name">LOADING...</span>
+                            </div>
+                            <div class="card-number" id="card-number-display">**** **** **** ****</div>
+                            <div class="card-bottom">
+                                <div class="balance-container">
+                                    <div style="font-size:0.6rem; color:#cbd5e1; margin-bottom:2px;">TOTAL BALANCE</div>
+                                    <div class="balance-display" id="balance-main">
+                                        KES 0
+                                    </div>
+                                </div>
+                                <div class="cvv-box" onclick="flipCard()">
+                                    <div style="font-size:0.55rem; color:#cbd5e1;">CVV</div>
+                                    <div style="font-family:var(--font-mono); font-size:0.9rem; display:flex; align-items:center; gap:5px;">
+                                        *** <i class="fas fa-redo" style="font-size:0.7rem; color:var(--gold-base);"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- BACK FACE -->
+                        <div class="card-face back">
+                             <div class="mag-strip"></div>
+                             <div style="padding:0 25px; width:100%; margin-top:10px;">
+                                 <div style="font-size:0.6rem; text-align:right; margin-bottom:2px;">AUTHORIZED SIGNATURE / CVC</div>
+                                 <div class="cvv-strip" id="back-cvv-display">***</div>
+                             </div>
+                             <div class="back-text">
+                                 This card is issued by EastLink Recruiters. Use of this card constitutes acceptance of terms.
+                                 <br><br>
+                                 <span onclick="flipCard()" style="cursor:pointer; color:var(--gold-base); text-decoration:underline;">Click to Flip Back</span>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <a class="download-link" onclick="openModal('downloadAuthModal')" style="text-align:center; display:block; color:var(--text-muted); font-size:0.8rem; cursor:pointer; text-decoration:underline;"><i class="fas fa-download"></i> Download Card to Phone</a>
+
+                <!-- Horizontal Actions -->
+                <div class="action-row animate__animated animate__fadeInUp">
+                    <div class="btn-wallet-small btn-dep" onclick="openModal('depositModal')">
+                        <i class="fa-solid fa-arrow-down"></i><span>Deposit</span>
+                    </div>
+                    <div class="btn-wallet-small btn-wth" onclick="openModal('withdrawModal')">
+                        <i class="fa-solid fa-paper-plane"></i><span>Withdraw</span>
+                    </div>
+                    <div class="btn-wallet-small btn-send" onclick="openModal('p2pModal')">
+                        <i class="fa-solid fa-comments-dollar"></i><span>Send</span>
+                    </div>
+                    <div class="btn-wallet-small btn-inv" onclick="location.href='seeker-invest.html'">
+                        <i class="fa-solid fa-chart-line"></i><span>Invest</span>
+                    </div>
+                </div>
+
+                <!-- Widgets: Purchasing Power & Savings Vault -->
+                <div class="wallet-widgets animate__animated animate__fadeInUp animate__delay-1s">
+                    <!-- Purchasing Power -->
+                    <div class="glass-panel widget-box" style="border-left-color: var(--success);">
+                        <div class="widget-title">Power <i class="fas fa-bolt"></i></div>
+                        <div style="font-size:0.8rem; color:var(--text-muted); margin:10px 0;">Your balance covers:</div>
+                        <div id="purchasing-power-text" style="font-weight:700; color:var(--text-main); font-size:0.9rem;">
+                            Calculating...
+                        </div>
+                    </div>
+                    <!-- Savings Vault -->
+                    <div class="glass-panel widget-box" style="border-left-color: var(--gold-base); flex-direction:row; align-items:center;">
+                        <div>
+                            <div class="widget-title" style="margin-bottom:5px;">Goal</div>
+                            <div style="font-size:0.75rem; color:var(--text-muted);">Pro Plan</div>
+                            <div style="font-size:0.9rem; font-weight:700;">KES 500</div>
+                        </div>
+                        <div class="vault-ring" style="background:conic-gradient(var(--gold-base) 25%, var(--bg-input) 0);">
+                            25%
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: HISTORY -->
+            <div class="history-panel animate__animated animate__fadeInRight">
+                <div class="history-header">
+                    <h3 style="font-size:1.1rem; font-weight:600;">Transaction History</h3>
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" onclick="filterHistory('all', this)">All</button>
+                        <button class="filter-tab" onclick="filterHistory('deposit', this)">In</button>
+                        <button class="filter-tab" onclick="filterHistory('withdrawal', this)">Out</button>
+                    </div>
+                </div>
+                <div id="tx-list">
+                    <!-- Skeleton Loader -->
+                    <div class="sk-row"><div class="sk-icon skeleton"></div><div style="flex:1; margin-left:15px;"><div class="sk-text skeleton"></div><div class="sk-sub skeleton"></div></div><div class="sk-amt skeleton"></div></div>
+                    <div class="sk-row"><div class="sk-icon skeleton"></div><div style="flex:1; margin-left:15px;"><div class="sk-text skeleton"></div><div class="sk-sub skeleton"></div></div><div class="sk-amt skeleton"></div></div>
+                    <div class="sk-row"><div class="sk-icon skeleton"></div><div style="flex:1; margin-left:15px;"><div class="sk-text skeleton"></div><div class="sk-sub skeleton"></div></div><div class="sk-amt skeleton"></div></div>
+                </div>
+                <button id="btn-view-more" onclick="loadMoreHistory()" style="width:calc(100% - 40px); margin:20px auto; padding:10px; background:var(--bg-input); border:1px dashed var(--border-color); color:var(--text-muted); border-radius:10px; cursor:pointer; display:none;">
+                    View More <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- DEPOSIT MODAL -->
+    <div class="modal-overlay" id="depositModal">
+        <div class="modal-content">
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                <h3 style="font-family:var(--font-head);">Add Funds</h3>
+                <i class="fas fa-times" onclick="closeModals()" style="cursor:pointer; color:var(--text-muted);"></i>
+            </div>
+            
+            <!-- UPDATED DEPOSIT DETAILS -->
+            <div class="payment-method">
+                <div class="method-logo"><img src="./assets/images/mpesa.png" alt="M"></div>
+                <div style="flex:1;">
+                    <div style="font-size:0.85rem; color:var(--text-muted);">Send Money</div>
+                    <div style="font-family:var(--font-mono); color:var(--gold-base); font-size:0.95rem;">0112705651</div>
+                    <div style="font-size:0.75rem; color:var(--text-main);">Fidelis Likhayu</div>
+                </div>
+                <i class="far fa-copy" onclick="copyTo('0112705651')" style="cursor:pointer; color:var(--text-muted);"></i>
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">Amount (KES)</label>
+                <div class="input-wrapper"><i class="fas fa-coins"></i><input type="text" id="dep-amount" class="modal-input fmt-num" placeholder="e.g. 500"></div>
+            </div>
+            <div class="input-group">
+                <label class="input-label">M-Pesa Reference Code</label>
+                <div class="input-wrapper"><i class="fas fa-receipt"></i><input type="text" id="dep-ref" class="modal-input" placeholder="e.g. QKH..." style="text-transform:uppercase;"></div>
+            </div>
+            
+            <button class="btn-submit" id="btn-dep-submit" onclick="submitDeposit()"><span>Verify & Deposit</span></button>
+        </div>
+    </div>
+
+    <!-- WITHDRAW MODAL -->
+    <div class="modal-overlay" id="withdrawModal">
+        <div class="modal-content">
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                <h3 style="font-family:var(--font-head);">Withdraw</h3>
+                <i class="fas fa-times" onclick="closeModals()" style="cursor:pointer; color:var(--text-muted);"></i>
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">Amount (KES)</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-wallet"></i>
+                    <input type="text" id="with-amount" class="modal-input fmt-num" placeholder="Min 1,000" onkeyup="calculateTotal()">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">Recipient Phone</label>
+                <div class="input-wrapper"><i class="fas fa-phone"></i><input type="tel" id="with-phone" class="modal-input"></div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:15px; border-top:1px solid var(--border-color); padding-top:10px;">
+                <span style="color:var(--text-muted)">Fee (Tier Adjusted)</span>
+                <span style="color:var(--text-main)" id="fee-display">KES 0.00</span>
+            </div>
+
+            <button class="btn-submit" id="btn-with-submit" onclick="submitWithdraw()"><span>Confirm Withdrawal</span></button>
+        </div>
+    </div>
+
+    <!-- P2P SEND MODAL -->
+    <div class="modal-overlay" id="p2pModal">
+        <div class="modal-content">
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                <h3 style="font-family:var(--font-head);">Send to User</h3>
+                <i class="fas fa-times" onclick="closeModals()" style="cursor:pointer; color:var(--text-muted);"></i>
+            </div>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px;">Instant transfer to another EastLink user (Mentor, Friend, etc).</p>
+
+            <div class="input-group">
+                <label class="input-label">Recipient Email / UID</label>
+                <div class="input-wrapper"><i class="fas fa-user"></i><input type="text" id="p2p-dest" class="modal-input" placeholder="user@email.com"></div>
+            </div>
+            <div class="input-group">
+                <label class="input-label">Amount</label>
+                <div class="input-wrapper"><i class="fas fa-coins"></i><input type="text" id="p2p-amount" class="modal-input fmt-num"></div>
+            </div>
+
+            <button class="btn-submit" onclick="submitP2P()"><span>Send Funds</span></button>
+        </div>
+    </div>
+
+    <!-- RECEIPT / DETAILS MODAL -->
+    <div class="modal-overlay" id="receiptModal">
+        <div class="modal-content" id="receipt-content">
+            <div style="display:flex; justify-content:flex-end;"><i class="fas fa-times" onclick="closeModals()" style="cursor:pointer; color:var(--text-muted);"></i></div>
+            
+            <div style="text-align:center; margin-bottom:20px; border-bottom:1px dashed var(--border-color); padding-bottom:15px;">
+                <div style="width:60px; height:60px; border-radius:50%; display:grid; place-items:center; margin:0 auto 10px auto; font-size:1.5rem;" id="rcpt-icon-bg">
+                    <i class="fas" id="rcpt-icon"></i>
+                </div>
+                <h3 style="font-size:1.1rem; margin-bottom:5px;" id="rcpt-type">Transaction</h3>
+                <p style="font-size:0.8rem; color:var(--text-muted);" id="rcpt-date">Date</p>
+                <div style="margin-top:10px; font-size:0.8rem; padding:4px 10px; background:var(--bg-input); border-radius:20px; display:inline-block;" id="rcpt-status">Status</div>
+            </div>
+
+            <div class="receipt-body">
+                <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:0.9rem;"><span style="color:var(--text-muted);">Reference</span><span style="font-family:var(--font-mono);" id="rcpt-ref">-</span></div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:0.9rem;"><span style="color:var(--text-muted);">Category</span><span style="font-family:var(--font-mono);" id="rcpt-cat">General</span></div>
+                
+                <div style="border-top:1px dashed var(--border-color); padding-top:15px; margin-top:15px; font-size:1.2rem; color:var(--gold-base); font-weight:700; display:flex; justify-content:space-between;">
+                    <span>Total Amount</span>
+                    <span id="rcpt-amount">KES 0.00</span>
+                </div>
+            </div>
+
+            <button class="btn-submit" onclick="downloadReceipt()" style="margin-top:25px; background:var(--bg-input); border:1px solid var(--border-color);">
+                <i class="fas fa-download"></i> Download Receipt
+            </button>
+        </div>
+    </div>
+
+    <!-- DOWNLOAD AUTH MODAL -->
+    <div class="modal-overlay" id="downloadAuthModal">
+        <div class="modal-content" style="max-width:320px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px;"><h3>Download Card</h3><i class="fas fa-times" onclick="closeModals()" style="cursor:pointer;"></i></div>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px;">Enter password to download.</p>
+            <input type="password" id="dl-password" class="modal-input" placeholder="Password">
+            <button class="btn-submit" onclick="downloadCardProcess()" id="btn-dl-submit">Verify & Download</button>
+        </div>
+    </div>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" style="
+        display: none; 
+        position: fixed; bottom: 20px; right: 20px; 
+        background: rgba(15, 23, 42, 0.95); 
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        backdrop-filter: blur(12px);
+        padding: 20px; border-radius: 16px; 
+        z-index: 10000; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        max-width: 320px; animation: slideUp 0.5s ease-out;
+    ">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+            <img src="./assets/images/logo.png" style="width:50px; height:50px; border-radius:10px;">
+            <div>
+                <h4 style="color:#fff; margin:0; font-family:'Cinzel', serif;">Install EastLink</h4>
+                <p style="color:#94A3B8; margin:5px 0 0; font-size:0.8rem;">Add to Home Screen for fast access.</p>
+            </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button id="pwa-dismiss" style="flex:1; padding:10px; background:transparent; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:8px; cursor:pointer;">Later</button>
+            <button id="pwa-install-btn" style="flex:1; padding:10px; background:linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border:none; color:#000; font-weight:700; border-radius:8px; cursor:pointer;">Install</button>
+        </div>
+    </div>
+    <style>@keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }</style>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, collection, query, where, addDoc, runTransaction, serverTimestamp, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null, walletBalance = 0, referralEarnings = 0, totalBalance = 0;
+        let allTx = [], visibleCount = 5, activeFilter = 'all';
+        let currentDynamicCVV = "000"; 
+        let isBalVisible = false;
+        let withdrawalFee = 50;
+        let userPlan = 'standard';
+
+        // --- GLOBAL UI HANDLERS ---
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none'; };
+        window.closeSidebar = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').style.display = 'none'; };
+        window.closeModals = () => document.querySelectorAll('.modal-overlay').forEach(e => e.classList.remove('open'));
+        window.openModal = (id) => document.getElementById(id).classList.add('open');
+        window.logout = () => signOut(auth).then(()=>location.href='signin.html');
+        window.copyTo = (t) => { navigator.clipboard.writeText(t); Toastify({text:"Copied!", style:{background:"var(--success)"}}).showToast(); };
+
+        // --- 3D CARD TILT & FLIP ---
+        const cardContainer = document.querySelector('.card-perspective');
+        const card = document.getElementById('creditCard3D');
+        
+        // Tilt Logic
+        if(cardContainer && card) {
+            cardContainer.addEventListener('mousemove', (e) => {
+                const rect = cardContainer.getBoundingClientRect();
+                const x = e.clientX - rect.left, y = e.clientY - rect.top;
+                cardContainer.style.transform = `rotateX(${((y - rect.height/2)/rect.height)*-10}deg) rotateY(${((x - rect.width/2)/rect.width)*10}deg)`;
+            });
+            cardContainer.addEventListener('mouseleave', () => cardContainer.style.transform = `rotateX(0) rotateY(0)`);
+        }
+
+        // Flip Logic (Triggered by CVV click)
+        window.flipCard = () => {
+            card.classList.toggle('is-flipped');
+            if(card.classList.contains('is-flipped')) {
+                document.getElementById('back-cvv-display').innerText = currentDynamicCVV;
+            }
+        };
+
+        // --- COUNTUP ANIMATION UTILITY ---
+        const animateValue = (obj, start, end, duration) => {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
+                if (progress < 1) window.requestAnimationFrame(step);
+            };
+            window.requestAnimationFrame(step);
+        };
+
+        // --- AUTH & DATA LOGIC ---
+        onAuthStateChanged(auth, (user) => {
+            if (!user) return location.href = 'signin.html';
+            currentUser = user;
+            
+            // 1. Generate Card Details
+            let hash = 0; for(let i=0; i<user.uid.length; i++) hash = ((hash<<5)-hash)+user.uid.charCodeAt(i);
+            currentDynamicCVV = (Math.abs(hash)%900 + 100).toString(); 
+            const rawNum = (Math.abs(hash).toString() + "5184926371820465").substring(0, 16);
+            document.getElementById('card-number-display').innerText = ("4" + rawNum.substring(1)).match(/.{1,4}/g).join(' ');
+
+            // 2. User Data
+            onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('card-holder-name').innerText = (data.fullName || "SEEKER CARD").toUpperCase();
+                    walletBalance = data.walletBalance || 0;
+                    userPlan = (data.plan || 'standard').toLowerCase();
+                    updateTotalBalance();
+                    calculatePurchasingPower(); 
+                    
+                    // Header Avatar
+                    const avatarImg = document.getElementById('header-avatar-img');
+                    const avatarFallback = document.getElementById('header-avatar-fallback');
+                    if(data.photoURL) { avatarImg.src = data.photoURL; avatarImg.style.display = 'block'; avatarFallback.style.display = 'none'; }
+                    else { avatarImg.style.display = 'none'; avatarFallback.style.display = 'grid'; avatarFallback.innerText = (data.fullName || 'U').charAt(0).toUpperCase(); }
+                }
+            });
+
+            // 3. Referral Earnings
+            onSnapshot(query(collection(db, "users"), where("referredBy", "==", user.uid)), (snap) => {
+                referralEarnings = 0;
+                snap.forEach(d => { if(['standard', 'pro', 'gold'].includes((d.data().plan||'').toLowerCase())) referralEarnings += 500; });
+                updateTotalBalance();
+            });
+
+            // 4. Transactions
+            onSnapshot(query(collection(db, "transactions"), where("userId", "==", user.uid)), (snap) => {
+                allTx = snap.empty ? [] : snap.docs.map(d => ({id:d.id, ...d.data()})).sort((a,b)=>(b.timestamp?.seconds||0)-(a.timestamp?.seconds||0));
+                renderHistory();
+            });
+
+            // 5. Badges
+            onSnapshot(query(collection(db, "notifications"), where("userId", "==", user.uid), where("read", "==", false)), s => {
+                document.getElementById('notif-badge').style.display = s.size>0?'flex':'none';
+                document.getElementById('notif-badge').innerText = s.size;
+            });
+        });
+
+        // --- WALLET LOGIC ---
+        function updateTotalBalance() {
+            const oldVal = totalBalance;
+            totalBalance = walletBalance + referralEarnings;
+            
+            const balEl = document.getElementById('balance-main');
+            if(isBalVisible) {
+                balEl.innerHTML = `KES <span id="val-counter">${oldVal}</span> <i class="fas fa-eye" onclick="toggleBalance()" style="cursor:pointer; opacity:0.7; font-size:0.9rem; margin-left:8px;"></i> <img src="https://flagcdn.com/w20/ke.png" style="width:16px; border-radius:50%; margin-left:5px;">`;
+                animateValue(document.getElementById('val-counter'), oldVal, totalBalance, 1000);
+            } else {
+                balEl.innerHTML = 'KES **** <i class="fas fa-eye-slash" onclick="toggleBalance()" style="cursor:pointer; opacity:0.7; font-size:0.9rem; margin-left:8px;"></i>';
+            }
+        }
+        window.toggleBalance = () => { isBalVisible = !isBalVisible; updateTotalBalance(); };
+
+        function calculatePurchasingPower() {
+            const el = document.getElementById('purchasing-power-text');
+            if(!el) return;
+            if(totalBalance >= 1500) {
+                el.innerText = `3 Months of Pro Plan or 6 Featured Applications.`;
+            } else if (totalBalance >= 500) {
+                el.innerText = `1 Month Pro Plan or 2 Featured Applications.`;
+            } else {
+                el.innerText = `Insufficient for plans. Top up to unlock Pro features.`;
+            }
+        }
+
+        window.calculateTotal = () => {
+            const val = document.getElementById('with-amount').value.replace(/,/g, '');
+            const amt = parseFloat(val) || 0;
+            
+            let fee = 50;
+            let msg = "KES 50.00";
+            
+            if(userPlan === 'pro' || userPlan === 'gold' || userPlan === 'guaranteed') {
+                fee = 0;
+                msg = `<span style="text-decoration:line-through; opacity:0.6; margin-right:5px;">KES 50</span> <span style="color:var(--success)">Waived (${userPlan.toUpperCase()})</span>`;
+            }
+
+            withdrawalFee = fee;
+            document.getElementById('fee-display').innerHTML = amt > 0 ? msg : 'KES 0.00';
+        };
+
+        window.renderHistory = () => {
+            const list = document.getElementById('tx-list');
+            const btn = document.getElementById('btn-view-more');
+            const filtered = allTx.filter(t => activeFilter === 'all' ? true : t.type === activeFilter);
+            
+            if(filtered.length === 0) {
+                list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:0.9rem;">No transactions found.</div>`;
+                btn.style.display = 'none';
+                return;
+            }
+
+            const toShow = filtered.slice(0, visibleCount);
+            
+            list.innerHTML = toShow.map((t, i) => {
+                const isInc = t.type === 'deposit';
+                const color = isInc ? 'var(--success)' : (t.type === 'p2p_sent' ? 'var(--neon-purple)' : 'var(--danger)');
+                
+                let iconHtml = `<i class="fas ${isInc ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>`;
+                let bgStyle = `background:${isInc ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; color:${color}`;
+                
+                const ref = (t.reference || "").toLowerCase();
+                if(ref.includes('qkh') || ref.includes('mpesa') || ref.includes('m-pesa')) {
+                    iconHtml = '';
+                    // Updated to relative path
+                    bgStyle = `background-image:url('./assets/images/mpesa.png'); background-color:#fff;`; 
+                }
+
+                const date = t.timestamp ? new Date(t.timestamp.seconds*1000).toLocaleDateString() : 'Pending';
+                
+                let tag = t.type.toUpperCase();
+                if(t.type === 'deposit') tag = "ADD FUNDS";
+                if(t.type === 'withdrawal') tag = "CASHOUT";
+                if(t.type === 'p2p_sent') tag = "TRANSFER";
+
+                return `
+                <div class="tx-item" onclick="viewReceipt('${t.id}')" style="animation-delay:${i*0.05}s">
+                    <div style="display:flex; align-items:center;">
+                        <div class="tx-icon" style="${bgStyle}">
+                            ${iconHtml}
+                        </div>
+                        <div>
+                            <div style="font-weight:600; font-size:0.95rem; color:var(--text-main);">${tag}</div>
+                            <div style="font-size:0.75rem; color:var(--text-muted);">${date} • <span style="color:${t.status==='completed'?'var(--success)':'var(--gold-base)'}">${t.status}</span></div>
+                        </div>
+                    </div>
+                    <div style="font-family:var(--font-mono); font-weight:700; color:${color};">
+                        ${isInc?'+':'-'} KES ${t.amount.toLocaleString()}
+                    </div>
+                </div>`;
+            }).join('');
+            
+            btn.style.display = visibleCount < filtered.length ? 'block' : 'none';
+        };
+
+        window.filterHistory = (type, btn) => {
+            activeFilter = type;
+            document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            visibleCount = 5;
+            document.getElementById('tx-list').innerHTML = '';
+            setTimeout(renderHistory, 50);
+        };
+        window.loadMoreHistory = () => { visibleCount += 5; renderHistory(); };
+
+        // --- ACTION SUBMISSIONS ---
+
+        window.submitWithdraw = async () => {
+            const amt = parseFloat(document.getElementById('with-amount').value.replace(/,/g, ''));
+            const phone = document.getElementById('with-phone').value;
+            
+            if(!amt || amt < 1000) return Toastify({text:"Min withdrawal KES 1,000", style:{background:"var(--danger)"}}).showToast();
+            if(amt + withdrawalFee > totalBalance) return Toastify({text:"Insufficient Funds", style:{background:"var(--danger)"}}).showToast();
+
+            if(amt > (totalBalance * 0.5)) {
+                if(!confirm("Security Alert: You are withdrawing over 50% of your balance. Proceed?")) return;
+            }
+
+            const btn = document.getElementById('btn-with-submit');
+            btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Processing..."; btn.disabled = true;
+
+            try {
+                await addDoc(collection(db, "transactions"), {
+                    userId: currentUser.uid, 
+                    type: "withdrawal", 
+                    amount: amt, 
+                    fee: withdrawalFee, 
+                    phone: phone,
+                    status: "pending", 
+                    timestamp: serverTimestamp(), 
+                    txCode: "WTH-" + Math.random().toString(36).substr(2, 6).toUpperCase()
+                });
+                
+                closeModals();
+                document.getElementById('with-amount').value = '';
+                Toastify({text:"Withdrawal Request Pending Approval", style:{background:"var(--gold-base)"}}).showToast();
+            } catch(e) { console.error(e); Toastify({text:"Transaction Failed", style:{background:"var(--danger)"}}).showToast(); }
+            btn.innerHTML = "Confirm Withdrawal"; btn.disabled = false;
+        };
+
+        window.submitDeposit = async () => {
+             const amt = parseFloat(document.getElementById('dep-amount').value.replace(/,/g, ''));
+             const ref = document.getElementById('dep-ref').value.toUpperCase();
+             if(!amt || !ref) return Toastify({text:"Fill all fields", style:{background:"var(--danger)"}}).showToast();
+             
+             try {
+                await addDoc(collection(db, "transactions"), {
+                    userId: currentUser.uid, type: "deposit", amount: amt, reference: ref, status: "pending", timestamp: serverTimestamp()
+                });
+                closeModals();
+                document.body.style.boxShadow = "inset 0 0 50px var(--success)";
+                setTimeout(()=> document.body.style.boxShadow = "none", 1000);
+                
+                Toastify({text:"Deposit Submitted for Approval", style:{background:"var(--success)"}}).showToast();
+             } catch(e) { console.error(e); }
+        };
+        
+        window.submitP2P = async () => {
+            const dest = document.getElementById('p2p-dest').value;
+            const amt = parseFloat(document.getElementById('p2p-amount').value.replace(/,/g, ''));
+            if(!dest || !amt) return Toastify({text:"Fill all fields", style:{background:"var(--danger)"}}).showToast();
+            Toastify({text:"P2P Transfer initiated (Simulated)", style:{background:"var(--neon-purple)"}}).showToast();
+            closeModals();
+        };
+
+        // --- RECEIPT & DOWNLOAD ---
+        window.viewReceipt = (id) => {
+            const tx = allTx.find(t => t.id === id);
+            if(!tx) return;
+            document.getElementById('rcpt-amount').innerText = `KES ${tx.amount.toLocaleString()}`;
+            document.getElementById('rcpt-type').innerText = tx.type.toUpperCase();
+            document.getElementById('rcpt-cat').innerText = tx.type === 'deposit' ? 'Wallet Topup' : 'Service Payment';
+            document.getElementById('rcpt-ref').innerText = tx.reference || tx.txCode || "N/A";
+            document.getElementById('rcpt-date').innerText = new Date(tx.timestamp.seconds*1000).toLocaleString();
+            
+            const statusEl = document.getElementById('rcpt-status');
+            statusEl.innerText = tx.status.toUpperCase();
+            statusEl.style.color = tx.status === 'completed' ? 'var(--success)' : 'var(--gold-base)';
+            
+            // Icon Logic
+            const icon = document.getElementById('rcpt-icon');
+            icon.className = tx.type === 'deposit' ? 'fas fa-arrow-down' : 'fas fa-arrow-up';
+            document.getElementById('rcpt-icon-bg').style.background = tx.type === 'deposit' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)';
+            document.getElementById('rcpt-icon-bg').style.color = tx.type === 'deposit' ? 'var(--success)' : 'var(--danger)';
+
+            openModal('receiptModal');
+        };
+
+        window.downloadCardProcess = async () => {
+            const pwd = document.getElementById('dl-password').value;
+            if(!pwd) return Toastify({text:"Enter Password", style:{background:"var(--danger)"}}).showToast();
+            Toastify({text:"Downloading...", style:{background:"var(--gold-base)"}}).showToast();
+            closeModals();
+        };
+
+        document.querySelectorAll('.fmt-num').forEach(i => {
+            i.addEventListener('input', e => {
+                let v = e.target.value.replace(/[^0-9.]/g, '');
+                if(v) { e.target.value = parseFloat(v).toLocaleString('en-US'); }
+            });
+        });
+
+        // --- PWA LOGIC START ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('SW Registered'))
+                    .catch(err => console.log('SW Failed', err));
+            });
+        }
+        let deferredPrompt;
+        const pwaPopup = document.getElementById('pwa-install-popup');
+        const installBtn = document.getElementById('pwa-install-btn');
+        const dismissBtn = document.getElementById('pwa-dismiss');
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            setTimeout(() => { pwaPopup.style.display = 'block'; }, 3000);
+        });
+        installBtn.addEventListener('click', (e) => {
+            pwaPopup.style.display = 'none';
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => { deferredPrompt = null; });
+            }
+        });
+        dismissBtn.addEventListener('click', () => { pwaPopup.style.display = 'none'; });
+        window.addEventListener('appinstalled', () => { pwaPopup.style.display = 'none'; });
+        // --- PWA LOGIC END ---
+
+    </script>
+</body>
+</html>

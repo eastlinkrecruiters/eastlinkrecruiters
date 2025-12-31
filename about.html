@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="EastLink - Our mission, vision, and the story behind the platform.">
+    <title>About Us | EastLink Recruiters</title>
+    
+    <!-- PWA Manifest & Favicon (Updated Paths) -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
+    <meta name="theme-color" content="#020617">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons & Animation -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        /* =========================================
+           THEME VARIABLES
+           ========================================= */
+        :root {
+            --primary: #f59e0b; 
+            --primary-dark: #d97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            
+            --bg: #020617; 
+            --bg-glass-70: rgba(15, 23, 42, 0.7); 
+            
+            --text: #F8FAFC;
+            --text-muted: #94A3B8;
+            
+            --border-color: rgba(255, 255, 255, 0.1);
+            --header-height: 80px;
+            --transition: all 0.3s ease;
+            --radius: 16px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            /* Relative path for GitHub Pages */
+            background-image: url('./assets/images/background.png');
+            background-attachment: fixed;
+            background-position: center;
+            background-size: cover;
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Dark overlay */
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background: rgba(2, 6, 23, 0.2); 
+            z-index: -5; pointer-events: none;
+        }
+
+        h1, h2, h3, h4, .brand-font { font-family: 'Cinzel', serif; }
+        a { text-decoration: none; color: inherit; transition: var(--transition); }
+        img { max-width: 100%; display: block; border-radius: var(--radius); }
+
+        .container { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
+        .section { padding: 6rem 0; }
+
+        /* Scroll Progress */
+        #scroll-progress {
+            position: fixed; top: 0; left: 0; height: 3px; background: var(--primary);
+            z-index: 2000; width: 0%; transition: width 0.1s;
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; width: 100%; height: var(--header-height);
+            z-index: 1000; transition: var(--transition); 
+            background: var(--bg-glass-70);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .nav-inner { height: 100%; display: flex; justify-content: space-between; align-items: center; }
+
+        .header-logo-text {
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem; font-weight: 700; color: var(--text);
+            letter-spacing: 1px; display: flex; align-items: center; gap: 12px;
+        }
+        .header-logo-text span { color: var(--primary); }
+
+        .menu-trigger {
+            display: inline-flex; align-items: center; gap: 12px; cursor: pointer;
+            padding: 8px 20px; border-radius: 99px;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);
+            color: var(--text); font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;
+            transition: var(--transition);
+        }
+        .menu-trigger:hover { border-color: var(--primary); background: rgba(245, 158, 11, 0.1); }
+
+        /* --- OVERLAY MENU --- */
+        .menu-overlay {
+            position: fixed; inset: 0; 
+            background: rgba(2, 6, 23, 0.98);
+            z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: var(--transition);
+        }
+        .menu-overlay.active { opacity: 1; pointer-events: all; }
+        .close-menu {
+            position: absolute; top: 30px; right: 30px;
+            width: 44px; height: 44px; border-radius: 50%;
+            border: 1px solid var(--border-color); color: var(--text-muted);
+            display: grid; place-items: center; cursor: pointer; transition: 0.3s; font-size: 1.2rem;
+        }
+        .close-menu:hover { border-color: var(--primary); color: var(--primary); transform: rotate(90deg); }
+        
+        .menu-links { text-align: center; display: flex; flex-direction: column; gap: 25px; }
+        .menu-link {
+            font-family: 'Cinzel', serif; font-size: 2.5rem; font-weight: 700;
+            color: var(--text); transition: 0.3s;
+        }
+        .menu-link:hover { color: var(--primary); }
+        .menu-actions { margin-top: 50px; display: flex; gap: 15px; align-items: center; }
+
+        /* --- ABOUT PAGE SPECIFIC STYLES --- */
+        .page-header {
+            padding-top: calc(var(--header-height) + 60px); 
+            padding-bottom: 3rem; text-align: center; max-width: 800px; margin: 0 auto;
+        }
+        .page-header h1 { font-size: clamp(2.5rem, 4vw, 3.5rem); margin-bottom: 15px; color: var(--text); }
+        .page-header p { color: var(--text-muted); font-size: 1.1rem; }
+        .highlight { color: var(--primary); }
+
+        .glass-card {
+            background: var(--bg-glass-70);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius); padding: 2.5rem;
+            backdrop-filter: blur(12px); transition: var(--transition);
+        }
+
+        .story-section { padding: 4rem 0; display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center; }
+        .story-text h2 { font-size: 2rem; margin-bottom: 20px; color: var(--text); }
+        .story-text p { color: var(--text-muted); margin-bottom: 20px; line-height: 1.8; }
+        
+        .story-img-wrap { position: relative; }
+        .story-img-wrap img { border: 1px solid var(--border-color); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        
+        .exp-badge {
+            position: absolute; bottom: 30px; left: -20px;
+            background: var(--bg-glass-70); border: 1px solid var(--border-color);
+            backdrop-filter: blur(12px);
+            padding: 20px; border-radius: var(--radius);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            display: flex; align-items: center; gap: 15px;
+            border-left: 4px solid var(--primary);
+        }
+        .exp-number { font-size: 2rem; font-weight: 800; color: var(--primary); font-family: 'Cinzel', serif; }
+        .exp-text { font-size: 0.85rem; font-weight: 600; color: var(--text); line-height: 1.2; }
+
+        .stats-bar {
+            background: var(--bg-glass-70); padding: 50px; border-radius: var(--radius);
+            border: 1px solid var(--border-color); margin: 60px 0; backdrop-filter: blur(12px);
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center;
+        }
+        .stat-item h3 { font-size: 2.2rem; color: var(--primary); margin-bottom: 5px; }
+        .stat-item p { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+        .mv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 80px; }
+        .mv-card {
+            background: var(--bg-glass-70); border: 1px solid var(--border-color);
+            padding: 40px; border-radius: var(--radius); transition: var(--transition);
+            backdrop-filter: blur(12px);
+        }
+        .mv-card:hover { border-color: var(--primary); transform: translateY(-5px); }
+        .mv-card i { font-size: 2.5rem; color: var(--primary); margin-bottom: 20px; }
+        .mv-card h3 { font-size: 1.5rem; margin-bottom: 15px; color: var(--text); }
+        .mv-card p { color: var(--text-muted); }
+
+        .values-section { margin-bottom: 80px; }
+        .section-header { text-align: center; margin-bottom: 50px; }
+        .section-header h2 { font-size: 2rem; margin-bottom: 10px; color: var(--text); }
+        .values-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        
+        .value-card {
+            background: var(--bg-glass-70); padding: 30px; border-radius: var(--radius);
+            border: 1px solid var(--border-color); transition: var(--transition); text-align: center;
+            backdrop-filter: blur(12px);
+        }
+        .value-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .v-icon {
+            width: 60px; height: 60px; background: rgba(245, 158, 11, 0.1); color: var(--primary);
+            border-radius: 50%; display: grid; place-items: center; font-size: 1.5rem; margin: 0 auto 20px;
+        }
+        .value-card h4 { font-size: 1.2rem; margin-bottom: 10px; color: var(--text); }
+        .value-card p { color: var(--text-muted); font-size: 0.95rem; }
+
+        .cta-section {
+            background: var(--bg-glass-70); border: 1px solid var(--border-color);
+            border-radius: var(--radius); padding: 60px; text-align: center;
+            position: relative; overflow: hidden; backdrop-filter: blur(12px);
+        }
+        .btn-gold {
+            background: var(--primary); color: #000; padding: 12px 30px;
+            border-radius: 50px; font-weight: 700; display: inline-flex;
+            align-items: center; gap: 10px; border: none; cursor: pointer;
+            transition: var(--transition);
+        }
+        .btn-gold:hover { background: #fbbf24; transform: translateY(-2px); }
+
+        /* FOOTER */
+        footer { 
+            background: var(--bg-glass-70); border-top: 1px solid var(--border-color); 
+            padding-top: 4rem; margin-top: auto; backdrop-filter: blur(12px);
+        }
+        /* UPDATED: Changed to 3 columns */
+        .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; margin-bottom: 4rem; }
+        
+        .f-col h4 { font-size: 0.9rem; color: var(--text); margin-bottom: 1.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-family: 'Cinzel', serif; }
+        .f-col ul { list-style: none; }
+        .f-col ul li { margin-bottom: 12px; }
+        .f-col a { color: var(--text-muted); font-size: 0.9rem; transition: 0.2s; }
+        .f-col a:hover { color: var(--primary); padding-left: 5px; }
+        .social-links { display: flex; gap: 10px; margin-top: 25px; }
+        .s-btn {
+            width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color); color: var(--text-muted);
+            display: grid; place-items: center; transition: 0.3s; font-size: 1rem;
+        }
+        .s-btn:hover { background: var(--primary); color: #000; border-color: var(--primary); }
+        .copyright { border-top: 1px solid var(--border-color); padding: 2rem 0; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+
+        @media (max-width: 992px) {
+            .story-section, .mv-grid, .stats-bar { grid-template-columns: 1fr; gap: 40px; }
+            .story-img-wrap { order: -1; }
+            .exp-badge { left: 50%; transform: translateX(-50%); bottom: -20px; width: auto; }
+        }
+        @media (max-width: 900px) {
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 600px) {
+            .footer-grid { grid-template-columns: 1fr; }
+            .stats-bar { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body style="background-color: #020617;">
+
+    <!-- PRELOADER (With Safety Style) -->
+    <div id="preloader" style="position:fixed; inset:0; background:#020617; z-index:9999; display:flex; justify-content:center; align-items:center; transition: opacity 0.5s ease;">
+        <div style="text-align:center;">
+            <img src="./assets/images/logo.png" style="width:70px; height:auto; margin-bottom:20px; filter: drop-shadow(0 0 15px var(--primary));" alt="Loading...">
+            <div style="width:150px; height:2px; background:rgba(255,255,255,0.1); overflow:hidden; border-radius:2px;">
+                <div style="width:100%; height:100%; background:linear-gradient(135deg, #fbbf24 0%, #d97706 100%); animation:loading 1.5s infinite ease-in-out; transform-origin:left;"></div>
+            </div>
+            <style>@keyframes loading { 0% { transform: scaleX(0); } 50% { transform: scaleX(1); } 100% { transform: scaleX(0); transform-origin:right; } }</style>
+        </div>
+    </div>
+
+    <!-- Scroll Progress -->
+    <div id="scroll-progress"></div>
+
+    <!-- HEADER -->
+    <header id="header">
+        <div class="container nav-inner">
+            <a href="index.html" class="header-logo-text">
+                <img src="./assets/images/logo.png" style="height:35px; width:auto;" alt="Logo">
+                <div>EAST<span>LINK</span></div>
+            </a>
+            <div class="menu-trigger" onclick="toggleMenu()">
+                <span>MENU</span>
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- MENU OVERLAY -->
+    <div class="menu-overlay" id="menuOverlay">
+        <div class="close-menu" onclick="toggleMenu()"><i class="fas fa-times"></i></div>
+        <div class="menu-links">
+            <a href="about.html" class="menu-link" style="color:var(--primary);">About Us</a>
+            <a href="signup.html" class="menu-link">Opportunities</a>
+            <!-- MOBILE APP LINK REMOVED -->
+        </div>
+        <div class="menu-actions">
+            <a href="signin.html" class="btn" style="background:transparent; border:1px solid var(--border-color); color:white; border-radius:50px; padding:12px 30px; text-decoration:none;">Sign In</a>
+            <a href="signup.html" class="btn" style="background:var(--primary); color:black; border-radius:50px; padding:12px 30px; font-weight:700; text-decoration:none;">Join Now</a>
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <main>
+        <div class="container">
+            
+            <!-- Hero Intro -->
+            <div class="page-header">
+                <h1 class="brand-font" data-aos="fade-down">Bridging Talent Across <span class="highlight">East Africa</span></h1>
+                <p data-aos="fade-up" data-aos-delay="100">We are building the digital infrastructure to connect ambition with opportunity, creating a borderless workforce for the future.</p>
+            </div>
+
+            <!-- Story Section -->
+            <section class="story-section">
+                <div class="story-img-wrap" data-aos="fade-right">
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Team Working">
+                    <div class="exp-badge">
+                        <div class="exp-number">5+</div>
+                        <div class="exp-text">Years of<br>Excellence</div>
+                    </div>
+                </div>
+                <div class="story-text" data-aos="fade-left">
+                    <h4 style="color:var(--primary); font-size:0.9rem; margin-bottom:10px; letter-spacing:1px; text-transform:uppercase; font-weight:700;">Our Story</h4>
+                    <h2 class="brand-font">Empowering Careers, <br>Transforming Business.</h2>
+                    <p>EastLink Recruiters began with a simple observation: Talent is equally distributed, but opportunity is not. In East Africa, thousands of skilled professionals struggle to find the right roles.</p>
+                    <p>We launched to solve this disconnect. By combining advanced verification technology with a human-centric approach, we've created a platform that prioritizes trust, speed, and compatibility.</p>
+                </div>
+            </section>
+
+            <!-- Stats Bar -->
+            <div class="stats-bar" data-aos="fade-up">
+                <div class="stat-item">
+                    <h3 class="brand-font" data-target="1500">0</h3>
+                    <p>Jobs Posted</p>
+                </div>
+                <div class="stat-item">
+                    <h3 class="brand-font" data-target="850">0</h3>
+                    <p>Candidates Hired</p>
+                </div>
+                <div class="stat-item">
+                    <h3 class="brand-font" data-target="200">0</h3>
+                    <p>Partner Companies</p>
+                </div>
+                <div class="stat-item">
+                    <h3 class="brand-font" data-target="98">0%</h3>
+                    <p>Satisfaction Rate</p>
+                </div>
+            </div>
+
+            <!-- Mission & Vision -->
+            <div class="mv-grid">
+                <div class="mv-card" data-aos="fade-up" data-aos-delay="100">
+                    <i class="fas fa-rocket"></i>
+                    <h3 class="brand-font">Our Mission</h3>
+                    <p>To democratize access to employment by building the most trusted, efficient, and transparent recruitment ecosystem in East Africa, ensuring every skilled individual has a path to economic growth.</p>
+                </div>
+                <div class="mv-card" data-aos="fade-up" data-aos-delay="200">
+                    <i class="fas fa-eye"></i>
+                    <h3 class="brand-font">Our Vision</h3>
+                    <p>To become the primary infrastructure for human capital in Africa, where hiring is seamless, instant, and based purely on merit and capability, powered by verified data.</p>
+                </div>
+            </div>
+
+            <!-- Core Values -->
+            <div class="values-section">
+                <div class="section-header" data-aos="fade-up">
+                    <h2 class="brand-font">Our Core Values</h2>
+                    <p style="color:var(--text-muted);">Principles that guide every decision we make.</p>
+                </div>
+                <div class="values-grid">
+                    <div class="value-card" data-aos="zoom-in" data-aos-delay="100">
+                        <div class="v-icon"><i class="fas fa-shield-alt"></i></div>
+                        <h4 class="brand-font">Integrity First</h4>
+                        <p>We verify everything. In an industry built on trust, we ensure that credentials and offers are authentic.</p>
+                    </div>
+                    <div class="value-card" data-aos="zoom-in" data-aos-delay="200">
+                        <div class="v-icon"><i class="fas fa-bolt"></i></div>
+                        <h4 class="brand-font">Speed & Efficiency</h4>
+                        <p>Time is money. Our algorithms match candidates to jobs in seconds, streamlining the hiring process.</p>
+                    </div>
+                    <div class="value-card" data-aos="zoom-in" data-aos-delay="300">
+                        <div class="v-icon"><i class="fas fa-users"></i></div>
+                        <h4 class="brand-font">Inclusivity</h4>
+                        <p>We believe in equal opportunity. Our platform is designed to reduce bias and highlight pure skill.</p>
+                    </div>
+                    <div class="value-card" data-aos="zoom-in" data-aos-delay="400">
+                        <div class="v-icon"><i class="fas fa-lightbulb"></i></div>
+                        <h4 class="brand-font">Innovation</h4>
+                        <p>We constantly evolve. From AI matching to secure payments, we use technology to solve old problems.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="cta-section" data-aos="fade-up">
+                <h2 class="brand-font" style="color:var(--text); margin-bottom:15px;">Ready to Make Your Move?</h2>
+                <p style="color:var(--text-muted); margin-bottom:30px;">Join thousands of professionals and companies building the future today.</p>
+                <a href="signup.html" class="btn-gold">
+                    Get Started Now <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="f-col">
+                    <div class="logo" style="margin-bottom:20px; font-weight:700; font-size:1.4rem; display:flex; align-items:center; gap:10px; font-family: 'Cinzel', serif;">
+                        <img src="./assets/images/logo.png" style="height:35px; width:auto;" alt="EastLink">
+                        <div style="color:white;">EAST<span style="color:var(--primary);">LINK</span></div>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.6;">The leading platform for professional recruitment. We ensure quality, trust, and speed.</p>
+                    <div class="social-links">
+                        <a href="#" id="link-fb" class="s-btn" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" id="link-in" class="s-btn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" id="link-tw" class="s-btn" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="#" id="link-ig" class="s-btn" target="_blank"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="f-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="services.html">Our Services</a></li>
+                        <li><a href="careers.html">Careers</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="f-col">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="signin.html">Client Portal</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <!-- REMOVED "GET THE APP" COLUMN -->
+            </div>
+            <div class="copyright">&copy; <span id="year"></span> EastLink Recruitment Solutions. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" style="
+        display: none; 
+        position: fixed; bottom: 20px; right: 20px; 
+        background: rgba(15, 23, 42, 0.95); 
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        backdrop-filter: blur(12px);
+        padding: 20px; border-radius: 16px; 
+        z-index: 10000; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        max-width: 320px; animation: slideUp 0.5s ease-out;
+    ">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+            <img src="./assets/images/logo.png" style="width:50px; height:50px; border-radius:10px;">
+            <div>
+                <h4 style="color:#fff; margin:0; font-family:'Cinzel', serif;">Install EastLink</h4>
+                <p style="color:#94A3B8; margin:5px 0 0; font-size:0.8rem;">Add to Home Screen for fast access.</p>
+            </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button id="pwa-dismiss" style="flex:1; padding:10px; background:transparent; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:8px; cursor:pointer;">Later</button>
+            <button id="pwa-install-btn" style="flex:1; padding:10px; background:linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border:none; color:#000; font-weight:700; border-radius:8px; cursor:pointer;">Install</button>
+        </div>
+    </div>
+    <style>@keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }</style>
+
+    <!-- SCRIPTS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        // CONFIG
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // INIT UI (Preloader Logic handled by Safe Script below)
+        AOS.init({ duration: 900, offset: 50, once: true });
+        document.getElementById("year").textContent = new Date().getFullYear();
+
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            const bar = document.getElementById("scroll-progress");
+            if(bar) bar.style.width = scrolled + "%";
+        });
+
+        window.toggleMenu = () => {
+            const menu = document.getElementById('menuOverlay');
+            menu.classList.toggle('active');
+            document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : 'auto';
+        };
+
+        // --- STATS ANIMATION ---
+        const counters = document.querySelectorAll('.stat-item h3');
+        const speed = 200;
+
+        const animateCounters = () => {
+            counters.forEach(counter => {
+                const updateCount = () => {
+                    const target = +counter.getAttribute('data-target');
+                    const text = counter.innerText.replace('%','').replace('+','');
+                    const count = +text;
+                    const inc = target / speed;
+
+                    if (count < target) {
+                        counter.innerText = Math.ceil(count + inc) + (counter.getAttribute('data-target').includes('98') ? '%' : '');
+                        setTimeout(updateCount, 20);
+                    } else {
+                        counter.innerText = target + (counter.getAttribute('data-target').includes('98') ? '%' : '+');
+                    }
+                };
+                updateCount();
+            });
+        };
+
+        let viewed = false;
+        window.addEventListener('scroll', () => {
+            const section = document.querySelector('.stats-bar');
+            if (section && !viewed && window.scrollY + window.innerHeight > section.offsetTop + 50) {
+                animateCounters();
+                viewed = true;
+            }
+        });
+
+        // --- SOCIALS LOADER ---
+        async function loadSocials() {
+            try {
+                const docSnap = await getDoc(doc(db, "site_settings", "general"));
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if(data.facebook) document.getElementById('link-fb').href = data.facebook;
+                    if(data.linkedin) document.getElementById('link-in').href = data.linkedin;
+                    if(data.twitter) document.getElementById('link-tw').href = data.twitter;
+                    if(data.instagram) document.getElementById('link-ig').href = data.instagram;
+                }
+            } catch (error) {}
+        }
+        loadSocials();
+
+        // --- PWA LOGIC START ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('SW Registered'))
+                    .catch(err => console.log('SW Failed', err));
+            });
+        }
+        let deferredPrompt;
+        const pwaPopup = document.getElementById('pwa-install-popup');
+        const installBtn = document.getElementById('pwa-install-btn');
+        const dismissBtn = document.getElementById('pwa-dismiss');
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            setTimeout(() => { pwaPopup.style.display = 'block'; }, 3000);
+        });
+        installBtn.addEventListener('click', (e) => {
+            pwaPopup.style.display = 'none';
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => { deferredPrompt = null; });
+            }
+        });
+        dismissBtn.addEventListener('click', () => { pwaPopup.style.display = 'none'; });
+        window.addEventListener('appinstalled', () => { pwaPopup.style.display = 'none'; });
+        // --- PWA LOGIC END ---
+    </script>
+    
+    <!-- SAFETY SCRIPT FOR PRELOADER -->
+    <script>
+        function removePreloader() {
+            const preloader = document.getElementById('preloader');
+            if(preloader) {
+                preloader.style.opacity = '0';
+                setTimeout(() => preloader.style.display = 'none', 500);
+            }
+        }
+        window.addEventListener('load', removePreloader);
+        setTimeout(removePreloader, 3000); // Failsafe
+    </script>
+</body>
+</html>

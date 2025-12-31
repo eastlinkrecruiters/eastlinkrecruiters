@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Notifications | EastLink Admin</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0F172A">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Executive Theme */
+            --bg-body: #0F172A;       
+            --bg-card: rgba(30, 41, 59, 0.65);
+            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.95);
+            --bg-input: rgba(255, 255, 255, 0.07);
+            --bg-hover: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8; 
+            --gold-base: #D97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --neon-purple: #8b5cf6;
+            --success: #10B981;
+            --danger: #EF4444;
+            --blue: #3B82F6;
+            
+            /* DIMENSIONS */
+            --sidebar-width: 260px; 
+            --header-height: 60px;
+            
+            --radius: 16px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background-image: url('assets/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Utils */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 20px; z-index: 1000;
+        }
+        
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .logo { 
+            font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.15rem;
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; 
+        }
+        .logo span { color: var(--gold-base); }
+        .admin-badge { 
+            font-family: var(--font-body); font-size: 0.55rem; background: var(--bg-input); 
+            border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; 
+            margin-left: 8px; color: var(--text-muted); letter-spacing: 0.5px;
+        }
+        .hamburger { font-size: 1.2rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+        .icon-btn { 
+            width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; font-size: 0.9rem;
+            color: var(--text-muted); cursor: pointer; transition: all 0.3s; position: relative;
+        }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); }
+        .notification-badge { 
+            position: absolute; top: 2px; right: 2px; min-width: 14px; height: 14px; 
+            background: var(--danger); border-radius: 10px; font-size: 0.55rem; color: white; 
+            font-weight: 700; display: none; place-items: center; justify-content: center;
+            padding: 0 3px; border: 2px solid var(--bg-card);
+        }
+        .profile-widget {
+            width: 34px; height: 34px; background: var(--bg-input); border-radius: 10px; 
+            display: grid; place-items: center; border: 1px solid var(--border-color); 
+            color: var(--gold-base); font-size: 0.9rem; cursor: pointer; margin-left: 4px;
+        }
+        .profile-widget:hover { background: var(--bg-hover); }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 15px 0; overflow-y: auto; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+        .nav-group { padding: 0 20px; margin-bottom: 15px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-item { 
+            display: flex; align-items: center; padding: 10px 12px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.85rem; transition: all 0.3s ease; border-radius: 8px; margin-bottom: 2px;
+        }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
+        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
+        .nav-item i { width: 22px; text-align: center; margin-right: 8px; }
+
+        /* --- MAIN CONTENT --- */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 25px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
+        
+        .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
+        .page-title h1 { font-family: var(--font-head); font-size: 1.5rem; color: var(--text-main); margin-bottom: 5px; }
+        .page-title p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* TABS */
+        .tabs-wrapper { 
+            display: flex; gap: 5px; background: var(--bg-input); padding: 4px; 
+            border-radius: 12px; border: 1px solid var(--border-color); width: fit-content;
+        }
+        .tab {
+            padding: 8px 20px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; 
+            color: var(--text-muted); cursor: pointer; transition: 0.3s;
+        }
+        .tab:hover { color: var(--text-main); }
+        .tab.active { background: var(--bg-glass); color: var(--gold-base); box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .tab-badge { 
+            background: var(--danger); color: white; padding: 1px 6px; border-radius: 10px; 
+            font-size: 0.7rem; margin-left: 6px; display: none;
+        }
+
+        /* NOTIFICATION LIST */
+        .content-wrapper { max-width: 1000px; margin: 0 auto; }
+        .notif-list { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+
+        .notif-item {
+            display: flex; gap: 16px; padding: 20px; align-items: center;
+            background: var(--bg-glass); border: 1px solid var(--border-color);
+            border-radius: var(--radius); cursor: pointer; transition: 0.3s;
+            position: relative; overflow: hidden;
+        }
+        .notif-item:hover { transform: translateX(5px); border-color: var(--gold-base); background: var(--bg-hover); }
+        
+        .notif-item.unread { border-left: 3px solid var(--gold-base); background: rgba(30, 41, 59, 0.8); }
+        .notif-item.unread .notif-title { color: var(--text-main); font-weight: 700; }
+
+        .notif-icon-box { 
+            width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0;
+            display: grid; place-items: center; font-size: 1.2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Icon Colors */
+        .type-success { background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.2); } 
+        .type-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border-color: rgba(239, 68, 68, 0.2); }
+        .type-wallet { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); border-color: rgba(217, 119, 6, 0.2); } 
+        .type-info { background: rgba(59, 130, 246, 0.1); color: var(--blue); border-color: rgba(59, 130, 246, 0.2); }
+        .type-default { background: var(--bg-input); color: var(--text-muted); }
+
+        .notif-content { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .notif-header { display: flex; justify-content: space-between; align-items: baseline; }
+        .notif-title { font-family: var(--font-body); font-size: 0.95rem; color: var(--text-main); font-weight: 600; }
+        .notif-body { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .notif-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 8px; font-family: var(--font-display); opacity: 0.7; }
+
+        /* Empty State */
+        .empty-state { 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            padding: 60px 20px; text-align: center; color: var(--text-muted);
+            background: var(--bg-glass); border-radius: var(--radius); border: 1px dashed var(--border-color);
+        }
+        .empty-icon { font-size: 3rem; margin-bottom: 20px; color: var(--bg-input); }
+
+        /* Floating Controls */
+        .controls-fab {
+            position: fixed; bottom: 30px; right: 30px; 
+            background: var(--bg-glass-heavy); padding: 10px 20px; border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--border-color);
+            display: flex; gap: 20px; z-index: 950; backdrop-filter: blur(10px);
+        }
+        .control-item { font-size: 0.85rem; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; transition: 0.2s; }
+        .control-item:hover { color: var(--gold-base); }
+
+        /* Modal */
+        .modal-overlay { 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
+            z-index: 2000; backdrop-filter: blur(5px); justify-content: center; align-items: center; padding: 20px; 
+        }
+        .modal-overlay.active { display: flex; }
+        
+        .modal-card { 
+            background: var(--bg-glass-heavy); width: 100%; max-width: 500px; border-radius: var(--radius); 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5); overflow: hidden; border: 1px solid var(--border-color);
+        }
+        
+        .modal-header { padding: 25px; display: flex; gap: 16px; align-items: start; border-bottom: 1px solid var(--border-color); background: rgba(255,255,255,0.02); }
+        .modal-title-area h3 { font-family: var(--font-head); font-size: 1.1rem; color: var(--text-main); margin-bottom: 4px; }
+        .modal-date { font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-display); }
+        .modal-body { padding: 25px; color: var(--text-main); line-height: 1.6; font-size: 0.9rem; white-space: pre-wrap; }
+        .modal-footer { 
+            padding: 20px 25px; display: flex; justify-content: flex-end; gap: 12px; 
+            border-top: 1px solid var(--border-color); background: rgba(0,0,0,0.2);
+        }
+        .btn-text { 
+            background: transparent; border: 1px solid var(--border-color); padding: 8px 20px; border-radius: 20px; 
+            font-family: var(--font-body); font-weight: 600; font-size: 0.85rem; cursor: pointer; color: var(--text-muted); 
+            transition: 0.2s;
+        }
+        .btn-text:hover { background: var(--bg-hover); color: var(--text-main); }
+        .btn-text.primary { background: var(--gold-gradient); color: #000; border: none; }
+        .btn-text.primary:hover { transform: translateY(-2px); }
+        .btn-text.danger { color: var(--danger); border-color: var(--danger); }
+        .btn-text.danger:hover { background: var(--danger); color: white; }
+
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 998; backdrop-filter: blur(4px); }
+
+        /* PWA Popup */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 20px 10px; width: 100%; }
+            .controls-fab { left: 50%; transform: translateX(-50%); right: auto; bottom: 80px; width: 90%; justify-content: center; }
+            .hamburger { display: block; }
+            .header-left { gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="admin-dashboard.html" class="logo">East<span>Link</span> <span class="admin-badge">ADMIN</span></a>
+        </div>
+        
+        <div class="header-actions">
+            <div class="icon-btn" onclick="location.href='admin-support.html'" title="Support Tickets">
+                <i class="fa-solid fa-envelope"></i>
+                <div class="notification-badge" id="msg-badge">0</div>
+            </div>
+            <div class="icon-btn" onclick="location.href='admin-notifications.html'" title="System Alerts">
+                <i class="fa-solid fa-bell"></i>
+                <div class="notification-badge" id="notif-badge">0</div>
+            </div>
+            <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Analytics</div>
+            <a href="admin-dashboard.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        </div>
+        
+        <div class="nav-group">
+            <div class="nav-label">User Management</div>
+            <a href="admin-users.html" class="nav-item"><i class="fa-solid fa-users"></i> Manage Users</a>
+            <a href="admin-plans.html" class="nav-item"><i class="fa-solid fa-tags"></i> Manage Plans</a>
+            <a href="admin-referrals.html" class="nav-item"><i class="fa-solid fa-share-nodes"></i> Referrals</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Jobs & Service</div>
+            <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
+            <a href="admin-guaranteed-jobs.html" class="nav-item"><i class="fa-solid fa-certificate"></i> Guaranteed Jobs</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="admin-deposits.html" class="nav-item"><i class="fa-solid fa-arrow-down"></i> Deposits</a>
+            <a href="admin-withdrawals.html" class="nav-item"><i class="fa-solid fa-arrow-up"></i> Withdrawals</a>
+            <a href="admin-deposit-issues.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> Errors</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">System</div>
+            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
+            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
+            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- MAIN -->
+    <main>
+        <div class="page-header animate__animated animate__fadeInDown">
+            <div class="page-title">
+                <h1>System Notifications</h1>
+                <p>Alerts, transaction logs, and system messages.</p>
+            </div>
+            
+            <div class="tabs-wrapper">
+                <div class="tab active" onclick="filterNotifications('all', this)">All Logs</div>
+                <div class="tab" onclick="filterNotifications('unread', this)">Unread <span class="tab-badge" id="tab-count">0</span></div>
+            </div>
+        </div>
+
+        <div class="content-wrapper">
+            <div class="notif-list" id="notif-container">
+                <div class="empty-state">
+                    <i class="fas fa-circle-notch fa-spin" style="color:var(--gold-base); font-size: 2rem;"></i>
+                    <p style="margin-top:20px">Syncing system logs...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Floating Controls -->
+        <div class="controls-fab animate__animated animate__fadeInUp" id="fab-controls" style="display:none;">
+            <div class="control-item" onclick="markAllRead()"><i class="fas fa-check-double"></i> Mark All Read</div>
+            <div style="width:1px; height:20px; background:var(--border-color);"></div>
+            <div class="control-item" onclick="deleteAllNotifications()" style="color:var(--danger);"><i class="fas fa-trash-alt"></i> Clear All</div>
+        </div>
+    </main>
+
+    <!-- DETAIL MODAL -->
+    <div class="modal-overlay" id="modal-container" onclick="closeModal()">
+        <div class="modal-card animate__animated animate__zoomIn" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div id="modal-icon-container" class="notif-icon-box"><i id="modal-icon" class="fas fa-bell"></i></div>
+                <div>
+                    <h3 id="modal-title">Notification Title</h3>
+                    <div class="modal-date" id="modal-time">Just now</div>
+                </div>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Content -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-text danger" onclick="deleteCurrentNotification()">Delete</button>
+                <button class="btn-text" onclick="closeModal()">Close</button>
+                <button class="btn-text primary" id="modal-action-btn" onclick="handleAction()">View Details</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install Admin App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add to home screen for quick access.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, orderBy, onSnapshot, updateDoc, writeBatch, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+
+        let allNotifications = [];
+        let currentFilter = 'all';
+        let activeNotifId = null;
+        let activeLink = null;
+
+        // --- UI UTILS ---
+        window.toggleSidebar = () => { 
+            document.getElementById('sidebar').classList.toggle('active'); 
+            document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
+        };
+        
+        window.logout = () => {
+            if(confirm("Confirm Log Out?")) {
+                signOut(auth).then(() => window.location.href = 'signin.html');
+            }
+        };
+
+        window.closeModal = () => document.getElementById('modal-container').classList.remove('active');
+
+        // Relative Time
+        function timeAgo(dateParam) {
+            if (!dateParam) return null;
+            const date = typeof dateParam === 'object' ? dateParam : new Date(dateParam);
+            const today = new Date();
+            const seconds = Math.round((today - date) / 1000);
+            const minutes = Math.round(seconds / 60);
+            const isToday = today.toDateString() === date.toDateString();
+
+            if (seconds < 10) return 'Just now';
+            if (seconds < 60) return 'Moments ago';
+            if (minutes < 60) return `${minutes} mins ago`;
+            if (isToday) return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        }
+
+        onAuthStateChanged(auth, user => {
+            if (!user) { window.location.href = 'signin.html'; return; }
+            initBadges();
+            
+            // Notifications Listener
+            const q = query(collection(db, "notifications"), where("userId", "==", user.uid), orderBy("timestamp", "desc"));
+            onSnapshot(q, (snapshot) => {
+                allNotifications = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                renderList();
+                updateUnreadCount();
+            });
+        });
+
+        function initBadges() {
+            const txQ = query(collection(db, "transactions"), where("status", "==", "pending"));
+            onSnapshot(txQ, s => {
+                const b = document.getElementById('notif-badge');
+                if(s.size > 0) { b.innerText = s.size; b.style.display = 'flex'; } else b.style.display = 'none';
+            });
+            const msgQ = query(collection(db, "support_tickets"), where("status", "==", "open"));
+             onSnapshot(msgQ, (snap) => {
+                const badge = document.getElementById('msg-badge');
+                if(snap.size > 0) { badge.innerText = snap.size; badge.style.display = 'flex'; } else badge.style.display = 'none';
+            });
+        }
+
+        function updateUnreadCount() {
+            const count = allNotifications.filter(n => !n.read).length;
+            const tabBadge = document.getElementById('tab-count');
+            const fab = document.getElementById('fab-controls');
+            
+            if(count > 0) {
+                tabBadge.innerText = count;
+                tabBadge.style.display = 'inline-block';
+                fab.style.display = 'flex'; 
+            } else {
+                tabBadge.style.display = 'none';
+                if(allNotifications.length === 0) fab.style.display = 'none';
+            }
+        }
+
+        function renderList() {
+            const container = document.getElementById('notif-container');
+            const list = currentFilter === 'all' ? allNotifications : allNotifications.filter(n => !n.read);
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state animate__animated animate__fadeIn">
+                        <div class="empty-icon"><i class="fas fa-check-circle"></i></div>
+                        <h3>All caught up!</h3>
+                        <p>${currentFilter === 'unread' ? 'No unread alerts.' : 'System logs are clear.'}</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = list.map(n => {
+                let icon = 'fa-bell', cls = 'type-default';
+                const type = (n.type||'').toLowerCase();
+                
+                if(type === 'success' || type === 'approved') { icon = 'fa-check'; cls = 'type-success'; }
+                else if(type === 'warning' || type === 'pending') { icon = 'fa-exclamation'; cls = 'type-wallet'; }
+                else if(type === 'danger' || type === 'error') { icon = 'fa-times'; cls = 'type-danger'; }
+                else if(type === 'info' || type === 'system') { icon = 'fa-info'; cls = 'type-info'; }
+
+                const jsDate = n.timestamp ? new Date(n.timestamp.seconds * 1000) : new Date();
+                const timeString = timeAgo(jsDate);
+                const isUnread = !n.read;
+
+                return `
+                    <div class="notif-item animate__animated animate__fadeInUp ${isUnread ? 'unread' : ''}" onclick="openModal('${n.id}')">
+                        <div class="notif-icon-box ${cls}">
+                            <i class="fas ${icon}"></i>
+                        </div>
+                        <div class="notif-content">
+                            <div class="notif-header">
+                                <span class="notif-title">${n.title}</span>
+                            </div>
+                            <div class="notif-body">${n.message}</div>
+                            <div class="notif-meta">
+                                <span>${timeString}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.filterNotifications = (type, el) => {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            currentFilter = type;
+            renderList();
+        };
+
+        window.openModal = async (id) => {
+            const n = allNotifications.find(x => x.id === id);
+            if (!n) return;
+            activeNotifId = id;
+            activeLink = n.link || null;
+
+            let icon = 'fa-bell', cls = 'type-default';
+            const type = (n.type||'').toLowerCase();
+            if(type === 'success') { icon = 'fa-check'; cls = 'type-success'; }
+            else if(type === 'danger') { icon = 'fa-times'; cls = 'type-danger'; }
+            else if(type === 'warning') { icon = 'fa-exclamation'; cls = 'type-wallet'; }
+
+            const jsDate = n.timestamp ? new Date(n.timestamp.seconds * 1000) : new Date();
+
+            document.getElementById('modal-title').textContent = n.title;
+            document.getElementById('modal-body').textContent = n.message;
+            document.getElementById('modal-time').textContent = jsDate.toLocaleString();
+            
+            const iconContainer = document.getElementById('modal-icon-container');
+            iconContainer.className = `notif-icon-box ${cls}`;
+            document.getElementById('modal-icon').className = `fas ${icon}`;
+            
+            const actionBtn = document.getElementById('modal-action-btn');
+            actionBtn.style.display = activeLink ? 'block' : 'none';
+
+            document.getElementById('modal-container').classList.add('active');
+            
+            if (!n.read) {
+                try { await updateDoc(doc(db, "notifications", id), { read: true }); } catch(e){}
+            }
+        };
+
+        window.handleAction = () => {
+            if(activeLink) window.location.href = activeLink;
+            closeModal();
+        };
+
+        window.markAllRead = async () => {
+            const unreadIds = allNotifications.filter(n => !n.read).map(n => n.id);
+            if (unreadIds.length === 0) return Toastify({ text: "No unread items", style: { background: "#3B82F6" } }).showToast();
+            
+            const batch = writeBatch(db);
+            unreadIds.forEach(id => batch.update(doc(db, "notifications", id), { read: true }));
+            await batch.commit();
+            Toastify({ text: "All marked as read", style: { background: "#10B981" } }).showToast();
+        };
+
+        window.deleteAllNotifications = async () => {
+            if (allNotifications.length === 0) return;
+            if (!confirm("Clear all logs? This cannot be undone.")) return;
+            
+            const batch = writeBatch(db);
+            allNotifications.forEach(n => batch.delete(doc(db, "notifications", n.id)));
+            await batch.commit();
+            Toastify({ text: "Logs cleared", style: { background: "#EF4444" } }).showToast();
+        };
+
+        window.deleteCurrentNotification = async () => {
+            if (!activeNotifId) return;
+            const tempId = activeNotifId;
+            closeModal();
+            await deleteDoc(doc(db, "notifications", tempId));
+        };
+
+        // --- PWA LOGIC ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('pwa-install-popup').style.display = 'block';
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('pwa-install-popup').style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            document.getElementById('pwa-install-popup').style.display = 'none';
+        };
+
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
+        }
+    </script>
+</body>
+</html>

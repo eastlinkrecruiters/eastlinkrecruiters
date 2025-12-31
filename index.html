@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="EastLink - The elite platform connecting exceptional talent with trusted employers.">
+    <title>EastLink | Elite Talent Connection</title>
+    
+    <meta name="theme-color" content="#020617">
+
+    <!-- PWA Manifest & Favicon -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons & Animation -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        /* =========================================
+           THEME VARIABLES
+           ========================================= */
+        :root {
+            --primary: #f59e0b; /* Bright Gold/Orange */
+            --primary-dark: #d97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            
+            --bg: #020617; 
+            
+            /* 70% Transparency for Containers (Glass Effect) */
+            --bg-glass-70: rgba(15, 23, 42, 0.7); 
+            
+            /* Text */
+            --text: #F8FAFC;
+            --text-muted: #94A3B8;
+            
+            --border-color: rgba(255, 255, 255, 0.1);
+            --header-height: 80px;
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            /* Relative path for GitHub Pages */
+            background-image: url('./assets/images/background.png');
+            background-attachment: fixed;
+            background-position: center;
+            background-size: cover;
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Dark overlay - 20% Opacity */
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background: rgba(2, 6, 23, 0.2); 
+            z-index: -5; pointer-events: none;
+        }
+
+        h1, h2, h3, .brand-font { font-family: 'Cinzel', serif; }
+        a { text-decoration: none; color: inherit; transition: var(--transition); }
+        img { max-width: 100%; display: block; }
+
+        .container { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
+        .section { padding: 6rem 0; }
+
+        /* Scroll Progress */
+        #scroll-progress {
+            position: fixed; top: 0; left: 0; height: 3px; background: var(--primary);
+            z-index: 2000; width: 0%; transition: width 0.1s;
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; width: 100%; height: var(--header-height);
+            z-index: 1000; transition: var(--transition); 
+            background: var(--bg-glass-70);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .nav-inner { height: 100%; display: flex; justify-content: space-between; align-items: center; }
+
+        .header-logo-text {
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem; font-weight: 700; color: var(--text);
+            letter-spacing: 1px; display: flex; align-items: center; gap: 12px;
+        }
+        .header-logo-text span { color: var(--primary); }
+
+        .menu-trigger {
+            display: inline-flex; align-items: center; gap: 12px; cursor: pointer;
+            padding: 8px 20px; border-radius: 99px;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);
+            color: var(--text); font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;
+            transition: var(--transition);
+        }
+        .menu-trigger:hover { border-color: var(--primary); background: rgba(245, 158, 11, 0.1); }
+
+        /* --- OVERLAY MENU --- */
+        .menu-overlay {
+            position: fixed; inset: 0; 
+            background: rgba(2, 6, 23, 0.98);
+            z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: var(--transition);
+        }
+        .menu-overlay.active { opacity: 1; pointer-events: all; }
+        .close-menu {
+            position: absolute; top: 30px; right: 30px;
+            width: 44px; height: 44px; border-radius: 50%;
+            border: 1px solid var(--border-color); color: var(--text-muted);
+            display: grid; place-items: center; cursor: pointer; transition: 0.3s; font-size: 1.2rem;
+        }
+        .close-menu:hover { border-color: var(--primary); color: var(--primary); transform: rotate(90deg); }
+        
+        .menu-links { text-align: center; display: flex; flex-direction: column; gap: 25px; }
+        .menu-link {
+            font-family: 'Cinzel', serif; font-size: 2.5rem; font-weight: 700;
+            color: var(--text); transition: 0.3s;
+        }
+        .menu-link:hover { color: var(--primary); }
+        .menu-actions { margin-top: 50px; display: flex; gap: 15px; align-items: center; }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            padding-top: calc(var(--header-height) + 40px); 
+            padding-bottom: 4rem;
+            position: relative;
+        }
+        
+        .hero-content {
+            display: grid; 
+            grid-template-columns: 1fr 1.2fr; 
+            gap: 4rem; 
+            align-items: start;
+        }
+
+        .hero-text-content { padding-top: 10px; }
+
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 8px 24px; border-radius: 50px;
+            background: rgba(245, 158, 11, 0.1); 
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--primary);
+            font-size: 0.75rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 4.5vw, 4rem); font-weight: 700;
+            margin-bottom: 20px; color: var(--text); line-height: 1.1;
+        }
+        .hero h1 span { color: var(--primary); display: block; margin-top: 5px; }
+        
+        .hero p {
+            font-size: 1.05rem; color: var(--text-muted);
+            margin-bottom: 40px; line-height: 1.6; max-width: 600px;
+        }
+
+        /* Search Box (70% Transparency) */
+        .hero-suggestions {
+            background: var(--bg-glass-70); 
+            border: 1px solid var(--border-color);
+            border-radius: 16px; padding: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+            margin-bottom: 30px;
+            display: flex; align-items: center; justify-content: space-between;
+            max-width: 600px; height: 65px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .suggestion-input-wrap { position: relative; flex-grow: 1; height: 100%; display: flex; align-items: center; }
+        .suggestion-input {
+            width: 100%; padding: 0 15px 0 50px; background: transparent;
+            border: none; color: var(--text); font-size: 1rem; font-family: inherit;
+        }
+        .suggestion-input:focus { outline: none; }
+        .search-icon { position: absolute; left: 20px; color: var(--primary); font-size: 1.1rem; }
+        
+        .search-btn-inside {
+            background: var(--primary); color: #000; border: none;
+            padding: 0 30px; height: 100%; border-radius: 12px; 
+            font-weight: 600; cursor: pointer; font-size: 0.95rem;
+            transition: 0.3s;
+        }
+        .search-btn-inside:hover { background: #fbbf24; }
+        
+        .trending-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 40px; align-items: center; }
+        .tag-label { font-size: 0.8rem; color: var(--text-muted); margin-right: 5px; }
+        .tag {
+            font-size: 0.8rem; color: var(--text-muted); padding: 6px 16px;
+            background: rgba(255,255,255,0.05); border-radius: 50px; 
+            cursor: pointer; transition: 0.2s; border: 1px solid transparent;
+        }
+        .tag:hover { border-color: var(--primary); color: var(--text); }
+
+        .stats-strip { display: flex; gap: 4rem; border-top: 1px solid var(--border-color); padding-top: 2rem; }
+        .stat-item { text-align: left; }
+        .stat-num { font-size: 1.8rem; font-weight: 700; color: var(--primary); font-family: 'Cinzel', serif; margin-bottom: 5px; }
+        .stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; }
+
+        /* --- VISUAL PANEL (70% Transparency) --- */
+        .hero-visual { position: relative; padding-top: 10px; }
+        
+        /* 20% Overlay Glow */
+        .hero-visual::before {
+            content:''; position: absolute; inset: -20px; z-index: -1;
+            background: radial-gradient(circle at center, rgba(245, 158, 11, 0.4) 0%, transparent 60%);
+            border-radius: 50%; opacity: 0.2; 
+        }
+
+        .hero-panel {
+            background: var(--bg-glass-70);
+            border-radius: 24px; padding: 2rem;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5); 
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(12px); 
+            overflow: hidden;
+            text-align: center;
+        }
+        
+        .job-list { list-style: none; display: flex; flex-direction: column; gap: 14px; margin-top: 1.5rem; min-height: 200px; }
+        .job-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 18px; border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color);
+            transition: 0.3s;
+        }
+        .job-item:hover { border-color: var(--primary); transform: translateX(5px); }
+        .job-main { display: flex; flex-direction: column; }
+        .job-title { font-weight: 600; font-size: 0.95rem; color: var(--text); margin-bottom: 2px; }
+        .job-meta { font-size: 0.75rem; color: var(--text-muted); }
+        .status-pill { 
+            padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; 
+            background: rgba(16, 185, 129, 0.1); color: #10B981; 
+            border: 1px solid rgba(16, 185, 129, 0.2); font-weight: 600; 
+        }
+
+        /* --- PROCESS & INDUSTRIES CARDS (70% Transparency) --- */
+        .section-head { text-align: center; margin-bottom: 3rem; max-width: 700px; margin-inline: auto; }
+        .section-head h2 { font-size: 2.2rem; margin-bottom: 0.5rem; color: var(--text); }
+        .section-head div:first-child { 
+            font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase;
+            color: var(--primary); font-weight: 700; margin-bottom: 10px;
+        }
+        
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+
+        .feature-card {
+            background: var(--bg-glass-70);
+            border: 1px solid var(--border-color);
+            border-radius: 16px; padding: 2rem; transition: var(--transition);
+            backdrop-filter: blur(12px);
+        }
+        .feature-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .f-icon {
+            width: 50px; height: 50px; border-radius: 12px; background: rgba(255,255,255,0.05);
+            color: var(--primary); font-size: 1.4rem; display: grid; place-items: center; margin-bottom: 1.5rem;
+        }
+        .feature-card h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.8rem; color: var(--text); }
+        .feature-card p { color: var(--text-muted); font-size: 0.9rem; }
+
+        /* Industries */
+        .ind-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 2rem; }
+        .ind-card {
+            height: 260px; border-radius: var(--radius-lg); overflow: hidden; position: relative;
+            cursor: pointer; border: 1px solid var(--border-color);
+        }
+        .ind-overlay {
+            position: absolute; inset: 0; background: linear-gradient(to top, rgba(2, 6, 23, 0.95), rgba(2, 6, 23, 0.1));
+            padding: 25px; display: flex; flex-direction: column; justify-content: flex-end;
+            transition: 0.3s;
+        }
+        .ind-card:hover .ind-overlay { background: linear-gradient(to top, rgba(217, 119, 6, 0.8), rgba(2, 6, 23, 0.1)); }
+        .ind-card h3 { color: white; font-size: 1.3rem; margin-bottom: 5px; font-family: 'Cinzel', serif; }
+        .ind-card p { color: rgba(255,255,255,0.8); font-size: 0.85rem; }
+
+        /* Blog */
+        .blog-card {
+            background: var(--bg-glass-70);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(12px); border-radius: 16px; overflow: hidden; 
+            display: flex; flex-direction: column; height: 100%;
+            transition: var(--transition);
+        }
+        .blog-card:hover { transform: translateY(-5px); border-color: var(--primary); }
+        .blog-img { width: 100%; height: 200px; object-fit: cover; }
+        .blog-body { padding: 1.8rem; flex: 1; display: flex; flex-direction: column; }
+        .blog-date { font-size: 0.75rem; color: var(--primary); margin-bottom: 10px; font-weight: 700; text-transform: uppercase; }
+        .blog-title { font-size: 1.3rem; color: var(--text); margin-bottom: 12px; line-height: 1.3; font-weight: 700; font-family: 'Cinzel', serif; }
+        .blog-desc { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 15px; flex: 1; }
+        .blog-link { color: var(--text); font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; transition:0.3s; }
+        .blog-link:hover { color: var(--primary); gap: 10px; }
+
+        /* FOOTER */
+        footer { 
+            background: var(--bg-glass-70); border-top: 1px solid var(--border-color); 
+            padding-top: 4rem; margin-top: 4rem; backdrop-filter: blur(12px);
+        }
+        /* UPDATED: Changed from 4 columns to 3 columns to remove the app download column */
+        .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; margin-bottom: 4rem; }
+        
+        .f-col h4 { font-size: 0.9rem; color: var(--text); margin-bottom: 1.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-family: 'Cinzel', serif; }
+        .f-col ul { list-style: none; }
+        .f-col ul li { margin-bottom: 12px; }
+        .f-col a { color: var(--text-muted); font-size: 0.9rem; transition: 0.2s; }
+        .f-col a:hover { color: var(--primary); padding-left: 5px; }
+        .social-links { display: flex; gap: 10px; margin-top: 25px; }
+        .s-btn {
+            width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color); color: var(--text-muted);
+            display: grid; place-items: center; transition: 0.3s; font-size: 1rem;
+        }
+        .s-btn:hover { background: var(--primary); color: #000; border-color: var(--primary); }
+        .copyright { border-top: 1px solid var(--border-color); padding: 2rem 0; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+        
+        /* Helpers */
+        .spinner {
+            width: 20px; height: 20px; border: 2px solid rgba(245, 158, 11, 0.3);
+            border-top: 2px solid var(--primary); border-radius: 50%;
+            animation: spin 1s linear infinite; display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .hero-content { grid-template-columns: 1fr; gap: 3rem; padding-top: 0; }
+            /* Mobile Order: Text Top, Visual Bottom */
+            .hero-text-content { order: 1; }
+            .hero-visual { order: 2; margin-top: 20px; }
+            
+            .hero h1 { font-size: 2.8rem; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .stats-strip { flex-wrap: wrap; gap: 2rem; justify-content: flex-start; }
+            .hero-suggestions { height: auto; flex-direction: column; gap: 10px; padding: 15px; }
+            .search-btn-inside { width: 100%; height: 50px; }
+            .suggestion-input { padding: 0 0 0 35px; height: 50px; }
+            .suggestion-input-wrap { width: 100%; height: 50px; }
+            .search-icon { left: 0; }
+        }
+        @media (max-width: 600px) {
+            .footer-grid { grid-template-columns: 1fr; }
+            .menu-actions { flex-direction: column; width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PRELOADER -->
+    <div id="preloader" style="position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; justify-content:center; align-items:center; transition: opacity 0.5s ease;">
+        <div style="text-align:center;">
+            <!-- Updated relative path -->
+            <img src="./assets/images/logo.png" style="width:70px; height:auto; margin-bottom:20px; filter: drop-shadow(0 0 15px var(--primary));">
+            <div style="width:150px; height:2px; background:rgba(255,255,255,0.1); overflow:hidden; border-radius:2px;">
+                <div style="width:100%; height:100%; background:var(--gold-gradient); animation:loading 1.5s infinite ease-in-out; transform-origin:left;"></div>
+            </div>
+            <style>@keyframes loading { 0% { transform: scaleX(0); } 50% { transform: scaleX(1); } 100% { transform: scaleX(0); transform-origin:right; } }</style>
+        </div>
+    </div>
+
+    <!-- Scroll Progress -->
+    <div id="scroll-progress"></div>
+
+    <!-- HEADER -->
+    <header id="header">
+        <div class="container nav-inner">
+            <a href="index.html" class="header-logo-text">
+                <img src="./assets/images/logo.png" style="height:35px; width:auto;" alt="Logo">
+                <div>EAST<span>LINK</span></div>
+            </a>
+            <div class="menu-trigger" onclick="toggleMenu()">
+                <span>MENU</span>
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- MENU OVERLAY -->
+    <div class="menu-overlay" id="menuOverlay">
+        <div class="close-menu" onclick="toggleMenu()"><i class="fas fa-times"></i></div>
+        <div class="menu-links">
+            <a href="about.html" class="menu-link">About Us</a>
+            <a href="signup.html" class="menu-link">Opportunities</a>
+        </div>
+        <div class="menu-actions">
+            <a href="signin.html" class="btn" style="background:transparent; border:1px solid var(--border-color); color:white; border-radius:50px; padding:12px 30px; text-decoration:none;">Sign In</a>
+            <a href="signup.html" class="btn" style="background:var(--primary); color:black; border-radius:50px; padding:12px 30px; font-weight:700; text-decoration:none;">Join Now</a>
+        </div>
+    </div>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="container hero-content">
+            
+            <!-- LEFT (or TOP on mobile): TEXT & SEARCH -->
+            <div class="hero-text-content">
+                <div class="hero-badge" data-aos="fade-down">
+                    <i class="fas fa-check-circle"></i> ELITE RECRUITMENT
+                </div>
+
+                <h1 data-aos="fade-up" data-aos-delay="100">
+                    CONNECT WITH <br><span>EXCEPTIONAL TALENT</span>
+                </h1>
+
+                <p data-aos="fade-up" data-aos-delay="200">
+                    EastLink bridges the gap between top-tier professionals and trusted employers across East Africa with verified data, guaranteed contracts, and speed.
+                </p>
+                
+                <!-- Search Box -->
+                <div class="hero-suggestions" data-aos="fade-up" data-aos-delay="300">
+                    <div class="suggestion-input-wrap">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="suggestion-input" id="roleInput" placeholder="Try 'Senior Finance' or 'Civil Engineer'...">
+                    </div>
+                    <button class="search-btn-inside" onclick="window.location.href='signup.html'">Search</button>
+                </div>
+                
+                <!-- Tags -->
+                <div class="trending-tags" id="tagContainer">
+                    <span class="tag-label">Trending:</span>
+                    <div class="spinner"></div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-strip" data-aos="fade-up" data-aos-delay="400">
+                    <div class="stat-item">
+                        <div class="stat-num">500+</div>
+                        <div class="stat-label">Partners</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-num">12K+</div>
+                        <div class="stat-label">Verified Talents</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-num">98%</div>
+                        <div class="stat-label">Success Rate</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT (or BOTTOM on mobile): VISUAL PANEL -->
+            <div class="hero-visual" data-aos="zoom-in" data-aos-delay="200">
+                <div class="hero-panel" style="padding: 40px 30px; text-align: center;">
+                    
+                    <div style="width: 70px; height: 70px; background: rgba(217, 119, 6, 0.15); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 20px auto; border: 1px solid rgba(217, 119, 6, 0.3);">
+                        <i class="fas fa-crown" style="color: var(--primary); font-size: 2rem;"></i>
+                    </div>
+                    
+                    <h3 style="font-family: var(--font-head); color: var(--text); font-size: 1.3rem; margin-bottom: 12px;">Elite Opportunities</h3>
+                    
+                    <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 30px; line-height: 1.6;">
+                        Access vetted roles with a 100% placement guarantee. Our elite partners are hiring now.
+                    </p>
+
+                    <button onclick="location.href='signup.html'" style="background: var(--gold-gradient); color: #000; border: none; padding: 14px 28px; border-radius: 30px; font-weight: 700; cursor: pointer; font-size: 0.9rem; width: 100%; transition: transform 0.2s;">
+                        View Opportunities <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- PROCESS SECTION -->
+    <section class="section" id="process">
+        <div class="container">
+            <div class="section-head" data-aos="fade-up">
+                <div>HOW IT WORKS</div>
+                <h2>Simple, Transparent, Verified</h2>
+                <p style="color:var(--text-muted);">We've stripped away the complexity of traditional recruitment.</p>
+            </div>
+            <div class="grid-3">
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="f-icon"><i class="fas fa-user-check"></i></div>
+                    <h3>1. Create Profile</h3>
+                    <p>Build your digital resume. Our verification system ensures credibility for every skill listed.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="f-icon"><i class="fas fa-search-dollar"></i></div>
+                    <h3>2. Explore Jobs</h3>
+                    <p>Access a curated list of opportunities filtered by industry, salary transparency, and location.</p>
+                </div>
+                <div class="feature-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="f-icon"><i class="fas fa-file-signature"></i></div>
+                    <h3>3. Get Hired</h3>
+                    <p>Connect directly with employers. Secure your contract digitally and start your journey.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INDUSTRIES SECTION -->
+    <section class="section" style="background:rgba(255,255,255,0.02);">
+        <div class="container">
+            <div class="section-head" data-aos="fade-up">
+                <div>SECTORS</div>
+                <h2>Industries We Serve</h2>
+                <p style="color:var(--text-muted);">Specialized recruitment across major economic pillars.</p>
+            </div>
+            <div class="ind-grid">
+                <div class="ind-card" data-aos="zoom-in">
+                    <img src="./assets/images/corporate-team.jpg" alt="Corporate" onerror="this.src='https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600'">
+                    <div class="ind-overlay">
+                        <h3>Corporate</h3>
+                        <p>Finance, HR, Admin</p>
+                    </div>
+                </div>
+                <div class="ind-card" data-aos="zoom-in" data-aos-delay="100">
+                    <img src="./assets/images/skilled-labor.jpg" alt="Industrial" onerror="this.src='https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=600'">
+                    <div class="ind-overlay">
+                        <h3>Industrial</h3>
+                        <p>Construction, Engineering</p>
+                    </div>
+                </div>
+                <div class="ind-card" data-aos="zoom-in" data-aos-delay="200">
+                    <img src="./assets/images/tech-office.jpg" alt="Tech" onerror="this.src='https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=600'">
+                    <div class="ind-overlay">
+                        <h3>Technology</h3>
+                        <p>Development, IT Security</p>
+                    </div>
+                </div>
+                <div class="ind-card" data-aos="zoom-in" data-aos-delay="300">
+                    <img src="./assets/images/medical.jpg" alt="Health" onerror="this.src='https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600'">
+                    <div class="ind-overlay">
+                        <h3>Healthcare</h3>
+                        <p>Nursing, Specialists</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+     <!-- BLOG SECTION -->
+    <section class="section" id="blog">
+        <div class="container">
+            <div class="section-head" data-aos="fade-up">
+                <div>NEWS & UPDATES</div>
+                <h2>Latest Insights</h2>
+                <p style="color:var(--text-muted);">Labor trends and platform news from our experts.</p>
+            </div>
+            <div class="grid-3" id="blogContainer">
+                <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted);">
+                    <div class="spinner"></div> Loading updates...
+                </div>
+            </div>
+            <div style="text-align:center; margin-top:50px;">
+                <a href="blog.html" class="btn" style="background:transparent; border:1px solid var(--border-color); color:white; border-radius:50px; padding:12px 30px; text-decoration:none;">View All News</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="f-col">
+                    <div class="logo" style="margin-bottom:20px; font-weight:700; font-size:1.4rem; display:flex; align-items:center; gap:10px; font-family: 'Cinzel', serif;">
+                        <img src="./assets/images/logo.png" style="height:35px; width:auto;" alt="EastLink">
+                        <div style="color:white;">EAST<span style="color:var(--primary);">LINK</span></div>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.6;">The leading platform for professional recruitment. We ensure quality, trust, and speed.</p>
+                    <div class="social-links">
+                        <a href="#" id="link-fb" class="s-btn" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" id="link-in" class="s-btn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" id="link-tw" class="s-btn" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="#" id="link-ig" class="s-btn" target="_blank"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="f-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="services.html">Our Services</a></li>
+                        <li><a href="careers.html">Careers</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="f-col">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="signin.html">Client Portal</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">&copy; <span id="year"></span> EastLink Recruitment Solutions. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <!-- PWA INSTALL POPUP (Added Logic) -->
+    <div id="pwa-install-popup" style="
+        display: none; 
+        position: fixed; bottom: 20px; right: 20px; 
+        background: rgba(15, 23, 42, 0.95); 
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        backdrop-filter: blur(12px);
+        padding: 20px; border-radius: 16px; 
+        z-index: 10000; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        max-width: 320px; animation: slideUp 0.5s ease-out;
+    ">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+            <img src="./assets/images/logo.png" style="width:50px; height:50px; border-radius:10px;">
+            <div>
+                <h4 style="color:#fff; margin:0; font-family:'Cinzel', serif;">Install EastLink</h4>
+                <p style="color:#94A3B8; margin:5px 0 0; font-size:0.8rem;">Add to Home Screen for fast access.</p>
+            </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button id="pwa-dismiss" style="flex:1; padding:10px; background:transparent; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:8px; cursor:pointer;">Later</button>
+            <button id="pwa-install-btn" style="flex:1; padding:10px; background:linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border:none; color:#000; font-weight:700; border-radius:8px; cursor:pointer;">Install</button>
+        </div>
+    </div>
+    <style>@keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }</style>
+
+    <!-- SCRIPTS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script type="module">
+        AOS.init({ duration: 900, offset: 50, once: true });
+        
+        document.getElementById("year").textContent = new Date().getFullYear();
+
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            preloader.style.opacity = '0';
+            setTimeout(() => preloader.style.display = 'none', 500);
+        });
+
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            const bar = document.getElementById("scroll-progress");
+            if(bar) bar.style.width = scrolled + "%";
+        });
+
+        window.toggleMenu = () => {
+            const menu = document.getElementById('menuOverlay');
+            menu.classList.toggle('active');
+            document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : 'auto';
+        };
+
+        // --- FIREBASE LOGIC ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, collection, query, orderBy, limit, getDocs, doc, getDoc, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Track Auth State
+        let isUserLoggedIn = false;
+        onAuthStateChanged(auth, (user) => {
+            isUserLoggedIn = !!user;
+        });
+
+        // TAG LOADER
+        async function loadSearchTags() {
+            const container = document.getElementById('tagContainer');
+            const input = document.getElementById('roleInput');
+            try {
+                const q = query(collection(db, "jobs"), where("status", "==", "active"), limit(15));
+                const snap = await getDocs(q);
+                
+                const categories = new Set();
+                snap.forEach(doc => { if(doc.data().category) categories.add(doc.data().category); });
+                
+                let uniqueTags = Array.from(categories).slice(0, 3);
+                if(uniqueTags.length === 0) uniqueTags = ['Finance', 'Engineering', 'Remote'];
+                
+                let html = `<span class="tag-label">Trending:</span>`;
+                uniqueTags.forEach(tag => { html += `<span class="tag">${tag}</span>`; });
+                container.innerHTML = html;
+                
+                document.querySelectorAll('.tag').forEach(tag => {
+                    tag.addEventListener('click', () => { input.value = tag.innerText; input.focus(); });
+                });
+            } catch (e) {}
+        }
+
+        // BLOG LOADER
+        async function loadUpdates() {
+            const container = document.getElementById('blogContainer');
+            if(!container) return;
+            try {
+                const q = query(collection(db, "blogs"), limit(10));
+                const snap = await getDocs(q);
+                if(snap.empty) {
+                    container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted);">No recent news updates.</div>`;
+                    return;
+                }
+                let blogs = [];
+                snap.forEach(doc => { let d = doc.data(); d.id = doc.id; blogs.push(d); });
+                blogs.sort((a, b) => {
+                    const dateA = a.timestamp ? a.timestamp.seconds : 0;
+                    const dateB = b.timestamp ? b.timestamp.seconds : 0;
+                    return dateB - dateA;
+                });
+                blogs = blogs.slice(0, 3);
+                container.innerHTML = '';
+                blogs.forEach(d => {
+                    if(d.status === 'published' || !d.status) { 
+                        const date = d.timestamp ? new Date(d.timestamp.seconds * 1000).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent';
+                        const img = d.imageUrl || './assets/images/logo.png';
+                        const plainText = d.content ? d.content.replace(/<[^>]+>/g, '') : '';
+                        const excerpt = plainText.length > 100 ? plainText.substring(0, 100) + '...' : plainText;
+                        
+                        container.innerHTML += `
+                            <article class="blog-card" data-aos="fade-up">
+                                <img src="${img}" class="blog-img" alt="${d.title}" onerror="this.src='https://via.placeholder.com/400x200?text=EastLink+Update'">
+                                <div class="blog-body">
+                                    <div class="blog-date">${date}</div>
+                                    <h3 class="blog-title">${d.title}</h3>
+                                    <p class="blog-desc">${excerpt}</p>
+                                    <a href="blog-details.html?id=${d.id}" class="blog-link">Read Article <i class="fas fa-arrow-right"></i></a>
+                                </div>
+                            </article>
+                        `;
+                    }
+                });
+            } catch(e) {
+                console.error("Blog error:", e);
+                container.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:#EF4444; padding:20px;">Error loading news feed.</div>`;
+            }
+        }
+
+        // SOCIALS LOADER
+        async function loadSocials() {
+            try {
+                const docSnap = await getDoc(doc(db, "site_settings", "general"));
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if(data.facebook) document.getElementById('link-fb').href = data.facebook;
+                    if(data.linkedin) document.getElementById('link-in').href = data.linkedin;
+                    if(data.twitter) document.getElementById('link-tw').href = data.twitter;
+                    if(data.instagram) document.getElementById('link-ig').href = data.instagram;
+                }
+            } catch (error) {}
+        }
+
+        // Init
+        document.querySelector('.search-btn-inside').addEventListener('click', () => {
+            const val = document.getElementById('roleInput').value;
+            window.location.href = `jobs.html?search=${encodeURIComponent(val)}`;
+        });
+        loadSearchTags();
+        loadUpdates();
+        loadSocials();
+
+        // --- PWA LOGIC START ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('SW Registered'))
+                    .catch(err => console.log('SW Failed', err));
+            });
+        }
+
+        let deferredPrompt;
+        const pwaPopup = document.getElementById('pwa-install-popup');
+        const installBtn = document.getElementById('pwa-install-btn');
+        const dismissBtn = document.getElementById('pwa-dismiss');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            setTimeout(() => { pwaPopup.style.display = 'block'; }, 3000);
+        });
+
+        installBtn.addEventListener('click', (e) => {
+            pwaPopup.style.display = 'none';
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => { deferredPrompt = null; });
+            }
+        });
+
+        dismissBtn.addEventListener('click', () => { pwaPopup.style.display = 'none'; });
+        window.addEventListener('appinstalled', () => { pwaPopup.style.display = 'none'; });
+        // --- PWA LOGIC END ---
+    </script>
+</body>
+</html>

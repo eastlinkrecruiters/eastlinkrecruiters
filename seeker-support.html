@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <!-- Zero-Zoom Viewport for App-like feel -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Concierge Support | EastLink Recruiters</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0F172A">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Dashboard Theme Variables */
+            --bg-body: #0F172A;       
+            --bg-card: rgba(30, 41, 59, 0.65);
+            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.95);
+            --bg-input: rgba(255, 255, 255, 0.07);
+            --bg-hover: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8; 
+            --gold-base: #D97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --neon-purple: #8b5cf6;
+            --success: #10B981;
+            --danger: #EF4444;
+            --sidebar-width: 260px; 
+            --header-height: 70px;
+            --radius: 16px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background-image: url('assets/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: var(--text-main); 
+            height: 100vh; height: 100dvh; /* Lock height for chat */
+            overflow: hidden; 
+        }
+
+        /* --- UTILS --- */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            width: 100%;
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 1000;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .logo { font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; }
+        .logo span { color: var(--gold-base); }
+        .hamburger { font-size: 1.4rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        /* Global Search (Hidden on Mobile) */
+        .global-search-container { flex: 1; max-width: 450px; position: relative; margin: 0 20px; }
+        .global-search-input {
+            width: 100%; background: var(--bg-input); border: 1px solid var(--border-color);
+            padding: 10px 45px 10px 15px; border-radius: 12px; color: var(--text-main);
+            transition: all 0.3s ease; font-size: 0.9rem;
+        }
+        .global-search-input:focus { border-color: var(--gold-base); background: var(--bg-hover); box-shadow: 0 0 15px rgba(217, 119, 6, 0.15); }
+
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+        .icon-btn { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; color: var(--text-muted); cursor: pointer; transition: 0.3s; position: relative; }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); }
+        .notification-badge { position: absolute; top: 5px; right: 5px; min-width: 16px; height: 16px; background: var(--danger); border-radius: 10px; font-size: 0.6rem; color: white; font-weight: 700; display: none; place-items: center; justify-content: center; padding: 0 4px; border: 2px solid var(--bg-card); }
+        .profile-widget { width: 42px; height: 42px; position: relative; cursor: pointer; margin-left: 5px; }
+        .user-avatar { width: 100%; height: 100%; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-weight: 700; color: #fff; border: 2px solid var(--border-color); object-fit: cover; }
+        .user-avatar.img-mode { background: transparent; }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 20px 0; overflow-y: auto; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+        .nav-group { padding: 0 24px; margin-bottom: 20px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-item { display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: 0.3s; border-radius: 10px; margin-bottom: 4px; }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
+        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
+        .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
+        .lock-icon { margin-left: auto; font-size: 0.7rem; opacity: 0.7; }
+
+        /* --- MAIN LAYOUT --- */
+        main { 
+            margin-left: var(--sidebar-width); margin-top: var(--header-height); 
+            height: calc(100vh - var(--header-height)); 
+            display: flex; flex-direction: column; padding: 20px;
+        }
+
+        /* --- CHAT SPECIFIC STYLES --- */
+        .chat-container {
+            flex: 1; display: flex; flex-direction: column; 
+            background: var(--bg-glass); backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color); border-radius: var(--radius);
+            overflow: hidden; max-width: 1000px; margin: 0 auto; width: 100%;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            /* New Animation */
+            animation: zoomIn 0.5s var(--ease-bounce);
+        }
+
+        .chat-header {
+            padding: 15px 24px; border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .agent-profile { display: flex; align-items: center; gap: 12px; }
+        .agent-avatar { width: 45px; height: 45px; border-radius: 14px; background: var(--bg-input); color: var(--gold-base); display: grid; place-items: center; font-size: 1.3rem; border: 1px solid var(--border-color); position: relative; transition: all 0.5s ease; }
+        .status-dot { position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; background: var(--success); border-radius: 50%; border: 3px solid var(--bg-card); box-shadow: 0 0 5px var(--success); }
+        .agent-text h3 { font-family: var(--font-display); font-size: 1rem; color: var(--text-main); font-weight: 700; margin-bottom: 2px; }
+        .agent-text p { font-size: 0.75rem; color: var(--text-muted); }
+        
+        /* Agent Mode Visuals */
+        .agent-avatar.bot-mode { color: var(--text-muted); border-color: var(--border-color); }
+        .agent-avatar.live-mode { color: #fff; background: var(--gold-gradient); border-color: var(--gold-base); box-shadow: 0 0 15px rgba(217,119,6,0.4); }
+
+        .ticket-bar {
+            background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-family: var(--font-mono); font-size: 0.75rem;
+            padding: 8px 24px; border-bottom: 1px solid rgba(217, 119, 6, 0.2); display: none; justify-content: space-between; align-items: center; letter-spacing: 0.5px;
+        }
+
+        .messages-area {
+            flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 18px;
+            scroll-behavior: smooth; background: transparent;
+        }
+        .msg-wrapper { display: flex; flex-direction: column; max-width: 85%; animation: fadeInUp 0.4s ease; }
+        .msg-wrapper.bot, .msg-wrapper.admin { align-self: flex-start; }
+        .msg-wrapper.user { align-self: flex-end; align-items: flex-end; }
+        
+        .msg-bubble { padding: 14px 20px; border-radius: 18px; font-size: 0.95rem; line-height: 1.6; position: relative; word-wrap: break-word; }
+        .msg-wrapper.bot .msg-bubble { background: var(--bg-input); color: var(--text-main); border-bottom-left-radius: 4px; border: 1px solid var(--border-color); }
+        .msg-wrapper.admin .msg-bubble { background: rgba(217, 119, 6, 0.15); color: var(--text-main); border-bottom-left-radius: 4px; border: 1px solid rgba(217, 119, 6, 0.3); }
+        .msg-wrapper.user .msg-bubble { background: var(--gold-gradient); color: #0f172a; font-weight: 600; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.2); border: none; }
+        
+        .msg-meta { font-size: 0.7rem; color: var(--text-muted); margin-top: 6px; padding: 0 4px; font-family: var(--font-mono); opacity: 0.8; }
+        .msg-system { align-self: center; font-size: 0.75rem; color: var(--text-muted); background: var(--bg-input); padding: 6px 18px; border-radius: 20px; margin: 12px 0; border: 1px solid var(--border-color); font-family: var(--font-mono); text-align: center; }
+
+        /* Thinking Animation */
+        .thinking-bubble { 
+            display: none; align-self: flex-start; background: var(--bg-input); 
+            padding: 10px 15px; border-radius: 16px; border-bottom-left-radius: 4px; 
+            border: 1px solid var(--border-color); margin-bottom: 10px;
+        }
+        .thinking-text { font-size: 0.75rem; color: var(--text-muted); font-style: italic; display: flex; gap: 4px; align-items: center; }
+
+        .chips-container {
+            padding: 12px 24px; border-top: 1px solid var(--border-color); display: flex; gap: 12px; overflow-x: auto; 
+            white-space: nowrap; background: rgba(15, 23, 42, 0.4); display: none; scrollbar-width: none;
+        }
+        .chip { 
+            padding: 8px 20px; border-radius: 24px; background: var(--bg-input); border: 1px solid var(--border-color); 
+            color: var(--text-main); font-size: 0.85rem; cursor: pointer; transition: 0.2s; font-weight: 500;
+        }
+        .chip:hover { border-color: var(--gold-base); color: var(--gold-base); background: rgba(217, 119, 6, 0.1); transform: translateY(-2px); }
+
+        .input-area {
+            padding: 20px 24px; background: rgba(15, 23, 42, 0.6); border-top: 1px solid var(--border-color);
+            display: flex; align-items: flex-end; gap: 14px;
+        }
+        .btn-attach { width: 48px; height: 48px; border-radius: 14px; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-muted); display: grid; place-items: center; cursor: pointer; transition: 0.2s; }
+        .btn-attach:hover { color: var(--text-main); border-color: var(--gold-base); background: var(--bg-hover); }
+        
+        .chat-box { 
+            flex: 1; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 18px; 
+            color: var(--text-main); font-family: var(--font-body); font-size: 0.95rem; resize: none; height: 48px; max-height: 120px; 
+            line-height: 1.4; outline: none; transition: 0.3s; 
+        }
+        .chat-box:focus { border-color: var(--gold-base); background: rgba(0,0,0,0.2); }
+        
+        .btn-send { width: 48px; height: 48px; border-radius: 14px; background: var(--gold-gradient); border: none; color: #0F172A; display: grid; place-items: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3); font-size: 1.2rem; }
+        .btn-send:hover { transform: scale(1.05); }
+
+        /* Typing Dots */
+        .typing-indicator { display: none; padding: 12px 18px; background: var(--bg-input); border-radius: 16px; border-bottom-left-radius: 4px; width: fit-content; margin-bottom: 10px; border: 1px solid var(--border-color); }
+        .dot { width: 6px; height: 6px; background: var(--text-muted); border-radius: 50%; display: inline-block; animation: bounce 1.4s infinite ease-in-out both; margin: 0 2px; }
+        .dot:nth-child(1) { animation-delay: -0.32s; } .dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 998; backdrop-filter: blur(4px); display: none; }
+
+        /* PWA Popup */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+        @media (max-width: 992px) {
+            .global-search-container { display: none; }
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 0; width: 100%; height: calc(100dvh - var(--header-height)); }
+            .chat-container { border-radius: 0; border: none; border-top: 1px solid var(--border-color); box-shadow: none; }
+            .hamburger { display: block; }
+            .msg-wrapper { max-width: 85%; }
+            .overlay.active { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER (Exact Dashboard Replica) -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="seeker-dashboard.html" class="logo">EAST<span>LINK</span></a>
+        </div>
+        
+        <div class="global-search-container">
+            <input type="text" class="global-search-input" placeholder="Search support topics...">
+            <i class="fas fa-search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+        </div>
+
+        <div class="header-actions">
+            <div class="icon-btn" title="Messages" onclick="location.href='seeker-messages.html'">
+                <i class="fa-regular fa-envelope"></i>
+                <div class="notification-badge" id="msg-badge">0</div>
+            </div>
+            <div class="icon-btn" title="Notifications" onclick="location.href='seeker-notifications.html'">
+                <i class="fa-regular fa-bell"></i>
+                <div class="notification-badge" id="notif-badge">0</div>
+            </div>
+            <div class="profile-widget" onclick="location.href='seeker-profile.html'">
+                <img src="" id="header-avatar-img" class="user-avatar img-mode" alt="Profile" style="display:none;">
+                <div id="header-avatar-fallback" class="user-avatar">U</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR (Exact Dashboard Replica) -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Overview</div>
+            <a href="seeker-dashboard.html" class="nav-item"><i class="fa-solid fa-compass"></i> Dashboard</a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Job Hunt</div>
+            <a href="seeker-applications.html" class="nav-item"><i class="fa-solid fa-file-signature"></i> Applied Jobs</a>
+            <a href="seeker-jobs.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Browse Jobs</a>
+            <a href="seeker-featured-jobs.html" class="nav-item link-std"><i class="fa-solid fa-star"></i> Featured Jobs <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-urgentlyhiring.html" class="nav-item link-pro"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-guaranteed-jobs.html" class="nav-item link-pro"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="seeker-wallet.html" class="nav-item"><i class="fa-solid fa-wallet"></i> My Wallet</a>
+            <a href="seeker-premium.html" class="nav-item"><i class="fa-solid fa-crown"></i> My Plan</a>
+            <a href="seeker-referrals.html" class="nav-item link-std"><i class="fa-solid fa-user-plus"></i> Invite & Earn <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-invest.html" class="nav-item link-std"><i class="fa-solid fa-chart-line"></i> Invest <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Resources</div>
+            <a href="seeker-blog.html" class="nav-item"><i class="fa-solid fa-newspaper"></i> News & Insights</a>
+            <a href="seeker-resources.html" class="nav-item link-pro"><i class="fa-solid fa-book"></i> Resources <i class="fas fa-lock lock-icon"></i></a>
+            <!-- Active State on Concierge -->
+            <a href="seeker-support.html" class="nav-item active"><i class="fa-solid fa-headset"></i> Concierge <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Settings</div>
+            <a href="seeker-profile.html" class="nav-item"><i class="fa-solid fa-user-gear"></i> Profile</a>
+            <a href="seeker-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- MAIN CHAT INTERFACE -->
+    <main>
+        <!-- Applied Glass Panel & Zoom Animation to Chat Container -->
+        <div class="chat-container">
+            <!-- Header -->
+            <div class="chat-header">
+                <div class="agent-profile">
+                    <div class="agent-avatar bot-mode" id="avatar-container">
+                        <i class="fas fa-robot" id="avatar-icon"></i>
+                        <div class="status-dot"></div>
+                    </div>
+                    <div class="agent-text">
+                        <h3 id="agent-name">EastLink SUPPORT</h3>
+                        <p id="agent-status">Analyzing Request...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ticket Info (Visible when ticket created) -->
+            <div class="ticket-bar" id="ticket-bar">
+                <span>TICKET: <span id="t-id" style="font-weight:700;">#---</span></span>
+                <span id="t-status" style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px;">OPEN</span>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="messages-area" id="chat-box">
+                <!-- Thinking Animation -->
+                <div class="thinking-bubble" id="thinking-bubble">
+                    <div class="thinking-text"><i class="fas fa-microchip fa-spin"></i> Processing...</div>
+                </div>
+                <!-- Typing Animation -->
+                <div class="typing-indicator" id="typing-indicator">
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                </div>
+            </div>
+
+            <!-- Suggestion Chips -->
+            <div class="chips-container" id="chips-area"></div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="btn-attach" onclick="triggerUpload()"><i class="fas fa-paperclip"></i></div>
+                <input type="file" id="file-upload" style="display:none" accept="image/*" onchange="handleFileUpload()">
+                <textarea class="chat-box" id="user-input" placeholder="Type a message..." rows="1"></textarea>
+                <button class="btn-send" id="btn-send"><i class="fas fa-arrow-up"></i></button>
+            </div>
+        </div>
+    </main>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add EastLink to home screen.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, addDoc, onSnapshot, serverTimestamp, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- DOM ELEMENTS ---
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+        const chipsArea = document.getElementById('chips-area');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const thinkingBubble = document.getElementById('thinking-bubble');
+        
+        // --- GLOBAL STATE ---
+        let currentUser = null;
+        let userData = {};
+        let activeTicketId = null;
+        let isLiveMode = false; 
+        
+        // --- AI ENGINE STATE ---
+        const BotState = {
+            IDLE: 'idle',
+            WAITING_TOPIC: 'waiting_topic',
+            WAITING_TRANS_ID: 'waiting_trans_id',
+            WAITING_JOB_REF: 'waiting_job_ref',
+            WAITING_DETAILS: 'waiting_details'
+        };
+        
+        let currentBotState = BotState.IDLE;
+        let ticketDraft = { category: '', priority: 'normal', context: {} };
+
+        // --- AUTH & INIT ---
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) return window.location.href = 'signin.html';
+            currentUser = user;
+
+            // Fetch Profile
+            try {
+                const snap = await getDoc(doc(db, "users", user.uid));
+                if (snap.exists()) {
+                    userData = snap.data();
+                    const img = document.getElementById('header-avatar-img');
+                    const fb = document.getElementById('header-avatar-fallback');
+                    if(userData.photoURL) { img.src=userData.photoURL; img.style.display='block'; fb.style.display='none'; }
+                    else { img.style.display='none'; fb.style.display='grid'; fb.innerText=(userData.fullName||'U').charAt(0); }
+                }
+            } catch(e) { console.log("Profile load error", e); }
+
+            listenForBadges(user.uid);
+            checkForOpenTicket(); 
+        });
+
+        // --- TICKET & BOT CHECK ---
+        function checkForOpenTicket() {
+            const q = query(collection(db, "support_tickets"), where("userId", "==", currentUser.uid), where("status", "==", "open"));
+            
+            // Listen for changes
+            onSnapshot(q, (snap) => {
+                if (!snap.empty) {
+                    // LIVE TICKET EXISTS -> Switch to Live Mode
+                    const ticketDoc = snap.docs[0];
+                    activateLiveMode(ticketDoc.id, ticketDoc.data());
+                } else {
+                    // NO OPEN TICKET -> Switch to Bot Mode
+                    if (isLiveMode) { 
+                        // If we were live, user closed ticket, reset UI
+                        resetToBotMode(); 
+                        addSystemMessage("Ticket Closed. Starting new session.");
+                    }
+                    
+                    // Force start bot if idle
+                    if (currentBotState === BotState.IDLE) {
+                        initBotConversation();
+                    }
+                }
+            });
+        }
+
+        // ============================================================
+        //  AI INTELLIGENCE ENGINE
+        // ============================================================
+
+        async function initBotConversation() {
+            // Prevent double init
+            if (currentBotState !== BotState.IDLE && currentBotState !== 'RESET') return;
+
+            currentBotState = BotState.WAITING_TOPIC;
+            document.getElementById('agent-status').innerText = "Online • Automated Support";
+            
+            await simulateThinking("Loading User Context...");
+            
+            const name = userData.fullName ? userData.fullName.split(' ')[0] : 'there';
+            
+            // Initial Greeting
+            addBotMessage(`Hello ${name}! how can I help you today?.`);
+            await simulateTyping(600);
+            addBotMessage("I can help with withdrawals, job issues, or connect you to an agent. Please select an option:");
+            
+            setChips(["💰 Withdrawal Issue", "💼 Job Application", "🛠 Technical Support", "👤 Speak to Agent"]);
+        }
+
+        async function processUserMessage(text) {
+            // 1. Display User Message Immediately
+            addUserMessage(text);
+            clearChips();
+
+            // 2. LIVE MODE CHECK (Direct pass-through)
+            if (isLiveMode) {
+                sendMessageToFirestore(text);
+                return;
+            }
+
+            // 3. WAKE UP BOT (Fix for stuck state)
+            if (currentBotState === BotState.IDLE) {
+                await initBotConversation();
+                return; 
+            }
+
+            // 4. AI PROCESSING LOGIC
+            await simulateThinking("Analyzing intent...");
+            const lowerText = text.toLowerCase();
+
+            // --- GLOBAL INTENT: AGENT REQUEST ---
+            if (lowerText.includes("agent") || lowerText.includes("human") || lowerText.includes("person")) {
+                currentBotState = BotState.WAITING_DETAILS;
+                ticketDraft.category = "General Support";
+                ticketDraft.priority = "high";
+                await simulateTyping(800);
+                addBotMessage("I understand you want to speak to a human agent. Please briefly describe your issue so I can route you correctly.");
+                return;
+            }
+
+            // --- STATE MACHINE ---
+            switch (currentBotState) {
+                
+                case BotState.WAITING_TOPIC:
+                    if (lowerText.includes("withdraw") || lowerText.includes("money") || lowerText.includes("wallet") || lowerText.includes("cash")) {
+                        currentBotState = BotState.WAITING_TRANS_ID;
+                        ticketDraft.category = "Finance";
+                        ticketDraft.priority = "high";
+                        await simulateTyping(800);
+                        addBotMessage("I can help with finance issues. To proceed, please provide the <b>M-PESA Transaction ID</b> (e.g., QHJ...).");
+                    } 
+                    else if (lowerText.includes("job") || lowerText.includes("app") || lowerText.includes("work")) {
+                        currentBotState = BotState.WAITING_JOB_REF;
+                        ticketDraft.category = "Jobs";
+                        await simulateTyping(800);
+                        addBotMessage("Okay. Is this regarding a specific Job? If so, please type the <b>Job Title</b> or Company Name.");
+                        setChips(["General Application Issue", "Report a Scam", "Application Stuck"]);
+                    }
+                    else if (lowerText.includes("tech") || lowerText.includes("error") || lowerText.includes("login")) {
+                        currentBotState = BotState.WAITING_DETAILS;
+                        ticketDraft.category = "Technical";
+                        await simulateTyping(800);
+                        addBotMessage("I see. Please describe the error or technical issue you are facing.");
+                    }
+                    else {
+                        // CATCH-ALL
+                        await simulateTyping(600);
+                        addBotMessage("I didn't quite catch that topic. Please select one of the options below or type 'Agent' to skip.");
+                        setChips(["💰 Withdrawal Issue", "💼 Job Application", "👤 Speak to Agent"]);
+                    }
+                    break;
+
+                case BotState.WAITING_TRANS_ID:
+                    // Regex: 10 chars, Alphanumeric
+                    const mpesaRegex = /^[A-Z0-9]{10}$/i; 
+                    const cleanText = text.trim().toUpperCase();
+                    
+                    if (mpesaRegex.test(cleanText)) {
+                        ticketDraft.context.transId = cleanText;
+                        currentBotState = BotState.WAITING_DETAILS;
+                        await simulateTyping(800);
+                        addBotMessage(`Transaction ID <b>${cleanText}</b> logged. Please briefly explain the issue (e.g., 'Money not reflected').`);
+                    } else {
+                        await simulateTyping(600);
+                        addBotMessage("⚠️ That doesn't look like a valid M-PESA ID (10 characters). Please try again.");
+                    }
+                    break;
+
+                case BotState.WAITING_JOB_REF:
+                    ticketDraft.context.jobRef = text;
+                    currentBotState = BotState.WAITING_DETAILS;
+                    await simulateTyping(800);
+                    addBotMessage(`Noted. Please describe the problem you are having with <b>${text}</b>.`);
+                    break;
+
+                case BotState.WAITING_DETAILS:
+                    // Final Step -> Create Ticket
+                    ticketDraft.description = text;
+                    createTicketInFirestore(); 
+                    break;
+            }
+        }
+
+        async function createTicketInFirestore() {
+            await simulateThinking("Creating Priority Ticket...");
+            await simulateTyping(1000);
+            
+            const summary = ticketDraft.context.transId 
+                ? `Withdrawal Issue - Ref: ${ticketDraft.context.transId}`
+                : ticketDraft.description.substring(0, 30) + "...";
+
+            const ticketPayload = {
+                userId: currentUser.uid,
+                userName: userData.fullName || "User",
+                userEmail: currentUser.email,
+                userPlan: userData.plan || "Free",
+                category: ticketDraft.category || "General",
+                priority: ticketDraft.priority || "normal",
+                status: 'open',
+                subject: summary,
+                description: ticketDraft.description, 
+                contextData: ticketDraft.context,
+                createdAt: serverTimestamp(),
+                lastUpdated: serverTimestamp(),
+                isReadByAdmin: false,
+                lastSender: 'user'
+            };
+
+            try {
+                // 1. Create Ticket Doc
+                const docRef = await addDoc(collection(db, "support_tickets"), ticketPayload);
+                
+                // 2. Add First Message (Description)
+                await addDoc(collection(db, "support_tickets", docRef.id, "messages"), {
+                    text: `[AUTO-GENERATED TICKET]\nIssue: ${ticketDraft.description}\nContext: ${JSON.stringify(ticketDraft.context)}`,
+                    sender: 'user',
+                    timestamp: serverTimestamp()
+                });
+
+                // 3. UI Handoff
+                addBotMessage("✅ <b>Ticket Created Successfully.</b> A support agent has been notified.");
+                
+            } catch (e) {
+                console.error(e);
+                addBotMessage("❌ Error creating ticket. Please try again.");
+                currentBotState = BotState.WAITING_TOPIC; 
+            }
+        }
+
+        // ============================================================
+        //  LIVE MODE HANDLERS
+        // ============================================================
+
+        function activateLiveMode(ticketId, data) {
+            if (activeTicketId === ticketId) return; 
+            
+            isLiveMode = true;
+            activeTicketId = ticketId;
+            currentBotState = 'LIVE'; 
+
+            // UI Updates
+            document.getElementById('agent-name').innerText = "Support Agent";
+            document.getElementById('agent-status').innerText = "Online • Viewing Ticket";
+            
+            const avatarContainer = document.getElementById('avatar-container');
+            avatarContainer.classList.remove('bot-mode');
+            avatarContainer.classList.add('live-mode');
+            document.getElementById('avatar-icon').className = "fas fa-headset";
+
+            document.getElementById('ticket-bar').style.display = 'flex';
+            document.getElementById('t-id').innerText = '#' + ticketId.substring(0,6).toUpperCase();
+
+            // Clear Chat & Load History
+            chatBox.innerHTML = ''; 
+            
+            const q = query(collection(db, "support_tickets", ticketId, "messages"), orderBy('timestamp', 'asc'));
+            onSnapshot(q, (snapshot) => {
+                chatBox.innerHTML = ''; 
+                snapshot.forEach(doc => {
+                    const m = doc.data();
+                    let type = 'user';
+                    if (m.sender === 'bot') type = 'bot'; 
+                    else if (m.sender === 'admin' || m.sender === 'agent') type = 'admin';
+                    renderMessage(type, m.text, m.timestamp, m.attachment);
+                });
+                
+                chatBox.appendChild(thinkingBubble);
+                chatBox.appendChild(typingIndicator);
+                scrollToBottom();
+            });
+        }
+
+        function resetToBotMode() {
+            isLiveMode = false;
+            activeTicketId = null;
+            currentBotState = BotState.IDLE;
+            ticketDraft = { category: '', priority: 'normal', context: {} };
+
+            document.getElementById('agent-name').innerText = "EastLink SUPPORT";
+            document.getElementById('agent-status').innerText = "Analyzing Request...";
+            document.getElementById('ticket-bar').style.display = 'none';
+            
+            const avatarContainer = document.getElementById('avatar-container');
+            avatarContainer.classList.remove('live-mode');
+            avatarContainer.classList.add('bot-mode');
+            document.getElementById('avatar-icon').className = "fas fa-robot";
+            
+            chatBox.innerHTML = '';
+            chatBox.appendChild(thinkingBubble);
+            chatBox.appendChild(typingIndicator);
+        }
+
+        async function sendMessageToFirestore(text, attachmentUrl = null) {
+            if (!activeTicketId) return;
+            try {
+                await addDoc(collection(db, "support_tickets", activeTicketId, "messages"), {
+                    text: text, 
+                    attachment: attachmentUrl, 
+                    sender: 'user', 
+                    timestamp: serverTimestamp()
+                });
+                await updateDoc(doc(db, "support_tickets", activeTicketId), {
+                    lastUpdated: serverTimestamp(), 
+                    lastSender: 'user', 
+                    isReadByAdmin: false
+                });
+            } catch (e) {
+                console.error("Send Error", e);
+                Toastify({text: "Failed to send.", style:{background:"var(--danger)"}}).showToast();
+            }
+        }
+
+        // ============================================================
+        //  RENDER & ANIMATIONS
+        // ============================================================
+
+        function renderMessage(type, text, timestamp, attachment) {
+            const wrapper = document.createElement('div'); 
+            wrapper.className = `msg-wrapper ${type}`;
+            
+            let content = (text || "").replace(/\n/g, '<br>');
+            if(attachment) content += `<br><a href="${attachment}" target="_blank"><img src="${attachment}" style="max-width:100%; border-radius:8px; margin-top:5px; border:1px solid var(--border-color);"></a>`;
+            
+            const timeStr = timestamp ? new Date(timestamp.seconds*1000).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'Just now';
+            
+            wrapper.innerHTML = `
+                <div class="msg-bubble animate__animated animate__fadeInUp">${content}</div>
+                <div class="msg-meta">${type==='user'?'You':(type==='admin'?'Agent':'AI')} • ${timeStr}</div>
+            `;
+            
+            chatBox.insertBefore(wrapper, thinkingBubble); 
+            scrollToBottom();
+        }
+
+        function addBotMessage(html) { renderMessage('bot', html, null); }
+        function addUserMessage(html) { renderMessage('user', html, null); }
+        
+        function addSystemMessage(text) { 
+            const el = document.createElement('div'); el.className = 'msg-system'; el.innerText = text; 
+            chatBox.insertBefore(el, thinkingBubble); 
+            scrollToBottom();
+        }
+
+        function setChips(opts) {
+            chipsArea.innerHTML = '';
+            if(opts.length) {
+                chipsArea.style.display = 'flex';
+                opts.forEach(o => {
+                    const btn = document.createElement('div'); btn.className = 'chip'; btn.innerText = o;
+                    btn.onclick = () => processUserMessage(o);
+                    chipsArea.appendChild(btn);
+                });
+                scrollToBottom();
+            } else { chipsArea.style.display = 'none'; }
+        }
+        
+        function clearChips() { chipsArea.innerHTML = ''; chipsArea.style.display = 'none'; }
+
+        // --- ANIMATIONS ---
+        function simulateThinking(text) {
+            return new Promise(resolve => {
+                document.querySelector('.thinking-text').innerHTML = `<i class="fas fa-microchip fa-spin"></i> ${text}`;
+                thinkingBubble.style.display = 'flex';
+                scrollToBottom();
+                setTimeout(() => { thinkingBubble.style.display = 'none'; resolve(); }, 800 + Math.random()*500);
+            });
+        }
+        
+        function simulateTyping(ms) {
+            return new Promise(resolve => {
+                typingIndicator.style.display = 'block';
+                scrollToBottom();
+                setTimeout(() => { typingIndicator.style.display = 'none'; resolve(); }, ms);
+            });
+        }
+        
+        function scrollToBottom() { setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 50); }
+
+        // --- UI HANDLERS ---
+        const send = () => { 
+            const t = userInput.value.trim(); 
+            if(t) { userInput.value = ''; processUserMessage(t); }
+        };
+        document.getElementById('btn-send').onclick = send;
+        
+        // Handle Enter key (Shift+Enter for new line)
+        userInput.onkeypress = (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }};
+
+        // --- FILE UPLOAD LOGIC ---
+        window.triggerUpload = () => document.getElementById('file-upload').click();
+        
+        window.handleFileUpload = () => {
+             const file = document.getElementById('file-upload').files[0];
+            if(file) {
+                // Visual feedback only
+                Toastify({
+                    text: "Uploading attachment...", 
+                    style:{background:"var(--bg-card)", border:"1px solid var(--border-color)", color:"var(--text-main)"}
+                }).showToast();
+                
+                // Simulate upload delay, then send dummy image path to Firestore
+                setTimeout(() => { 
+                    sendMessageToFirestore("Attached File: " + file.name, "assets/images/logo.png"); 
+                }, 1500);
+            }
+        };
+
+        // --- SIDEBAR & NAVIGATION (Synced with Dashboard) ---
+        window.toggleSidebar = () => { 
+            document.getElementById('sidebar').classList.toggle('active'); 
+            const overlay = document.getElementById('overlay');
+            if(document.getElementById('sidebar').classList.contains('active')) {
+                overlay.style.display = 'block';
+            } else {
+                overlay.style.display = 'none';
+            }
+        };
+
+        window.closeSidebar = () => { 
+            document.getElementById('sidebar').classList.remove('active'); 
+            document.getElementById('overlay').style.display = 'none';
+        };
+
+        window.logout = () => signOut(auth).then(() => window.location.href = 'signin.html');
+
+        // --- REALTIME BADGES ---
+        function listenForBadges(uid) {
+            // 1. Notifications Badge
+            const notifQ = query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false));
+            onSnapshot(notifQ, s => {
+                const el = document.getElementById('notif-badge'); 
+                if(el){ 
+                    el.innerText = s.size > 9 ? '9+' : s.size; 
+                    el.style.display = s.empty ? 'none' : 'flex';
+                }
+            });
+            
+            // 2. Messages Badge (For Envelope Icon)
+            // Note: Adjust collection name to 'chats' or 'messages' depending on your DB structure
+            const msgQ = query(collection(db, "chats"), where("participants", "array-contains", uid), where("hasUnread", "==", true));
+            onSnapshot(msgQ, (snap) => {
+                let unreadCount = 0;
+                snap.docs.forEach(doc => {
+                    const d = doc.data();
+                    if(d.lastSenderId !== uid) unreadCount++;
+                });
+
+                const el = document.getElementById('msg-badge'); 
+                if(el){ 
+                    el.innerText = unreadCount > 9 ? '9+' : unreadCount; 
+                    el.style.display = unreadCount > 0 ? 'flex' : 'none';
+                }
+            });
+        }
+        
+        // --- PWA LOGIC ---
+        let deferredPrompt;
+        const pwaPopup = document.getElementById('pwa-install-popup');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if(!localStorage.getItem('pwaDismissed')) {
+                pwaPopup.style.display = 'flex';
+            }
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                pwaPopup.style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            pwaPopup.style.display = 'none';
+            localStorage.setItem('pwaDismissed', 'true');
+        };
+
+        // PWA Registration
+        if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js");
+    </script>
+</body>
+</html>

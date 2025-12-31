@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Our Services | EastLink Recruiters</title>
+    
+    <!-- PWA Manifest & Favicon (Updated Paths) -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
+    <meta name="theme-color" content="#020617">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons & Animation -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        /* =========================================
+           THEME VARIABLES
+           ========================================= */
+        :root {
+            --primary: #f59e0b; /* Bright Gold/Orange */
+            --primary-dark: #d97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            
+            --bg: #020617; 
+            --bg-glass-70: rgba(15, 23, 42, 0.7); 
+            
+            --text: #F8FAFC;
+            --text-muted: #94A3B8;
+            
+            --border-color: rgba(255, 255, 255, 0.1);
+            --header-height: 80px;
+            --transition: all 0.3s ease;
+            --radius: 16px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            /* Relative path */
+            background-image: url('./assets/images/background.png');
+            background-attachment: fixed;
+            background-position: center;
+            background-size: cover;
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        /* Dark overlay - 20% Opacity */
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background: rgba(2, 6, 23, 0.2); 
+            z-index: -5; pointer-events: none;
+        }
+
+        h1, h2, h3, h4, .brand-font { font-family: 'Cinzel', serif; }
+        a { text-decoration: none; color: inherit; transition: var(--transition); }
+        ul { list-style: none; }
+
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* Buttons */
+        .btn-outline {
+            display: inline-block; padding: 10px 24px; border-radius: 50px;
+            border: 1px solid var(--border-color); color: var(--text);
+            font-weight: 600; font-size: 0.9rem; width: 100%; text-align: center;
+            transition: var(--transition); background: transparent;
+        }
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: rgba(255,255,255,0.05); }
+
+        .btn-gold {
+            background: var(--primary); color: #000; padding: 12px 30px;
+            border-radius: 50px; font-weight: 700; display: inline-flex;
+            align-items: center; justify-content: center; gap: 10px; border: none;
+            width: 100%; cursor: pointer; transition: var(--transition);
+        }
+        .btn-gold:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3); background: #fbbf24; }
+
+        /* --- SCROLL PROGRESS --- */
+        #scroll-progress {
+            position: fixed; top: 0; left: 0; height: 3px; background: var(--primary);
+            z-index: 2000; width: 0%; transition: width 0.1s;
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; width: 100%; height: var(--header-height);
+            z-index: 1000; transition: var(--transition); 
+            background: var(--bg-glass-70);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .nav-inner { height: 100%; display: flex; justify-content: space-between; align-items: center; }
+
+        .header-logo-text {
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem; font-weight: 700; color: var(--text);
+            letter-spacing: 1px; display: flex; align-items: center; gap: 12px;
+        }
+        .header-logo-text span { color: var(--primary); }
+
+        .menu-trigger {
+            display: inline-flex; align-items: center; gap: 12px; cursor: pointer;
+            padding: 8px 20px; border-radius: 99px;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);
+            color: var(--text); font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;
+            transition: var(--transition);
+        }
+        .menu-trigger:hover { border-color: var(--primary); background: rgba(245, 158, 11, 0.1); }
+
+        /* --- OVERLAY MENU --- */
+        .menu-overlay {
+            position: fixed; inset: 0; 
+            background: rgba(2, 6, 23, 0.98);
+            z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: var(--transition);
+        }
+        .menu-overlay.active { opacity: 1; pointer-events: all; }
+        .close-menu {
+            position: absolute; top: 30px; right: 30px;
+            width: 44px; height: 44px; border-radius: 50%;
+            border: 1px solid var(--border-color); color: var(--text-muted);
+            display: grid; place-items: center; cursor: pointer; transition: 0.3s; font-size: 1.2rem;
+        }
+        .close-menu:hover { border-color: var(--primary); color: var(--primary); transform: rotate(90deg); }
+        
+        .menu-links { text-align: center; display: flex; flex-direction: column; gap: 25px; }
+        .menu-link {
+            font-family: 'Cinzel', serif; font-size: 2.5rem; font-weight: 700;
+            color: var(--text); transition: 0.3s;
+        }
+        .menu-link:hover { color: var(--primary); }
+        .menu-actions { margin-top: 50px; display: flex; gap: 15px; align-items: center; }
+
+        /* --- PAGE CONTENT --- */
+        .page-intro {
+            padding: calc(var(--header-height) + 60px) 0 40px; 
+            text-align: center; max-width: 800px; margin: 0 auto;
+        }
+        .page-intro h1 { font-size: 2.8rem; margin-bottom: 15px; color: var(--text); }
+        .page-intro p { color: var(--text-muted); font-size: 1.1rem; }
+
+        /* Toggle Switch */
+        .toggle-container {
+            text-align: center; margin: 0 auto 50px; position: relative; z-index: 10;
+        }
+        .toggle-switch {
+            background: var(--bg-glass-70); display: inline-flex; padding: 5px; border-radius: 50px;
+            border: 1px solid var(--border-color); backdrop-filter: blur(12px);
+        }
+        .toggle-btn {
+            padding: 10px 30px; border-radius: 40px; border: none; background: transparent;
+            font-weight: 600; color: var(--text-muted); cursor: pointer; font-size: 0.95rem;
+            transition: var(--transition); white-space: nowrap; font-family: 'Inter', sans-serif;
+        }
+        .toggle-btn.active { background: var(--primary); color: #000; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4); }
+
+        /* Service Cards (Glass 70%) */
+        .services-wrapper { display: none; animation: fadeIn 0.5s ease; padding-bottom: 60px; }
+        .services-wrapper.active { display: block; }
+
+        .card-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 30px; margin-bottom: 80px;
+        }
+
+        .s-card {
+            background: var(--bg-glass-70); padding: 30px; border-radius: var(--radius);
+            border: 1px solid var(--border-color); transition: var(--transition);
+            position: relative; display: flex; flex-direction: column; height: 100%;
+            backdrop-filter: blur(12px);
+        }
+        .s-card:hover { transform: translateY(-8px); border-color: var(--primary); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        
+        .s-icon {
+            width: 50px; height: 50px; background: rgba(245, 158, 11, 0.1); color: var(--primary);
+            border-radius: 12px; display: grid; place-items: center; font-size: 1.3rem; margin-bottom: 20px;
+        }
+        .s-card h3 { font-size: 1.3rem; margin-bottom: 15px; color: var(--text); }
+        .s-card p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px; flex: 1; }
+        
+        .learn-more { 
+            color: var(--text); font-weight: 600; font-size: 0.9rem; 
+            display: flex; align-items: center; gap: 8px; margin-top: auto; transition: 0.3s;
+        }
+        .learn-more:hover { color: var(--primary); gap: 12px; }
+
+        .badge-new {
+            position: absolute; top: 15px; right: 15px; 
+            background: var(--primary); color: #000;
+            font-size: 0.7rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; 
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        /* Plans */
+        .plans-header { text-align: center; margin: 0 0 40px; }
+        .plans-header h2 { font-size: 2rem; color: var(--text); margin-bottom: 10px; }
+        .plans-header p { color: var(--text-muted); }
+
+        .plan-card.highlight { border: 1px solid var(--primary); box-shadow: 0 0 30px rgba(245, 158, 11, 0.1); }
+        .plan-card .plan-title { font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 5px; font-family: 'Cinzel', serif; }
+        .plan-card .plan-desc { font-size: 0.9rem; color: var(--primary); margin-bottom: 25px; font-style: italic; }
+        
+        .plan-features li { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; font-size: 0.95rem; color: var(--text-muted); }
+        .plan-features i { color: var(--primary); margin-top: 4px; }
+
+        /* CTA Section (Glass 70%) */
+        .cta-section {
+            background: var(--bg-glass-70); border: 1px solid var(--border-color);
+            border-radius: var(--radius); padding: 60px; text-align: center;
+            margin-bottom: 60px; position: relative; overflow: hidden;
+            backdrop-filter: blur(12px);
+        }
+        .cta-section::before {
+            content:''; position: absolute; top:0; left:0; width:100%; height:100%;
+            background: linear-gradient(135deg, transparent 0%, rgba(245, 158, 11, 0.05) 100%);
+            pointer-events: none;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* FOOTER */
+        footer { 
+            background: var(--bg-glass-70); border-top: 1px solid var(--border-color); 
+            padding-top: 4rem; margin-top: auto; backdrop-filter: blur(12px);
+        }
+        /* UPDATED: Changed from 4 columns to 3 columns to remove the app download column */
+        .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; margin-bottom: 4rem; text-align: left; }
+        
+        .f-col h4 { font-size: 0.9rem; color: var(--text); margin-bottom: 1.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-family: 'Cinzel', serif; }
+        .f-col ul { list-style: none; }
+        .f-col ul li { margin-bottom: 12px; }
+        .f-col a { color: var(--text-muted); font-size: 0.9rem; transition: 0.2s; }
+        .f-col a:hover { color: var(--primary); padding-left: 5px; }
+        .social-links { display: flex; gap: 10px; margin-top: 25px; }
+        .s-btn {
+            width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color); color: var(--text-muted);
+            display: grid; place-items: center; transition: 0.3s; font-size: 1rem;
+        }
+        .s-btn:hover { background: var(--primary); color: #000; border-color: var(--primary); }
+        .copyright { border-top: 1px solid var(--border-color); padding: 2rem 0; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 600px) {
+            .footer-grid { grid-template-columns: 1fr; }
+            .page-intro h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PRELOADER -->
+    <div id="preloader" style="position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; justify-content:center; align-items:center; transition: opacity 0.5s ease;">
+        <div style="text-align:center;">
+            <img src="./assets/images/logo.png" style="width:70px; height:auto; margin-bottom:20px; filter: drop-shadow(0 0 15px var(--primary));">
+            <div style="width:150px; height:2px; background:rgba(255,255,255,0.1); overflow:hidden; border-radius:2px;">
+                <div style="width:100%; height:100%; background:var(--gold-gradient); animation:loading 1.5s infinite ease-in-out; transform-origin:left;"></div>
+            </div>
+            <style>@keyframes loading { 0% { transform: scaleX(0); } 50% { transform: scaleX(1); } 100% { transform: scaleX(0); transform-origin:right; } }</style>
+        </div>
+    </div>
+
+    <!-- Scroll Progress -->
+    <div id="scroll-progress"></div>
+
+    <!-- HEADER -->
+    <header id="header">
+        <div class="container nav-inner">
+            <a href="index.html" class="header-logo-text">
+                <img src="./assets/images/logo.png" style="height:35px; width:auto;" alt="Logo">
+                <div>EAST<span>LINK</span></div>
+            </a>
+            <div class="menu-trigger" onclick="toggleMenu()">
+                <span>MENU</span>
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- MENU OVERLAY -->
+    <div class="menu-overlay" id="menuOverlay">
+        <div class="close-menu" onclick="toggleMenu()"><i class="fas fa-times"></i></div>
+        <div class="menu-links">
+            <a href="index.html" class="menu-link">Home</a>
+            <a href="about.html" class="menu-link">About Us</a>
+            <a href="careers.html" class="menu-link">Careers</a>
+            <a href="contact.html" class="menu-link">Contact</a>
+        </div>
+        <div class="menu-actions">
+            <a href="signin.html" class="btn" style="background:transparent; border:1px solid var(--border-color); color:white; border-radius:50px; padding:12px 30px; text-decoration:none;">Sign In</a>
+            <a href="signup.html" class="btn" style="background:var(--primary); color:black; border-radius:50px; padding:12px 30px; font-weight:700; text-decoration:none;">Join Now</a>
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <main>
+        <div class="container">
+            <!-- Intro -->
+            <div class="page-intro" data-aos="fade-down">
+                <h1 class="brand-font">Tailored Solutions</h1>
+                <p>Comprehensive recruitment tools designed for modern professionals and growing companies.</p>
+            </div>
+
+            <!-- Toggle Switch -->
+            <div class="toggle-container" data-aos="fade-down" data-aos-delay="100">
+                <div class="toggle-switch">
+                    <button class="toggle-btn active" onclick="switchView('seeker')">For Job Seekers</button>
+                    <button class="toggle-btn" onclick="switchView('employer')">For Employers</button>
+                </div>
+            </div>
+
+            <!-- SEEKER SERVICES VIEW -->
+            <div id="view-seeker" class="services-wrapper active">
+                
+                <!-- Services Grid -->
+                <div class="card-grid">
+                    <div class="s-card" data-aos="fade-up">
+                        <span class="badge-new">Guaranteed</span>
+                        <div class="s-icon"><i class="fas fa-check-circle"></i></div>
+                        <h3 class="brand-font">Placement Guarantee</h3>
+                        <p>Our premium service ensures you get hired. Includes personalized coaching, CV revamps, and priority matching.</p>
+                        <a href="signup.html" class="learn-more">Get Started <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="s-card" data-aos="fade-up" data-aos-delay="100">
+                        <div class="s-icon"><i class="fas fa-file-alt"></i></div>
+                        <h3 class="brand-font">CV Optimization</h3>
+                        <p>Professional ATS-compliant resume redesign to highlight your strengths and pass automated scanners.</p>
+                        <a href="#" class="learn-more">Learn more <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="s-card" data-aos="fade-up" data-aos-delay="200">
+                        <div class="s-icon"><i class="fas fa-bolt"></i></div>
+                        <h3 class="brand-font">One-Click Apply</h3>
+                        <p>Create a single profile and apply to hundreds of matched jobs instantly without re-entering data.</p>
+                    </div>
+                    <div class="s-card" data-aos="fade-up" data-aos-delay="300">
+                        <div class="s-icon"><i class="fas fa-user-graduate"></i></div>
+                        <h3 class="brand-font">Skill Verification</h3>
+                        <p>Take standardized tests to earn "Verified Skill" badges that make your profile stand out to employers.</p>
+                    </div>
+                </div>
+
+                <!-- Plans -->
+                <div class="plans-header" data-aos="fade-up">
+                    <h2 class="brand-font">Membership Tiers</h2>
+                    <p>Choose the level of support that fits your career goals.</p>
+                </div>
+                <div class="card-grid">
+                    <!-- Basic -->
+                    <div class="s-card plan-card" data-aos="fade-up">
+                        <div class="plan-title">Basic Account</div>
+                        <div class="plan-desc">Essential tools for job hunting.</div>
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i> Standard Job Board Access</li>
+                            <li><i class="fas fa-check"></i> Create Online Profile</li>
+                            <li><i class="fas fa-check"></i> Limited Applications per month</li>
+                        </ul>
+                        <a href="signup.html" class="btn-outline" style="margin-top:auto;">Sign Up Free</a>
+                    </div>
+                    <!-- Pro -->
+                    <div class="s-card plan-card highlight" data-aos="fade-up" data-aos-delay="100">
+                        <span class="badge-new">Recommended</span>
+                        <div class="plan-title">Pro Seeker</div>
+                        <div class="plan-desc">Maximum visibility & unlimited access.</div>
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i> Unlimited Job Applications</li>
+                            <li><i class="fas fa-check"></i> Featured Profile (Top of Search)</li>
+                            <li><i class="fas fa-check"></i> Instant SMS & WhatsApp Alerts</li>
+                            <li><i class="fas fa-check"></i> See Who Viewed Your Profile</li>
+                        </ul>
+                        <a href="signup.html" class="btn-gold" style="margin-top:auto;">Explore Pro</a>
+                    </div>
+                    <!-- Placement -->
+                    <div class="s-card plan-card" data-aos="fade-up" data-aos-delay="200">
+                        <div class="plan-title">Placement Program</div>
+                        <div class="plan-desc">We do the work for you.</div>
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i> Dedicated Recruitment Agent</li>
+                            <li><i class="fas fa-check"></i> Exclusive "Hidden" Job Market</li>
+                            <li><i class="fas fa-check"></i> Interview Preparation</li>
+                        </ul>
+                        <a href="signup.html" class="btn-outline" style="margin-top:auto;">Apply for Program</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EMPLOYER SERVICES VIEW (Hidden Default) -->
+            <div id="view-employer" class="services-wrapper" style="display:none;">
+                <!-- Services Grid -->
+                <div class="card-grid">
+                    <div class="s-card">
+                        <span class="badge-new">Top Rated</span>
+                        <div class="s-icon"><i class="fas fa-database"></i></div>
+                        <h3 class="brand-font">Talent Database</h3>
+                        <p>Access our pool of pre-vetted professionals. Filter by skills, experience, and verified badges.</p>
+                        <a href="employer-post-job.html" class="learn-more">Find Talent <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="s-card">
+                        <div class="s-icon"><i class="fas fa-bullhorn"></i></div>
+                        <h3 class="brand-font">Premium Job Posting</h3>
+                        <p>Your vacancies pinned to the top of search results and emailed directly to relevant candidates.</p>
+                    </div>
+                    <div class="s-card">
+                        <div class="s-icon"><i class="fas fa-shield-alt"></i></div>
+                        <h3 class="brand-font">Background Checks</h3>
+                        <p>Integrated verification services for criminal records, academic history, and employment references.</p>
+                    </div>
+                    <div class="s-card">
+                        <div class="s-icon"><i class="fas fa-users-cog"></i></div>
+                        <h3 class="brand-font">End-to-End Hiring</h3>
+                        <p>Let EastLink manage the entire pipeline from sourcing to interviews and onboarding.</p>
+                    </div>
+                </div>
+
+                <!-- Plans -->
+                <div class="plans-header">
+                    <h2 class="brand-font">Hiring Solutions</h2>
+                    <p>Flexible options for startups and enterprises.</p>
+                </div>
+                <div class="card-grid">
+                    <div class="s-card plan-card">
+                        <div class="plan-title">Standard</div>
+                        <div class="plan-desc">For occasional hiring.</div>
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i> Single Active Job Post</li>
+                            <li><i class="fas fa-check"></i> Basic Applicant Management</li>
+                            <li><i class="fas fa-check"></i> 30 Days Visibility</li>
+                        </ul>
+                        <a href="employer-post-job.html" class="btn-outline" style="margin-top:auto;">Post a Job</a>
+                    </div>
+                    <div class="s-card plan-card highlight">
+                        <span class="badge-new">Best Value</span>
+                        <div class="plan-title">Growth</div>
+                        <div class="plan-desc">For expanding teams.</div>
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i> Multiple Active Posts</li>
+                            <li><i class="fas fa-check"></i> Resume Database Access</li>
+                            <li><i class="fas fa-check"></i> Urgent Hiring Badges</li>
+                            <li><i class="fas fa-check"></i> Company Branding Page</li>
+                        </ul>
+                        <a href="employer-billing.html" class="btn-gold" style="margin-top:auto;">Upgrade</a>
+                    </div>
+                    <div class="s-card plan-card">
+                        <div class="plan-title">Corporate</div>
+                        <div class="plan-desc">High volume recruitment.</div>
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i> Unlimited Job Slots</li>
+                            <li><i class="fas fa-check"></i> API Integration</li>
+                            <li><i class="fas fa-check"></i> Dedicated Account Manager</li>
+                        </ul>
+                        <a href="contact.html" class="btn-outline" style="margin-top:auto;">Contact Sales</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="cta-section" data-aos="zoom-in">
+                <h2 class="brand-font" style="margin-bottom:15px; color:var(--text);">Need Help Choosing?</h2>
+                <p style="color:var(--text-muted); margin-bottom:30px;">Our team is available 24/7 to guide you to the right solution.</p>
+                <a href="contact.html" class="btn-gold">Contact Support</a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="f-col">
+                    <div class="logo" style="margin-bottom:20px; font-weight:700; font-size:1.4rem; display:flex; align-items:center; gap:10px; font-family: 'Cinzel', serif;">
+                        <img src="./assets/images/logo.png" style="height:35px; width:auto;" alt="EastLink">
+                        <div style="color:white;">EAST<span style="color:var(--primary);">LINK</span></div>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.6;">The leading platform for professional recruitment. We ensure quality, trust, and speed.</p>
+                    <div class="social-links">
+                        <a href="#" id="link-fb" class="s-btn" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" id="link-in" class="s-btn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" id="link-tw" class="s-btn" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="#" id="link-ig" class="s-btn" target="_blank"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="f-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="services.html">Our Services</a></li>
+                        <li><a href="careers.html">Careers</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="f-col">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="signin.html">Client Portal</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <!-- REMOVED "GET THE APP" COLUMN -->
+            </div>
+            <div class="copyright">&copy; <span id="year"></span> EastLink Recruitment Solutions. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" style="
+        display: none; 
+        position: fixed; bottom: 20px; right: 20px; 
+        background: rgba(15, 23, 42, 0.95); 
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        backdrop-filter: blur(12px);
+        padding: 20px; border-radius: 16px; 
+        z-index: 10000; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        max-width: 320px; animation: slideUp 0.5s ease-out;
+    ">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+            <img src="./assets/images/logo.png" style="width:50px; height:50px; border-radius:10px;">
+            <div>
+                <h4 style="color:#fff; margin:0; font-family:'Cinzel', serif;">Install EastLink</h4>
+                <p style="color:#94A3B8; margin:5px 0 0; font-size:0.8rem;">Add to Home Screen for fast access.</p>
+            </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button id="pwa-dismiss" style="flex:1; padding:10px; background:transparent; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:8px; cursor:pointer;">Later</button>
+            <button id="pwa-install-btn" style="flex:1; padding:10px; background:linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border:none; color:#000; font-weight:700; border-radius:8px; cursor:pointer;">Install</button>
+        </div>
+    </div>
+    <style>@keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }</style>
+
+    <!-- SCRIPTS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- INIT UI ---
+        AOS.init({ duration: 800, offset: 50, once: true });
+        document.getElementById("year").textContent = new Date().getFullYear();
+
+        window.toggleMenu = () => {
+            const menu = document.getElementById('menuOverlay');
+            menu.classList.toggle('active');
+            document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : 'auto';
+        };
+
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            const bar = document.getElementById("scroll-progress");
+            if(bar) bar.style.width = scrolled + "%";
+        });
+
+        // --- TAB SWITCHER LOGIC ---
+        window.switchView = (type) => {
+            // Update buttons
+            document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Hide all views
+            document.getElementById('view-seeker').style.display = 'none';
+            document.getElementById('view-employer').style.display = 'none';
+            document.getElementById('view-seeker').classList.remove('active');
+            document.getElementById('view-employer').classList.remove('active');
+
+            // Show selected
+            const selected = document.getElementById('view-' + type);
+            selected.style.display = 'block';
+            
+            // Animation trigger
+            setTimeout(() => { selected.classList.add('active'); }, 10);
+        };
+
+        async function loadSocials() {
+            try {
+                const docRef = doc(db, "site_settings", "general"); 
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if(data.facebook) document.getElementById('link-fb').href = data.facebook;
+                    if(data.linkedin) document.getElementById('link-in').href = data.linkedin;
+                    if(data.twitter) document.getElementById('link-tw').href = data.twitter;
+                    if(data.instagram) document.getElementById('link-ig').href = data.instagram;
+                }
+            } catch (error) {}
+        }
+
+        loadSocials();
+
+        // --- PWA LOGIC START ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('SW Registered'))
+                    .catch(err => console.log('SW Failed', err));
+            });
+        }
+        let deferredPrompt;
+        const pwaPopup = document.getElementById('pwa-install-popup');
+        const installBtn = document.getElementById('pwa-install-btn');
+        const dismissBtn = document.getElementById('pwa-dismiss');
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            setTimeout(() => { pwaPopup.style.display = 'block'; }, 3000);
+        });
+        installBtn.addEventListener('click', (e) => {
+            pwaPopup.style.display = 'none';
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => { deferredPrompt = null; });
+            }
+        });
+        dismissBtn.addEventListener('click', () => { pwaPopup.style.display = 'none'; });
+        window.addEventListener('appinstalled', () => { pwaPopup.style.display = 'none'; });
+        // --- PWA LOGIC END ---
+    </script>
+    
+    <!-- SAFETY SCRIPT -->
+    <script>
+        function removePreloader() {
+            const preloader = document.getElementById('preloader');
+            if(preloader) {
+                preloader.style.opacity = '0';
+                setTimeout(() => preloader.style.display = 'none', 500);
+            }
+        }
+        window.addEventListener('load', removePreloader);
+        setTimeout(removePreloader, 3000); 
+    </script>
+</body>
+</html>

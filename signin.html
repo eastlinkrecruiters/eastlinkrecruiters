@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sign In | EastLink Recruiters</title>
+    
+    <!-- PWA Manifest & Favicon (Updated Paths) -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
+    <meta name="theme-color" content="#0F172A">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons & Animation & Toast -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        /* =========================================
+           THEME VARIABLES
+           ========================================= */
+        :root {
+            --bg-body: #0F172A;       
+            --bg-card: rgba(30, 41, 59, 0.65);
+            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.95);
+            --bg-input: rgba(255, 255, 255, 0.07);
+            --bg-hover: rgba(255, 255, 255, 0.12);
+            
+            --primary: #D97706; /* Gold Base */
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            
+            /* Text Colors */
+            --text: #F8FAFC;
+            --text-muted: #94A3B8;
+            
+            --border-color: rgba(255, 255, 255, 0.12);
+            --header-height: 80px;
+            --transition: all 0.3s ease;
+            --radius: 16px;
+            
+            --success: #10B981;
+            --danger: #EF4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            /* Relative path for GitHub Pages */
+            background-image: url('./assets/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        h1, h2, h3, .brand-font { font-family: 'Cinzel', serif; }
+        a { text-decoration: none; color: inherit; transition: var(--transition); }
+        .container { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; width: 100%; height: var(--header-height);
+            z-index: 1000; transition: var(--transition); 
+            background: var(--bg-glass-heavy);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-inner { height: 100%; display: flex; justify-content: space-between; align-items: center; }
+
+        .header-logo-text {
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem; font-weight: 700; color: var(--text);
+            letter-spacing: 1px; display: flex; align-items: center; gap: 12px;
+        }
+        .header-logo-text span { color: var(--primary); }
+
+        .menu-trigger {
+            display: inline-flex; align-items: center; gap: 12px; cursor: pointer;
+            padding: 8px 20px; border-radius: 99px;
+            background: var(--bg-input); border: 1px solid var(--border-color);
+            color: var(--text); font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;
+            transition: var(--transition);
+        }
+        .menu-trigger:hover { border-color: var(--primary); background: var(--bg-hover); }
+
+        /* --- OVERLAY MENU --- */
+        .menu-overlay {
+            position: fixed; inset: 0; 
+            background: rgba(15, 23, 42, 0.98);
+            z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: var(--transition);
+        }
+        .menu-overlay.active { opacity: 1; pointer-events: all; }
+        .close-menu {
+            position: absolute; top: 30px; right: 30px;
+            width: 44px; height: 44px; border-radius: 50%;
+            border: 1px solid var(--border-color); color: var(--text-muted);
+            display: grid; place-items: center; cursor: pointer; transition: 0.3s; font-size: 1.2rem;
+        }
+        .close-menu:hover { border-color: var(--primary); color: var(--primary); transform: rotate(90deg); }
+        .menu-links { text-align: center; display: flex; flex-direction: column; gap: 25px; }
+        .menu-link {
+            font-family: 'Cinzel', serif; font-size: 2.5rem; font-weight: 700;
+            color: var(--text); transition: 0.3s;
+        }
+        .menu-link:hover { color: var(--primary); }
+
+        /* --- LOGIN LAYOUT --- */
+        .signup-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 60px;
+            min-height: calc(100vh - var(--header-height));
+            align-items: center; padding: 40px 0 60px; margin-top: var(--header-height);
+        }
+
+        /* Left Visual */
+        .visual-content h1 { font-size: 3.5rem; margin-bottom: 20px; line-height: 1.1; color: var(--text); text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .visual-content h1 span { color: var(--primary); }
+        .visual-content p { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 40px; }
+        
+        .trust-badge {
+            display: inline-flex; align-items: center; gap: 15px; padding: 12px 25px;
+            background: var(--bg-glass); border: 1px solid var(--border-color);
+            border-radius: 50px; color: var(--text); box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Right Form */
+        .form-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius); padding: 50px 40px; 
+            position: relative; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.4);
+            overflow: hidden;
+        }
+
+        .form-header { text-align: center; margin-bottom: 30px; }
+        .form-header img { height: 50px; margin-bottom: 15px; display: inline-block; filter: drop-shadow(0 0 10px rgba(217, 119, 6, 0.4)); }
+        .form-header h2 { font-size: 1.8rem; margin-bottom: 5px; color: var(--text); }
+        .form-header p { font-size: 0.95rem; color: var(--text-muted); }
+
+        /* Inputs */
+        .input-group { position: relative; margin-bottom: 20px; }
+        .input-control {
+            width: 100%; padding: 14px 14px 14px 45px; 
+            background: var(--bg-input);
+            border: 1px solid var(--border-color); border-radius: 12px;
+            color: var(--text); font-size: 0.95rem; font-family: 'Inter', sans-serif;
+            transition: var(--transition);
+        }
+        .input-control::placeholder { color: var(--text-muted); opacity: 0.7; }
+        .input-control:focus { border-color: var(--primary); background: var(--bg-hover); box-shadow: 0 0 15px rgba(217, 119, 6, 0.15); }
+        
+        .icon-start {
+            position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted); font-size: 1rem; pointer-events: none; transition: 0.3s;
+        }
+        .input-control:focus + .icon-start { color: var(--primary); }
+
+        .pass-toggle {
+            position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+            cursor: pointer; color: var(--text-muted); font-size: 0.9rem; transition: 0.3s;
+        }
+        .pass-toggle:hover { color: var(--primary); }
+
+        /* Suggestions */
+        .suggestion-box {
+            position: absolute; top: 100%; left: 0; width: 100%;
+            background: var(--bg-glass-heavy); border: 1px solid var(--border-color);
+            border-radius: 12px; z-index: 100; max-height: 200px; overflow-y: auto;
+            display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.4); backdrop-filter: blur(20px);
+        }
+        .suggestion-item { padding: 12px 16px; cursor: pointer; color: var(--text); font-size: 0.9rem; border-bottom: 1px solid var(--border-color); }
+        .suggestion-item:hover { background: var(--bg-hover); color: var(--primary); }
+
+        /* Actions */
+        .form-options { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; font-size: 0.85rem; color: var(--text-muted); }
+        .forgot-link { color: var(--text-muted); transition: 0.2s; cursor: pointer; }
+        .forgot-link:hover { color: var(--primary); text-decoration: underline; }
+
+        .btn-pri { 
+            width: 100%; padding: 14px; border-radius: 50px; font-weight: 700; cursor: pointer;
+            transition: var(--transition); border: none; display: flex; align-items: center; justify-content: center; gap: 10px;
+            background: var(--gold-gradient); color: #000; 
+        }
+        .btn-pri:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(217, 119, 6, 0.3); }
+        
+        /* FOOTER */
+        footer { 
+            background: var(--bg-glass-heavy); border-top: 1px solid var(--border-color); 
+            padding-top: 3rem; margin-top: auto; backdrop-filter: blur(20px);
+        }
+        .footer-grid { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            text-align: center;
+            margin-bottom: 2rem; 
+        }
+        .f-col { max-width: 500px; }
+        .social-links { display: flex; gap: 15px; justify-content: center; margin-top: 25px; }
+        .s-btn {
+            width: 44px; height: 44px; border-radius: 50%; background: var(--bg-input);
+            border: 1px solid var(--border-color); color: var(--text-muted);
+            display: grid; place-items: center; transition: 0.3s; font-size: 1.1rem;
+        }
+        .s-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: translateY(-3px); }
+        .copyright { border-top: 1px solid var(--border-color); padding: 2rem 0; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+
+        @media (max-width: 900px) {
+            .signup-grid { grid-template-columns: 1fr; gap: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
+            .visual-content { display: none; }
+            .form-card { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PRELOADER -->
+    <div id="preloader" style="position:fixed; inset:0; background:var(--bg-body); z-index:9999; display:flex; justify-content:center; align-items:center; transition: opacity 0.5s ease;">
+        <div style="text-align:center;">
+            <img src="./assets/images/logo.png" style="width:70px; height:auto; margin-bottom:20px;">
+            <div style="width:150px; height:2px; background:rgba(255,255,255,0.1); overflow:hidden; border-radius:2px;">
+                <div style="width:100%; height:100%; background:var(--gold-gradient); animation:loading 1.5s infinite ease-in-out; transform-origin:left;"></div>
+            </div>
+            <style>@keyframes loading { 0% { transform: scaleX(0); } 50% { transform: scaleX(1); } 100% { transform: scaleX(0); transform-origin:right; } }</style>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header id="header">
+        <div class="container nav-inner">
+            <a href="index.html" class="header-logo-text">
+                <img src="./assets/images/logo.png" style="height:35px; width:auto;" alt="Logo">
+                <div>EAST<span>LINK</span></div>
+            </a>
+            <div class="menu-trigger" onclick="toggleMenu()">
+                <span>MENU</span>
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- MENU OVERLAY -->
+    <div class="menu-overlay" id="menuOverlay">
+        <div class="close-menu" onclick="toggleMenu()"><i class="fas fa-times"></i></div>
+        <div class="menu-links">
+            <a href="index.html" class="menu-link">Home</a>
+            <a href="about.html" class="menu-link">About Us</a>
+            <a href="signup.html" class="menu-link">Sign Up</a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="container">
+        <div class="signup-grid">
+            
+            <!-- Left Visual (Updated style) -->
+            <div class="visual-content" data-aos="fade-right">
+                <h1 class="brand-font">Unlock Your <br><span>Potential.</span></h1>
+                <p>Join thousands of professionals and employers connecting daily through East Africa's most trusted recruitment platform.</p>
+                
+                <div class="trust-badge">
+                    <i class="fas fa-shield-alt" style="color:var(--primary)"></i>
+                    <span>Secure Access Portal</span>
+                </div>
+            </div>
+
+            <!-- Right Form (Updated style) -->
+            <div class="form-card" data-aos="fade-left">
+                <div class="form-header">
+                    <img src="./assets/images/logo.png" alt="EastLink">
+                    <h2 class="brand-font">Welcome Back</h2>
+                    <p>Enter your credentials to access your dashboard</p>
+                </div>
+
+                <form id="loginForm" onsubmit="return false;">
+                    
+                    <div class="input-group">
+                        <input type="email" id="email" class="input-control" placeholder="Email Address" required autocomplete="off">
+                        <i class="fas fa-envelope icon-start"></i>
+                        <div id="email-suggestions" class="suggestion-box"></div>
+                    </div>
+
+                    <div class="input-group">
+                        <input type="password" id="password" class="input-control" placeholder="Password" required>
+                        <i class="fas fa-lock icon-start"></i>
+                        <i class="fas fa-eye pass-toggle" onclick="togglePass()"></i>
+                    </div>
+
+                    <div class="form-options">
+                        <label style="cursor:pointer; display:flex; align-items:center; gap:8px;">
+                            <input type="checkbox" style="accent-color:var(--primary); width:16px; height:16px;"> Remember me
+                        </label>
+                        <span class="forgot-link" onclick="showToast('Password reset functionality coming soon.', 'yellow')">Forgot Password?</span>
+                    </div>
+
+                    <button class="btn-pri" onclick="handleLogin()">
+                        <span id="btnText">Log In</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div style="text-align: center; margin-top: 25px; font-size: 0.9rem; color: var(--text-muted);">
+                    Don't have an account? <a href="signup.html" style="color: var(--primary); font-weight: 600;">Create Account</a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="f-col">
+                    <div class="logo" style="margin-bottom:20px; font-weight:700; font-size:1.6rem; display:flex; align-items:center; justify-content:center; gap:10px; font-family: 'Cinzel', serif;">
+                        <img src="./assets/images/logo.png" style="height:40px; width:auto;" alt="EastLink">
+                        <div style="color:var(--text);">EAST<span style="color:var(--primary);">LINK</span></div>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:1rem; line-height:1.6;">The leading platform for professional recruitment. We ensure quality, trust, and speed.</p>
+                    <div class="social-links">
+                        <a href="#" id="link-fb" class="s-btn" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" id="link-in" class="s-btn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" id="link-tw" class="s-btn" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="#" id="link-ig" class="s-btn" target="_blank"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">&copy; <span id="year"></span> EastLink Recruiters. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" style="
+        display: none; 
+        position: fixed; bottom: 20px; right: 20px; 
+        background: rgba(15, 23, 42, 0.95); 
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        backdrop-filter: blur(12px);
+        padding: 20px; border-radius: 16px; 
+        z-index: 10000; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        max-width: 320px; animation: slideUp 0.5s ease-out;
+    ">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+            <img src="./assets/images/logo.png" style="width:50px; height:50px; border-radius:10px;">
+            <div>
+                <h4 style="color:#fff; margin:0; font-family:'Cinzel', serif;">Install EastLink</h4>
+                <p style="color:#94A3B8; margin:5px 0 0; font-size:0.8rem;">Add to Home Screen for fast access.</p>
+            </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button id="pwa-dismiss" style="flex:1; padding:10px; background:transparent; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:8px; cursor:pointer;">Later</button>
+            <button id="pwa-install-btn" style="flex:1; padding:10px; background:linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border:none; color:#000; font-weight:700; border-radius:8px; cursor:pointer;">Install</button>
+        </div>
+    </div>
+    <style>@keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }</style>
+
+    <!-- SCRIPTS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- INIT UI ---
+        AOS.init({ duration: 800, offset: 50, once: true });
+        document.getElementById("year").textContent = new Date().getFullYear();
+
+        // Updated Preloader Logic
+        const removePreloader = () => {
+            const preloader = document.getElementById('preloader');
+            if(preloader && preloader.style.display !== 'none') {
+                preloader.style.opacity = '0';
+                setTimeout(() => preloader.style.display = 'none', 500);
+            }
+        };
+        window.addEventListener('load', removePreloader);
+        setTimeout(removePreloader, 2000); // Fail-safe
+
+        window.toggleMenu = () => {
+            const menu = document.getElementById('menuOverlay');
+            menu.classList.toggle('active');
+            document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : 'auto';
+        };
+
+        window.togglePass = () => {
+            const el = document.getElementById('password');
+            el.type = el.type === 'password' ? 'text' : 'password';
+        };
+
+        window.showToast = (msg, type) => {
+            let bg = type === "error" ? "linear-gradient(to right, #EF4444, #B91C1C)" : (type === "yellow" ? "linear-gradient(to right, #D97706, #fbbf24)" : "linear-gradient(to right, #10B981, #059669)");
+            Toastify({ text: msg, duration: 3000, gravity: "top", position: "center", style: { background: bg, borderRadius: "12px", boxShadow: "0 10px 30px rgba(0,0,0,0.3)" } }).showToast();
+        };
+
+        // --- PWA LOGIC START ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('SW Registered'))
+                    .catch(err => console.log('SW Failed', err));
+            });
+        }
+        let deferredPrompt;
+        const pwaPopup = document.getElementById('pwa-install-popup');
+        const installBtn = document.getElementById('pwa-install-btn');
+        const dismissBtn = document.getElementById('pwa-dismiss');
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            setTimeout(() => { pwaPopup.style.display = 'block'; }, 3000);
+        });
+        installBtn.addEventListener('click', (e) => {
+            pwaPopup.style.display = 'none';
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => { deferredPrompt = null; });
+            }
+        });
+        dismissBtn.addEventListener('click', () => { pwaPopup.style.display = 'none'; });
+        window.addEventListener('appinstalled', () => { pwaPopup.style.display = 'none'; });
+        // --- PWA LOGIC END ---
+
+        // --- SOCIALS ---
+        async function loadSocials() {
+            try {
+                const docRef = doc(db, "site_settings", "general"); 
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if(data.facebook) document.getElementById('link-fb').href = data.facebook;
+                    if(data.linkedin) document.getElementById('link-in').href = data.linkedin;
+                    if(data.twitter) document.getElementById('link-tw').href = data.twitter;
+                    if(data.instagram) document.getElementById('link-ig').href = data.instagram;
+                }
+            } catch (error) {}
+        }
+        loadSocials();
+
+        // --- EMAIL SUGGESTIONS ---
+        const domains = ["gmail.com", "yahoo.com", "outlook.com", "eastlink.co.ke"];
+        const emailInput = document.getElementById('email');
+        const emailBox = document.getElementById('email-suggestions');
+
+        emailInput.addEventListener('input', (e) => {
+            const val = e.target.value;
+            if (!val.includes('@')) { emailBox.style.display = 'none'; return; }
+            const [prefix, suffix] = val.split('@');
+            const matches = domains.filter(d => d.startsWith(suffix.toLowerCase()));
+            
+            if (matches.length > 0) {
+                emailBox.innerHTML = matches.map(d => `<div class="suggestion-item" onclick="fillEmail('${prefix}@${d}')">${prefix}<b>@${d}</b></div>`).join('');
+                emailBox.style.display = 'block';
+            } else emailBox.style.display = 'none';
+        });
+
+        window.fillEmail = (val) => { emailInput.value = val; emailBox.style.display = 'none'; };
+
+        document.addEventListener('click', (e) => {
+            if (e.target !== emailInput && emailBox) emailBox.style.display = 'none';
+        });
+
+        // --- LOGIN LOGIC ---
+        window.handleLogin = async () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btnText = document.getElementById('btnText');
+
+            if(!email || !password) { showToast("Please fill in all fields", "yellow"); return; }
+            const originalText = btnText.innerHTML;
+            btnText.innerHTML = "Authenticating...";
+            
+            try {
+                const cred = await signInWithEmailAndPassword(auth, email, password);
+                const user = cred.user;
+
+                // Check Email Verification
+                if (!user.emailVerified) {
+                    showToast("Email not verified. Redirecting...", "yellow");
+                    setTimeout(() => window.location.href = 'verify.html', 1500);
+                    return;
+                }
+
+                // Check Firestore Role
+                const snap = await getDoc(doc(db, "users", user.uid));
+                if (snap.exists()) {
+                    const role = snap.data().role;
+                    const dest = role === 'employer' ? 'employer-dashboard.html' : (role === 'admin' ? 'admin-dashboard.html' : 'seeker-dashboard.html');
+                    showToast("Login successful!", "success");
+                    setTimeout(() => window.location.href = dest, 800);
+                } else {
+                    showToast("User profile not found.", "error");
+                    btnText.innerHTML = originalText;
+                }
+            } catch (error) {
+                console.error(error);
+                let msg = "Login failed.";
+                if (error.code === 'auth/invalid-credential') msg = "Invalid email or password.";
+                showToast(msg, "error");
+                btnText.innerHTML = originalText;
+            }
+        };
+    </script>
+</body>
+</html>

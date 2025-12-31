@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Resolution Console | EastLink Admin</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0F172A">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Executive Theme */
+            --bg-body: #0F172A;       
+            --bg-card: rgba(30, 41, 59, 0.65);
+            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.95);
+            --bg-input: rgba(255, 255, 255, 0.07);
+            --bg-hover: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8; 
+            --gold-base: #D97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --neon-purple: #8b5cf6;
+            --success: #10B981;
+            --danger: #EF4444;
+            --blue: #3B82F6;
+            
+            /* DIMENSIONS */
+            --sidebar-width: 260px; 
+            --header-height: 60px;
+            
+            --radius: 16px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background-image: url('assets/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Utils */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 20px; z-index: 1000;
+        }
+        
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .logo { 
+            font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.15rem;
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; 
+        }
+        .logo span { color: var(--gold-base); }
+        .admin-badge { 
+            font-family: var(--font-body); font-size: 0.55rem; background: var(--bg-input); 
+            border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; 
+            margin-left: 8px; color: var(--text-muted); letter-spacing: 0.5px;
+        }
+        .hamburger { font-size: 1.2rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+        .icon-btn { 
+            width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; font-size: 0.9rem;
+            color: var(--text-muted); cursor: pointer; transition: all 0.3s; position: relative;
+        }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); }
+        .notification-badge { 
+            position: absolute; top: 2px; right: 2px; min-width: 14px; height: 14px; 
+            background: var(--danger); border-radius: 10px; font-size: 0.55rem; color: white; 
+            font-weight: 700; display: none; place-items: center; justify-content: center;
+            padding: 0 3px; border: 2px solid var(--bg-card);
+        }
+        .profile-widget {
+            width: 34px; height: 34px; background: var(--bg-input); border-radius: 10px; 
+            display: grid; place-items: center; border: 1px solid var(--border-color); 
+            color: var(--gold-base); font-size: 0.9rem; cursor: pointer; margin-left: 4px;
+        }
+        .profile-widget:hover { background: var(--bg-hover); }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 15px 0; overflow-y: auto; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+        .nav-group { padding: 0 20px; margin-bottom: 15px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-item { 
+            display: flex; align-items: center; padding: 10px 12px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.85rem; transition: all 0.3s ease; border-radius: 8px; margin-bottom: 2px;
+        }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
+        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
+        .nav-item i { width: 22px; text-align: center; margin-right: 8px; }
+
+        /* --- MAIN CONTENT --- */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 25px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
+        
+        .hero-section {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 27, 75, 0.9) 100%);
+            padding: 30px; border-radius: var(--radius); color: white;
+            margin-bottom: 30px; border: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .hero-title h2 { font-family: var(--font-head); font-size: 1.5rem; margin-bottom: 5px; }
+        .hero-title p { color: var(--text-muted); font-size: 0.9rem; }
+
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; max-width: 1400px; margin: 0 auto; }
+
+        .card-header { 
+            padding: 20px 25px; border-bottom: 1px solid var(--border-color); 
+            display:flex; justify-content:space-between; align-items:center; 
+            background: rgba(255,255,255,0.02);
+        }
+        .card-header h3 { font-size: 1rem; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+        .card-body { padding: 25px; }
+
+        /* ALERTS */
+        .alert-box { 
+            padding: 15px; border-radius: 10px; font-size: 0.85rem; margin-bottom: 20px; 
+            display: flex; align-items: flex-start; gap: 12px; line-height: 1.5; 
+        }
+        .alert-info { background: rgba(59, 130, 246, 0.1); color: var(--blue); border: 1px solid rgba(59, 130, 246, 0.2); }
+        .alert-warning { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+
+        /* FORMS */
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 0.75rem; font-weight: 600; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .form-input, .form-select, .form-textarea { 
+            width: 100%; padding: 12px 15px; background: var(--bg-input); 
+            border: 1px solid var(--border-color); border-radius: 10px; 
+            color: var(--text-main); outline: none; font-family: var(--font-body); font-size: 0.9rem; transition: 0.3s; 
+        }
+        .form-input:focus, .form-select:focus { border-color: var(--gold-base); background: rgba(255,255,255,0.08); }
+        
+        .btn-search { 
+            background: var(--bg-input); border: 1px solid var(--border-color); color: var(--gold-base); 
+            width: 50px; border-radius: 10px; cursor: pointer; transition: 0.3s; font-size: 1rem;
+        }
+        .btn-search:hover { background: var(--gold-base); color: white; border-color: var(--gold-base); }
+
+        .btn-action { 
+            padding: 14px; width: 100%; border-radius: 30px; font-weight: 600; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.9rem; 
+            transition: 0.3s; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .btn-action:disabled { opacity: 0.7; cursor: not-allowed; }
+        .btn-primary { background: var(--gold-gradient); color: #000; }
+        .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-danger:hover { background: var(--danger); color: white; }
+        .btn-success { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid var(--success); }
+        .btn-success:hover { background: var(--success); color: white; }
+
+        /* RESULTS AREA */
+        .result-box { 
+            display: none; background: rgba(0,0,0,0.2); border: 1px dashed var(--border-color); 
+            border-radius: 12px; padding: 20px; margin-top: 20px; animation: fadeIn 0.3s ease; 
+        }
+        .data-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+        .data-label { color: var(--text-muted); }
+        .data-val { font-weight: 700; color: var(--text-main); font-family: var(--font-display); }
+
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 998; backdrop-filter: blur(4px); }
+
+        /* PWA Popup */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+
+        @media(max-width: 992px) {
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 20px 10px; width: 100%; }
+            .admin-grid { grid-template-columns: 1fr; }
+            .hamburger { display: block; }
+            .header-left { gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="admin-dashboard.html" class="logo">East<span>Link</span> <span class="admin-badge">ADMIN</span></a>
+        </div>
+        
+        <div class="header-actions">
+            <div class="icon-btn" onclick="location.href='admin-support.html'" title="Support Tickets">
+                <i class="fa-solid fa-envelope"></i>
+                <div class="notification-badge" id="msg-badge">0</div>
+            </div>
+            <div class="icon-btn" onclick="location.href='admin-notifications.html'" title="System Alerts">
+                <i class="fa-solid fa-bell"></i>
+                <div class="notification-badge" id="notif-badge">0</div>
+            </div>
+            <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Analytics</div>
+            <a href="admin-dashboard.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        </div>
+        
+        <div class="nav-group">
+            <div class="nav-label">User Management</div>
+            <a href="admin-users.html" class="nav-item"><i class="fa-solid fa-users"></i> Manage Users</a>
+            <a href="admin-plans.html" class="nav-item"><i class="fa-solid fa-tags"></i> Manage Plans</a>
+            <a href="admin-referrals.html" class="nav-item"><i class="fa-solid fa-share-nodes"></i> Referrals</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Jobs & Service</div>
+            <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
+            <a href="admin-guaranteed-jobs.html" class="nav-item"><i class="fa-solid fa-certificate"></i> Guaranteed Jobs</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="admin-deposits.html" class="nav-item"><i class="fa-solid fa-arrow-down"></i> Deposits</a>
+            <a href="admin-withdrawals.html" class="nav-item"><i class="fa-solid fa-arrow-up"></i> Withdrawals</a>
+            <a href="admin-deposit-issues.html" class="nav-item active"><i class="fas fa-exclamation-triangle"></i> Errors</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">System</div>
+            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
+            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
+            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- MAIN -->
+    <main>
+        <div class="hero-section animate__animated animate__fadeInDown">
+            <div class="hero-title">
+                <h2>Financial Resolution Console</h2>
+                <p>Advanced Tools: Mismatch Fixer, Ledger Override & Security Freeze.</p>
+            </div>
+            <div style="font-size:2rem; color:var(--gold-base); opacity:0.8;">
+                <i class="fas fa-balance-scale"></i>
+            </div>
+        </div>
+
+        <div class="admin-grid">
+            
+            <!-- MODULE A: MISMATCH FIXER -->
+            <div class="glass-panel animate__animated animate__fadeInUp animate__delay-1s">
+                <div class="card-header">
+                    <h3><i class="fas fa-wrench" style="color:var(--gold-base);"></i> Transaction Mismatch Fixer</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert-box alert-info">
+                        <i class="fas fa-info-circle"></i> Use this when a user's claimed amount differs from the actual M-Pesa receipt, or to fix pending ref codes manually.
+                    </div>
+
+                    <div class="form-group" style="display:flex; gap:10px;">
+                        <input type="text" id="search-tx-input" class="form-input" placeholder="Enter Reference (QKH...) or TX Code">
+                        <button class="btn-search" onclick="findTransaction()"><i class="fas fa-search"></i></button>
+                    </div>
+
+                    <div id="tx-result" class="result-box">
+                        <div class="data-row"><span class="data-label">User:</span> <span class="data-val" id="tx-user">--</span></div>
+                        <div class="data-row"><span class="data-label">Claimed Amount:</span> <span class="data-val" style="color:var(--danger);" id="tx-old-amt">--</span></div>
+                        <div class="data-row"><span class="data-label">Status:</span> <span class="data-val" id="tx-status">--</span></div>
+                        
+                        <hr style="border:0; border-top:1px dashed var(--border-color); margin:15px 0;">
+                        
+                        <div class="form-group">
+                            <label class="form-label">Corrected Amount (Received)</label>
+                            <input type="number" id="tx-new-amt" class="form-input" placeholder="e.g. 1000">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Resolution Reason</label>
+                            <select id="tx-reason" class="form-select">
+                                <option value="Input Error">User Input Error</option>
+                                <option value="Fee Adjustment">Bank Fee Adjustment</option>
+                                <option value="Partial Payment">Partial Payment Received</option>
+                                <option value="System Correction">System Error Correction</option>
+                            </select>
+                        </div>
+                        <button class="btn-action btn-success" onclick="correctAndApprove()">
+                            <i class="fas fa-check-double"></i> Correct & Approve
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODULE B & C: MANUAL LEDGER & SECURITY -->
+            <div class="glass-panel animate__animated animate__fadeInUp animate__delay-1s">
+                <div class="card-header">
+                    <h3><i class="fas fa-shield-alt" style="color:var(--danger);"></i> Ledger Override & Security</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert-box alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>Audit Warning:</strong> All actions here create permanent log entries. Do not credit without authorization.
+                    </div>
+
+                    <div class="form-group" style="display:flex; gap:10px;">
+                        <input type="text" id="search-user-input" class="form-input" placeholder="Search by User Email Address">
+                        <button class="btn-search" onclick="findUser()"><i class="fas fa-search"></i></button>
+                    </div>
+
+                    <div id="user-result" class="result-box">
+                        <div class="data-row"><span class="data-label">Account:</span> <span class="data-val" id="u-name">--</span></div>
+                        <div class="data-row"><span class="data-label">Current Balance:</span> <span class="data-val" style="color:var(--success);" id="u-bal">--</span></div>
+                        
+                        <!-- SECURITY FREEZE -->
+                        <div style="margin-top:20px; padding:15px; background:rgba(239, 68, 68, 0.05); border:1px solid rgba(239, 68, 68, 0.2); border-radius:10px;">
+                            <label class="form-label" style="color:var(--danger);">Security Status</label>
+                            <div style="display:flex; gap:10px;">
+                                <select id="u-status-select" class="form-select" style="border-color:rgba(239, 68, 68, 0.3);">
+                                    <option value="active">Active (Normal)</option>
+                                    <option value="frozen_withdrawals">Frozen (No Withdrawals)</option>
+                                    <option value="banned">Banned (No Access)</option>
+                                </select>
+                                <button class="btn-action btn-danger" style="width:auto; padding:0 20px; border-radius:10px;" onclick="updateFreezeStatus()">Set</button>
+                            </div>
+                        </div>
+
+                        <hr style="border:0; border-top:1px dashed var(--border-color); margin:15px 0;">
+
+                        <!-- MANUAL LEDGER -->
+                        <div class="form-group">
+                            <label class="form-label">Ledger Action</label>
+                            <select id="ledger-type" class="form-select">
+                                <option value="credit">CREDIT (Deposit Real Money)</option>
+                                <option value="bonus">BONUS (Add Promo Funds)</option>
+                                <option value="debit">DEBIT (Remove/Penalty)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Amount (KES)</label>
+                            <input type="number" id="ledger-amount" class="form-input" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Audit Note (Required)</label>
+                            <textarea id="ledger-note" class="form-textarea" rows="2" placeholder="Explain why this adjustment is being made..."></textarea>
+                        </div>
+                        <button id="btn-ledger-process" class="btn-action btn-primary" onclick="processLedgerUpdate()">
+                            <i class="fas fa-file-invoice-dollar"></i> Process Adjustment
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install Admin App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add to home screen for quick access.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, collection, doc, getDoc, getDocs, query, where, runTransaction, serverTimestamp, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+
+        // --- UI UTILS ---
+        window.toggleSidebar = () => { 
+            document.getElementById('sidebar').classList.toggle('active'); 
+            document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
+        };
+        
+        window.logout = () => {
+            if(confirm("Confirm Log Out?")) {
+                signOut(auth).then(() => window.location.href = 'signin.html');
+            }
+        };
+
+        let currentTx = null;
+        let currentUser = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            if(!user) window.location.href = 'signin.html';
+            initBadges();
+        });
+
+        function initBadges() {
+            const txQ = query(collection(db, "transactions"), where("status", "==", "pending"));
+            onSnapshot(txQ, s => {
+                const b = document.getElementById('notif-badge');
+                if(s.size > 0) { b.innerText = s.size; b.style.display = 'flex'; } else b.style.display = 'none';
+            });
+            const msgQ = query(collection(db, "support_tickets"), where("status", "==", "open"));
+             onSnapshot(msgQ, (snap) => {
+                const badge = document.getElementById('msg-badge');
+                if(snap.size > 0) { badge.innerText = snap.size; badge.style.display = 'flex'; } else badge.style.display = 'none';
+            });
+        }
+
+        /* =========================================
+           MODULE A: MISMATCH FIXER LOGIC
+           ========================================= */
+        window.findTransaction = async () => {
+            const input = document.getElementById('search-tx-input').value.trim();
+            if(!input) return Toastify({text:"Enter TX Code or Reference", style:{background:"var(--danger)"}}).showToast();
+
+            // 1. Try finding by internal TX Code
+            let q = query(collection(db, "transactions"), where("txCode", "==", input));
+            let snap = await getDocs(q);
+
+            // 2. If fail, try finding by Reference
+            if(snap.empty) {
+                q = query(collection(db, "transactions"), where("reference", "==", input.toUpperCase()));
+                snap = await getDocs(q);
+            }
+
+            if(snap.empty) {
+                document.getElementById('tx-result').style.display = 'none';
+                return Toastify({text:"Transaction Not Found", style:{background:"var(--danger)"}}).showToast();
+            }
+
+            const docData = snap.docs[0].data();
+            currentTx = { id: snap.docs[0].id, ...docData };
+
+            document.getElementById('tx-user').innerText = currentTx.senderName || currentTx.userId;
+            document.getElementById('tx-old-amt').innerText = "KES " + currentTx.amount;
+            document.getElementById('tx-status').innerHTML = `<span style="padding:2px 8px; border-radius:4px; font-size:0.75rem; background:var(--bg-input); border:1px solid var(--border-color);">${currentTx.status.toUpperCase()}</span>`;
+            document.getElementById('tx-new-amt').value = currentTx.amount;
+            
+            document.getElementById('tx-result').style.display = 'block';
+        };
+
+        window.correctAndApprove = async () => {
+            if(!currentTx) return;
+            const newAmt = Number(document.getElementById('tx-new-amt').value);
+            const reason = document.getElementById('tx-reason').value;
+
+            if(newAmt <= 0) return alert("Amount must be greater than 0");
+
+            if(!confirm(`⚠️ CORRECTION ALERT ⚠️\n\nOriginal Claim: KES ${currentTx.amount}\nCorrected To: KES ${newAmt}\n\nAre you sure you want to approve this?`)) return;
+
+            try {
+                await runTransaction(db, async (t) => {
+                    const txRef = doc(db, "transactions", currentTx.id);
+                    const userRef = doc(db, "users", currentTx.userId);
+                    
+                    const txDoc = await t.get(txRef);
+                    if(txDoc.data().status === 'success') throw "Transaction was already approved!";
+
+                    const userDoc = await t.get(userRef);
+                    const currentBal = userDoc.data().walletBalance || 0;
+                    
+                    // Credit User
+                    t.update(userRef, { walletBalance: currentBal + newAmt });
+
+                    // Update Transaction
+                    t.update(txRef, {
+                        amount: newAmt,
+                        originalClaimedAmount: currentTx.amount,
+                        status: 'success',
+                        resolutionMethod: 'admin_correction',
+                        correctionReason: reason,
+                        adminProcessedAt: serverTimestamp()
+                    });
+
+                    // Notify
+                    const notifRef = doc(collection(db, "notifications"));
+                    t.set(notifRef, {
+                        userId: currentTx.userId,
+                        title: "Deposit Approved (Corrected)",
+                        message: `Deposit approved. Amount corrected to KES ${newAmt} based on verification (${reason}).`,
+                        type: "info",
+                        read: false,
+                        timestamp: serverTimestamp()
+                    });
+                });
+
+                Toastify({text:"Correction Applied Successfully", style:{background:"var(--success)"}}).showToast();
+                document.getElementById('tx-result').style.display = 'none';
+                document.getElementById('search-tx-input').value = "";
+                currentTx = null;
+
+            } catch(e) {
+                console.error(e);
+                alert("Error: " + e);
+            }
+        };
+
+        /* =========================================
+           MODULE B & C: LEDGER & SECURITY LOGIC
+           ========================================= */
+        window.findUser = async () => {
+            const email = document.getElementById('search-user-input').value.trim();
+            if(!email) return Toastify({text:"Enter User Email", style:{background:"var(--danger)"}}).showToast();
+
+            const q = query(collection(db, "users"), where("email", "==", email));
+            const snap = await getDocs(q);
+
+            if(snap.empty) {
+                document.getElementById('user-result').style.display = 'none';
+                return Toastify({text:"User Not Found", style:{background:"var(--danger)"}}).showToast();
+            }
+
+            const d = snap.docs[0].data();
+            currentUser = { id: snap.docs[0].id, ...d };
+
+            document.getElementById('u-name').innerText = d.fullName || "No Name";
+            document.getElementById('u-bal').innerText = "KES " + (d.walletBalance || 0).toLocaleString();
+            
+            const status = d.accountStatus || (d.walletFrozen ? 'frozen_withdrawals' : 'active');
+            document.getElementById('u-status-select').value = status;
+
+            document.getElementById('user-result').style.display = 'block';
+        };
+
+        window.updateFreezeStatus = async () => {
+            if(!currentUser) return;
+            const newStatus = document.getElementById('u-status-select').value;
+            
+            try {
+                await updateDoc(doc(db, "users", currentUser.id), {
+                    accountStatus: newStatus,
+                    walletFrozen: newStatus !== 'active'
+                });
+                Toastify({text:`User status set to: ${newStatus.toUpperCase()}`, style:{background:"var(--blue)"}}).showToast();
+            } catch(e) {
+                Toastify({text:"Error updating status", style:{background:"var(--danger)"}}).showToast();
+            }
+        };
+
+        window.processLedgerUpdate = async () => {
+            if(!currentUser) return;
+            const type = document.getElementById('ledger-type').value; 
+            const amt = Number(document.getElementById('ledger-amount').value);
+            const note = document.getElementById('ledger-note').value.trim();
+
+            if(amt <= 0) return alert("Amount must be positive");
+            if(!note) return alert("Audit Note is REQUIRED for manual adjustments.");
+
+            if(amt > 5000) {
+                if(!confirm(`⚠️ HIGH VALUE ALERT ⚠️\n\nYou are about to manually ${type.toUpperCase()} KES ${amt}.\n\nIs this authorized?`)) return;
+            }
+
+            const btn = document.getElementById('btn-ledger-process');
+            const originalHtml = btn.innerHTML;
+
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
+
+                await runTransaction(db, async (t) => {
+                    const userRef = doc(db, "users", currentUser.id);
+                    const userDoc = await t.get(userRef);
+                    const currentBal = userDoc.data().walletBalance || 0;
+                    let newBal = currentBal;
+
+                    if(type === 'debit') {
+                        if(currentBal < amt) throw "Insufficient funds for Debit operation.";
+                        newBal -= amt;
+                    } else {
+                        newBal += amt;
+                    }
+
+                    t.update(userRef, { walletBalance: newBal });
+
+                    const newTxRef = doc(collection(db, "transactions"));
+                    t.set(newTxRef, {
+                        userId: currentUser.id,
+                        type: type === 'debit' ? 'admin_debit' : 'admin_credit',
+                        amount: amt,
+                        balanceAfter: newBal,
+                        status: 'success',
+                        reference: `ADMIN-MAN-${Date.now()}`,
+                        adminNote: note,
+                        timestamp: serverTimestamp()
+                    });
+
+                    const notifRef = doc(collection(db, "notifications"));
+                    t.set(notifRef, {
+                        userId: currentUser.id,
+                        title: "Wallet Adjustment",
+                        message: `Your wallet was adjusted (${type.toUpperCase()}) by KES ${amt}. Reason: ${note}`,
+                        type: type === 'debit' ? 'alert' : 'success',
+                        read: false,
+                        timestamp: serverTimestamp()
+                    });
+                });
+
+                Toastify({text:"Ledger Updated Successfully", style:{background:"var(--success)"}}).showToast();
+                document.getElementById('u-bal').innerText = "KES " + (type==='debit' ? (currentUser.walletBalance - amt) : (currentUser.walletBalance + amt)).toLocaleString();
+                document.getElementById('ledger-amount').value = "";
+                document.getElementById('ledger-note').value = "";
+
+            } catch(e) {
+                console.error(e);
+                alert("Error: " + e);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        };
+
+        // --- PWA LOGIC ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('pwa-install-popup').style.display = 'block';
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('pwa-install-popup').style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            document.getElementById('pwa-install-popup').style.display = 'none';
+        };
+
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
+        }
+    </script>
+</body>
+</html>
