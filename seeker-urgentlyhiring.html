@@ -749,10 +749,7 @@
                     salaryDisplay = job.salary ? `KES ${job.salary}` : 'Competitive';
                 }
 
-                // 4. Activity Indicator (Simulated)
-                const isNew = (Date.now() - (job.postedAt?.seconds*1000)) < (3 * 24 * 60 * 60 * 1000);
-                const appliedCount = Math.floor(Math.random() * 50) + 10; 
-                const activityHTML = `<div class="hot-activity"><i class="fas fa-fire"></i> ${appliedCount} applied today</div>`;
+                // 4. Activity Indicator REMOVED
 
                 // 5. Match Ring (AI Feature)
                 const matchScore = Math.floor(Math.random() * (99 - 80 + 1) + 80); 
@@ -773,6 +770,7 @@
                 const btnAction = isPro ? `window.location.href='seeker-job-details.html?id=${job.id}'` : `showUpgradeModal()`;
 
                 const delay = index * 0.05;
+                const isNew = (Date.now() - (job.postedAt?.seconds*1000)) < (3 * 24 * 60 * 60 * 1000);
 
                 container.innerHTML += `
                     <div class="glass-panel job-card animate__animated animate__fadeInUp" style="animation-delay: ${delay}s;">
@@ -782,7 +780,6 @@
                         <div class="card-head">
                             <div class="c-logo">${logoHtml}</div>
                             <div class="card-body" style="margin-left:15px;">
-                                ${activityHTML}
                                 <div class="c-info" style="margin-bottom:0;">
                                     <h3>${job.title}</h3>
                                     <p>${job.company} ${verifiedTick}</p>
@@ -920,3 +917,4 @@
     </script>
 </body>
 </html>
+
