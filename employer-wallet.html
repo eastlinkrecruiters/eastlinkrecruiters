@@ -420,24 +420,15 @@
                 <i class="fas fa-times" onclick="closeModals()" style="cursor:pointer; color:var(--text-muted);"></i>
             </div>
             
+            <!-- DYNAMIC DEPOSIT (Synced from Admin) -->
             <div class="payment-method">
                 <div class="method-logo"><img src="assets/images/mpesa.png" alt="M"></div>
                 <div style="flex:1;">
-                    <div style="font-size:0.85rem; color:var(--text-muted);">M-Pesa Paybill</div>
-                    <div style="font-family:var(--font-mono); color:var(--gold-base); font-size:0.95rem;">0112705651</div>
-                    <div style="font-size:0.75rem; color:var(--text-main);">Fidelis Likhayu</div>
+                    <div style="font-size:0.85rem; color:var(--text-muted);">Send Money</div>
+                    <div id="admin-dep-phone" style="font-family:var(--font-mono); color:var(--gold-base); font-size:0.95rem;">Loading...</div>
+                    <div id="admin-dep-name" style="font-size:0.75rem; color:var(--text-main);">Loading...</div>
                 </div>
-                <i class="far fa-copy" onclick="copyTo('0112705651')" style="cursor:pointer; color:var(--text-muted);"></i>
-            </div>
-
-            <div class="payment-method">
-                <div class="method-logo" style="background:#fce7f3;"><img src="assets/images/airtel.png" alt="A"></div>
-                <div style="flex:1;">
-                    <div style="font-size:0.85rem; color:var(--text-muted);">Airtel Money</div>
-                    <div style="font-family:var(--font-mono); color:var(--gold-base); font-size:0.95rem;">0781842387</div>
-                    <div style="font-size:0.75rem; color:var(--text-main);">Fidelis Likhayu</div>
-                </div>
-                <i class="far fa-copy" onclick="copyTo('0781842387')" style="cursor:pointer; color:var(--text-muted);"></i>
+                <i class="far fa-copy" onclick="copyDepositPhone()" style="cursor:pointer; color:var(--text-muted);"></i>
             </div>
 
             <hr style="border:0; border-top:1px solid var(--border-color); margin:20px 0;">
@@ -490,7 +481,7 @@
 
             <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:15px; border-top:1px solid var(--border-color); padding-top:10px;">
                 <span style="color:var(--text-muted)">Processing Fee</span>
-                <span style="color:var(--text-main)" id="fee-display">KES 0.00</span>
+                <span style="color:var(--text-main)" id="fee-display">Checking...</span>
             </div>
 
             <button class="btn-submit" id="btn-with-submit" onclick="submitWithdraw()"><span>Confirm Withdrawal</span></button>
@@ -578,7 +569,13 @@
         let allTx = [], visibleCount = 5, activeFilter = 'all';
         let currentDynamicCVV = "000"; 
         let isBalVisible = false;
-        let withdrawalFee = 50;
+        let userPlan = 'free';
+
+        // --- ADMIN CONFIG VARS (Synced) ---
+        let globalDepositPhone = "0112705651"; // Default
+        let globalDepositName = "Fidelis Likhayu"; // Default
+        let globalWithdrawalFee = 50; 
+        let feesEnabled = true;
 
         // --- GLOBAL UI HANDLERS ---
         window.toggleSidebar = () => { 
@@ -595,6 +592,7 @@
         window.openModal = (id) => document.getElementById(id).classList.add('open');
         window.logout = () => signOut(auth).then(()=>location.href='signin.html');
         window.copyTo = (t) => { navigator.clipboard.writeText(t); Toastify({text:"Copied!", style:{background:"var(--success)"}}).showToast(); };
+        window.copyDepositPhone = () => { navigator.clipboard.writeText(globalDepositPhone); Toastify({text:"Phone Copied: " + globalDepositPhone, style:{background:"var(--gold-base)", color:"#000"}}).showToast(); };
 
         // --- NAVIGATION LOCK LOGIC ---
         function lockNav(id, lockId) {
@@ -610,14 +608,13 @@
             if(lock) lock.style.display = 'none';
         }
 
-        // --- BADGE & PLAN LOGIC ---
+        // --- BADGE LOGIC ---
         function loadBadges(uid) {
             // Messages Badge
             const msgQuery = query(collection(db, "chats"), where("participants", "array-contains", uid), where("hasUnread", "==", true));
             onSnapshot(msgQuery, (snap) => {
                 let unreadCount = 0;
                 snap.docs.forEach(doc => { if(doc.data().lastSenderId !== uid) unreadCount++; });
-                
                 const headerBadge = document.getElementById('header-msg-badge');
                 if(headerBadge) { headerBadge.style.display = unreadCount > 0 ? 'flex' : 'none'; headerBadge.innerText = unreadCount > 9 ? '9+' : unreadCount; }
                 const navBadge = document.getElementById('nav-badge-messages');
@@ -629,24 +626,16 @@
             onSnapshot(notifQuery, (snap) => {
                 const count = snap.size;
                 const headerNotif = document.getElementById('header-notif-badge');
-                
-                if(headerNotif) {
-                    headerNotif.style.display = count > 0 ? 'flex' : 'none';
-                    headerNotif.innerText = count > 9 ? '9+' : count;
-                }
+                if(headerNotif) { headerNotif.style.display = count > 0 ? 'flex' : 'none'; headerNotif.innerText = count > 9 ? '9+' : count; }
             });
 
-            // Applicants Badge
+            // Applicants Badge (Specific to Employer)
             const appQuery = query(collection(db, "applications"), where("employerId", "==", uid), where("status", "==", "new"));
             onSnapshot(appQuery, (snap) => {
                 const el = document.getElementById('nav-badge-candidates');
                 if(el) {
-                    if(!snap.empty) {
-                        el.style.display = 'inline-block';
-                        el.innerText = snap.size > 99 ? '99+' : snap.size;
-                    } else {
-                        el.style.display = 'none';
-                    }
+                    if(!snap.empty) { el.style.display = 'inline-block'; el.innerText = snap.size > 99 ? '99+' : snap.size; } 
+                    else { el.style.display = 'none'; }
                 }
             });
         }
@@ -663,22 +652,45 @@
             cardContainer.addEventListener('mouseleave', () => card.style.transform = `rotateX(0) rotateY(0)`);
         }
 
-        // --- MAIN LOGIC ---
+        // --- MAIN DATA LOGIC ---
         onAuthStateChanged(auth, (user) => {
             if (!user) return location.href = 'signin.html';
             currentUser = user;
             
-            // 1. Generate Deterministic Card Details from UID
+            // 1. LISTEN TO ADMIN CONFIG (Real-Time Sync)
+            onSnapshot(doc(db, "site_settings", "config"), (docSnap) => {
+                if (docSnap.exists()) {
+                    const cfg = docSnap.data();
+                    
+                    // Update global vars
+                    globalDepositPhone = cfg.depositPhone || "0112705651";
+                    globalDepositName = cfg.depositName || "Fidelis Likhayu";
+                    globalWithdrawalFee = cfg.withdrawalFee !== undefined ? Number(cfg.withdrawalFee) : 50;
+                    feesEnabled = cfg.enableFees !== undefined ? cfg.enableFees : true;
+
+                    // Update UI (Deposit Modal)
+                    const phoneEl = document.getElementById('admin-dep-phone');
+                    const nameEl = document.getElementById('admin-dep-name');
+                    if(phoneEl) phoneEl.innerText = globalDepositPhone;
+                    if(nameEl) nameEl.innerText = globalDepositName;
+                    
+                    // Recalculate fees if modal is open
+                    if(document.getElementById('withdrawModal').classList.contains('open')) calculateTotal();
+                }
+            });
+
+            // 2. Generate Deterministic Card Details from UID
             let hash = 0; for(let i=0; i<user.uid.length; i++) hash = ((hash<<5)-hash)+user.uid.charCodeAt(i);
             currentDynamicCVV = (Math.abs(hash)%900 + 100).toString(); 
             const rawNum = (Math.abs(hash).toString() + "5184926371820465").substring(0, 16);
             const fmtNum = ("5" + rawNum.substring(1)).match(/.{1,4}/g).join(' '); 
             if(document.getElementById('card-number-display')) document.getElementById('card-number-display').innerText = fmtNum;
 
-            // 2. User Profile, Plan Locking & Wallet Balance
+            // 3. User Profile, Plan Locking & Wallet Balance
             onSnapshot(doc(db, "users", user.uid), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
+                    // Optional: enforce role check
                     if(data.role !== 'employer') { location.href = 'seeker-dashboard.html'; return; }
 
                     // Header Avatar
@@ -698,14 +710,14 @@
                     }
 
                     // --- PLAN LOCKING ---
-                    const plan = (data.plan || data.subscription || 'free').toLowerCase();
+                    userPlan = (data.plan || data.subscription || 'free').toLowerCase();
                     
                     // Lock Invite if Free
-                    if(plan === 'free') lockNav('nav-invite', 'lock-invite');
+                    if(userPlan === 'free') lockNav('nav-invite', 'lock-invite');
                     else unlockNav('nav-invite', 'lock-invite');
 
-                    // Lock Invest & Resources if NOT Growth/Scale
-                    if(!plan.includes('growth') && !plan.includes('scale') && !plan.includes('enterprise')) {
+                    // Lock Invest & Resources if NOT Growth/Scale/Enterprise
+                    if(!['growth', 'scale', 'enterprise'].includes(userPlan)) {
                         lockNav('nav-invest', 'lock-invest');
                         lockNav('nav-resources', 'lock-resources');
                     } else {
@@ -718,7 +730,7 @@
                 }
             });
 
-            // 3. Transactions History
+            // 4. Transactions History
             const qTx = query(collection(db, "transactions"), where("userId", "==", user.uid));
             onSnapshot(qTx, (snap) => {
                 allTx = snap.empty ? [] : snap.docs.map(d => ({id:d.id, ...d.data()})).sort((a,b)=>(b.timestamp?.seconds||0)-(a.timestamp?.seconds||0));
@@ -743,11 +755,32 @@
         }
         window.toggleBalance = () => { isBalVisible = !isBalVisible; updateTotalBalance(); };
 
+        // --- DYNAMIC FEE CALCULATION ---
         window.calculateTotal = () => {
             const val = document.getElementById('with-amount').value.replace(/,/g, '');
             const amt = parseFloat(val) || 0;
-            const fee = amt > 0 ? withdrawalFee : 0;
-            document.getElementById('fee-display').innerText = `KES ${fee.toLocaleString()}`;
+            
+            let appliedFee = 0;
+            let msg = "";
+
+            if (!feesEnabled) {
+                // Admin disabled fees
+                appliedFee = 0;
+                msg = `<span style="color:var(--success)">Fees Disabled by Admin</span>`;
+            } else {
+                // Employer Premium Tiers get waivers (Growth, Scale, Enterprise)
+                if (['growth', 'scale', 'enterprise'].includes(userPlan)) {
+                    appliedFee = 0;
+                    msg = `<span style="text-decoration:line-through; opacity:0.6; margin-right:5px;">KES ${globalWithdrawalFee}</span> <span style="color:var(--success)">Waived (${userPlan.toUpperCase()})</span>`;
+                } else {
+                    // Free & Standard employers pay fee
+                    appliedFee = globalWithdrawalFee;
+                    msg = `KES ${appliedFee.toFixed(2)}`;
+                }
+            }
+
+            document.getElementById('fee-display').innerHTML = amt > 0 ? msg : 'KES 0.00';
+            return appliedFee;
         };
 
         window.filterHistory = (type, btn) => {
@@ -776,14 +809,24 @@
                 const isInc = t.type === 'deposit';
                 const color = isInc ? 'var(--success)' : 'var(--danger)';
                 const icon = isInc ? 'fa-arrow-down' : 'fa-arrow-up';
-                const bg = isInc ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)';
+                
+                // M-Pesa Icon override
+                let iconHtml = `<i class="fas ${icon}"></i>`;
+                let bgStyle = `background:${isInc ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'}; color:${color}`;
+
+                const ref = (t.reference || "").toLowerCase();
+                if(ref.includes('qkh') || ref.includes('mpesa') || ref.includes('m-pesa')) {
+                    iconHtml = '';
+                    bgStyle = `background-image:url('./assets/images/mpesa.png'); background-color:#fff; background-size:cover;`; 
+                }
+
                 const date = t.timestamp ? new Date(t.timestamp.seconds*1000).toLocaleDateString() : 'Pending';
                 
                 return `
                 <div class="tx-item animate__animated animate__fadeInUp" onclick="viewReceipt('${t.id}')" style="animation-delay:${i*0.05}s">
                     <div style="display:flex; align-items:center;">
-                        <div class="tx-icon" style="background:${bg}; color:${color};">
-                            <i class="fas ${icon}"></i>
+                        <div class="tx-icon" style="${bgStyle}">
+                            ${iconHtml}
                         </div>
                         <div>
                             <div style="font-weight:600; font-size:0.95rem; text-transform:capitalize; color:var(--text-main);">${t.type.replace('_',' ')}</div>
@@ -878,17 +921,11 @@
                     timestamp: serverTimestamp(),
                     txCode: "DEP-" + Math.random().toString(36).substr(2, 6).toUpperCase()
                 });
-                await addDoc(collection(db, "notifications"), {
-                    userId: currentUser.uid, 
-                    title: "Deposit Processing", 
-                    message: `We are verifying Ref: ${ref} for KES ${amt.toLocaleString()}.`, 
-                    read: false, 
-                    timestamp: serverTimestamp()
-                });
+                
                 closeModals();
                 document.getElementById('dep-amount').value = '';
                 document.getElementById('dep-ref').value = '';
-                Toastify({text:"Deposit Submitted Successfully!", style:{background:"var(--success)"}}).showToast();
+                Toastify({text:"Deposit Submitted for Approval!", style:{background:"var(--success)"}}).showToast();
             } catch(e) { 
                 console.error(e);
                 Toastify({text:"Error: " + e.message, style:{background:"var(--danger)"}}).showToast();
@@ -901,7 +938,12 @@
             const amt = parseFloat(document.getElementById('with-amount').value.replace(/,/g, ''));
             const phone = document.getElementById('with-phone').value;
             const cvv = document.getElementById('with-cvv').value;
-            const fee = withdrawalFee;
+            
+            // Recalculate fee to be safe
+            let fee = 0;
+            if(feesEnabled && !['growth', 'scale', 'enterprise'].includes(userPlan)) {
+                fee = globalWithdrawalFee;
+            }
 
             if(!amt || amt < 1000) return Toastify({text:"Min withdrawal KES 1,000", style:{background:"var(--danger)"}}).showToast();
             if(cvv !== currentDynamicCVV) return Toastify({text:"Invalid CVV Code", style:{background:"var(--danger)"}}).showToast();
@@ -912,32 +954,23 @@
             btn.disabled = true;
 
             try {
-                await runTransaction(db, async (transaction) => {
-                    const userRef = doc(db, "users", currentUser.uid);
-                    const sfDoc = await transaction.get(userRef);
-                    if (!sfDoc.exists()) throw "User does not exist!";
-                    
-                    const currentDbBal = sfDoc.data().walletBalance || 0;
-                    const newBal = currentDbBal - (amt + fee); 
-                    transaction.update(userRef, { walletBalance: newBal });
-                    
-                    const txRef = doc(collection(db, "transactions"));
-                    transaction.set(txRef, {
-                        userId: currentUser.uid, 
-                        type: "withdrawal", 
-                        amount: amt, 
-                        fee: fee,
-                        phone: phone,
-                        status: "completed", 
-                        timestamp: serverTimestamp(),
-                        txCode: "WTH-" + Math.random().toString(36).substr(2, 6).toUpperCase()
-                    });
+                // Creates a PENDING request (Admin must approve to deduct funds)
+                await addDoc(collection(db, "transactions"), {
+                    userId: currentUser.uid, 
+                    type: "withdrawal", 
+                    amount: amt, 
+                    fee: fee,
+                    phone: phone,
+                    status: "pending", 
+                    timestamp: serverTimestamp(),
+                    txCode: "WTH-" + Math.random().toString(36).substr(2, 6).toUpperCase()
                 });
+
                 closeModals();
                 document.getElementById('with-amount').value = '';
                 document.getElementById('with-cvv').value = '';
                 document.getElementById('fee-display').innerText = "KES 0.00";
-                Toastify({text:"Withdrawal Successful!", style:{background:"var(--success)"}}).showToast();
+                Toastify({text:"Withdrawal Pending Approval", style:{background:"var(--gold-base)"}}).showToast();
             } catch(e) {
                 console.error(e);
                 Toastify({text:"Transaction Failed", style:{background:"var(--danger)"}}).showToast();
@@ -1058,3 +1091,4 @@
     </script>
 </body>
 </html>
+
