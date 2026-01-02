@@ -498,15 +498,15 @@
                 <i class="fas fa-times" onclick="closeModals()" style="cursor:pointer; color:var(--text-muted);"></i>
             </div>
             
-            <!-- UPDATED DEPOSIT DETAILS -->
+            <!-- DYNAMIC DEPOSIT DETAILS (Synced from Admin) -->
             <div class="payment-method">
                 <div class="method-logo"><img src="./assets/images/mpesa.png" alt="M"></div>
                 <div style="flex:1;">
                     <div style="font-size:0.85rem; color:var(--text-muted);">Send Money</div>
-                    <div style="font-family:var(--font-mono); color:var(--gold-base); font-size:0.95rem;">0112705651</div>
-                    <div style="font-size:0.75rem; color:var(--text-main);">Fidelis Likhayu</div>
+                    <div id="admin-dep-phone" style="font-family:var(--font-mono); color:var(--gold-base); font-size:0.95rem;">Loading...</div>
+                    <div id="admin-dep-name" style="font-size:0.75rem; color:var(--text-main);">Loading...</div>
                 </div>
-                <i class="far fa-copy" onclick="copyTo('0112705651')" style="cursor:pointer; color:var(--text-muted);"></i>
+                <i class="far fa-copy" onclick="copyDepositPhone()" style="cursor:pointer; color:var(--text-muted);" title="Copy Phone"></i>
             </div>
 
             <div class="input-group">
@@ -544,8 +544,8 @@
             </div>
 
             <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:15px; border-top:1px solid var(--border-color); padding-top:10px;">
-                <span style="color:var(--text-muted)">Fee (Tier Adjusted)</span>
-                <span style="color:var(--text-main)" id="fee-display">KES 0.00</span>
+                <span style="color:var(--text-muted)">Fee</span>
+                <span style="color:var(--text-main)" id="fee-display">Checking...</span>
             </div>
 
             <button class="btn-submit" id="btn-with-submit" onclick="submitWithdraw()"><span>Confirm Withdrawal</span></button>
@@ -653,22 +653,27 @@
         let allTx = [], visibleCount = 5, activeFilter = 'all';
         let currentDynamicCVV = "000"; 
         let isBalVisible = false;
-        let withdrawalFee = 50;
         let userPlan = 'standard';
+        
+        // --- ADMIN CONFIG VARS (Synced) ---
+        let globalDepositPhone = "0112705651"; // Default
+        let globalDepositName = "Fidelis Likhayu"; // Default
+        let globalWithdrawalFee = 50; 
+        let feesEnabled = true;
 
-        // --- GLOBAL UI HANDLERS ---
+        // --- UI UTILS ---
         window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none'; };
         window.closeSidebar = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').style.display = 'none'; };
         window.closeModals = () => document.querySelectorAll('.modal-overlay').forEach(e => e.classList.remove('open'));
         window.openModal = (id) => document.getElementById(id).classList.add('open');
         window.logout = () => signOut(auth).then(()=>location.href='signin.html');
         window.copyTo = (t) => { navigator.clipboard.writeText(t); Toastify({text:"Copied!", style:{background:"var(--success)"}}).showToast(); };
+        window.copyDepositPhone = () => { navigator.clipboard.writeText(globalDepositPhone); Toastify({text:"Phone Copied: " + globalDepositPhone, style:{background:"var(--gold-base)", color:"#000"}}).showToast(); };
 
         // --- 3D CARD TILT & FLIP ---
         const cardContainer = document.querySelector('.card-perspective');
         const card = document.getElementById('creditCard3D');
         
-        // Tilt Logic
         if(cardContainer && card) {
             cardContainer.addEventListener('mousemove', (e) => {
                 const rect = cardContainer.getBoundingClientRect();
@@ -678,7 +683,6 @@
             cardContainer.addEventListener('mouseleave', () => cardContainer.style.transform = `rotateX(0) rotateY(0)`);
         }
 
-        // Flip Logic (Triggered by CVV click)
         window.flipCard = () => {
             card.classList.toggle('is-flipped');
             if(card.classList.contains('is-flipped')) {
@@ -686,7 +690,6 @@
             }
         };
 
-        // --- COUNTUP ANIMATION UTILITY ---
         const animateValue = (obj, start, end, duration) => {
             let startTimestamp = null;
             const step = (timestamp) => {
@@ -703,13 +706,33 @@
             if (!user) return location.href = 'signin.html';
             currentUser = user;
             
-            // 1. Generate Card Details
+            // 1. LISTEN TO ADMIN CONFIG (Real-Time Sync)
+            onSnapshot(doc(db, "site_settings", "config"), (docSnap) => {
+                if (docSnap.exists()) {
+                    const cfg = docSnap.data();
+                    
+                    // Update global vars
+                    globalDepositPhone = cfg.depositPhone || "0112705651";
+                    globalDepositName = cfg.depositName || "Fidelis Likhayu";
+                    globalWithdrawalFee = cfg.withdrawalFee !== undefined ? Number(cfg.withdrawalFee) : 50;
+                    feesEnabled = cfg.enableFees !== undefined ? cfg.enableFees : true;
+
+                    // Update UI (Deposit Modal)
+                    document.getElementById('admin-dep-phone').innerText = globalDepositPhone;
+                    document.getElementById('admin-dep-name').innerText = globalDepositName;
+                    
+                    // Recalculate fees if modal is open
+                    if(document.getElementById('withdrawModal').classList.contains('open')) calculateTotal();
+                }
+            });
+
+            // 2. Generate Card Details
             let hash = 0; for(let i=0; i<user.uid.length; i++) hash = ((hash<<5)-hash)+user.uid.charCodeAt(i);
             currentDynamicCVV = (Math.abs(hash)%900 + 100).toString(); 
             const rawNum = (Math.abs(hash).toString() + "5184926371820465").substring(0, 16);
             document.getElementById('card-number-display').innerText = ("4" + rawNum.substring(1)).match(/.{1,4}/g).join(' ');
 
-            // 2. User Data
+            // 3. User Data
             onSnapshot(doc(db, "users", user.uid), (docSnap) => {
                 if (docSnap.exists()) {
                     const data = docSnap.data();
@@ -719,7 +742,6 @@
                     updateTotalBalance();
                     calculatePurchasingPower(); 
                     
-                    // Header Avatar
                     const avatarImg = document.getElementById('header-avatar-img');
                     const avatarFallback = document.getElementById('header-avatar-fallback');
                     if(data.photoURL) { avatarImg.src = data.photoURL; avatarImg.style.display = 'block'; avatarFallback.style.display = 'none'; }
@@ -727,19 +749,18 @@
                 }
             });
 
-            // 3. Referral Earnings
+            // 4. Referral Earnings & Transactions
             onSnapshot(query(collection(db, "users"), where("referredBy", "==", user.uid)), (snap) => {
                 referralEarnings = 0;
                 snap.forEach(d => { if(['standard', 'pro', 'gold'].includes((d.data().plan||'').toLowerCase())) referralEarnings += 500; });
                 updateTotalBalance();
             });
 
-            // 4. Transactions
             onSnapshot(query(collection(db, "transactions"), where("userId", "==", user.uid)), (snap) => {
                 allTx = snap.empty ? [] : snap.docs.map(d => ({id:d.id, ...d.data()})).sort((a,b)=>(b.timestamp?.seconds||0)-(a.timestamp?.seconds||0));
                 renderHistory();
             });
-
+            
             // 5. Badges
             onSnapshot(query(collection(db, "notifications"), where("userId", "==", user.uid), where("read", "==", false)), s => {
                 document.getElementById('notif-badge').style.display = s.size>0?'flex':'none';
@@ -774,20 +795,33 @@
             }
         }
 
+        // --- FEE CALCULATION LOGIC (Synced with Admin) ---
         window.calculateTotal = () => {
             const val = document.getElementById('with-amount').value.replace(/,/g, '');
             const amt = parseFloat(val) || 0;
             
-            let fee = 50;
-            let msg = "KES 50.00";
-            
-            if(userPlan === 'pro' || userPlan === 'gold' || userPlan === 'guaranteed') {
-                fee = 0;
-                msg = `<span style="text-decoration:line-through; opacity:0.6; margin-right:5px;">KES 50</span> <span style="color:var(--success)">Waived (${userPlan.toUpperCase()})</span>`;
+            let appliedFee = 0;
+            let msg = "";
+
+            if (!feesEnabled) {
+                // Admin disabled fees entirely
+                appliedFee = 0;
+                msg = `<span style="color:var(--success)">Fees Disabled by Admin</span>`;
+            } else {
+                // Fees are enabled, check user tier
+                if (['pro', 'gold', 'guaranteed'].includes(userPlan)) {
+                    // Premium users get fee waiver
+                    appliedFee = 0;
+                    msg = `<span style="text-decoration:line-through; opacity:0.6; margin-right:5px;">KES ${globalWithdrawalFee}</span> <span style="color:var(--success)">Waived (${userPlan.toUpperCase()})</span>`;
+                } else {
+                    // Standard users pay the admin-set fee
+                    appliedFee = globalWithdrawalFee;
+                    msg = `KES ${appliedFee.toFixed(2)}`;
+                }
             }
 
-            withdrawalFee = fee;
             document.getElementById('fee-display').innerHTML = amt > 0 ? msg : 'KES 0.00';
+            return appliedFee;
         };
 
         window.renderHistory = () => {
@@ -813,7 +847,6 @@
                 const ref = (t.reference || "").toLowerCase();
                 if(ref.includes('qkh') || ref.includes('mpesa') || ref.includes('m-pesa')) {
                     iconHtml = '';
-                    // Updated to relative path
                     bgStyle = `background-image:url('./assets/images/mpesa.png'); background-color:#fff;`; 
                 }
 
@@ -860,8 +893,14 @@
             const amt = parseFloat(document.getElementById('with-amount').value.replace(/,/g, ''));
             const phone = document.getElementById('with-phone').value;
             
+            // Calculate actual fee based on current state
+            let fee = 0;
+            if (feesEnabled && !['pro', 'gold', 'guaranteed'].includes(userPlan)) {
+                fee = globalWithdrawalFee;
+            }
+
             if(!amt || amt < 1000) return Toastify({text:"Min withdrawal KES 1,000", style:{background:"var(--danger)"}}).showToast();
-            if(amt + withdrawalFee > totalBalance) return Toastify({text:"Insufficient Funds", style:{background:"var(--danger)"}}).showToast();
+            if(amt + fee > totalBalance) return Toastify({text:"Insufficient Funds", style:{background:"var(--danger)"}}).showToast();
 
             if(amt > (totalBalance * 0.5)) {
                 if(!confirm("Security Alert: You are withdrawing over 50% of your balance. Proceed?")) return;
@@ -875,7 +914,7 @@
                     userId: currentUser.uid, 
                     type: "withdrawal", 
                     amount: amt, 
-                    fee: withdrawalFee, 
+                    fee: fee, 
                     phone: phone,
                     status: "pending", 
                     timestamp: serverTimestamp(), 
@@ -951,7 +990,7 @@
             });
         });
 
-        // --- PWA LOGIC START ---
+        // --- PWA LOGIC ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./service-worker.js')
@@ -977,8 +1016,8 @@
         });
         dismissBtn.addEventListener('click', () => { pwaPopup.style.display = 'none'; });
         window.addEventListener('appinstalled', () => { pwaPopup.style.display = 'none'; });
-        // --- PWA LOGIC END ---
 
     </script>
 </body>
 </html>
+
