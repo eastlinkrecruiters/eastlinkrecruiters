@@ -19,19 +19,15 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
     <style>
-        /* =========================================
-           THEME VARIABLES (DARK/DASHBOARD THEME)
-           ========================================= */
         :root {
             --bg-body: #0F172A;       
             --bg-card: rgba(30, 41, 59, 0.65);
             --bg-glass: rgba(30, 41, 59, 0.75);
             --bg-glass-heavy: rgba(15, 23, 42, 0.95);
             
-            --primary: #D97706; /* Gold Base */
+            --primary: #D97706;
             --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
             
-            /* Text Colors */
             --text: #F8FAFC;
             --text-muted: #94A3B8;
             
@@ -57,8 +53,6 @@
             line-height: 1.6;
             overflow-x: hidden;
             min-height: 100vh;
-            
-            /* Center Content */
             display: flex; 
             align-items: center; 
             justify-content: center;
@@ -68,7 +62,6 @@
         h1, h2, h3, .brand-font { font-family: 'Cinzel', serif; }
         a { text-decoration: none; color: inherit; transition: var(--transition); }
 
-        /* --- VERIFICATION CARD --- */
         .auth-card {
             background: var(--bg-card);
             backdrop-filter: blur(25px);
@@ -83,7 +76,6 @@
             overflow: hidden;
         }
 
-        /* Branding inside card */
         .card-brand {
             display: flex; align-items: center; justify-content: center; gap: 10px;
             margin-bottom: 30px; font-size: 1.4rem; font-weight: 700; color: var(--text);
@@ -91,7 +83,6 @@
         .card-brand span { color: var(--primary); }
         .card-brand img { height: 35px; width: auto; }
 
-        /* Icon Animation */
         .icon-container { position: relative; width: 100px; height: 100px; margin: 0 auto 30px; }
         .icon-bg {
             position: absolute; inset: 0; background: rgba(217, 119, 6, 0.1);
@@ -100,7 +91,6 @@
         }
         .icon-bg i { font-size: 2.5rem; color: var(--primary); }
         
-        /* Radar Pulse Effect */
         .pulse-ring {
             position: absolute; inset: 0; border-radius: 50%; border: 1px solid var(--primary);
             opacity: 0; z-index: 1; animation: pulse 2s infinite;
@@ -118,7 +108,6 @@
             border: 1px solid rgba(217, 119, 6, 0.2);
         }
 
-        /* Actions */
         .action-area { margin-top: 40px; }
         
         .btn-inbox {
@@ -145,14 +134,12 @@
         }
         .back-link:hover { color: var(--primary); }
 
-        /* Loader */
         #preloader {
             position: fixed; inset: 0; background: var(--bg-body); z-index: 9999;
             display: flex; justify-content: center; align-items: center;
             transition: opacity 0.5s ease;
         }
 
-        /* PWA Popup */
         .pwa-install-popup {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
@@ -172,7 +159,6 @@
 </head>
 <body>
 
-    <!-- PRELOADER -->
     <div id="preloader">
         <div style="text-align:center;">
             <img src="assets/images/logo.png" style="width:70px; height:auto; margin-bottom:20px;">
@@ -183,16 +169,13 @@
         </div>
     </div>
 
-    <!-- MAIN CARD -->
     <div class="auth-card" data-aos="zoom-in">
         
-        <!-- Branding (Since header is gone) -->
         <div class="card-brand brand-font">
             <img src="assets/images/logo.png" alt="Logo">
             <div>EAST<span>LINK</span></div>
         </div>
 
-        <!-- Pulse Animation -->
         <div class="icon-container">
             <div class="pulse-ring"></div>
             <div class="pulse-ring"></div>
@@ -207,9 +190,11 @@
         <p class="desc" style="font-size: 0.9rem; margin-top: 20px; opacity: 0.8; border-top:1px solid var(--border-color); padding-top:20px;">
             Click the link in that email to activate your account. <br>This page will auto-refresh once verified.
         </p>
+        <p class="desc" style="font-size:0.9rem; color:var(--text-muted); margin-top:8px;">
+            ⚠️ Please check your <strong>Spam</strong> or <strong>Junk</strong> folder if you don't see the email in your inbox.
+        </p>
 
         <div class="action-area">
-            <!-- Dynamic Link Button -->
             <a href="#" id="inboxBtn" class="btn-inbox" target="_blank">
                 <i class="fas fa-paper-plane"></i> <span id="inboxText">Open Email App</span>
             </a>
@@ -225,7 +210,6 @@
 
     </div>
 
-    <!-- PWA INSTALL POPUP -->
     <div id="pwa-install-popup" class="pwa-install-popup">
         <div class="pwa-content">
             <div class="pwa-icon"><i class="fas fa-download"></i></div>
@@ -240,7 +224,6 @@
         </div>
     </div>
 
-    <!-- SCRIPTS -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module">
@@ -251,7 +234,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // --- INIT UI ---
         AOS.init({ duration: 800, offset: 50, once: true });
 
         window.addEventListener('load', () => {
@@ -260,7 +242,6 @@
             setTimeout(() => preloader.style.display = 'none', 500);
         });
 
-        // --- MAIN VERIFICATION LOGIC ---
         let currentUser = null;
         let checkInterval = null;
 
@@ -280,7 +261,6 @@
             }
         });
 
-        // --- SMART INBOX BUTTON ---
         function configureInboxButton(email) {
             const btn = document.getElementById('inboxBtn');
             const txt = document.getElementById('inboxText');
@@ -301,7 +281,6 @@
             }
         }
 
-        // --- AUTO-POLLING ---
         function startPolling() {
             checkInterval = setInterval(async () => {
                 if (auth.currentUser) {
@@ -314,7 +293,6 @@
             }, 3000);
         }
 
-        // --- SUCCESS HANDLER ---
         function handleVerified() {
             showToast("Email Verified Successfully! Redirecting...", "success");
             const card = document.querySelector('.auth-card');
@@ -327,7 +305,6 @@
             }, 2000);
         }
 
-        // --- RESEND LOGIC WITH COOLDOWN ---
         window.resendVerification = async () => {
             const btn = document.getElementById('resendBtn');
             const timerSpan = document.getElementById('timer');
@@ -379,7 +356,6 @@
             }).showToast();
         }
 
-        // --- PWA LOGIC ---
         let deferredPrompt;
         const pwaPopup = document.getElementById('pwa-install-popup');
         
@@ -412,3 +388,4 @@
     </script>
 </body>
 </html>
+
