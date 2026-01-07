@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Upgrade Plan | EastLink Recruiters</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#1e293b">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            /* Brighter, Richer Theme */
+            --bg-body: #1e293b;       
+            --bg-glass: rgba(255, 255, 255, 0.02);
+            --bg-glass-hover: rgba(255, 255, 255, 0.08);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.75);
+            --bg-input: rgba(0, 0, 0, 0.2);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-highlight: rgba(255, 255, 255, 0.15);
+            
+            --text-main: #F1F5F9;     
+            --text-muted: #94A3B8; 
+            
+            /* Vibrant Gradients */
+            --gold-base: #fbbf24;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --purple-gradient: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+            --success-gradient: linear-gradient(135deg, #34d399 0%, #059669 100%);
+            --danger-gradient: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
+            
+            --neon-purple: #8b5cf6;
+            --success: #10B981;
+            --danger: #EF4444;
+            
+            --sidebar-width: 260px; 
+            --header-height: 70px;
+            --radius: 16px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            
+            --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background: url('assets/images/background.png') no-repeat center center fixed;
+            background-size: cover;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+        }
+
+        /* --- ADVANCED GLASSMORPHISM --- */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid var(--border-color);
+            border-top: 1px solid var(--border-highlight);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            width: 100%;
+            transition: all 0.25s var(--ease-snap);
+        }
+        
+        .text-truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        /* Header */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 1000;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        
+        .logo { 
+            font-family: var(--font-head); 
+            font-weight: 700; color: var(--text-main); font-size: 1.3rem; 
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; 
+            display: flex; align-items: center; 
+        }
+        .logo span { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .hamburger { font-size: 1.1rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        /* Search */
+        .global-search-container { flex: 1; max-width: 450px; position: relative; margin: 0 20px; }
+        .global-search-input {
+            width: 100%; background: var(--bg-input); border: 1px solid var(--border-color);
+            padding: 10px 45px 10px 15px; border-radius: 12px; color: var(--text-main);
+            transition: all 0.3s ease; font-size: 0.9rem;
+        }
+        .global-search-input:focus { 
+            border-color: var(--gold-base); background: rgba(0,0,0,0.3); 
+            box-shadow: 0 0 15px rgba(217, 119, 6, 0.2);
+        }
+        .search-results-dropdown {
+            position: absolute; top: 115%; left: 0; width: 100%; background: var(--bg-glass-heavy);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            max-height: 300px; overflow-y: auto; display: none; z-index: 2000;
+        }
+        .search-result-item { padding: 12px 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .search-result-item:hover { background: var(--bg-glass-hover); padding-left: 20px; }
+
+        /* Header Actions */
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+        .icon-btn { 
+            width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px;
+            color: var(--text-muted); cursor: pointer; transition: all 0.3s var(--ease-snap); position: relative;
+            background: rgba(255,255,255,0.03); border: 1px solid transparent;
+        }
+        .icon-btn:hover { background: var(--bg-glass-hover); color: var(--text-main); transform: translateY(-2px); border-color: rgba(255,255,255,0.1); }
+        
+        .notification-badge { 
+            position: absolute; top: -2px; right: -2px; 
+            min-width: 18px; height: 18px; 
+            background: var(--danger-gradient); border-radius: 50%; 
+            font-size: 0.6rem; color: white; font-weight: 700;
+            display: none; place-items: center; justify-content: center;
+            border: 2px solid var(--bg-body); box-shadow: 0 2px 5px rgba(220, 38, 38, 0.4);
+        }
+        
+        .profile-widget {
+            width: 42px; height: 42px; position: relative; cursor: pointer;
+            transition: transform 0.3s var(--ease-snap); margin-left: 5px; flex-shrink: 0;
+        }
+        .profile-widget:hover { transform: scale(1.05); }
+        .user-avatar { 
+            width: 100%; height: 100%; border-radius: 12px; 
+            background: var(--gold-gradient); display: grid; place-items: center; 
+            font-weight: 700; color: #fff; border: 2px solid var(--border-color); 
+            object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .user-avatar.img-mode { background: transparent; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 20px 0; overflow-y: auto; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+        .nav-group { padding: 0 24px; margin-bottom: 20px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-item { 
+            display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.9rem; transition: all 0.2s ease; border-radius: 10px; margin-bottom: 4px;
+        }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-glass-hover); transform: translateX(5px); }
+        .nav-item.active { background: linear-gradient(90deg, rgba(251, 191, 36, 0.15) 0%, transparent 100%); color: var(--gold-base); font-weight: 600; border-left: 3px solid var(--gold-base); }
+        .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
+        
+        /* Layout */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
+        
+        /* Floating Support Button */
+        .floating-support {
+            position: fixed; bottom: 30px; right: 30px;
+            width: 60px; height: 60px;
+            background: var(--gold-gradient);
+            border-radius: 50%;
+            display: grid; place-items: center;
+            color: black; font-size: 1.5rem;
+            box-shadow: 0 10px 25px rgba(217, 119, 6, 0.4);
+            z-index: 2000;
+            text-decoration: none;
+            transition: transform 0.3s var(--ease-snap);
+            animation: pulse-glow 2s infinite;
+        }
+        .floating-support:hover { transform: scale(1.15) rotate(15deg); }
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(217, 119, 6, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0); }
+        }
+
+        /* --- PRICING SPECIFIC STYLES --- */
+        .hero-section-center {
+            text-align: center; margin-bottom: 40px; position: relative;
+            padding: 40px 20px;
+        }
+        .wallet-badge {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color);
+            padding: 8px 24px; border-radius: 30px; margin-top: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2); backdrop-filter: blur(10px);
+        }
+        .wallet-amount { color: var(--gold-base); font-family: var(--font-display); font-weight: 700; }
+        .top-up-link { color: var(--text-muted); font-size: 0.8rem; border-bottom: 1px dotted var(--text-muted); margin-left: 10px; text-decoration: none; transition: 0.2s; }
+        .top-up-link:hover { color: var(--text-main); border-color: var(--text-main); }
+
+        .pricing-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 60px; align-items: start; max-width: 1200px; margin: 0 auto;
+        }
+        .price-card {
+            padding: 35px 25px; position: relative; display: flex; flex-direction: column; height: 100%;
+        }
+        .price-card:hover { transform: translateY(-10px); box-shadow: 0 15px 40px rgba(0,0,0,0.3); border-color: var(--border-highlight); }
+        
+        .card-free { border-top: 4px solid var(--text-muted); }
+        .card-standard { border-top: 4px solid var(--gold-base); background: linear-gradient(180deg, rgba(251, 191, 36, 0.03) 0%, rgba(255, 255, 255, 0.02) 100%); }
+        .card-pro { 
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            background: linear-gradient(180deg, rgba(139, 92, 246, 0.1) 0%, rgba(15, 23, 42, 0.8) 100%);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.1);
+            transform: scale(1.05); z-index: 2;
+        }
+        .card-pro:hover { transform: scale(1.08) translateY(-5px); box-shadow: 0 0 40px rgba(139, 92, 246, 0.25); border-color: var(--neon-purple); }
+
+        .pro-badge {
+            position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%);
+            background: var(--purple-gradient); color: white; padding: 6px 16px;
+            border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(126, 34, 206, 0.4); letter-spacing: 1px;
+        }
+
+        .plan-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 10px; font-family: var(--font-head); }
+        .plan-cost { margin-bottom: 25px; display: flex; align-items: baseline; gap: 4px; }
+        .currency { font-size: 1rem; color: var(--text-muted); font-weight: 500; }
+        .amount { font-size: 2.5rem; font-weight: 700; font-family: var(--font-display); color: var(--text-main); }
+        .period { font-size: 0.85rem; color: var(--text-muted); }
+
+        .btn-action {
+            width: 100%; padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none;
+            transition: all 0.2s var(--ease-snap); font-size: 0.95rem; margin-top: auto;
+        }
+        .btn-ghost { background: var(--bg-input); color: var(--text-muted); border: 1px solid var(--border-color); cursor: default; }
+        .btn-gold { background: var(--gold-gradient); color: #fff; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3); }
+        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(217, 119, 6, 0.4); }
+        .btn-purple { background: var(--purple-gradient); color: #fff; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
+        .btn-purple:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4); }
+
+        /* Comparison Table */
+        .compare-table-wrapper {
+            max-width: 1200px; margin: 40px auto; overflow-x: auto;
+        }
+        .compare-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        .compare-table th, .compare-table td {
+            padding: 18px 20px; text-align: center; border-bottom: 1px solid var(--border-color);
+            color: var(--text-muted); font-size: 0.9rem;
+        }
+        .compare-table th { background: rgba(0,0,0,0.2); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; color: var(--text-main); }
+        .compare-table th:first-child, .compare-table td:first-child { text-align: left; padding-left: 30px; color: var(--text-main); font-weight: 500; width: 35%; }
+        
+        .compare-table .col-pro { background: rgba(139, 92, 246, 0.05); border-left: 1px solid rgba(139, 92, 246, 0.1); border-right: 1px solid rgba(139, 92, 246, 0.1); }
+        .compare-table th.col-pro { color: var(--neon-purple); }
+        
+        .icon-check { color: var(--success); font-size: 1rem; }
+        .icon-cross { color: var(--border-color); font-size: 1rem; opacity: 0.5; }
+        .feature-val { font-weight: 700; color: var(--text-main); font-family: var(--font-display); }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px);
+            z-index: 3000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-overlay.open { display: flex; opacity: 1; }
+        .popup-content {
+            background: #1e293b; border: 1px solid var(--border-color);
+            padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center;
+            position: relative; transform: scale(0.9); transition: transform 0.3s var(--ease-snap);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+        .modal-overlay.open .popup-content { transform: scale(1); }
+
+        /* PWA Popup */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+        @media (max-width: 992px) {
+            .global-search-container { display: none; }
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 20px 10px; width: 100%; max-width: 100vw; overflow-x: hidden; }
+            .pricing-grid { grid-template-columns: 1fr; gap: 40px; margin-top: 30px; }
+            .card-pro { transform: scale(1); }
+            .card-pro:hover { transform: translateY(-5px); }
+            .hamburger { display: block; }
+            .header-left { gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="seeker-dashboard.html" class="logo">EAST<span>LINK</span></a>
+        </div>
+        
+        <div class="global-search-container">
+            <input type="text" id="searchInput" class="global-search-input" placeholder="Search jobs, skills, or companies...">
+            <i class="fas fa-search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+            <div id="searchResults" class="search-results-dropdown"></div>
+        </div>
+
+        <div class="header-actions">
+            <div class="icon-btn" title="Messages" onclick="location.href='seeker-messages.html'">
+                <i class="fa-regular fa-envelope"></i>
+                <div class="notification-badge" id="msg-badge">0</div>
+            </div>
+            <div class="icon-btn" title="Notifications" onclick="location.href='seeker-notifications.html'">
+                <i class="fa-regular fa-bell"></i>
+                <div class="notification-badge" id="notif-badge">0</div>
+            </div>
+            <div class="profile-widget" onclick="location.href='seeker-profile.html'" title="My Profile">
+                <img src="" id="header-avatar-img" class="user-avatar img-mode" alt="Profile" style="display:none;">
+                <div id="header-avatar-fallback" class="user-avatar">U</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Overview</div>
+            <a href="seeker-dashboard.html" class="nav-item"><i class="fa-solid fa-compass"></i> Dashboard</a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Job Hunt</div>
+            <a href="seeker-applications.html" class="nav-item"><i class="fa-solid fa-file-signature"></i> Applied Jobs</a>
+            <a href="seeker-jobs.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Browse Jobs</a>
+            <a href="seeker-featured-jobs.html" class="nav-item link-std"><i class="fa-solid fa-star"></i> Featured Jobs <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-urgentlyhiring.html" class="nav-item link-pro"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-guaranteed-jobs.html" class="nav-item link-pro"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="seeker-wallet.html" class="nav-item"><i class="fa-solid fa-wallet"></i> My Wallet</a>
+            <a href="seeker-premium.html" class="nav-item active"><i class="fa-solid fa-crown"></i> My Plan</a>
+            <a href="seeker-referrals.html" class="nav-item link-std"><i class="fa-solid fa-user-plus"></i> Invite & Earn <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-invest.html" class="nav-item link-std"><i class="fa-solid fa-chart-line"></i> Invest <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Resources</div>
+            <a href="seeker-blog.html" class="nav-item"><i class="fa-solid fa-newspaper"></i> News & Insights</a>
+            <a href="seeker-resources.html" class="nav-item link-pro"><i class="fa-solid fa-book"></i> Resources <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Settings</div>
+            <a href="seeker-profile.html" class="nav-item"><i class="fa-solid fa-user-gear"></i> Profile</a>
+            <a href="seeker-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="closeSidebar()" style="position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:998; display:none; backdrop-filter:blur(2px);"></div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        
+        <!-- Hero -->
+        <div class="glass-panel hero-section-center animate__animated animate__zoomIn">
+            <h1 style="font-family:var(--font-head); font-size:2rem; margin-bottom:15px; color:var(--text-main);">Choose Your Advantage</h1>
+            <p style="color:var(--text-muted); max-width:600px; margin:0 auto; line-height:1.6;">
+                Unlock verified badges, guaranteed job placements, and direct employer access. Invest in your career today.
+            </p>
+            
+            <div class="wallet-badge">
+                <i class="fas fa-wallet" style="color:var(--text-muted)"></i>
+                <span style="color:var(--text-muted); font-size:0.9rem;">Balance:</span>
+                <span class="wallet-amount" id="wallet-display">KES ...</span>
+                <a href="seeker-wallet.html" class="top-up-link">Top Up</a>
+            </div>
+        </div>
+
+        <!-- Pricing Grid -->
+        <div class="pricing-grid">
+            
+            <!-- Free Plan -->
+            <article class="glass-panel price-card card-free animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+                <div>
+                    <h3 class="plan-title">Free</h3>
+                    <div class="plan-cost">
+                        <span class="amount">0</span>
+                        <span class="currency">KES</span>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Basic access to get you started.</p>
+                </div>
+                <button class="btn-action btn-ghost" disabled>Current Plan</button>
+            </article>
+
+            <!-- Standard Plan -->
+            <article class="glass-panel price-card card-standard animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+                <div>
+                    <h3 class="plan-title" style="color:var(--gold-base)">Standard</h3>
+                    <div class="plan-cost">
+                        <span class="amount">550</span>
+                        <span class="currency">KES</span>
+                        <span class="period">/ 3 months</span>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Get verified and stand out.</p>
+                </div>
+                <button class="btn-action btn-gold" onclick="initiateUpgrade('standard', 550)">Upgrade Standard</button>
+            </article>
+
+            <!-- Pro Plan -->
+            <article class="glass-panel price-card card-pro animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+                <div class="pro-badge">Best Value</div>
+                <div>
+                    <h3 class="plan-title" style="color:var(--neon-purple)">Pro Access</h3>
+                    <div class="plan-cost">
+                        <span class="amount">1,250</span>
+                        <span class="currency">KES</span>
+                        <span class="period">/ 3 months</span>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">Unlimited access & guaranteed jobs.</p>
+                </div>
+                <button class="btn-action btn-purple" onclick="initiateUpgrade('pro', 1250)"><i class="fas fa-crown"></i> Get Pro Access</button>
+            </article>
+
+        </div>
+
+        <!-- Detailed Comparison Table -->
+        <div class="glass-panel animate__animated animate__fadeInUp animate__delay-1s" style="padding: 24px;">
+            <h2 style="font-family:var(--font-head); font-size:1.4rem; margin-bottom:25px; text-align:center;">Detailed Feature Breakdown</h2>
+            
+            <div class="compare-table-wrapper">
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>Features</th>
+                            <th>Free</th>
+                            <th>Standard</th>
+                            <th class="col-pro">Pro</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Jobs Allowed to Apply (Monthly)</td>
+                            <td><span class="feature-val">1</span></td>
+                            <td><span class="feature-val">5</span></td>
+                            <td class="col-pro"><span class="feature-val" style="color:var(--success)">Unlimited</span></td>
+                        </tr>
+                        <tr>
+                            <td>Apply to: Free Jobs</td>
+                            <td><i class="fas fa-check icon-check"></i></td>
+                            <td><i class="fas fa-check icon-check"></i></td>
+                            <td class="col-pro"><i class="fas fa-check icon-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Apply to: Featured Jobs</td>
+                            <td><i class="fas fa-times icon-cross"></i></td>
+                            <td><i class="fas fa-check icon-check"></i></td>
+                            <td class="col-pro"><i class="fas fa-check icon-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Apply to: Urgently Hiring</td>
+                            <td><i class="fas fa-times icon-cross"></i></td>
+                            <td><i class="fas fa-times icon-cross"></i></td>
+                            <td class="col-pro"><i class="fas fa-check icon-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Apply to: Guaranteed Jobs</td>
+                            <td><i class="fas fa-times icon-cross"></i></td>
+                            <td><i class="fas fa-times icon-cross"></i></td>
+                            <td class="col-pro"><i class="fas fa-check icon-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Investment Opportunities</td>
+                            <td><i class="fas fa-times icon-cross"></i></td>
+                            <td><i class="fas fa-check icon-check"></i></td>
+                            <td class="col-pro"><i class="fas fa-check icon-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Referral Programme</td>
+                            <td><i class="fas fa-times icon-cross"></i></td>
+                            <td><i class="fas fa-check icon-check"></i></td>
+                            <td class="col-pro"><i class="fas fa-check icon-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Referral Bonus Amount</td>
+                            <td>-</td>
+                            <td><span class="feature-val">Ksh 300</span></td>
+                            <td class="col-pro"><span class="feature-val" style="color:var(--neon-purple)">Ksh 650</span></td>
+                        </tr>
+                        <tr>
+                            <td>Highly Recommended Job Match</td>
+                            <td><i class="fas fa-times icon-cross"></i></td>
+                            <td><i class="fas fa-times icon-cross"></i></td>
+                            <td class="col-pro"><i class="fas fa-check icon-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Access to Resources</td>
+                            <td><i class="fas fa-times icon-cross"></i></td>
+                            <td><i class="fas fa-check icon-check"></i></td>
+                            <td class="col-pro"><i class="fas fa-check icon-check"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Prioritized Support</td>
+                            <td><i class="fas fa-times icon-cross"></i></td>
+                            <td><i class="fas fa-times icon-cross"></i></td>
+                            <td class="col-pro"><i class="fas fa-check icon-check"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div style="text-align:center; padding:30px 0; color:var(--text-muted); font-size:0.85rem;">
+            &copy; 2025 EastLink Recruiters. All rights reserved.
+        </div>
+
+    </main>
+
+    <!-- FLOATING SUPPORT BUTTON -->
+    <a href="seeker-support.html" class="floating-support" title="Contact Support">
+        <i class="fa-solid fa-headset"></i>
+    </a>
+
+    <!-- Payment Modal -->
+    <div class="modal-overlay" id="paymentModal">
+        <div class="popup-content animate__animated animate__zoomIn">
+            <h3 style="color:var(--text-main); font-family:var(--font-head); margin-bottom:15px; font-size:1.4rem;">Confirm Upgrade</h3>
+            <p style="color:var(--text-muted); margin-bottom:20px;">You are about to upgrade to <strong id="modal-plan-name" style="color:var(--text-main)"></strong>.</p>
+            
+            <div style="background:rgba(0,0,0,0.2); border-radius:10px; padding:15px; margin-bottom:20px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; color:var(--text-muted);">
+                    <span>Current Balance</span>
+                    <span id="modal-bal" style="color:var(--text-main); font-weight:600;">...</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; color:var(--text-muted);">
+                    <span>Cost</span>
+                    <span id="modal-cost" style="color:var(--danger); font-weight:600;">...</span>
+                </div>
+                <div style="border-top:1px dashed var(--border-color); margin:10px 0;"></div>
+                <div style="display:flex; justify-content:space-between; color:var(--gold-base); font-weight:700;">
+                    <span>Remaining</span>
+                    <span id="modal-remain">...</span>
+                </div>
+            </div>
+
+            <div id="insufficient-alert" style="display:none; text-align:center; color:var(--danger); margin-bottom:15px; background:rgba(239, 68, 68, 0.1); padding:10px; border-radius:8px;">
+                Insufficient Funds. <a href="seeker-wallet.html" style="color:var(--danger); text-decoration:underline;">Top Up</a>
+            </div>
+
+            <button id="btn-confirm" class="btn-action btn-gold" onclick="processTransaction()">Confirm Payment</button>
+            <button class="btn-action btn-ghost" onclick="togglePaymentModal(false)" style="margin-top:10px;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add to home screen for quick access.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        // CONFIG
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- UI UTILS ---
+        window.toggleSidebar = () => {
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            sb.classList.toggle('active');
+            ov.style.display = sb.classList.contains('active') ? 'block' : 'none';
+        };
+        window.closeSidebar = () => {
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('overlay').style.display = 'none';
+        };
+        window.logout = () => signOut(auth).then(() => window.location.href = 'signin.html');
+        
+        window.togglePaymentModal = (show) => {
+            const el = document.getElementById('paymentModal');
+            if(show) el.classList.add('open');
+            else el.classList.remove('open');
+        };
+
+        // Theme Init
+        const saved = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', saved);
+
+        // --- CORE LOGIC ---
+        let currentUser = null;
+        let userData = {};
+        let targetPlan = {};
+
+        onAuthStateChanged(auth, async (user) => {
+            if(!user) return window.location.href = 'signin.html';
+            currentUser = user;
+
+            try {
+                // REALTIME LISTENER FOR USER PROFILE
+                onSnapshot(doc(db, "users", user.uid), (userDoc) => {
+                    if(userDoc.exists()) {
+                        userData = userDoc.data();
+                        
+                        // Header Avatar Logic
+                        const avatarImg = document.getElementById('header-avatar-img');
+                        const avatarFallback = document.getElementById('header-avatar-fallback');
+                        const photoUrl = userData.photoURL || user.photoURL;
+                        const name = (userData.fullName || userData.displayName || 'User').split(' ')[0];
+
+                        if(photoUrl) {
+                            if(avatarImg) { avatarImg.src = photoUrl; avatarImg.style.display = 'block'; }
+                            if(avatarFallback) avatarFallback.style.display = 'none';
+                        } else {
+                            if(avatarImg) avatarImg.style.display = 'none';
+                            if(avatarFallback) {
+                                avatarFallback.style.display = 'grid';
+                                avatarFallback.innerText = name.charAt(0).toUpperCase();
+                            }
+                        }
+
+                        // Wallet Update
+                        const bal = (userData.walletBalance || 0).toLocaleString();
+                        document.getElementById('wallet-display').innerText = `KES ${bal}`;
+
+                        // Check Current Plan & Disable Buttons if needed
+                        const currentPlan = (userData.plan || 'free').toLowerCase();
+                        updateButtonStates(currentPlan);
+                    }
+                });
+                
+                // Setup Badge Listeners
+                setupRealtimeListeners(user.uid);
+
+            } catch(e) { 
+                console.error("Auth Error:", e);
+            }
+        });
+
+        function updateButtonStates(currentPlan) {
+            // Logic to disable/change buttons based on current plan
+            const btns = document.querySelectorAll('.btn-action');
+            // Reset logic if needed, or highlight the current plan card
+            // For now, we keep buttons active to allow upgrades/extensions
+        }
+
+        // --- UPGRADE LOGIC ---
+        window.initiateUpgrade = (plan, cost) => {
+            targetPlan = { id: plan, cost: cost, name: plan === 'pro' ? 'Pro Access' : 'Standard Plan' };
+            const bal = userData.walletBalance || 0;
+            const remaining = bal - cost;
+
+            document.getElementById('modal-plan-name').innerText = targetPlan.name;
+            document.getElementById('modal-bal').innerText = `KES ${bal.toLocaleString()}`;
+            document.getElementById('modal-cost').innerText = `KES ${cost.toLocaleString()}`;
+            document.getElementById('modal-remain').innerText = `KES ${remaining.toLocaleString()}`;
+
+            const alertBox = document.getElementById('insufficient-alert');
+            const confirmBtn = document.getElementById('btn-confirm');
+            
+            if (remaining < 0) {
+                alertBox.style.display = 'block';
+                confirmBtn.style.display = 'none';
+            } else {
+                alertBox.style.display = 'none';
+                confirmBtn.style.display = 'block';
+            }
+            
+            togglePaymentModal(true);
+        };
+
+        window.processTransaction = async () => {
+            const btn = document.getElementById('btn-confirm');
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const userRef = doc(db, "users", currentUser.uid);
+                    const userDoc = await transaction.get(userRef);
+                    if (!userDoc.exists()) throw "User does not exist!";
+                    
+                    const currentBal = userDoc.data().walletBalance || 0;
+                    if (currentBal < targetPlan.cost) throw "Insufficient funds!";
+                    
+                    const newExpiry = new Date();
+                    newExpiry.setMonth(newExpiry.getMonth() + 3); // 3 months duration
+
+                    transaction.update(userRef, {
+                        walletBalance: currentBal - targetPlan.cost,
+                        plan: targetPlan.id,
+                        isVerified: true,
+                        subscriptionExpiry: newExpiry
+                    });
+                });
+
+                togglePaymentModal(false);
+                Toastify({ text: "Upgrade Successful!", style: { background: "var(--success)" } }).showToast();
+                
+            } catch (e) {
+                console.error(e);
+                Toastify({ text: "Error: " + e, style: { background: "var(--danger)" } }).showToast();
+            } finally {
+                btn.innerText = "Confirm Payment";
+                btn.disabled = false;
+            }
+        };
+
+        // --- SEARCH & LISTENERS ---
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        let debounceTimer;
+
+        if(searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(debounceTimer);
+                const term = e.target.value.toLowerCase().trim();
+                if(term.length < 2) {
+                    searchResults.style.display = 'none';
+                    return;
+                }
+
+                debounceTimer = setTimeout(async () => {
+                    try {
+                        const q = query(collection(db, "jobs"), limit(30));
+                        const snap = await getDocs(q);
+                        const matches = snap.docs.filter(d => {
+                            const j = d.data();
+                            const title = j.title ? j.title.toLowerCase() : "";
+                            const company = j.company ? j.company.toLowerCase() : "";
+                            return title.includes(term) || company.includes(term);
+                        });
+
+                        if(matches.length > 0) {
+                            searchResults.innerHTML = matches.map(d => {
+                                const j = d.data();
+                                return `<div class="search-result-item" onclick="location.href='seeker-job-details.html?id=${d.id}'">
+                                    <i class="fas fa-search" style="color:var(--text-muted)"></i>
+                                    <div>
+                                        <div style="font-weight:600; font-size:0.9rem;">${j.title}</div>
+                                        <div style="font-size:0.75rem; color:var(--text-muted);">${j.company}</div>
+                                    </div>
+                                </div>`;
+                            }).join('');
+                            searchResults.style.display = 'block';
+                        } else {
+                            searchResults.innerHTML = `<div style="padding:15px; text-align:center; color:var(--text-muted); font-size:0.9rem;">No matches found.</div>`;
+                            searchResults.style.display = 'block';
+                        }
+                    } catch(err) { console.error(err); }
+                }, 400); 
+            });
+
+            document.addEventListener('click', (e) => {
+                if (document.querySelector('.global-search-container') && !document.querySelector('.global-search-container').contains(e.target)) {
+                    searchResults.style.display = 'none';
+                }
+            });
+        }
+
+        // --- BADGE LISTENERS ---
+        function setupRealtimeListeners(uid) {
+            const notifQ = query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false));
+            onSnapshot(notifQ, (snap) => {
+                const badge = document.getElementById('notif-badge');
+                if(badge) {
+                    if (snap.size > 0) {
+                        badge.style.display = 'flex';
+                        badge.innerText = snap.size > 9 ? '9+' : snap.size;
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            });
+
+            const msgQ = query(collection(db, "messages"), where("receiverId", "==", uid), where("read", "==", false));
+            onSnapshot(msgQ, (snap) => {
+                const badge = document.getElementById('msg-badge');
+                if(badge) {
+                     if (snap.size > 0) {
+                        badge.style.display = 'flex';
+                        badge.innerText = snap.size > 9 ? '9+' : snap.size;
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        // --- PWA LOGIC ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('pwa-install-popup').style.display = 'block';
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('pwa-install-popup').style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            document.getElementById('pwa-install-popup').style.display = 'none';
+        };
+
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
+        }
+    </script>
+</body>
+</html>

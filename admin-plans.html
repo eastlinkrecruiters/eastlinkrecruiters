@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Manage Plans | EastLink Admin</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0F172A">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Executive Theme */
+            --bg-body: #0F172A;       
+            --bg-card: rgba(30, 41, 59, 0.65);
+            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.95);
+            --bg-input: rgba(255, 255, 255, 0.07);
+            --bg-hover: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8; 
+            --gold-base: #D97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --neon-purple: #8b5cf6;
+            --success: #10B981;
+            --danger: #EF4444;
+            --blue: #3B82F6;
+            
+            /* DIMENSIONS */
+            --sidebar-width: 260px; 
+            --header-height: 60px;
+            
+            --radius: 16px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background-image: url('assets/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Utils */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 20px; z-index: 1000;
+        }
+        
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .logo { 
+            font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.15rem;
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; 
+        }
+        .logo span { color: var(--gold-base); }
+        .admin-badge { 
+            font-family: var(--font-body); font-size: 0.55rem; background: var(--bg-input); 
+            border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; 
+            margin-left: 8px; color: var(--text-muted); letter-spacing: 0.5px;
+        }
+        .hamburger { font-size: 1.2rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+        .icon-btn { 
+            width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; font-size: 0.9rem;
+            color: var(--text-muted); cursor: pointer; transition: all 0.3s; position: relative;
+        }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); }
+        .notification-badge { 
+            position: absolute; top: 2px; right: 2px; min-width: 14px; height: 14px; 
+            background: var(--danger); border-radius: 10px; font-size: 0.55rem; color: white; 
+            font-weight: 700; display: none; place-items: center; justify-content: center;
+            padding: 0 3px; border: 2px solid var(--bg-card);
+        }
+        .profile-widget {
+            width: 34px; height: 34px; background: var(--bg-input); border-radius: 10px; 
+            display: grid; place-items: center; border: 1px solid var(--border-color); 
+            color: var(--gold-base); font-size: 0.9rem; cursor: pointer; margin-left: 4px;
+        }
+        .profile-widget:hover { background: var(--bg-hover); }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 15px 0; overflow-y: auto; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+        .nav-group { padding: 0 20px; margin-bottom: 15px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-item { 
+            display: flex; align-items: center; padding: 10px 12px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.85rem; transition: all 0.3s ease; border-radius: 8px; margin-bottom: 2px;
+        }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
+        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
+        .nav-item i { width: 22px; text-align: center; margin-right: 8px; }
+
+        /* --- MAIN CONTENT --- */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 25px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
+        
+        .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
+        .page-title h1 { font-family: var(--font-head); font-size: 1.5rem; color: var(--text-main); margin-bottom: 5px; }
+        .page-title p { color: var(--text-muted); font-size: 0.85rem; }
+
+        /* TABS */
+        .tabs { 
+            display: flex; gap: 5px; margin-bottom: 30px; padding: 4px; 
+            background: var(--bg-input); border-radius: 12px; width: fit-content; border: 1px solid var(--border-color);
+        }
+        .tab-btn { 
+            padding: 8px 20px; background: transparent; border: none; border-radius: 8px; 
+            font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.2s; white-space: nowrap;
+            font-family: var(--font-body); font-size: 0.85rem;
+        }
+        .tab-btn:hover { color: var(--text-main); }
+        .tab-btn.active { background: var(--bg-glass); color: var(--gold-base); box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+
+        /* PLAN CARDS */
+        .plans-grid { display: none; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; }
+        .plans-grid.active { display: grid; }
+
+        .plan-card { 
+            display: flex; flex-direction: column; height: 100%; transition: 0.3s;
+        }
+        .plan-card:hover { transform: translateY(-5px); box-shadow: 0 10px 40px rgba(0,0,0,0.3); border-color: var(--gold-base); }
+        
+        .pc-header { 
+            padding: 20px 25px; border-bottom: 1px solid var(--border-color); background: rgba(255,255,255,0.02);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .pc-title { font-weight: 700; color: var(--text-main); font-size: 1.1rem; font-family: var(--font-head); }
+        .pc-badge { font-size: 0.65rem; padding: 4px 10px; border-radius: 20px; font-weight: 700; text-transform: uppercase; font-family: var(--font-display); letter-spacing: 0.5px; }
+        .badge-blue { background: rgba(59, 130, 246, 0.15); color: var(--blue); border: 1px solid rgba(59, 130, 246, 0.3); }
+        .badge-gold { background: rgba(217, 119, 6, 0.15); color: var(--gold-base); border: 1px solid rgba(217, 119, 6, 0.3); }
+
+        .pc-body { padding: 25px; flex-grow: 1; }
+
+        /* FORM ELEMENTS */
+        .flex-row { display: flex; gap: 20px; margin-bottom: 20px; }
+        .form-group { flex: 1; }
+        .form-label { display: block; font-size: 0.7rem; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-input { 
+            width: 100%; padding: 12px 15px; border: 1px solid var(--border-color); border-radius: 10px; 
+            background: var(--bg-input); color: var(--text-main); font-family: var(--font-display); font-size: 0.9rem;
+            transition: 0.3s;
+        }
+        .form-input:focus { border-color: var(--gold-base); background: rgba(255,255,255,0.08); }
+
+        /* TOGGLE SWITCH */
+        .feature-list { margin-top: 25px; border-top: 1px solid var(--border-color); padding-top: 20px; }
+        .feature-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 0.9rem; color: var(--text-main); }
+        
+        .toggle-switch { position: relative; width: 44px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .3s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--gold-base); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        .pc-footer { padding: 20px 25px; border-top: 1px solid var(--border-color); background: rgba(255,255,255,0.02); text-align: right; }
+        .btn-save { 
+            background: var(--gold-gradient); color: #000; border: none; padding: 12px 24px; 
+            border-radius: 30px; font-weight: 600; cursor: pointer; transition: 0.3s; 
+            font-family: var(--font-body); box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3); font-size: 0.9rem;
+        }
+        .btn-save:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .btn-save:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 998; backdrop-filter: blur(4px); }
+
+        /* PWA Popup */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 20px 10px; width: 100%; }
+            .hamburger { display: block; }
+            .header-left { gap: 10px; }
+            .flex-row { flex-direction: column; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="admin-dashboard.html" class="logo">East<span>Link</span> <span class="admin-badge">ADMIN</span></a>
+        </div>
+        
+        <div class="header-actions">
+            <div class="icon-btn" onclick="location.href='admin-support.html'" title="Support Tickets">
+                <i class="fa-solid fa-envelope"></i>
+                <div class="notification-badge" id="msg-badge">0</div>
+            </div>
+            <div class="icon-btn" onclick="location.href='admin-notifications.html'" title="System Alerts">
+                <i class="fa-solid fa-bell"></i>
+                <div class="notification-badge" id="notif-badge">0</div>
+            </div>
+            <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Analytics</div>
+            <a href="admin-dashboard.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        </div>
+        
+        <div class="nav-group">
+            <div class="nav-label">User Management</div>
+            <a href="admin-users.html" class="nav-item"><i class="fa-solid fa-users"></i> Manage Users</a>
+            <a href="admin-plans.html" class="nav-item active"><i class="fa-solid fa-tags"></i> Manage Plans</a>
+            <a href="admin-referrals.html" class="nav-item"><i class="fa-solid fa-share-nodes"></i> Referrals</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Jobs & Service</div>
+            <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
+            <a href="admin-guaranteed-jobs.html" class="nav-item"><i class="fa-solid fa-certificate"></i> Guaranteed Jobs</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="admin-deposits.html" class="nav-item"><i class="fa-solid fa-arrow-down"></i> Deposits</a>
+            <a href="admin-withdrawals.html" class="nav-item"><i class="fa-solid fa-arrow-up"></i> Withdrawals</a>
+            <a href="admin-deposit-issues.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> Errors</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">System</div>
+            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
+            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
+            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- MAIN -->
+    <main>
+        <div class="page-header animate__animated animate__fadeInDown">
+            <div class="page-title">
+                <h1>Subscription Plans</h1>
+                <p>Configure pricing, limits, and features for user subscriptions.</p>
+            </div>
+        </div>
+
+        <div class="tabs animate__animated animate__fadeInUp">
+            <div class="tab-btn active" onclick="switchTab('seeker')">Talent (Seeker)</div>
+            <div class="tab-btn" onclick="switchTab('employer')">Recruiter (Employer)</div>
+        </div>
+
+        <!-- SEEKER PLANS -->
+        <div class="plans-grid active animate__animated animate__fadeInUp" id="seeker-grid">
+            
+            <!-- Standard Plan -->
+            <div class="glass-panel plan-card">
+                <div class="pc-header">
+                    <div class="pc-title">Standard Plan</div>
+                    <span class="pc-badge badge-blue">3 Months</span>
+                </div>
+                <div class="pc-body">
+                    <form onsubmit="savePlan(event, 'seeker_standard')">
+                        <div class="flex-row">
+                            <div class="form-group">
+                                <label class="form-label">Price (Ksh)</label>
+                                <input type="number" class="form-input" id="s-std-price" value="550">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Daily App Limit</label>
+                                <input type="number" class="form-input" id="s-std-limit" value="15">
+                            </div>
+                        </div>
+
+                        <div class="feature-list">
+                            <div class="form-label" style="margin-bottom:15px; color:var(--gold-base);">Feature Config</div>
+                            <div class="feature-item">
+                                <span>Verified Badge</span>
+                                <label class="toggle-switch"><input type="checkbox" id="s-std-verified" checked><span class="slider"></span></label>
+                            </div>
+                            <div class="feature-item">
+                                <span>SMS Alerts</span>
+                                <label class="toggle-switch"><input type="checkbox" id="s-std-sms" checked><span class="slider"></span></label>
+                            </div>
+                            <div class="feature-item">
+                                <span>Direct Messaging</span>
+                                <label class="toggle-switch"><input type="checkbox" id="s-std-dm"><span class="slider"></span></label>
+                            </div>
+                        </div>
+                        <div class="pc-footer">
+                            <button type="submit" class="btn-save">Update Plan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Pro Plan -->
+            <div class="glass-panel plan-card">
+                <div class="pc-header">
+                    <div class="pc-title">Pro Access</div>
+                    <span class="pc-badge badge-gold">6 Months</span>
+                </div>
+                <div class="pc-body">
+                    <form onsubmit="savePlan(event, 'seeker_pro')">
+                        <div class="flex-row">
+                            <div class="form-group">
+                                <label class="form-label">Price (Ksh)</label>
+                                <input type="number" class="form-input" id="s-pro-price" value="1550">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Daily App Limit</label>
+                                <input type="number" class="form-input" id="s-pro-limit" value="9999">
+                            </div>
+                        </div>
+
+                        <div class="feature-list">
+                            <div class="form-label" style="margin-bottom:15px; color:var(--gold-base);">Feature Config</div>
+                            <div class="feature-item">
+                                <span>Verified Badge</span>
+                                <label class="toggle-switch"><input type="checkbox" id="s-pro-verified" checked><span class="slider"></span></label>
+                            </div>
+                            <div class="feature-item">
+                                <span>SMS Alerts</span>
+                                <label class="toggle-switch"><input type="checkbox" id="s-pro-sms" checked><span class="slider"></span></label>
+                            </div>
+                            <div class="feature-item">
+                                <span>Direct Messaging</span>
+                                <label class="toggle-switch"><input type="checkbox" id="s-pro-dm" checked><span class="slider"></span></label>
+                            </div>
+                        </div>
+                        <div class="pc-footer">
+                            <button type="submit" class="btn-save">Update Plan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- EMPLOYER PLANS -->
+        <div class="plans-grid animate__animated animate__fadeInUp" id="employer-grid">
+            
+            <!-- Growth Plan -->
+            <div class="glass-panel plan-card">
+                <div class="pc-header">
+                    <div class="pc-title">Growth Plan</div>
+                    <span class="pc-badge badge-blue">Monthly</span>
+                </div>
+                <div class="pc-body">
+                    <form onsubmit="savePlan(event, 'employer_growth')">
+                        <div class="flex-row">
+                            <div class="form-group">
+                                <label class="form-label">Price (Ksh)</label>
+                                <input type="number" class="form-input" id="e-gro-price" value="500">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Job Post Limit</label>
+                                <input type="number" class="form-input" id="e-gro-limit" value="5">
+                            </div>
+                        </div>
+
+                        <div class="feature-list">
+                            <div class="form-label" style="margin-bottom:15px; color:var(--gold-base);">Feature Config</div>
+                            <div class="feature-item">
+                                <span>Verified Company</span>
+                                <label class="toggle-switch"><input type="checkbox" id="e-gro-verified" checked><span class="slider"></span></label>
+                            </div>
+                            <div class="feature-item">
+                                <span>Access CV Database</span>
+                                <label class="toggle-switch"><input type="checkbox" id="e-gro-cv" checked><span class="slider"></span></label>
+                            </div>
+                            <div class="feature-item">
+                                <span>Featured Jobs</span>
+                                <label class="toggle-switch"><input type="checkbox" id="e-gro-feat"><span class="slider"></span></label>
+                            </div>
+                        </div>
+                        <div class="pc-footer">
+                            <button type="submit" class="btn-save">Update Plan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Scale Plan -->
+            <div class="glass-panel plan-card">
+                <div class="pc-header">
+                    <div class="pc-title">Scale Plan</div>
+                    <span class="pc-badge badge-gold">Monthly</span>
+                </div>
+                <div class="pc-body">
+                    <form onsubmit="savePlan(event, 'employer_scale')">
+                        <div class="flex-row">
+                            <div class="form-group">
+                                <label class="form-label">Price (Ksh)</label>
+                                <input type="number" class="form-input" id="e-scl-price" value="1100">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Job Post Limit</label>
+                                <input type="number" class="form-input" id="e-scl-limit" value="9999">
+                            </div>
+                        </div>
+
+                        <div class="feature-list">
+                            <div class="form-label" style="margin-bottom:15px; color:var(--gold-base);">Feature Config</div>
+                            <div class="feature-item">
+                                <span>Verified Company</span>
+                                <label class="toggle-switch"><input type="checkbox" id="e-scl-verified" checked><span class="slider"></span></label>
+                            </div>
+                            <div class="feature-item">
+                                <span>Access CV Database</span>
+                                <label class="toggle-switch"><input type="checkbox" id="e-scl-cv" checked><span class="slider"></span></label>
+                            </div>
+                            <div class="feature-item">
+                                <span>Featured Jobs</span>
+                                <label class="toggle-switch"><input type="checkbox" id="e-scl-feat" checked><span class="slider"></span></label>
+                            </div>
+                        </div>
+                        <div class="pc-footer">
+                            <button type="submit" class="btn-save">Update Plan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:30px; text-align:center; font-family:var(--font-display); opacity:0.7;">
+            <i class="fas fa-info-circle" style="color:var(--blue);"></i> Changes affect system logic immediately.
+        </p>
+
+    </main>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install Admin App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add to home screen for quick access.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, getDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+
+        // --- UI UTILS ---
+        window.toggleSidebar = () => { 
+            document.getElementById('sidebar').classList.toggle('active'); 
+            document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
+        };
+        
+        window.logout = () => {
+            if(confirm("Confirm Log Out?")) {
+                signOut(auth).then(() => window.location.href = 'signin.html');
+            }
+        };
+
+        // --- TABS ---
+        window.switchTab = (tab) => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.plans-grid').forEach(g => g.classList.remove('active'));
+            
+            if(tab === 'seeker') {
+                document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+                document.getElementById('seeker-grid').classList.add('active');
+            } else {
+                document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+                document.getElementById('employer-grid').classList.add('active');
+            }
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'signin.html'; return; }
+            initPlans();
+            initBadges();
+        });
+
+        function initBadges() {
+            const txQ = query(collection(db, "transactions"), where("status", "==", "pending"));
+            onSnapshot(txQ, s => {
+                const b = document.getElementById('notif-badge');
+                if(s.size > 0) { b.innerText = s.size; b.style.display = 'flex'; } else b.style.display = 'none';
+            });
+            const msgQ = query(collection(db, "support_tickets"), where("status", "==", "open"));
+             onSnapshot(msgQ, (snap) => {
+                const badge = document.getElementById('msg-badge');
+                if(snap.size > 0) { badge.innerText = snap.size; badge.style.display = 'flex'; } else badge.style.display = 'none';
+            });
+        }
+
+        async function initPlans() {
+            const planIds = ['seeker_standard', 'seeker_pro', 'employer_growth', 'employer_scale'];
+            for(const pid of planIds) {
+                try {
+                    const snap = await getDoc(doc(db, "plans", pid));
+                    if(snap.exists()) {
+                        const d = snap.data();
+                        if(pid === 'seeker_standard') {
+                            setVal('s-std-price', d.price); setVal('s-std-limit', d.limit);
+                            setCheck('s-std-verified', d.verified); setCheck('s-std-sms', d.sms); setCheck('s-std-dm', d.dm);
+                        }
+                        if(pid === 'seeker_pro') {
+                            setVal('s-pro-price', d.price); setVal('s-pro-limit', d.limit);
+                            setCheck('s-pro-verified', d.verified); setCheck('s-pro-sms', d.sms); setCheck('s-pro-dm', d.dm);
+                        }
+                        if(pid === 'employer_growth') {
+                            setVal('e-gro-price', d.price); setVal('e-gro-limit', d.limit);
+                            setCheck('e-gro-verified', d.verified); setCheck('e-gro-cv', d.cvAccess); setCheck('e-gro-feat', d.featured);
+                        }
+                        if(pid === 'employer_scale') {
+                            setVal('e-scl-price', d.price); setVal('e-scl-limit', d.limit);
+                            setCheck('e-scl-verified', d.verified); setCheck('e-scl-cv', d.cvAccess); setCheck('e-scl-feat', d.featured);
+                        }
+                    }
+                } catch(e) { console.log("Init plan error", e); }
+            }
+        }
+
+        function setVal(id, val) { if(val !== undefined) document.getElementById(id).value = val; }
+        function setCheck(id, val) { if(val !== undefined) document.getElementById(id).checked = val; }
+        
+        const getVal = (id) => Number(document.getElementById(id).value);
+        const getCheck = (id) => document.getElementById(id).checked;
+
+        window.savePlan = async (e, planId) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('.btn-save');
+            const originalText = btn.innerText;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...'; btn.disabled = true;
+
+            let data = {};
+            if(planId === 'seeker_standard') {
+                data = { price: getVal('s-std-price'), limit: getVal('s-std-limit'), verified: getCheck('s-std-verified'), sms: getCheck('s-std-sms'), dm: getCheck('s-std-dm') };
+            } else if(planId === 'seeker_pro') {
+                data = { price: getVal('s-pro-price'), limit: getVal('s-pro-limit'), verified: getCheck('s-pro-verified'), sms: getCheck('s-pro-sms'), dm: getCheck('s-pro-dm') };
+            } else if(planId === 'employer_growth') {
+                data = { price: getVal('e-gro-price'), limit: getVal('e-gro-limit'), verified: getCheck('e-gro-verified'), cvAccess: getCheck('e-gro-cv'), featured: getCheck('e-gro-feat') };
+            } else if(planId === 'employer_scale') {
+                data = { price: getVal('e-scl-price'), limit: getVal('e-scl-limit'), verified: getCheck('e-scl-verified'), cvAccess: getCheck('e-scl-cv'), featured: getCheck('e-scl-feat') };
+            }
+
+            try {
+                await setDoc(doc(db, "plans", planId), { ...data, updatedAt: new Date() }, { merge: true });
+                Toastify({ text: "Plan Config Updated!", style: { background: "#10B981" } }).showToast();
+            } catch(err) {
+                console.error(err);
+                Toastify({ text: "Error: " + err.message, style: { background: "#EF4444" } }).showToast();
+            } finally {
+                btn.innerText = originalText; btn.disabled = false;
+            }
+        };
+
+        // --- PWA LOGIC ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('pwa-install-popup').style.display = 'block';
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('pwa-install-popup').style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            document.getElementById('pwa-install-popup').style.display = 'none';
+        };
+
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
+        }
+    </script>
+</body>
+</html>

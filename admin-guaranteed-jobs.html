@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Guaranteed Placements | EastLink Admin</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0F172A">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Executive Theme */
+            --bg-body: #0F172A;       
+            --bg-card: rgba(30, 41, 59, 0.65);
+            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.95);
+            --bg-input: rgba(255, 255, 255, 0.07);
+            --bg-hover: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8; 
+            --gold-base: #D97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --neon-purple: #8b5cf6;
+            --success: #10B981;
+            --danger: #EF4444;
+            
+            /* DIMENSIONS */
+            --sidebar-width: 260px; 
+            --header-height: 70px;
+            
+            --radius: 16px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background-image: url('assets/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Utils */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 24px; z-index: 1000;
+        }
+        
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .logo { 
+            font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.25rem;
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; 
+        }
+        .logo span { color: var(--gold-base); }
+        .admin-badge { 
+            font-family: var(--font-body); font-size: 0.6rem; background: rgba(217, 119, 6, 0.15); 
+            border: 1px solid rgba(217, 119, 6, 0.3); padding: 3px 8px; border-radius: 6px; 
+            margin-left: 10px; color: var(--gold-base); letter-spacing: 0.5px; font-weight: 600;
+        }
+        .hamburger { font-size: 1.4rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+        .icon-btn { 
+            width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; font-size: 1rem;
+            color: var(--text-muted); cursor: pointer; transition: all 0.3s; position: relative;
+        }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); }
+        .notification-badge { 
+            position: absolute; top: 5px; right: 5px; min-width: 16px; height: 16px; 
+            background: var(--danger); border-radius: 10px; font-size: 0.6rem; color: white; 
+            font-weight: 700; display: none; place-items: center; justify-content: center;
+            padding: 0 3px; border: 2px solid var(--bg-card);
+        }
+        .profile-widget {
+            width: 42px; height: 42px; background: var(--bg-input); border-radius: 12px; 
+            display: grid; place-items: center; border: 1px solid var(--border-color); 
+            color: var(--gold-base); font-size: 1.1rem; cursor: pointer; margin-left: 8px;
+        }
+        .profile-widget:hover { background: var(--bg-hover); border-color: var(--gold-base); }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 20px 0; overflow-y: auto; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+        .nav-group { padding: 0 24px; margin-bottom: 20px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-item { 
+            display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.9rem; transition: all 0.3s ease; border-radius: 10px; margin-bottom: 4px;
+        }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
+        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
+        .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
+
+        /* --- MAIN CONTENT --- */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
+        
+        .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
+        .page-title h1 { font-family: var(--font-head); font-size: 1.8rem; color: var(--text-main); margin-bottom: 8px; display:flex; align-items:center; gap:10px; }
+        .page-title p { color: var(--text-muted); font-size: 0.95rem; }
+
+        .btn-action { 
+            background: var(--success); color: white; border: none; padding: 12px 24px; border-radius: 12px; 
+            font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; 
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); transition: 0.3s; font-size: 0.95rem;
+        }
+        .btn-action:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+        /* STATS */
+        .quick-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .qs-card { padding: 25px; display: flex; align-items: center; gap: 20px; }
+        .qs-icon { 
+            width: 55px; height: 55px; border-radius: 14px; display: grid; place-items: center; 
+            font-size: 1.6rem; background: var(--bg-input); border: 1px solid var(--border-color);
+        }
+        .qs-info h4 { font-size: 1.8rem; font-weight: 700; margin: 0; font-family: var(--font-display); line-height: 1; color: var(--text-main); }
+        .qs-info span { font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 5px; display: block; }
+
+        /* APPLICANT GRID */
+        .app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; padding-bottom: 30px; }
+        .app-card {
+            padding: 24px; position: relative; display: flex; flex-direction: column; cursor: pointer;
+            border-top: 3px solid var(--success); /* Green for Guaranteed */
+        }
+        .app-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        
+        .app-status { 
+            position: absolute; top: 20px; right: 20px; font-size: 0.7rem; padding: 4px 12px; 
+            border-radius: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; 
+            border: 1px solid transparent;
+        }
+        .st-pending { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border-color: rgba(251, 191, 36, 0.3); }
+        .st-placed { background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
+        .st-rejected { background: rgba(239, 68, 68, 0.1); color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
+
+        .seeker-name { font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px; font-family: var(--font-head); }
+        .seeker-detail { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .seeker-detail i { color: var(--gold-base); width: 18px; text-align: center; }
+
+        .app-footer { 
+            margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color); 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
+        .time-ago { font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-display); font-weight: 600; }
+        
+        .btn-msg-card { 
+            padding: 8px 16px; font-size: 0.8rem; background: var(--bg-input); color: var(--text-main); 
+            border-radius: 20px; font-weight: 600; text-decoration: none; transition: 0.2s; border: 1px solid var(--border-color);
+            display: flex; align-items: center; gap: 8px; position: relative;
+        }
+        .btn-msg-card:hover { background: var(--gold-base); color: white; border-color: var(--gold-base); }
+        
+        .card-badge {
+            background: var(--danger); color: white; border-radius: 50%; width: 20px; height: 20px;
+            display: grid; place-items: center; font-size: 0.65rem; position: absolute; top: -8px; right: -8px; 
+            font-weight: bold; border: 2px solid var(--bg-card);
+        }
+
+        /* MODAL */
+        .modal-overlay { 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); 
+            z-index: 2000; backdrop-filter: blur(8px); justify-content: center; align-items: center; padding: 20px; 
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-card { 
+            background: var(--bg-glass-heavy); width: 100%; max-width: 1100px; height: 85vh; 
+            border-radius: var(--radius); border: 1px solid var(--border-color); overflow: hidden; 
+            display: flex; flex-direction: column; box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+        
+        .modal-header { 
+            padding: 20px 30px; border-bottom: 1px solid var(--border-color); display: flex; 
+            justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.95); 
+        }
+        .modal-header h3 { font-family: var(--font-head); color: var(--text-main); margin: 0; font-size: 1.3rem; }
+        
+        .modal-body-split { display: flex; flex-grow: 1; overflow: hidden; }
+        
+        /* Modal Left */
+        .left-panel { 
+            width: 380px; background: rgba(30, 41, 59, 0.3); border-right: 1px solid var(--border-color); 
+            padding: 30px; overflow-y: auto; display: flex; flex-direction: column; 
+        }
+        .panel-label { 
+            font-size: 0.75rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; 
+            margin-top: 25px; margin-bottom: 12px; letter-spacing: 1px; 
+        }
+        .info-box { 
+            background: var(--bg-input); border: 1px solid var(--border-color); padding: 15px; 
+            border-radius: 12px; font-size: 0.95rem; color: var(--text-main); margin-bottom: 8px; 
+        }
+        
+        /* Modal Right (Chat) */
+        .right-panel { 
+            flex: 1; background: var(--bg-body); display: flex; flex-direction: column; position: relative;
+        }
+        .chat-container { flex-grow: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        
+        .message { max-width: 80%; padding: 14px 18px; border-radius: 16px; font-size: 0.95rem; line-height: 1.5; position: relative; }
+        .msg-admin { align-self: flex-end; background: var(--gold-gradient); color: #000; border-bottom-right-radius: 4px; font-weight: 500; }
+        .msg-seeker { align-self: flex-start; background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-color); border-bottom-left-radius: 4px; }
+        .msg-time { font-size: 0.7rem; margin-top: 6px; opacity: 0.7; text-align: right; display: block; font-family: var(--font-display); }
+        .msg-seeker .msg-time { text-align: left; }
+
+        .chat-input-area { 
+            padding: 25px; background: rgba(15, 23, 42, 0.95); border-top: 1px solid var(--border-color); 
+            display: flex; gap: 15px; align-items: center; backdrop-filter: blur(10px);
+        }
+        .chat-input { 
+            flex: 1; background: var(--bg-input); border: 1px solid var(--border-color); 
+            padding: 14px 24px; border-radius: 30px; color: var(--text-main); outline: none; 
+            font-family: var(--font-body); transition: 0.3s; font-size: 0.95rem;
+        }
+        .chat-input:focus { border-color: var(--gold-base); background: var(--bg-hover); }
+        
+        .btn-send { 
+            width: 50px; height: 50px; border-radius: 50%; background: var(--gold-gradient); 
+            color: #000; border: none; cursor: pointer; display: grid; place-items: center; 
+            transition: 0.3s; font-size: 1.2rem;
+        }
+        .btn-send:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(217, 119, 6, 0.4); }
+        
+        .btn-ai {
+            width: 45px; height: 45px; border-radius: 50%; border: 1px solid var(--neon-purple); 
+            font-weight: 600; cursor: pointer; background: rgba(139, 92, 246, 0.1); color: var(--neon-purple); 
+            display: grid; place-items: center; transition: 0.3s; font-size: 1.1rem;
+        }
+        .btn-ai:hover { background: var(--neon-purple); color: white; box-shadow: 0 0 15px rgba(139, 92, 246, 0.4); }
+
+        .action-row { margin-top: auto; padding-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn-panel { 
+            padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none; 
+            font-size: 0.85rem; transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; 
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-approve { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid var(--success); }
+        .btn-approve:hover { background: var(--success); color: white; box-shadow: 0 5px 20px rgba(16, 185, 129, 0.3); }
+        .btn-reject { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+        .btn-reject:hover { background: var(--danger); color: white; }
+
+        /* AI POPUP */
+        .ai-popup { 
+            position: absolute; bottom: 90px; left: 30px; right: 30px; background: var(--bg-glass-heavy); 
+            border: 1px solid var(--neon-purple); border-radius: 15px; padding: 25px; 
+            box-shadow: 0 -10px 40px rgba(139, 92, 246, 0.15); z-index: 200; display: none; 
+        }
+        .ai-step { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .ai-step i { color: var(--neon-purple); }
+
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 998; backdrop-filter: blur(4px); }
+
+        /* PWA Popup */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 20px 10px; width: 100%; }
+            .modal-card { height: 100%; max-width: 100%; border-radius: 0; border: none; }
+            .modal-body-split { flex-direction: column; }
+            .left-panel { width: 100%; height: auto; max-height: 40vh; border-right: none; border-bottom: 1px solid var(--border-color); }
+            .right-panel { height: 60vh; }
+            .hamburger { display: block; }
+            .header-left { gap: 10px; }
+            .action-row { padding-top: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="admin-dashboard.html" class="logo">East<span>Link</span> <span class="admin-badge">ADMIN</span></a>
+        </div>
+        
+        <div class="header-actions">
+            <div class="icon-btn" onclick="location.href='admin-support.html'" title="Support Tickets">
+                <i class="fa-solid fa-envelope"></i>
+                <div class="notification-badge" id="msg-badge">0</div>
+            </div>
+            <div class="icon-btn" onclick="location.href='admin-notifications.html'" title="System Alerts">
+                <i class="fa-solid fa-bell"></i>
+                <div class="notification-badge" id="notif-badge">0</div>
+            </div>
+            <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Analytics</div>
+            <a href="admin-dashboard.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        </div>
+        
+        <div class="nav-group">
+            <div class="nav-label">User Management</div>
+            <a href="admin-users.html" class="nav-item"><i class="fa-solid fa-users"></i> Manage Users</a>
+            <a href="admin-plans.html" class="nav-item"><i class="fa-solid fa-tags"></i> Manage Plans</a>
+            <a href="admin-referrals.html" class="nav-item"><i class="fa-solid fa-share-nodes"></i> Referrals</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Jobs & Service</div>
+            <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
+            <a href="admin-guaranteed-jobs.html" class="nav-item active"><i class="fa-solid fa-certificate"></i> Guaranteed Jobs</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Vacancy</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="admin-deposits.html" class="nav-item"><i class="fa-solid fa-arrow-down"></i> Deposits</a>
+            <a href="admin-withdrawals.html" class="nav-item"><i class="fa-solid fa-arrow-up"></i> Withdrawals</a>
+            <a href="admin-deposit-issues.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> Errors</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">System</div>
+            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
+            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
+            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- MAIN -->
+    <main>
+        <div class="page-header animate__animated animate__fadeInDown">
+            <div class="page-title">
+                <h1><i class="fas fa-shield-alt" style="color:var(--success)"></i> Guaranteed Placements</h1>
+                <p>Manage seekers applying for verified placement opportunities.</p>
+            </div>
+            <a href="admin-post-guaranteed.html" class="btn-action">
+                <i class="fas fa-plus-circle"></i> Post Vacancy
+            </a>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="quick-stats animate__animated animate__fadeInUp">
+            <div class="glass-panel qs-card">
+                <div class="qs-icon" style="color:var(--gold-base);"><i class="fas fa-clock"></i></div>
+                <div class="qs-info">
+                    <h4 id="stat-pending">--</h4>
+                    <span>Pending Review</span>
+                </div>
+            </div>
+            <div class="glass-panel qs-card">
+                <div class="qs-icon" style="color:var(--success);"><i class="fas fa-check-circle"></i></div>
+                <div class="qs-info">
+                    <h4 id="stat-approved">--</h4>
+                    <span>Successful Placements</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Applicant Grid -->
+        <div id="app-grid" class="app-grid animate__animated animate__fadeInUp animate__delay-1s">
+            <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted); opacity:0.6;">
+                <i class="fas fa-circle-notch fa-spin fa-2x"></i> <br><br> Loading guaranteed applications...
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Review & Chat Modal -->
+    <div class="modal-overlay" id="appModal">
+        <div class="modal-card animate__animated animate__zoomIn">
+            <div class="modal-header">
+                <div style="display:flex; flex-direction:column;">
+                    <h3 id="header-name">Applicant Name</h3>
+                    <span id="header-status" style="font-size:0.75rem; color:var(--gold-base); font-family:var(--font-display); margin-top:4px;">LOADING...</span>
+                </div>
+                <i class="fas fa-times" onclick="closeModal()" style="cursor:pointer; color:var(--text-muted); font-size:1.4rem; transition:0.2s;"></i>
+            </div>
+            
+            <div class="modal-body-split">
+                <!-- Left: Details -->
+                <div class="left-panel">
+                    <div class="panel-label"><i class="fas fa-address-card"></i> Contact Info</div>
+                    <div class="info-box"><i class="fas fa-envelope" style="color:var(--gold-base); width:20px;"></i> <span id="v-email">...</span></div>
+                    <div class="info-box"><i class="fas fa-phone" style="color:var(--gold-base); width:20px;"></i> <span id="v-phone">...</span></div>
+                    <div class="info-box"><i class="fas fa-map-marker-alt" style="color:var(--gold-base); width:20px;"></i> <span id="v-location">...</span></div>
+
+                    <div class="panel-label"><i class="fas fa-briefcase"></i> Job Applied For</div>
+                    <div class="info-box" style="font-weight:700; color:var(--success);">
+                        <span id="v-pref">...</span>
+                    </div>
+
+                    <div class="action-row" id="action-buttons">
+                        <button class="btn-panel btn-reject" onclick="updateStatus('rejected')"><i class="fas fa-times"></i> Reject</button>
+                        <button class="btn-panel btn-approve" onclick="updateStatus('placed')"><i class="fas fa-check"></i> Mark Placed</button>
+                    </div>
+                </div>
+
+                <!-- Right: Chat -->
+                <div class="right-panel">
+                    <div class="chat-container" id="chat-container">
+                        <!-- Chats Load Here -->
+                    </div>
+                    
+                    <!-- AI Assistant Overlay -->
+                    <div class="ai-popup" id="ai-popup">
+                        <div style="color:var(--neon-purple); font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+                            <i class="fas fa-brain fa-spin"></i> AI Assistant
+                        </div>
+                        <div id="ai-steps"></div>
+                    </div>
+
+                    <div class="chat-input-area">
+                        <button class="btn-ai" onclick="generateAIReply()" title="Generate AI Reply"><i class="fas fa-wand-magic-sparkles"></i></button>
+                        <input type="text" id="msg-input" class="chat-input" placeholder="Type a message to applicant..." autocomplete="off">
+                        <button class="btn-send" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add to home screen for quick access.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, getDocs, collection, query, where, onSnapshot, updateDoc, addDoc, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+
+        let currentAppId = null;
+        let currentSeekerId = null;
+        let currentSeekerDetails = {}; 
+        let currentChatId = null;
+        let currentAdminId = null;
+        let chatUnsub = null;
+
+        // --- UI UTILS ---
+        window.toggleSidebar = () => { 
+            document.getElementById('sidebar').classList.toggle('active'); 
+            document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
+        };
+        
+        window.logout = () => {
+            if(confirm("Confirm Log Out?")) {
+                signOut(auth).then(() => window.location.href = 'signin.html');
+            }
+        };
+
+        onAuthStateChanged(auth, (u) => {
+            if(!u) { window.location.href='signin.html'; return; }
+            currentAdminId = u.uid;
+            initBadges();
+            initApplications();
+        });
+
+        function initBadges() {
+            const txQ = query(collection(db, "transactions"), where("status", "==", "pending"));
+            onSnapshot(txQ, s => {
+                const b = document.getElementById('notif-badge');
+                if(s.size > 0) { b.innerText = s.size; b.style.display = 'flex'; } else b.style.display = 'none';
+            });
+            const msgQ = query(collection(db, "support_tickets"), where("status", "==", "open"));
+             onSnapshot(msgQ, (snap) => {
+                const badge = document.getElementById('msg-badge');
+                if(snap.size > 0) { badge.innerText = snap.size; badge.style.display = 'flex'; } else badge.style.display = 'none';
+            });
+        }
+
+        function initApplications() {
+            const grid = document.getElementById('app-grid');
+            const q = collection(db, "applications");
+            
+            onSnapshot(q, (snap) => {
+                if(snap.empty) {
+                    renderEmpty(grid);
+                    return;
+                }
+
+                let apps = [];
+                snap.forEach(docSnap => { apps.push({ id: docSnap.id, ...docSnap.data() }); });
+                
+                // FILTER: Only show "Guaranteed" applications
+                const guaranteedApps = apps.filter(a => a.listingType === 'guaranteed' || a.category === 'guaranteed');
+
+                if(guaranteedApps.length === 0) {
+                    renderEmpty(grid);
+                    return;
+                }
+
+                guaranteedApps.sort((a, b) => (b.appliedAt?.seconds || 0) - (a.appliedAt?.seconds || 0));
+
+                grid.innerHTML = '';
+                let counts = { pending: 0, placed: 0 };
+
+                guaranteedApps.forEach(d => {
+                    const status = (d.status || 'pending').toLowerCase();
+                    if(status === 'pending') counts.pending++;
+                    else if(status === 'placed') counts.placed++;
+
+                    let badge = 'st-pending';
+                    if(status === 'placed') badge = 'st-placed';
+                    if(status === 'rejected') badge = 'st-rejected';
+
+                    const dateStr = d.appliedAt ? new Date(d.appliedAt.seconds*1000).toLocaleDateString() : 'Recent';
+                    const safeName = (d.seekerName || 'User').replace(/'/g, "\\'");
+                    const unreadCount = d.unreadCount || 0;
+                    const badgeHtml = unreadCount > 0 ? `<div class="card-badge">${unreadCount}</div>` : '';
+                    const jobRole = d.jobTitle || d.jobPreference || 'Guaranteed Role';
+                    const userLoc = d.city || d.location || 'N/A';
+
+                    grid.innerHTML += `
+                        <div class="glass-panel app-card animate__animated animate__fadeInUp" onclick="openAppModal('${d.id}', '${d.seekerId}', '${safeName}', '${d.seekerEmail || ''}', '${d.phone || ''}', '${userLoc}', '${jobRole}', '${status}')">
+                            <div class="app-status ${badge}">${status === 'placed' ? 'Placed' : status}</div>
+                            <div class="seeker-name">${d.seekerName || 'Unknown'}</div>
+                            <div class="seeker-detail"><i class="fas fa-briefcase"></i> ${jobRole}</div>
+                            <div class="seeker-detail"><i class="fas fa-map-marker-alt"></i> ${userLoc}</div>
+                            <div class="app-footer">
+                                <span class="time-ago">${dateStr}</span>
+                                <span class="btn-msg-card">
+                                    <i class="far fa-comment-dots"></i> Review
+                                    ${badgeHtml}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                document.getElementById('stat-pending').innerText = counts.pending;
+                document.getElementById('stat-approved').innerText = counts.placed;
+            });
+        }
+
+        function renderEmpty(grid) {
+             grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:60px; color:var(--text-muted);">
+                <i class="fas fa-folder-open fa-3x" style="margin-bottom:20px; opacity:0.3;"></i>
+                <p>No guaranteed placement applications yet.</p>
+            </div>`;
+            document.getElementById('stat-pending').innerText = "0";
+            document.getElementById('stat-approved').innerText = "0";
+        }
+
+        // --- MODAL LOGIC ---
+        window.openAppModal = (appId, seekerId, name, email, phone, loc, pref, status) => {
+            currentAppId = appId;
+            currentSeekerId = seekerId;
+            currentSeekerDetails = { name, email, pref, status }; 
+            currentChatId = null;
+
+            document.getElementById('header-name').innerText = name;
+            document.getElementById('header-status').innerText = (status === 'placed' ? 'SUCCESSFUL PLACEMENT' : status.toUpperCase());
+            document.getElementById('header-status').style.color = status === 'placed' ? 'var(--success)' : 'var(--gold-base)';
+            
+            document.getElementById('v-email').innerText = email || '-';
+            document.getElementById('v-phone').innerText = phone || '-';
+            document.getElementById('v-location').innerText = loc || '-';
+            document.getElementById('v-pref').innerText = pref || '-';
+
+            const btns = document.getElementById('action-buttons');
+            if(status !== 'pending') btns.style.display = 'none';
+            else btns.style.display = 'grid';
+
+            document.getElementById('appModal').classList.add('active');
+            
+            try { updateDoc(doc(db, "applications", appId), { unreadCount: 0 }); } catch(e){}
+            findChatSession(appId, seekerId, name, pref);
+        };
+
+        window.closeModal = () => {
+            document.getElementById('appModal').classList.remove('active');
+            if(chatUnsub) chatUnsub();
+            currentAppId = null;
+            currentChatId = null;
+        };
+
+        // --- CHAT LOGIC ---
+        async function findChatSession(appId, seekerId, seekerName, jobTitle) {
+            const container = document.getElementById('chat-container');
+            container.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-muted);"><i class="fas fa-circle-notch fa-spin"></i> Retrieving history...</div>';
+            if(chatUnsub) chatUnsub();
+
+            try {
+                // Check for existing chat related to this application
+                const q = query(collection(db, "chats"), where("participants", "array-contains", seekerId));
+                const snap = await getDocs(q);
+                let chatFound = false;
+
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    // Match specifically by application ID or match a generic chat with this user if no app ID exists
+                    if (data.applicationId === appId || (data.jobId === appId)) {
+                        currentChatId = doc.id;
+                        chatFound = true;
+                    }
+                });
+
+                if (chatFound && currentChatId) {
+                    subscribeToMessages(currentChatId);
+                } else {
+                    container.innerHTML = `<div style="text-align:center; margin-top:60px; color:var(--text-muted); font-size:0.9rem;">
+                        <i class="far fa-comments fa-2x" style="margin-bottom:15px; opacity:0.5;"></i><br>
+                        Start the interview process for this guaranteed placement.
+                    </div>`;
+                }
+            } catch (error) {
+                console.error("Error finding chat:", error);
+                container.innerHTML = `<div style="text-align:center; color:var(--danger);">Error loading chat.</div>`;
+            }
+        }
+
+        function subscribeToMessages(chatId) {
+            const container = document.getElementById('chat-container');
+            const q = query(collection(db, "messages"), where("chatId", "==", chatId));
+
+            chatUnsub = onSnapshot(q, (snap) => {
+                const msgs = [];
+                snap.forEach(d => msgs.push(d.data()));
+                // Sort by timestamp
+                msgs.sort((a,b) => (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0));
+
+                container.innerHTML = '';
+                if(msgs.length === 0) {
+                    container.innerHTML = `<div style="text-align:center; margin-top:60px; color:var(--text-muted);">No messages yet.</div>`;
+                    return;
+                }
+
+                msgs.forEach(m => {
+                    const isMe = m.senderId === currentAdminId || m.senderId === 'admin';
+                    const bubble = document.createElement('div');
+                    bubble.className = `message ${isMe ? 'msg-admin' : 'msg-seeker'} animate__animated animate__fadeInUp`;
+                    bubble.style.animationDuration = '0.3s';
+                    
+                    // Format text to handle newlines
+                    const formattedText = (m.text || "").replace(/\n/g, '<br>');
+                    
+                    bubble.innerHTML = `
+                        ${formattedText}
+                        <span class="msg-time">${m.timestamp ? new Date(m.timestamp.seconds*1000).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'Just now'}</span>
+                    `;
+                    container.appendChild(bubble);
+                });
+                container.scrollTop = container.scrollHeight;
+            });
+        }
+
+        window.sendMessage = async () => {
+            const box = document.getElementById('msg-input');
+            const txt = box.value.trim();
+            if(!txt || !currentAppId) return;
+
+            try {
+                // Create chat if it doesn't exist
+                if (!currentChatId) {
+                    const chatData = {
+                        participants: [currentAdminId, currentSeekerId],
+                        seekerId: currentSeekerId,
+                        employerId: currentAdminId, 
+                        applicationId: currentAppId, 
+                        jobId: currentAppId, 
+                        seekerName: currentSeekerDetails.name || "Seeker",
+                        employerName: "EastLink Admin",
+                        jobTitle: currentSeekerDetails.pref || "Guaranteed Placement",
+                        lastMessage: txt,
+                        lastUpdated: serverTimestamp(),
+                        isRead: false,
+                        lastSenderId: currentAdminId
+                    };
+                    const newChat = await addDoc(collection(db, "chats"), chatData);
+                    currentChatId = newChat.id;
+                    subscribeToMessages(currentChatId);
+                } else {
+                    await updateDoc(doc(db, "chats", currentChatId), {
+                        lastMessage: txt, 
+                        lastUpdated: serverTimestamp(), 
+                        isRead: false, 
+                        lastSenderId: currentAdminId
+                    });
+                }
+
+                // Add message
+                await addDoc(collection(db, "messages"), {
+                    chatId: currentChatId, 
+                    text: txt, 
+                    senderId: currentAdminId, 
+                    receiverId: currentSeekerId, 
+                    timestamp: serverTimestamp(), 
+                    read: false
+                });
+
+                // Update application meta
+                await updateDoc(doc(db, "applications", currentAppId), { 
+                    lastAdminReply: serverTimestamp(), 
+                    // Ensure status stays consistent unless manually changed
+                    status: currentSeekerDetails.status 
+                });
+                
+                box.value = '';
+            } catch(e) { 
+                console.error(e); 
+                Toastify({text:"Error sending message", style:{background:"var(--danger)"}}).showToast(); 
+            }
+        };
+
+        // Send on Enter key
+        document.getElementById('msg-input').addEventListener('keypress', (e) => { 
+            if(e.key==='Enter') sendMessage(); 
+        });
+
+        // --- AI ASSISTANT ---
+        window.generateAIReply = async () => {
+            const popup = document.getElementById('ai-popup');
+            const steps = document.getElementById('ai-steps');
+            const input = document.getElementById('msg-input');
+            
+            popup.style.display = 'block';
+            steps.innerHTML = '';
+            
+            // Visual Feedback
+            const actions = ["Analyzing applicant profile...", "Checking placement status...", "Drafting professional response..."];
+            for(let a of actions) {
+                steps.innerHTML += `<div class="ai-step animate__animated animate__fadeInLeft"><i class="fas fa-check-circle"></i> ${a}</div>`;
+                await new Promise(r => setTimeout(r, 600));
+            }
+
+            const { name, pref, status } = currentSeekerDetails;
+            const firstName = name ? name.split(' ')[0] : "Applicant";
+            let replyText = "";
+
+            if (status === 'pending') {
+                replyText = `Hello ${firstName}, thank you for your application regarding the ${pref} placement. We have reviewed your profile and would like to schedule a verification call. Are you available tomorrow?`;
+            } else if (status === 'placed') {
+                replyText = `Congratulations ${firstName}! We are pleased to inform you that your placement for ${pref} has been confirmed. We will be sending over the onboarding documents shortly. Welcome aboard!`;
+            } else if (status === 'rejected') {
+                replyText = `Dear ${firstName}, thank you for your interest in the ${pref} opportunity. After careful consideration, we have decided to proceed with other candidates who more closely match our current requirements. We wish you the best in your search.`;
+            } else {
+                replyText = `Hello ${firstName}, following up on your application. Do you have any pending documents you need to submit?`;
+            }
+
+            setTimeout(() => {
+                popup.style.display = 'none';
+                input.value = replyText;
+                input.focus();
+            }, 500);
+        };
+
+        // --- STATUS UPDATE ---
+        window.updateStatus = async (status) => {
+            if(!currentAppId) return;
+            
+            // Map 'placed' to 'approved' if necessary, or keep 'placed' as the specific status for guaranteed jobs.
+            // Using 'placed' for display and logic consistency.
+            const actionText = status === 'placed' ? 'Mark as Placed' : 'Reject Application';
+            
+            if(!confirm(`Are you sure you want to ${actionText}? This will notify the user immediately.`)) return;
+
+            try {
+                // 1. Update Application Doc
+                await updateDoc(doc(db, "applications", currentAppId), { 
+                    status: status, 
+                    reviewedAt: serverTimestamp(), 
+                    unreadCount: 1 
+                });
+
+                // 2. Update Local State & UI
+                currentSeekerDetails.status = status;
+                const statusDisplay = status === 'placed' ? 'SUCCESSFUL PLACEMENT' : 'REJECTED';
+                const statusEl = document.getElementById('header-status');
+                
+                statusEl.innerText = statusDisplay;
+                statusEl.style.color = status === 'placed' ? 'var(--success)' : 'var(--danger)';
+                
+                // Hide buttons since decision is made
+                document.getElementById('action-buttons').style.display = 'none';
+
+                // 3. Auto-Send System Message
+                const { name, pref } = currentSeekerDetails;
+                const firstName = name ? name.split(' ')[0] : "Applicant";
+                
+                let msg = "";
+                if (status === 'placed') {
+                    msg = `✨ **SYSTEM NOTIFICATION**: Congratulations ${firstName}! Your application for Guaranteed Placement (${pref}) has been marked as SUCCESSFUL. An agent will contact you shortly for onboarding.`;
+                } else {
+                    msg = `**SYSTEM NOTIFICATION**: Dear ${firstName}, regarding your application for ${pref}. We regret to inform you that your application was not successful at this time.`;
+                }
+
+                // Inject message directly into input and send
+                const box = document.getElementById('msg-input');
+                box.value = msg;
+                await sendMessage(); // This handles Firestore addDoc for the message
+
+                Toastify({
+                    text: `Application updated to: ${status.toUpperCase()}`, 
+                    style:{background: status === 'placed' ? "var(--success)" : "var(--danger)"}
+                }).showToast();
+
+            } catch(e) {
+                console.error("Update failed", e);
+                Toastify({text:"Update Failed", style:{background:"var(--danger)"}}).showToast();
+            }
+        };
+
+        // --- PWA LOGIC ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('pwa-install-popup').style.display = 'block';
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('pwa-install-popup').style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            document.getElementById('pwa-install-popup').style.display = 'none';
+        };
+
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Concierge Support | EastLink Recruiters</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#020617">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Theme Variables */
+            --bg-body: #020617;       
+            --bg-card: #0f172a; 
+            --bg-glass: rgba(15, 23, 42, 0.95); 
+            --bg-glass-heavy: rgba(15, 23, 42, 0.98);
+            --bg-input: rgba(255, 255, 255, 0.05);
+            --bg-hover: rgba(255, 255, 255, 0.08);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8; 
+            --gold-base: #D97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --success: #10B981;
+            --danger: #EF4444;
+            
+            --sidebar-width: 260px; 
+            --header-height: 65px;
+            --radius: 12px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background-image: url('assets/images/background.png'); 
+            background-size: cover;
+            background-attachment: fixed;
+            color: var(--text-main); 
+            height: 100vh;
+            overflow: hidden; /* Prevent body scroll for chat app feel */
+        }
+
+        /* --- LAYOUT --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 1000;
+        }
+
+        .logo { font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.2rem; text-decoration: none; display:flex; flex-direction: column; line-height: 1; }
+        .logo span { color: var(--gold-base); }
+        .logo small { font-size: 0.6em; color: var(--text-muted); font-family: var(--font-body); letter-spacing: 1px; margin-top: 3px; font-weight: 400; opacity: 0.8; }
+        
+        .icon-btn { 
+            width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%;
+            color: var(--text-muted); cursor: pointer; transition: 0.2s; position: relative;
+        }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); }
+        
+        .badge { 
+            position: absolute; top: -3px; right: -3px; 
+            background: var(--danger); color: white;
+            font-size: 0.65rem; font-weight: 700;
+            min-width: 16px; height: 16px; 
+            border-radius: 50%; 
+            display: none; align-items: center; justify-content: center;
+            border: 2px solid var(--bg-card);
+            z-index: 10;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 20px 0; 
+            overflow-y: auto; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999;
+            display: flex; flex-direction: column;
+        }
+        .nav-group-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; padding: 0 24px; margin-bottom: 8px; letter-spacing: 1px; margin-top: 20px; }
+        .nav-item { 
+            display: flex; align-items: center; padding: 12px 24px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.9rem; transition: 0.2s; border-left: 3px solid transparent; position: relative;
+        }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); }
+        .nav-item.active { color: var(--gold-base); font-weight: 600; border-left-color: var(--gold-base); background: linear-gradient(90deg, rgba(217,119,6,0.1), transparent); }
+        .nav-item i { width: 25px; margin-right: 10px; text-align: center; }
+        
+        .nav-badge-count { 
+            background: var(--danger); color: #fff; font-size: 0.7rem; padding: 1px 6px; 
+            border-radius: 10px; margin-left: auto; font-weight: 600; display: none;
+        }
+        .nav-lock-icon { margin-left: auto; font-size: 0.8rem; opacity: 0.5; }
+        .nav-item.locked { opacity: 0.5; cursor: not-allowed; pointer-events: none; filter: grayscale(1); }
+
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index:998; display:none; backdrop-filter:blur(3px); }
+
+        /* --- MAIN CHAT LAYOUT --- */
+        main { 
+            margin-left: var(--sidebar-width); margin-top: var(--header-height); 
+            height: calc(100vh - var(--header-height)); width: 100%;
+            display: flex; flex-direction: column; padding: 20px;
+        }
+        
+        /* Glass Chat Container */
+        .chat-container {
+            flex: 1; display: flex; flex-direction: column; 
+            background: var(--bg-glass); backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color); border-radius: var(--radius);
+            overflow: hidden; width: 100%; max-width: 1200px; margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: zoomIn 0.4s ease-out;
+        }
+
+        /* Chat Header */
+        .chat-header {
+            padding: 15px 24px; border-bottom: 1px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.4);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .agent-profile { display: flex; align-items: center; gap: 12px; }
+        .agent-avatar { 
+            width: 42px; height: 42px; border-radius: 10px; background: var(--bg-input); 
+            color: var(--text-muted); display: grid; place-items: center; font-size: 1.2rem; 
+            border: 1px solid var(--border-color); position: relative; transition: all 0.5s ease; 
+        }
+        .status-dot { position: absolute; bottom: -2px; right: -2px; width: 10px; height: 10px; background: var(--success); border-radius: 50%; border: 2px solid var(--bg-card); box-shadow: 0 0 5px var(--success); }
+        
+        .agent-text h3 { font-family: var(--font-display); font-size: 1rem; color: var(--text-main); font-weight: 700; margin-bottom: 2px; }
+        .agent-text p { font-size: 0.75rem; color: var(--text-muted); display:flex; align-items:center; gap:6px; }
+
+        /* Modes */
+        .agent-avatar.bot-mode { color: var(--text-muted); border-color: var(--border-color); }
+        .agent-avatar.live-mode { color: #fff; background: var(--gold-gradient); border-color: var(--gold-base); box-shadow: 0 0 15px rgba(217,119,6,0.2); }
+
+        /* Ticket Bar */
+        .ticket-bar {
+            background: rgba(217, 119, 6, 0.08); color: var(--gold-base); font-family: var(--font-mono); font-size: 0.75rem;
+            padding: 8px 24px; border-bottom: 1px solid rgba(217, 119, 6, 0.15); display: none; justify-content: space-between; align-items: center;
+        }
+
+        /* Messages Area */
+        .messages-area {
+            flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 18px;
+            scroll-behavior: smooth; background: radial-gradient(circle at center, rgba(217,119,6,0.03) 0%, transparent 70%);
+        }
+        /* Custom Scrollbar */
+        .messages-area::-webkit-scrollbar { width: 5px; }
+        .messages-area::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 4px; }
+
+        .msg-wrapper { display: flex; flex-direction: column; max-width: 80%; animation: fadeInUp 0.3s ease; }
+        .msg-wrapper.bot, .msg-wrapper.admin { align-self: flex-start; }
+        .msg-wrapper.user { align-self: flex-end; align-items: flex-end; }
+        
+        .msg-bubble { padding: 14px 20px; border-radius: 12px; font-size: 0.95rem; line-height: 1.5; position: relative; word-wrap: break-word; }
+        
+        /* Bot Bubble */
+        .msg-wrapper.bot .msg-bubble { background: var(--bg-input); color: var(--text-main); border-bottom-left-radius: 2px; border: 1px solid var(--border-color); }
+        /* Admin Bubble */
+        .msg-wrapper.admin .msg-bubble { background: rgba(16, 185, 129, 0.1); color: var(--text-main); border-bottom-left-radius: 2px; border: 1px solid rgba(16, 185, 129, 0.3); }
+        /* User Bubble */
+        .msg-wrapper.user .msg-bubble { background: var(--gold-gradient); color: #0f172a; font-weight: 600; border-bottom-right-radius: 2px; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.2); border: none; }
+        
+        .msg-meta { font-size: 0.65rem; color: var(--text-muted); margin-top: 6px; padding: 0 2px; font-family: var(--font-mono); opacity: 0.6; }
+        .msg-system { align-self: center; font-size: 0.7rem; color: var(--text-muted); background: var(--bg-input); padding: 4px 12px; border-radius: 20px; margin: 10px 0; border: 1px solid var(--border-color); font-family: var(--font-mono); }
+
+        /* Chips */
+        .chips-container {
+            padding: 12px 24px; border-top: 1px solid var(--border-color); display: flex; gap: 10px; overflow-x: auto; 
+            white-space: nowrap; background: rgba(15, 23, 42, 0.3); display: none; scrollbar-width: none;
+        }
+        .chip { 
+            padding: 6px 16px; border-radius: 20px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); 
+            color: var(--text-main); font-size: 0.8rem; cursor: pointer; transition: 0.2s; 
+        }
+        .chip:hover { border-color: var(--gold-base); color: var(--gold-base); background: rgba(217, 119, 6, 0.05); }
+
+        /* Input Area */
+        .input-area {
+            padding: 20px 24px; background: rgba(15, 23, 42, 0.4); border-top: 1px solid var(--border-color);
+            display: flex; align-items: flex-end; gap: 12px;
+        }
+        .btn-attach { 
+            width: 44px; height: 44px; border-radius: 12px; background: var(--bg-input); border: 1px solid var(--border-color); 
+            color: var(--text-muted); display: grid; place-items: center; cursor: pointer; transition: 0.2s; 
+        }
+        .btn-attach:hover { color: var(--text-main); border-color: var(--gold-base); background: var(--bg-hover); }
+        
+        .chat-box { 
+            flex: 1; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 16px; 
+            color: var(--text-main); font-family: var(--font-body); font-size: 0.95rem; resize: none; height: 44px; max-height: 120px; 
+            line-height: 1.4; transition: 0.3s; 
+        }
+        .chat-box:focus { border-color: var(--gold-base); background: rgba(0,0,0,0.2); }
+        
+        .btn-send { 
+            width: 44px; height: 44px; border-radius: 12px; background: var(--gold-gradient); border: none; color: #0F172A; 
+            display: grid; place-items: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2); font-size: 1.1rem; 
+        }
+        .btn-send:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(217, 119, 6, 0.3); }
+
+        /* Thinking & Typing */
+        .thinking-bubble { display: none; align-self: flex-start; margin-bottom: 10px; animation: pulse 2s infinite; }
+        .thinking-text { font-size: 0.75rem; color: var(--text-muted); font-style: italic; display: flex; gap: 6px; align-items: center; background:rgba(255,255,255,0.03); padding:6px 12px; border-radius:12px; border:1px solid var(--border-color); }
+
+        .typing-indicator { display: none; padding: 12px 16px; background: var(--bg-input); border-radius: 12px; border-bottom-left-radius: 2px; width: fit-content; margin-bottom: 10px; border: 1px solid var(--border-color); }
+        .dot { width: 5px; height: 5px; background: var(--text-muted); border-radius: 50%; display: inline-block; animation: bounce 1.4s infinite ease-in-out both; margin: 0 2px; }
+        .dot:nth-child(1) { animation-delay: -0.32s; } .dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        /* PWA Popup */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+        /* Mobile */
+        @media(max-width: 992px) {
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 0; width: 100%; height: calc(100vh - var(--header-height)); }
+            .chat-container { border-radius: 0; border: none; border-top: 1px solid var(--border-color); }
+            .msg-wrapper { max-width: 85%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- OVERLAY -->
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- HEADER -->
+    <header>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <i class="fas fa-bars" style="font-size:1.2rem; color:var(--text-muted); cursor:pointer; display:block; @media(min-width:993px){display:none;}" onclick="toggleSidebar()"></i>
+            <a href="employer-dashboard.html" class="logo">
+                <span>EastLink</span>
+                <small>PARTNER</small>
+            </a>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+            <!-- Notifications with Badge -->
+            <div class="icon-btn" onclick="location.href='employer-notifications.html'">
+                <i class="fa-regular fa-bell"></i>
+                <div class="badge" id="header-notif-badge"></div>
+            </div>
+
+            <!-- Messages with Badge -->
+            <div class="icon-btn" onclick="location.href='employer-messages.html'">
+                <i class="fa-regular fa-comment-dots"></i>
+                <div class="badge" id="header-msg-badge"></div>
+            </div>
+
+            <!-- Avatar -->
+            <div onclick="location.href='employer-profile.html'" id="header-avatar" style="width:34px; height:34px; background:var(--gold-gradient); border-radius:50%; display:grid; place-items:center; color:white; font-size:0.9rem; font-weight:bold; cursor:pointer; overflow:hidden; border:1px solid var(--border-color);">
+                <i class="fas fa-building"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group-label">Overview</div>
+        <a href="employer-dashboard.html" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+        <a href="employer-post-job.html" class="nav-item"><i class="fas fa-plus-circle"></i> Post a job ad</a>
+        <a href="employer-jobs.html" class="nav-item"><i class="fas fa-briefcase"></i> My jobs</a>
+        
+        <div class="nav-group-label">Candidates & Comms</div>
+        <a href="employer-candidates.html" class="nav-item">
+            <i class="fas fa-users"></i> Manage applicants 
+            <span class="nav-badge-count" id="nav-badge-candidates">0</span>
+        </a>
+        <a href="employer-messages.html" class="nav-item">
+            <i class="fas fa-comment-alt"></i> Messages 
+            <span class="nav-badge-count" id="nav-badge-messages">0</span>
+        </a>
+
+        <div class="nav-group-label">Organization</div>
+        <a href="employer-profile.html" class="nav-item"><i class="fas fa-building"></i> Company profile</a>
+        <a href="employer-wallet.html" class="nav-item"><i class="fas fa-wallet"></i> My wallet</a>
+        <a href="employer-premium.html" class="nav-item"><i class="fas fa-crown"></i> My plan</a>
+
+        <div class="nav-group-label">Growth</div>
+        <a href="employer-referrals.html" class="nav-item" id="nav-invite">
+            <i class="fas fa-share-nodes"></i> Invite and earn
+            <i class="fas fa-lock nav-lock-icon" id="lock-invite" style="display:none;"></i>
+        </a>
+        <a href="employer-investment.html" class="nav-item" id="nav-invest">
+            <i class="fas fa-chart-line"></i> Invest
+            <i class="fas fa-lock nav-lock-icon" id="lock-invest" style="display:none;"></i>
+        </a>
+
+        <div class="nav-group-label">Resources</div>
+        <a href="employer-blogs.html" class="nav-item"><i class="fas fa-newspaper"></i> News and insights</a>
+        <a href="employer-resources.html" class="nav-item" id="nav-resources">
+            <i class="fas fa-book"></i> Resources
+            <i class="fas fa-lock nav-lock-icon" id="lock-resources" style="display:none;"></i>
+        </a>
+
+        <div class="nav-group-label">Account</div>
+        <a href="employer-profile.html" class="nav-item"><i class="fas fa-user"></i> My profile</a>
+        <a href="employer-support.html" class="nav-item active"><i class="fas fa-headset"></i> Support</a>
+        <a href="employer-settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+        
+        <div style="margin-top:auto; padding:20px 24px;">
+            <a href="#" onclick="logout()" style="color:var(--danger); text-decoration:none; font-size:0.9rem; display:flex; align-items:center;"><i class="fa-solid fa-right-from-bracket" style="margin-right:10px;"></i> Signout</a>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        
+        <!-- Chat Container -->
+        <div class="chat-container">
+            <!-- Header -->
+            <div class="chat-header">
+                <div class="agent-profile">
+                    <div class="agent-avatar bot-mode" id="avatar-container">
+                        <i class="fas fa-robot" id="avatar-icon"></i>
+                        <div class="status-dot"></div>
+                    </div>
+                    <div class="agent-text">
+                        <h3 id="agent-name">EastLink PARTNER SUPPORT</h3>
+                        <p id="agent-status">Analyzing Request...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ticket Info (Visible when ticket created) -->
+            <div class="ticket-bar" id="ticket-bar">
+                <span>TICKET: <span id="t-id" style="font-weight:700;">#---</span></span>
+                <span id="t-status" style="background:rgba(217, 119, 6, 0.2); padding:2px 8px; border-radius:4px;">OPEN</span>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="messages-area" id="chat-box">
+                <!-- Thinking Animation -->
+                <div class="thinking-bubble" id="thinking-bubble">
+                    <div class="thinking-text"><i class="fas fa-microchip fa-spin"></i> Processing...</div>
+                </div>
+                <!-- Typing Animation -->
+                <div class="typing-indicator" id="typing-indicator">
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                </div>
+            </div>
+
+            <!-- Suggestion Chips -->
+            <div class="chips-container" id="chips-area"></div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="btn-attach" onclick="triggerUpload()"><i class="fas fa-paperclip"></i></div>
+                <input type="file" id="file-upload" style="display:none" accept="image/*" onchange="handleFileUpload()">
+                <textarea class="chat-box" id="user-input" placeholder="Type a message..." rows="1"></textarea>
+                <button class="btn-send" id="btn-send"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add EastLink to home screen.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, addDoc, onSnapshot, serverTimestamp, orderBy, updateDoc, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- GLOBAL STATE ---
+        let currentUser = null;
+        let userData = {};
+        let activeTicketId = null;
+        let isLiveMode = false;
+        
+        // --- UI HELPERS ---
+        window.toggleSidebar = () => {
+            const sb = document.getElementById('sidebar');
+            sb.classList.toggle('active');
+            document.getElementById('overlay').style.display = sb.classList.contains('active') ? 'block' : 'none';
+        };
+        window.closeSidebar = () => {
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('overlay').style.display = 'none';
+        };
+        window.logout = () => signOut(auth).then(() => location.href = 'signin.html');
+
+        // --- MAIN LOGIC ---
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) return location.href = 'signin.html';
+            currentUser = user;
+            
+            // 1. GET USER DATA & PLAN
+            onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+                if (!docSnap.exists()) return;
+                userData = docSnap.data();
+                
+                if (userData.role !== 'employer') return location.href = 'seeker-dashboard.html';
+
+                // Header Avatar
+                if(userData.logoUrl) document.getElementById('header-avatar').innerHTML = `<img src="${userData.logoUrl}" style="width:100%; height:100%; object-fit:cover;">`;
+
+                // PLAN HANDLING & LOCKS
+                const plan = (userData.plan || userData.subscription || 'free').toLowerCase();
+                
+                // Lock Invite
+                if(plan === 'free') lockNav('nav-invite', 'lock-invite');
+                else unlockNav('nav-invite', 'lock-invite');
+
+                // Lock Invest & Resources
+                if(!plan.includes('growth') && !plan.includes('scale') && !plan.includes('enterprise')) {
+                    lockNav('nav-invest', 'lock-invest');
+                    lockNav('nav-resources', 'lock-resources');
+                } else {
+                    unlockNav('nav-invest', 'lock-invest');
+                    unlockNav('nav-resources', 'lock-resources');
+                }
+
+                loadBadges(user.uid);
+            });
+
+            // 2. CHECK TICKETS
+            checkForOpenTicket(); 
+        });
+
+        // --- NAVIGATION HELPERS ---
+        function lockNav(id, lockId) {
+            const el = document.getElementById(id);
+            const lock = document.getElementById(lockId);
+            if(el) el.classList.add('locked');
+            if(lock) lock.style.display = 'block';
+        }
+        function unlockNav(id, lockId) {
+            const el = document.getElementById(id);
+            const lock = document.getElementById(lockId);
+            if(el) el.classList.remove('locked');
+            if(lock) lock.style.display = 'none';
+        }
+
+        // --- BADGE LOGIC ---
+        function loadBadges(uid) {
+            // Messages
+            onSnapshot(query(collection(db, "chats"), where("participants", "array-contains", uid), where("hasUnread", "==", true)), (snap) => {
+                let unreadCount = 0;
+                snap.docs.forEach(doc => { if(doc.data().lastSenderId !== uid) unreadCount++; });
+                updateBadge('header-msg-badge', unreadCount);
+                updateBadge('nav-badge-messages', unreadCount);
+            });
+
+            // Notifications
+            onSnapshot(query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false)), (snap) => {
+                updateBadge('header-notif-badge', snap.size);
+            });
+
+            // Candidates
+            onSnapshot(query(collection(db, "applications"), where("employerId", "==", uid), where("status", "==", "new")), (snap) => {
+                updateBadge('nav-badge-candidates', snap.size);
+            });
+        }
+
+        function updateBadge(id, count) {
+            const el = document.getElementById(id);
+            if(!el) return;
+            el.style.display = count > 0 ? (id.includes('nav') ? 'inline-block' : 'flex') : 'none';
+            el.innerText = count > 9 ? '9+' : count;
+        }
+
+        // ============================================================
+        //  AI CHAT ENGINE
+        // ============================================================
+        
+        const BotState = {
+            IDLE: 'idle',
+            WAITING_TOPIC: 'waiting_topic',
+            WAITING_TRANS_ID: 'waiting_trans_id',
+            WAITING_JOB_REF: 'waiting_job_ref',
+            WAITING_DETAILS: 'waiting_details'
+        };
+        
+        let currentBotState = BotState.IDLE;
+        let ticketDraft = { category: '', priority: 'normal', context: {} };
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+        const chipsArea = document.getElementById('chips-area');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const thinkingBubble = document.getElementById('thinking-bubble');
+
+        function checkForOpenTicket() {
+            const q = query(collection(db, "support_tickets"), where("userId", "==", currentUser.uid), where("status", "==", "open"), limit(1));
+            
+            onSnapshot(q, (snap) => {
+                if (!snap.empty) {
+                    const ticketDoc = snap.docs[0];
+                    activateLiveMode(ticketDoc.id, ticketDoc.data());
+                } else {
+                    if (isLiveMode) { 
+                        resetToBotMode(); 
+                        addSystemMessage("Ticket Closed. Starting new session.");
+                    }
+                    if (currentBotState === BotState.IDLE) {
+                        initBotConversation();
+                    }
+                }
+            });
+        }
+
+        async function initBotConversation() {
+            if (currentBotState !== BotState.IDLE && currentBotState !== 'RESET') return;
+
+            currentBotState = BotState.WAITING_TOPIC;
+            document.getElementById('agent-status').innerHTML = '<span style="color:#10B981">●</span> Online • Automated';
+            
+            await simulateThinking("Retrieving Company Profile...");
+            
+            const name = userData.companyName ? userData.companyName : 'Partner';
+            addBotMessage(`Hello ${name}. Welcome to Priority Support.`);
+            await simulateTyping(600);
+            addBotMessage("I can assist with hiring, wallet transactions, or compliance. How can I help?");
+            setChips(["💼 Job Issue", "💳 Wallet & Billing", "👥 Candidates", "🏢 Verification"]);
+        }
+
+        async function processUserMessage(text) {
+            addUserMessage(text);
+            clearChips();
+
+            if (isLiveMode) {
+                sendMessageToFirestore(text);
+                return;
+            }
+
+            if (currentBotState === BotState.IDLE) {
+                await initBotConversation();
+                return; 
+            }
+
+            // Agent Request Override
+            if (text.toLowerCase().includes("agent")) {
+                currentBotState = BotState.WAITING_DETAILS;
+                ticketDraft.category = "General Support";
+                ticketDraft.priority = "high";
+                await simulateTyping(800);
+                addBotMessage("Connecting you to a specialist. Please briefly describe your issue.");
+                return;
+            }
+
+            switch (currentBotState) {
+                case BotState.WAITING_TOPIC:
+                    const lowerText = text.toLowerCase();
+                    if (lowerText.includes("job") || lowerText.includes("post")) {
+                        currentBotState = BotState.WAITING_JOB_REF;
+                        ticketDraft.category = "Jobs";
+                        await simulateTyping(800);
+                        addBotMessage("Which job posting is this regarding? Please type the **Job Title**.");
+                    } 
+                    else if (lowerText.includes("wallet") || lowerText.includes("bill")) {
+                        currentBotState = BotState.WAITING_TRANS_ID;
+                        ticketDraft.category = "Billing";
+                        ticketDraft.priority = "high";
+                        await simulateTyping(800);
+                        addBotMessage("For billing issues, please provide the **Transaction Code**.");
+                    }
+                    else if (lowerText.includes("candidate") || lowerText.includes("applicant")) {
+                        currentBotState = BotState.WAITING_DETAILS;
+                        ticketDraft.category = "Candidates";
+                        await simulateTyping(800);
+                        addBotMessage("Please describe the issue with candidates or applications.");
+                    }
+                    else if (lowerText.includes("verification")) {
+                        currentBotState = BotState.WAITING_DETAILS;
+                        ticketDraft.category = "Verification";
+                        ticketDraft.priority = "high";
+                        await simulateTyping(800);
+                        addBotMessage("Have you uploaded your business documents in Settings?");
+                        setChips(["Yes, waiting", "No, help me"]);
+                    }
+                    else {
+                        await simulateTyping(600);
+                        addBotMessage("I didn't quite catch that. Please describe your issue briefly.");
+                        currentBotState = BotState.WAITING_DETAILS;
+                        ticketDraft.category = "General";
+                    }
+                    break;
+
+                case BotState.WAITING_TRANS_ID:
+                    ticketDraft.context.transId = text.trim().toUpperCase();
+                    currentBotState = BotState.WAITING_DETAILS;
+                    await simulateTyping(800);
+                    addBotMessage(`Ref **${text}** noted. Describe the issue (e.g., 'Deposit not reflecting').`);
+                    break;
+
+                case BotState.WAITING_JOB_REF:
+                    ticketDraft.context.jobRef = text;
+                    currentBotState = BotState.WAITING_DETAILS;
+                    await simulateTyping(800);
+                    addBotMessage(`Okay. Please describe the problem with **${text}**.`);
+                    break;
+
+                case BotState.WAITING_DETAILS:
+                    ticketDraft.description = text;
+                    createTicketInFirestore(); 
+                    break;
+            }
+        }
+
+        async function createTicketInFirestore() {
+            await simulateThinking("Generating Priority Ticket...");
+            
+            const summary = ticketDraft.context.transId 
+                ? `Billing Issue - Ref: ${ticketDraft.context.transId}`
+                : ticketDraft.description.substring(0, 30) + "...";
+
+            const ticketPayload = {
+                userId: currentUser.uid,
+                userName: userData.companyName || "Employer",
+                userType: 'employer',
+                userEmail: currentUser.email,
+                category: ticketDraft.category || "General",
+                priority: ticketDraft.priority || "normal",
+                status: 'open',
+                subject: summary,
+                description: ticketDraft.description, 
+                contextData: ticketDraft.context,
+                createdAt: serverTimestamp(),
+                lastUpdated: serverTimestamp(),
+                isReadByAdmin: false,
+                lastSender: 'user'
+            };
+
+            try {
+                const docRef = await addDoc(collection(db, "support_tickets"), ticketPayload);
+                
+                await addDoc(collection(db, "support_tickets", docRef.id, "messages"), {
+                    text: `[AUTO-TICKET]\nCategory: ${ticketDraft.category}\nDetails: ${ticketDraft.description}\nContext: ${JSON.stringify(ticketDraft.context)}`,
+                    sender: 'user',
+                    timestamp: serverTimestamp()
+                });
+
+                addBotMessage("✅ **Ticket Created.** A support agent will respond shortly.");
+                
+            } catch (e) {
+                console.error(e);
+                addBotMessage("❌ Error creating ticket. Please try again.");
+                currentBotState = BotState.WAITING_TOPIC; 
+            }
+        }
+
+        // ============================================================
+        //  LIVE MODE HANDLERS
+        // ============================================================
+
+        function activateLiveMode(ticketId, data) {
+            if (activeTicketId === ticketId) return; 
+            
+            isLiveMode = true;
+            activeTicketId = ticketId;
+            currentBotState = 'LIVE'; 
+
+            document.getElementById('agent-name').innerText = "Business Support Agent";
+            document.getElementById('agent-status').innerHTML = '<span style="color:#10B981">●</span> Connected • Live';
+            
+            const avatarContainer = document.getElementById('avatar-container');
+            avatarContainer.classList.remove('bot-mode');
+            avatarContainer.classList.add('live-mode');
+            document.getElementById('avatar-icon').className = "fas fa-headset";
+
+            document.getElementById('ticket-bar').style.display = 'flex';
+            document.getElementById('t-id').innerText = '#' + ticketId.substring(0,6).toUpperCase();
+
+            chatBox.innerHTML = ''; 
+            
+            const q = query(collection(db, "support_tickets", ticketId, "messages"), orderBy('timestamp', 'asc'));
+            onSnapshot(q, (snapshot) => {
+                chatBox.innerHTML = ''; 
+                snapshot.forEach(doc => {
+                    const m = doc.data();
+                    let type = 'user';
+                    if (m.sender === 'bot') type = 'bot'; 
+                    else if (m.sender === 'admin' || m.sender === 'agent') type = 'admin';
+                    renderMessage(type, m.text, m.timestamp, m.attachment);
+                });
+                
+                chatBox.appendChild(thinkingBubble);
+                chatBox.appendChild(typingIndicator);
+                scrollToBottom();
+            });
+        }
+
+        function resetToBotMode() {
+            isLiveMode = false;
+            activeTicketId = null;
+            currentBotState = BotState.IDLE;
+            ticketDraft = { category: '', priority: 'normal', context: {} };
+
+            document.getElementById('agent-name').innerText = "EastLink PARTNER SUPPORT";
+            document.getElementById('agent-status').innerHTML = '<span style="color:#10B981">●</span> Online • Automated';
+            document.getElementById('ticket-bar').style.display = 'none';
+            
+            const avatarContainer = document.getElementById('avatar-container');
+            avatarContainer.classList.remove('live-mode');
+            avatarContainer.classList.add('bot-mode');
+            document.getElementById('avatar-icon').className = "fas fa-robot";
+            
+            chatBox.innerHTML = '';
+            chatBox.appendChild(thinkingBubble);
+            chatBox.appendChild(typingIndicator);
+        }
+
+        async function sendMessageToFirestore(text, attachmentUrl = null) {
+            if (!activeTicketId) return;
+            try {
+                await addDoc(collection(db, "support_tickets", activeTicketId, "messages"), {
+                    text: text, attachment: attachmentUrl, sender: 'user', timestamp: serverTimestamp()
+                });
+                await updateDoc(doc(db, "support_tickets", activeTicketId), {
+                    lastUpdated: serverTimestamp(), lastSender: 'user', isReadByAdmin: false
+                });
+            } catch (e) {
+                Toastify({text: "Failed to send.", style:{background:"var(--danger)"}}).showToast();
+            }
+        }
+
+         // ============================================================
+        //  RENDER & ANIMATIONS
+        // ============================================================
+
+        function renderMessage(type, text, timestamp, attachment) {
+            const wrapper = document.createElement('div'); 
+            wrapper.className = `msg-wrapper ${type}`;
+            
+            let content = (text || "").replace(/\n/g, '<br>');
+            if(attachment) content += `<br><a href="${attachment}" target="_blank"><img src="${attachment}" style="max-width:100%; border-radius:8px; margin-top:5px; border:1px solid var(--border-color);"></a>`;
+            
+            const timeStr = timestamp ? new Date(timestamp.seconds*1000).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'Just now';
+            
+            wrapper.innerHTML = `
+                <div class="msg-bubble animate__animated animate__fadeIn">${content}</div>
+                <div class="msg-meta">${type==='user'?'You':(type==='admin'?'Agent':'AI')} • ${timeStr}</div>
+            `;
+            
+            // Insert before the thinking/typing bubbles so they stay at bottom
+            chatBox.insertBefore(wrapper, thinkingBubble); 
+            scrollToBottom();
+        }
+
+        function addBotMessage(html) { renderMessage('bot', html, null); }
+        function addUserMessage(html) { renderMessage('user', html, null); }
+        function addSystemMessage(text) { 
+            const el = document.createElement('div'); el.className = 'msg-system'; el.innerText = text; 
+            chatBox.insertBefore(el, thinkingBubble); 
+            scrollToBottom();
+        }
+
+        function setChips(opts) {
+            chipsArea.innerHTML = '';
+            if(opts.length) {
+                chipsArea.style.display = 'flex';
+                opts.forEach(o => {
+                    const btn = document.createElement('div'); btn.className = 'chip'; btn.innerText = o;
+                    btn.onclick = () => processUserMessage(o);
+                    chipsArea.appendChild(btn);
+                });
+                scrollToBottom();
+            } else { chipsArea.style.display = 'none'; }
+        }
+        function clearChips() { chipsArea.innerHTML = ''; chipsArea.style.display = 'none'; }
+
+        function simulateThinking(text) {
+            return new Promise(resolve => {
+                document.querySelector('.thinking-text').innerHTML = `<i class="fas fa-microchip fa-spin"></i> ${text}`;
+                thinkingBubble.style.display = 'flex';
+                scrollToBottom();
+                setTimeout(() => { thinkingBubble.style.display = 'none'; resolve(); }, 800 + Math.random()*500);
+            });
+        }
+        function simulateTyping(ms) {
+            return new Promise(resolve => {
+                typingIndicator.style.display = 'block';
+                scrollToBottom();
+                setTimeout(() => { typingIndicator.style.display = 'none'; resolve(); }, ms);
+            });
+        }
+        function scrollToBottom() { setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 50); }
+
+        // --- HANDLERS ---
+        const send = () => { 
+            const t = userInput.value.trim(); 
+            if(t) { userInput.value = ''; processUserMessage(t); }
+        };
+        
+        document.getElementById('btn-send').onclick = send;
+        userInput.onkeypress = (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }};
+        
+        window.triggerUpload = () => document.getElementById('file-upload').click();
+        
+        window.handleFileUpload = () => {
+             const file = document.getElementById('file-upload').files[0];
+            if(file) {
+                Toastify({
+                    text: "Uploading...", 
+                    style: { background:"var(--bg-card)", border:"1px solid var(--border-color)", color:"var(--text-main)" }
+                }).showToast();
+                
+                // Simulate upload delay
+                setTimeout(() => { 
+                    sendMessageToFirestore("Attached File: " + file.name, "assets/images/logo.png"); 
+                }, 1500);
+            }
+        };
+
+        // --- PWA LOGIC ---
+        let deferredPrompt;
+        const pwaPopup = document.getElementById('pwa-install-popup');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if(!localStorage.getItem('pwaDismissed')) {
+                pwaPopup.style.display = 'flex';
+            }
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                pwaPopup.style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            pwaPopup.style.display = 'none';
+            localStorage.setItem('pwaDismissed', 'true');
+        };
+    </script>
+</body>
+</html>

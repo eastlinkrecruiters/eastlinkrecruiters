@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Refer & Earn | EastLink Recruiters</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#020617">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Theme Variables */
+            --bg-body: #020617;       
+            --bg-card: #0f172a; 
+            --bg-glass: rgba(15, 23, 42, 0.95); 
+            --bg-glass-heavy: rgba(15, 23, 42, 0.98);
+            --bg-input: rgba(255, 255, 255, 0.05);
+            --bg-hover: rgba(255, 255, 255, 0.08);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8; 
+            --gold-base: #D97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --success: #10B981;
+            --danger: #EF4444;
+            --info: #3B82F6;
+            
+            --sidebar-width: 260px; 
+            --header-height: 65px;
+            --radius: 12px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-mono: 'Share Tech Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background-image: url('assets/images/background.png'); 
+            background-size: cover;
+            background-attachment: fixed;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+        }
+
+        /* --- LAYOUT --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 1000;
+        }
+
+        .logo { font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.2rem; text-decoration: none; display:flex; flex-direction: column; line-height: 1; }
+        .logo span { color: var(--gold-base); }
+        .logo small { font-size: 0.6em; color: var(--text-muted); font-family: var(--font-body); letter-spacing: 1px; margin-top: 3px; font-weight: 400; opacity: 0.8; }
+        
+        .icon-btn { 
+            width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%;
+            color: var(--text-muted); cursor: pointer; transition: 0.2s; position: relative;
+        }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); }
+        
+        .badge { 
+            position: absolute; top: -3px; right: -3px; 
+            background: var(--danger); color: white;
+            font-size: 0.65rem; font-weight: 700;
+            min-width: 16px; height: 16px; 
+            border-radius: 50%; 
+            display: none; align-items: center; justify-content: center;
+            border: 2px solid var(--bg-card);
+            z-index: 10;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 20px 0; 
+            overflow-y: auto; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999;
+            display: flex; flex-direction: column;
+        }
+        .nav-group-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; padding: 0 24px; margin-bottom: 8px; letter-spacing: 1px; margin-top: 20px; }
+        .nav-item { 
+            display: flex; align-items: center; padding: 12px 24px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.9rem; transition: 0.2s; border-left: 3px solid transparent; position: relative;
+        }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); }
+        .nav-item.active { color: var(--gold-base); font-weight: 600; border-left-color: var(--gold-base); background: linear-gradient(90deg, rgba(217,119,6,0.1), transparent); }
+        .nav-item i { width: 25px; margin-right: 10px; text-align: center; }
+        
+        .nav-badge-count { 
+            background: var(--danger); color: #fff; font-size: 0.7rem; padding: 1px 6px; 
+            border-radius: 10px; margin-left: auto; font-weight: 600; display: none;
+        }
+        .nav-lock-icon { margin-left: auto; font-size: 0.8rem; opacity: 0.5; }
+        .nav-item.locked { opacity: 0.5; cursor: not-allowed; pointer-events: none; filter: grayscale(1); }
+
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index:998; display:none; backdrop-filter:blur(3px); }
+
+        /* --- MAIN CONTENT --- */
+        main { 
+            margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 25px; 
+            min-height: calc(100vh - var(--header-height)); width: 100%;
+        }
+        .content-wrapper { max-width: 1200px; margin: 0 auto; width: 100%; }
+
+        /* --- PAGE SPECIFIC --- */
+        .referral-hero {
+            background: linear-gradient(135deg, rgba(217, 119, 6, 0.1), rgba(15, 23, 42, 0.9));
+            border: 1px solid var(--border-color); border-radius: var(--radius);
+            padding: 40px; margin-bottom: 30px; position: relative; overflow: hidden;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .hero-content { max-width: 600px; z-index: 2; }
+        .hero-title { font-family: var(--font-head); font-size: 2rem; color: var(--text-main); margin-bottom: 10px; }
+        .hero-subtitle { color: var(--text-muted); font-size: 1rem; margin-bottom: 20px; line-height: 1.6; }
+        .plan-badge { 
+            display: inline-flex; align-items: center; gap: 8px; background: rgba(251, 191, 36, 0.15); 
+            border: 1px solid #fbbf24; color: #fbbf24; padding: 6px 14px; border-radius: 20px; 
+            font-weight: 600; font-size: 0.85rem; 
+        }
+
+        .dashboard-grid { 
+            display: grid; grid-template-columns: 2fr 1fr; gap: 25px; 
+        }
+
+        /* Glass Panel Standard */
+        .glass-panel {
+            background: var(--bg-glass); backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color); border-radius: var(--radius);
+            padding: 25px; margin-bottom: 25px;
+        }
+
+        /* Link Sharing */
+        .link-box { 
+            background: var(--bg-input); border: 1px solid var(--border-color); 
+            border-radius: 12px; padding: 5px; display: flex; align-items: center; margin-top: 15px; 
+        }
+        .referral-input { 
+            flex: 1; background: transparent; border: none; padding: 12px 15px; 
+            color: var(--text-muted); font-family: var(--font-mono); font-size: 0.9rem; 
+        }
+        .btn-copy { 
+            background: var(--gold-gradient); color: white; border: none; 
+            padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+        }
+        .btn-copy:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3); }
+
+        .share-row { display: flex; gap: 10px; margin-top: 20px; }
+        .share-btn { 
+            flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; 
+            padding: 10px; border-radius: 8px; text-decoration: none; color: white; font-size: 0.9rem; font-weight: 500; transition: 0.2s; 
+        }
+        .share-wa { background: #25D366; }
+        .share-x { background: #000000; border: 1px solid #333; }
+        .share-fb { background: #1877F2; }
+        .share-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        /* Stats & Table */
+        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
+        .stat-card { 
+            background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 12px; 
+            padding: 15px; text-align: center; 
+        }
+        .stat-val { font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: var(--text-main); display: block; margin-bottom: 5px; }
+        .stat-lbl { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; }
+
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        th { text-align: left; padding: 12px; color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
+        td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-size: 0.9rem; vertical-align: middle; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* Leaderboard */
+        .sticky-wrapper { position: sticky; top: 90px; }
+        .lb-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .lb-rank { font-family: var(--font-mono); font-weight: 700; font-size: 1.1rem; width: 25px; }
+        .rank-1 { color: #fbbf24; } .rank-2 { color: #94a3b8; } .rank-3 { color: #b45309; }
+        .lb-avatar { width: 32px; height: 32px; background: var(--bg-input); border-radius: 50%; display: grid; place-items: center; font-size: 0.8rem; font-weight: 700; border: 1px solid var(--border-color); }
+        .lb-name { flex: 1; font-size: 0.9rem; font-weight: 500; }
+        .lb-score { font-family: var(--font-mono); color: var(--gold-base); font-weight: 700; }
+
+        /* Mystery Box */
+        .mystery-box {
+            background: linear-gradient(135deg, rgba(217,119,6,0.1), transparent);
+            border: 1px dashed var(--gold-base); border-radius: 12px;
+            padding: 20px; margin-top: 20px; display: flex; align-items: center; gap: 15px;
+        }
+        .box-icon { font-size: 2rem; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+        /* PWA Popup */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+        @media(max-width: 992px) { 
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 15px; width: 100%; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .sticky-wrapper { position: static; }
+            .referral-hero { flex-direction: column; align-items: flex-start; text-align: left; padding: 30px; }
+            .share-row { flex-wrap: wrap; }
+            
+            /* Table Mobile */
+            thead { display: none; }
+            tbody { display: block; width: 100%; }
+            tr { display: flex; flex-direction: column; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 15px; padding: 15px; }
+            td { display: flex; justify-content: space-between; padding: 8px 0; border: none; font-size: 0.9rem; width: 100%; }
+            td::before { content: attr(data-label); font-weight: 600; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- OVERLAY -->
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- HEADER -->
+    <header>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <i class="fas fa-bars" style="font-size:1.2rem; color:var(--text-muted); cursor:pointer; display:block; @media(min-width:993px){display:none;}" onclick="toggleSidebar()"></i>
+            <a href="employer-dashboard.html" class="logo">
+                <span>EastLink</span>
+                <small>PARTNER</small>
+            </a>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+            <div class="icon-btn" onclick="location.href='employer-notifications.html'">
+                <i class="fa-regular fa-bell"></i>
+                <div class="badge" id="header-notif-badge"></div>
+            </div>
+            <div class="icon-btn" onclick="location.href='employer-messages.html'">
+                <i class="fa-regular fa-comment-dots"></i>
+                <div class="badge" id="header-msg-badge"></div>
+            </div>
+            <div onclick="location.href='employer-profile.html'" id="header-avatar" style="width:34px; height:34px; background:var(--gold-gradient); border-radius:50%; display:grid; place-items:center; color:white; font-size:0.9rem; font-weight:bold; cursor:pointer; overflow:hidden; border:1px solid var(--border-color);">
+                <i class="fas fa-building"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR NAVIGATION -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group-label">Overview</div>
+        <a href="employer-dashboard.html" class="nav-item"><i class="fas fa-th-large"></i> Dashboard</a>
+        <a href="employer-post-job.html" class="nav-item"><i class="fas fa-plus-circle"></i> Post a job ad</a>
+        <a href="employer-jobs.html" class="nav-item"><i class="fas fa-briefcase"></i> My jobs</a>
+        
+        <div class="nav-group-label">Candidates & Comms</div>
+        <a href="employer-candidates.html" class="nav-item">
+            <i class="fas fa-users"></i> Manage applicants 
+            <span class="nav-badge-count" id="nav-badge-candidates">0</span>
+        </a>
+        <a href="employer-messages.html" class="nav-item">
+            <i class="fas fa-comment-alt"></i> Messages 
+            <span class="nav-badge-count" id="nav-badge-messages">0</span>
+        </a>
+
+        <div class="nav-group-label">Organization</div>
+        <a href="employer-profile.html" class="nav-item"><i class="fas fa-building"></i> Company profile</a>
+        <a href="employer-wallet.html" class="nav-item"><i class="fas fa-wallet"></i> My wallet</a>
+        <a href="employer-premium.html" class="nav-item"><i class="fas fa-crown"></i> My plan</a>
+
+        <div class="nav-group-label">Growth</div>
+        <a href="employer-referrals.html" class="nav-item active" id="nav-invite">
+            <i class="fas fa-share-nodes"></i> Invite and earn
+            <i class="fas fa-lock nav-lock-icon" id="lock-invite" style="display:none;"></i>
+        </a>
+        <a href="employer-investment.html" class="nav-item" id="nav-invest">
+            <i class="fas fa-chart-line"></i> Invest
+            <i class="fas fa-lock nav-lock-icon" id="lock-invest" style="display:none;"></i>
+        </a>
+
+        <div class="nav-group-label">Resources</div>
+        <a href="employer-blogs.html" class="nav-item"><i class="fas fa-newspaper"></i> News and insights</a>
+        <a href="employer-resources.html" class="nav-item" id="nav-resources">
+            <i class="fas fa-book"></i> Resources
+            <i class="fas fa-lock nav-lock-icon" id="lock-resources" style="display:none;"></i>
+        </a>
+
+        <div class="nav-group-label">Account</div>
+        <a href="employer-profile.html" class="nav-item"><i class="fas fa-user"></i> My profile</a>
+        <a href="employer-settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+        
+        <div style="margin-top:auto; padding:20px 24px;">
+            <a href="#" onclick="logout()" style="color:var(--danger); text-decoration:none; font-size:0.9rem; display:flex; align-items:center;"><i class="fa-solid fa-right-from-bracket" style="margin-right:10px;"></i> Signout</a>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="content-wrapper">
+            
+            <!-- Hero -->
+            <div class="referral-hero animate__animated animate__fadeInDown">
+                <div class="hero-content">
+                    <h1 class="hero-title">Partner Program</h1>
+                    <p class="hero-subtitle">Invite other businesses to EastLink. Earn direct wallet credits when they verify and post their first job.</p>
+                    <div class="plan-badge" id="commission-info">
+                        <i class="fas fa-star"></i> Standard: 5% Commission
+                    </div>
+                </div>
+                <div style="font-size:8rem; opacity:0.1; position:absolute; right:20px; top:50%; transform:translateY(-50%); pointer-events:none;">
+                    <i class="fas fa-handshake"></i>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                
+                <!-- LEFT COLUMN -->
+                <div class="animate__animated animate__fadeInLeft">
+                    
+                    <!-- Invite Box -->
+                    <div class="glass-panel">
+                        <h3 style="color:var(--text-main); font-family:var(--font-head); margin-bottom:5px;">Your Unique Invite Link</h3>
+                        <p style="font-size:0.9rem; color:var(--text-muted);">Share this link to track your referrals.</p>
+                        
+                        <div class="link-box">
+                            <input type="text" class="referral-input" id="ref-link" readonly value="Generating link...">
+                            <button class="btn-copy" onclick="copyLink()">Copy</button>
+                        </div>
+
+                        <div class="share-row">
+                            <a href="#" id="share-wa" class="share-btn share-wa" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                            <a href="#" id="share-tw" class="share-btn share-x" target="_blank"><i class="fab fa-x-twitter"></i> Twitter</a>
+                            <a href="#" id="share-fb" class="share-btn share-fb" target="_blank"><i class="fab fa-facebook-f"></i> Facebook</a>
+                        </div>
+                    </div>
+
+                    <!-- Stats & Table -->
+                    <div class="glass-panel">
+                        <div style="margin-bottom:20px;">
+                            <h3 style="color:var(--text-main); font-family:var(--font-head);">Performance History</h3>
+                        </div>
+
+                        <div class="stats-row">
+                            <div class="stat-card">
+                                <span class="stat-val" id="total-referrals">0</span>
+                                <span class="stat-lbl">Invited</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-val" style="color:var(--success);" id="qualified-referrals">0</span>
+                                <span class="stat-lbl">Qualified</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-val" style="color:var(--gold-base);" id="total-earned-display">0</span>
+                                <span class="stat-lbl">Earned (KES)</span>
+                            </div>
+                        </div>
+
+                        <table id="referral-table">
+                            <thead>
+                                <tr>
+                                    <th>Company</th>
+                                    <th>Date</th>
+                                    <th>Plan</th>
+                                    <th>Comm</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body">
+                                <tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);"><i class="fas fa-circle-notch fa-spin"></i> Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN (Leaderboard) -->
+                <div class="animate__animated animate__fadeInRight">
+                    <div class="sticky-wrapper">
+                        <div class="glass-panel">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid var(--border-color); padding-bottom:15px;">
+                                <h3 style="font-family:var(--font-head); font-size:1.1rem; margin:0;"><i class="fas fa-trophy" style="color:var(--gold-base); margin-right:8px;"></i> Top Partners</h3>
+                                <span style="font-size:0.7rem; background:var(--bg-input); padding:3px 8px; border-radius:4px; color:var(--text-muted);">This Month</span>
+                            </div>
+
+                            <div id="leaderboard-list">
+                                <div style="padding:20px; text-align:center; color:var(--text-muted);">Loading...</div>
+                            </div>
+
+                            <div class="mystery-box">
+                                <div class="box-icon">🎁</div>
+                                <div>
+                                    <div style="font-weight:700; color:var(--text-main); font-size:0.9rem;">Corporate Rewards</div>
+                                    <div style="font-size:0.8rem; color:var(--text-muted); line-height:1.4;">Top 3 partners this month unlock premium ATS tools for free!</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- FOOTER -->
+            <footer style="text-align:center; margin-top:30px; padding:20px; border-top:1px solid var(--border-color); color:var(--text-muted); font-size:0.75rem;">
+                &copy; 2025 EastLink Recruiters. All Rights Reserved.
+            </footer>
+        </div>
+    </main>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add EastLink to home screen.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+
+        // UI Helpers
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = 'block'; };
+        window.closeSidebar = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').style.display = 'none'; };
+        window.logout = () => signOut(auth).then(() => window.location.href = 'signin.html');
+        window.copyLink = () => {
+            const copyText = document.getElementById("ref-link");
+            copyText.select();
+            navigator.clipboard.writeText(copyText.value);
+            Toastify({ text: "Link Copied!", style: { background: "var(--success)" } }).showToast();
+        };
+
+        // --- NAVIGATION LOCK LOGIC ---
+        function lockNav(id, lockId) {
+            const el = document.getElementById(id);
+            const lock = document.getElementById(lockId);
+            if(el) el.classList.add('locked');
+            if(lock) lock.style.display = 'block';
+        }
+        function unlockNav(id, lockId) {
+            const el = document.getElementById(id);
+            const lock = document.getElementById(lockId);
+            if(el) el.classList.remove('locked');
+            if(lock) lock.style.display = 'none';
+        }
+
+        // --- AUTH & DATA ---
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'signin.html'; return; }
+            
+            // 1. User Data & Plan Locking
+            onSnapshot(doc(db, "users", user.uid), (docSnap) => {
+                if(docSnap.exists()) {
+                    const data = docSnap.data();
+                    if(data.role !== 'employer') return location.href = 'seeker-dashboard.html';
+
+                    if(data.logoUrl) document.getElementById('header-avatar').innerHTML = `<img src="${data.logoUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+                    
+                    // Plan Logic
+                    const plan = (data.plan || data.subscriptionPlan || 'free').toLowerCase();
+                    
+                    if(plan === 'free') lockNav('nav-invite', 'lock-invite');
+                    else unlockNav('nav-invite', 'lock-invite');
+
+                    if(!plan.includes('growth') && !plan.includes('scale') && !plan.includes('enterprise')) {
+                        lockNav('nav-invest', 'lock-invest');
+                        lockNav('nav-resources', 'lock-resources');
+                    } else {
+                        unlockNav('nav-invest', 'lock-invest');
+                        unlockNav('nav-resources', 'lock-resources');
+                    }
+
+                    // Update UI Badge
+                    updateUIForPlan(plan);
+                    
+                    // Setup Links
+                    const refLink = `${window.location.origin}/employer-signup.html?ref=${user.uid}`;
+                    document.getElementById('ref-link').value = refLink;
+                    setupSocialLinks(refLink);
+
+                    loadBadges(user.uid);
+                }
+            });
+
+            // 2. Load Referral Data
+            loadReferrals(user.uid);
+            loadLeaderboard();
+        });
+
+        // --- BADGES ---
+        function loadBadges(uid) {
+            const msgQuery = query(collection(db, "chats"), where("participants", "array-contains", uid), where("hasUnread", "==", true));
+            onSnapshot(msgQuery, (snap) => {
+                let unreadCount = 0;
+                snap.docs.forEach(doc => { if(doc.data().lastSenderId !== uid) unreadCount++; });
+                const headerBadge = document.getElementById('header-msg-badge');
+                if(headerBadge) { headerBadge.style.display = unreadCount > 0 ? 'flex' : 'none'; headerBadge.innerText = unreadCount > 9 ? '9+' : unreadCount; }
+                const navBadge = document.getElementById('nav-badge-messages');
+                if(navBadge) { navBadge.style.display = unreadCount > 0 ? 'inline-block' : 'none'; navBadge.innerText = unreadCount > 9 ? '9+' : unreadCount; }
+            });
+
+            const notifQuery = query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false));
+            onSnapshot(notifQuery, (snap) => {
+                const count = snap.size;
+                const headerNotif = document.getElementById('header-notif-badge');
+                if(headerNotif) { headerNotif.style.display = count > 0 ? 'flex' : 'none'; headerNotif.innerText = count > 9 ? '9+' : count; }
+            });
+
+            const appQuery = query(collection(db, "applications"), where("employerId", "==", uid), where("status", "==", "new"));
+            onSnapshot(appQuery, (snap) => {
+                const el = document.getElementById('nav-badge-candidates');
+                if(el) { el.style.display = !snap.empty ? 'inline-block' : 'none'; el.innerText = snap.size > 99 ? '99+' : snap.size; }
+            });
+        }
+
+        function updateUIForPlan(plan) {
+            const badge = document.getElementById('commission-info');
+            if(plan.includes('premium') || plan.includes('scale')) {
+                badge.innerHTML = `<i class="fas fa-crown"></i> Premium Partner: 20% Commission`;
+                badge.style.background = "rgba(217, 119, 6, 0.15)";
+                badge.style.color = "#fbbf24";
+                badge.style.borderColor = "#fbbf24";
+            } else {
+                badge.innerHTML = `<i class="fas fa-star"></i> Standard Partner: 5% Commission`;
+            }
+        }
+
+        function setupSocialLinks(url) {
+            const msg = encodeURIComponent(`Join EastLink Recruiters to hire top talent! Sign up here: ${url}`);
+            document.getElementById('share-wa').href = `https://wa.me/?text=${msg}`;
+            document.getElementById('share-tw').href = `https://twitter.com/intent/tweet?text=${msg}`;
+            document.getElementById('share-fb').href = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+        }
+
+        function loadReferrals(uid) {
+            const q = query(collection(db, "users"), where("referredBy", "==", uid), orderBy("createdAt", "desc"));
+            onSnapshot(q, (snapshot) => {
+                const tbody = document.getElementById('table-body');
+                let total = 0, qualified = 0, earned = 0;
+
+                if(snapshot.empty) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--text-muted);">No referrals yet.</td></tr>`;
+                } else {
+                    tbody.innerHTML = '';
+                    snapshot.forEach(doc => {
+                        const u = doc.data();
+                        total++;
+                        const isQualified = (u.subscriptionPlan && u.subscriptionPlan !== 'starter' && u.subscriptionPlan !== 'free'); 
+                        
+                        let commission = 0;
+                        if(isQualified) {
+                            qualified++;
+                            commission = (u.subscriptionPlan === 'scale') ? 1000 : 200; 
+                            earned += commission;
+                        }
+                        const date = u.createdAt ? new Date(u.createdAt.seconds*1000).toLocaleDateString(undefined, {month:'short', day:'numeric'}) : 'N/A';
+
+                        tbody.innerHTML += `
+                            <tr>
+                                <td data-label="Company" style="font-weight:600; color:var(--text-main);">${u.companyName || u.fullName || 'Company'}</td>
+                                <td data-label="Date">${date}</td>
+                                <td data-label="Plan" style="text-transform:capitalize;">${u.subscriptionPlan || 'Starter'}</td>
+                                <td data-label="Comm">${commission}</td>
+                                <td data-label="Status"><span style="color:${isQualified?'var(--success)':'var(--text-muted)'};font-weight:600;">${isQualified?'Approved':'Pending'}</span></td>
+                            </tr>`;
+                    });
+                }
+                document.getElementById('total-referrals').innerText = total;
+                document.getElementById('qualified-referrals').innerText = qualified;
+                document.getElementById('total-earned-display').innerText = earned.toLocaleString();
+            });
+        }
+
+        function loadLeaderboard() {
+            try {
+                const q = query(collection(db, "users"), where("role", "==", "employer"), orderBy("referralCount", "desc"), limit(5));
+                onSnapshot(q, (snapshot) => {
+                    const list = document.getElementById('leaderboard-list');
+                    if(snapshot.empty) { list.innerHTML = '<div style="padding:15px; text-align:center; color:var(--text-muted);">No data yet.</div>'; return; }
+                    list.innerHTML = '';
+                    let rank = 1;
+                    snapshot.forEach(doc => {
+                        const u = doc.data();
+                        const rankClass = rank === 1 ? 'rank-1' : (rank === 2 ? 'rank-2' : (rank === 3 ? 'rank-3' : ''));
+                        list.innerHTML += `
+                            <div class="lb-item animate__animated animate__fadeInRight" style="animation-delay:${rank*0.1}s">
+                                <div class="lb-rank ${rankClass}">${rank}</div>
+                                <div class="lb-avatar">${(u.companyName||'C').charAt(0)}</div>
+                                <div class="lb-name">${u.companyName||'Company'}</div>
+                                <div class="lb-score">${u.referralCount||0}</div>
+                            </div>`;
+                        rank++;
+                    });
+                });
+            } catch (e) { console.log("Leaderboard indexing pending", e); }
+        }
+
+        // --- PWA LOGIC ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('pwa-install-popup').style.display = 'block';
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('pwa-install-popup').style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            document.getElementById('pwa-install-popup').style.display = 'none';
+        };
+
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Analytics | EastLink Recruiters</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0F172A">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            /* Theme Variables */
+            --bg-body: #0F172A;       
+            --bg-card: rgba(30, 41, 59, 0.65);
+            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.95);
+            --bg-input: rgba(255, 255, 255, 0.07);
+            --bg-hover: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8; 
+            --gold-base: #D97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --neon-purple: #8b5cf6;
+            --success: #10B981;
+            --danger: #EF4444;
+            --sidebar-width: 260px; 
+            --header-height: 70px;
+            --radius: 16px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background-image: url('assets/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+            transition: background 0.3s ease;
+        }
+
+        /* Utils & Glass */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s var(--ease-bounce), border-color 0.3s;
+        }
+
+        /* Header */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 1000;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .logo { font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; }
+        .logo span { color: var(--gold-base); }
+        .hamburger { font-size: 1.4rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        .global-search-container { flex: 1; max-width: 450px; position: relative; margin: 0 20px; }
+        .global-search-input {
+            width: 100%; background: var(--bg-input); border: 1px solid var(--border-color);
+            padding: 10px 45px 10px 15px; border-radius: 12px; color: var(--text-main);
+            transition: all 0.3s ease; font-size: 0.9rem;
+        }
+        .global-search-input:focus { border-color: var(--gold-base); background: var(--bg-hover); box-shadow: 0 0 15px rgba(217, 119, 6, 0.15); }
+
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+        .icon-btn { 
+            width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px;
+            color: var(--text-muted); cursor: pointer; transition: all 0.3s var(--ease-bounce); position: relative;
+        }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); transform: translateY(-2px); }
+        .notification-badge { 
+            position: absolute; top: 5px; right: 5px; min-width: 16px; height: 16px; 
+            background: var(--danger); border-radius: 10px; font-size: 0.6rem; color: white; 
+            font-weight: 700; display: none; place-items: center; justify-content: center; border: 2px solid var(--bg-card);
+        }
+        .profile-widget { width: 42px; height: 42px; position: relative; cursor: pointer; transition: transform 0.3s var(--ease-bounce); margin-left: 5px; }
+        .profile-widget:hover { transform: scale(1.05); }
+        .user-avatar { width: 100%; height: 100%; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-weight: 700; color: #fff; border: 2px solid var(--border-color); object-fit: cover; }
+        .user-avatar.img-mode { background: transparent; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 20px 0; overflow-y: auto; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column; backdrop-filter: blur(20px);
+        }
+        .nav-group { padding: 0 24px; margin-bottom: 20px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-item { display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: all 0.3s ease; border-radius: 10px; margin-bottom: 4px; }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
+        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
+        .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
+        .lock-icon { margin-left: auto; font-size: 0.7rem; opacity: 0.7; }
+
+        /* Layout */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; display: flex; flex-direction: column; }
+        .content-wrapper { max-width: 1200px; width: 100%; margin: 0 auto; }
+
+        /* Toolbar */
+        .analytics-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 20px; }
+        .page-title h1 { font-family: var(--font-head); font-size: 1.8rem; color: var(--text-main); margin-bottom: 5px; }
+        .page-title p { color: var(--text-muted); font-size: 0.95rem; }
+        
+        .action-group { display: flex; gap: 12px; }
+        .filter-select { 
+            padding: 10px 16px; border-radius: 10px; border: 1px solid var(--border-color); 
+            background: var(--bg-glass); color: var(--text-main); font-family: inherit; 
+            font-size: 0.9rem; outline: none; cursor: pointer; transition: 0.3s;
+        }
+        .filter-select:hover { border-color: var(--gold-base); }
+        .filter-select option { background: var(--bg-body); color: var(--text-main); }
+        
+        .btn-export { 
+            background: var(--gold-gradient); color: white; border: none; padding: 10px 20px; 
+            border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px; 
+            font-weight: 600; font-size: 0.9rem; transition: 0.3s; 
+        }
+        .btn-export:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(217, 119, 6, 0.3); }
+
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 30px; }
+        .stat-card { 
+            padding: 24px; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; justify-content: space-between; height: 140px;
+        }
+        .stat-card:hover { border-color: var(--gold-base); transform: translateY(-5px); }
+        
+        .stat-header { display: flex; justify-content: space-between; align-items: flex-start; z-index: 2; }
+        .stat-value { font-size: 2.5rem; font-weight: 700; color: var(--text-main); font-family: var(--font-display); line-height: 1; margin-top: 10px; }
+        .stat-label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        
+        .stat-icon { 
+            width: 45px; height: 45px; border-radius: 12px; display: grid; place-items: center; 
+            font-size: 1.2rem; background: var(--bg-input); border: 1px solid var(--border-color);
+            transition: 0.3s;
+        }
+        .stat-card:hover .stat-icon { background: var(--gold-base); color: white; border-color: var(--gold-base); }
+
+        /* Charts */
+        .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 30px; }
+        .chart-card { padding: 24px; display: flex; flex-direction: column; min-height: 400px; }
+        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .chart-title { font-size: 1.1rem; font-weight: 700; color: var(--text-main); font-family: var(--font-head); letter-spacing: 0.5px; }
+        .canvas-container { position: relative; flex: 1; width: 100%; min-height: 0; }
+
+        /* Activity Feed */
+        .activity-feed-container { margin-top: 5px; flex: 1; overflow-y: auto; padding-right: 5px; }
+        .activity-item { 
+            display: flex; gap: 15px; padding: 12px; border-radius: 10px;
+            align-items: center; animation: fadeIn 0.3s ease-in; margin-bottom: 8px;
+            background: var(--bg-input); border: 1px solid transparent; transition: 0.2s;
+        }
+        .activity-item:hover { background: var(--bg-hover); border-color: var(--border-color); }
+        .act-icon { 
+            width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; 
+            font-size: 0.9rem; flex-shrink: 0; background: rgba(15, 23, 42, 0.5); border: 1px solid var(--border-color);
+        }
+        .act-content { flex: 1; }
+        .act-title { font-size: 0.9rem; font-weight: 600; color: var(--text-main); margin-bottom: 3px; font-family: var(--font-display); }
+        .act-meta { font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); }
+
+        /* Footer */
+        .footer { margin-top: auto; padding-top: 40px; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.85rem; text-align: center; width: 100%; }
+        .social-links { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
+        .social-links a { 
+            color: var(--text-muted); width: 36px; height: 36px; border: 1px solid var(--border-color); 
+            border-radius: 50%; display: grid; place-items: center; transition: 0.3s;
+            background: var(--bg-input); text-decoration: none;
+        }
+        .social-links a:hover { color: white; background: var(--gold-base); border-color: var(--gold-base); transform: translateY(-3px); }
+
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 998; }
+
+        /* PWA Popup */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+        @media (max-width: 992px) {
+            .global-search-container { display: none; }
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 20px 15px; width: 100%; } 
+            .hamburger { display: block; }
+            .charts-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="seeker-dashboard.html" class="logo">EAST<span>LINK</span></a>
+        </div>
+        <div class="global-search-container">
+            <input type="text" class="global-search-input" placeholder="Search analytics or history...">
+            <i class="fas fa-search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+        </div>
+        <div class="header-actions">
+            <div class="icon-btn" title="Messages" onclick="location.href='seeker-messages.html'">
+                <i class="fa-regular fa-envelope"></i><div class="notification-badge" id="msg-badge">0</div>
+            </div>
+            <div class="icon-btn" title="Notifications" onclick="location.href='seeker-notifications.html'">
+                <i class="fa-regular fa-bell"></i><div class="notification-badge" id="notif-badge">0</div>
+            </div>
+            <div class="profile-widget" onclick="location.href='seeker-profile.html'">
+                <img src="" id="header-avatar-img" class="user-avatar img-mode" alt="Profile" style="display:none;">
+                <div id="header-avatar-fallback" class="user-avatar">U</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Overview</div>
+            <a href="seeker-dashboard.html" class="nav-item"><i class="fa-solid fa-compass"></i> Dashboard</a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Job Hunt</div>
+            <a href="seeker-applications.html" class="nav-item"><i class="fa-solid fa-file-signature"></i> Applied Jobs</a>
+            <a href="seeker-jobs.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Browse Jobs</a>
+            <a href="seeker-featured-jobs.html" class="nav-item link-std"><i class="fa-solid fa-star"></i> Featured Jobs <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-urgentlyhiring.html" class="nav-item link-pro"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-guaranteed-jobs.html" class="nav-item link-pro"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="seeker-wallet.html" class="nav-item"><i class="fa-solid fa-wallet"></i> My Wallet</a>
+            <a href="seeker-premium.html" class="nav-item"><i class="fa-solid fa-crown"></i> My Plan</a>
+            <a href="seeker-referrals.html" class="nav-item link-std"><i class="fa-solid fa-user-plus"></i> Invite & Earn <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-invest.html" class="nav-item link-std"><i class="fa-solid fa-chart-line"></i> Invest <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Resources</div>
+            <a href="seeker-blog.html" class="nav-item"><i class="fa-solid fa-newspaper"></i> News & Insights</a>
+            <a href="seeker-resources.html" class="nav-item link-pro"><i class="fa-solid fa-book"></i> Resources <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Settings</div>
+            <a href="seeker-profile.html" class="nav-item"><i class="fa-solid fa-user-gear"></i> Profile</a>
+            <a href="seeker-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="content-wrapper">
+            
+            <!-- Toolbar -->
+            <div class="analytics-toolbar animate__animated animate__fadeInDown">
+                <div class="page-title">
+                    <h1>Performance Analytics</h1>
+                    <p>Track your job search progress and profile visibility.</p>
+                </div>
+                <div class="action-group">
+                    <select class="filter-select" id="timeFilter" onchange="applyFilter()">
+                        <option value="30">Last 30 Days</option>
+                        <option value="7">Last 7 Days</option>
+                        <option value="all">All Time</option>
+                    </select>
+                    <button class="btn-export" onclick="exportData()"><i class="fa-solid fa-download"></i> Report</button>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid animate__animated animate__fadeIn">
+                <div class="glass-panel stat-card">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-label">Applications</div>
+                            <div class="stat-value" id="val-apps">0</div>
+                        </div>
+                        <div class="stat-icon"><i class="fa-solid fa-paper-plane"></i></div>
+                    </div>
+                </div>
+                
+                <div class="glass-panel stat-card">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-label">Interviews</div>
+                            <div class="stat-value" id="val-interviews">0</div>
+                        </div>
+                        <div class="stat-icon" style="color:var(--neon-purple); border-color: rgba(139, 92, 246, 0.3);"><i class="fa-solid fa-video"></i></div>
+                    </div>
+                </div>
+
+                <div class="glass-panel stat-card">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-label">Saved Jobs</div>
+                            <div class="stat-value" id="val-saved">0</div>
+                        </div>
+                        <div class="stat-icon" style="color:var(--gold-base); border-color: rgba(217, 119, 6, 0.3);"><i class="fa-solid fa-bookmark"></i></div>
+                    </div>
+                </div>
+
+                <div class="glass-panel stat-card">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-label">Profile Views</div>
+                            <div class="stat-value" id="val-views">0</div>
+                        </div>
+                        <div class="stat-icon" style="color:var(--success); border-color: rgba(16, 185, 129, 0.3);"><i class="fa-solid fa-eye"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row 1 -->
+            <div class="charts-grid animate__animated animate__fadeInUp">
+                <div class="glass-panel chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Application Timeline</div>
+                    </div>
+                    <div class="canvas-container"><canvas id="historyChart"></canvas></div>
+                </div>
+                <div class="glass-panel chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Status Breakdown</div>
+                    </div>
+                    <div class="canvas-container"><canvas id="statusChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Charts Row 2 -->
+            <div class="charts-grid animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+                <div class="glass-panel chart-card" style="min-height: auto;">
+                    <div class="chart-header">
+                        <div class="chart-title">Recent Activity</div>
+                    </div>
+                    <div id="activity-feed" class="activity-feed-container">
+                        <div style="text-align:center; padding:30px; color:var(--text-muted);">
+                            <i class="fa-solid fa-circle-notch fa-spin"></i> Loading...
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-panel chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Role Demand</div>
+                        <i class="fa-solid fa-circle-info" style="color:var(--text-muted); cursor: help;" title="Based on applied job keywords"></i>
+                    </div>
+                    <div class="canvas-container"><canvas id="roleChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <footer class="footer">
+                <div class="social-links" id="social-container">
+                    <!-- JS Injected -->
+                </div>
+                <p>&copy; 2025 EastLink Recruiters. All Rights Reserved.</p>
+            </footer>
+        </div>
+    </main>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add EastLink to home screen.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, getDocs, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig); 
+        const auth = getAuth(app); 
+        const db = getFirestore(app);
+
+        // --- UI UTILS ---
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
+        };
+        window.closeSidebar = () => {
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('overlay').style.display = 'none';
+        };
+        window.logout = () => signOut(auth).then(() => window.location.href = 'signin.html');
+
+        // Theme Init
+        document.documentElement.setAttribute('data-theme', 'dark');
+
+        // --- CHART SETUP ---
+        let charts = {}; 
+        let rawAppData = [];
+
+        // --- AUTH & DATA ---
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'signin.html'; return; }
+            
+            try {
+                const docSnap = await getDoc(doc(db, "users", user.uid));
+                if(docSnap.exists()) {
+                    const data = docSnap.data();
+                    
+                    // Avatar
+                    const avatarImg = document.getElementById('header-avatar-img');
+                    const avatarFallback = document.getElementById('header-avatar-fallback');
+                    if(data.photoURL || user.photoURL) {
+                        avatarImg.src = data.photoURL || user.photoURL;
+                        avatarImg.style.display = 'block';
+                        avatarFallback.style.display = 'none';
+                    } else {
+                        avatarFallback.innerText = (data.fullName || "U").charAt(0).toUpperCase();
+                    }
+                    
+                    // Sidebar Icons
+                    const plan = (data.plan || 'free').toLowerCase();
+                    if(['standard','pro','gold','premium','guaranteed'].some(p => plan.includes(p))) {
+                        document.querySelectorAll('.lock-icon').forEach(el => el.style.display = 'none');
+                    }
+
+                    // Stats: Profile Views
+                    document.getElementById('val-views').innerText = data.profileViews || 0;
+
+                    // Stats: Saved Jobs (Load via Collection query to match Rules)
+                    const savedQ = query(collection(db, "savedJobs"), where("userId", "==", user.uid));
+                    getDocs(savedQ).then(snap => {
+                        document.getElementById('val-saved').innerText = snap.size;
+                    });
+
+                    listenForBadges(user.uid);
+                    await fetchApplicationData(user.uid);
+                    loadSocials();
+                }
+            } catch(e) { console.error("Data load error:", e); }
+        });
+
+        async function fetchApplicationData(uid) {
+            // Rule check: resource.data.seekerId == request.auth.uid
+            const q = query(collection(db, "applications"), where("seekerId", "==", uid), orderBy("appliedAt", "desc"));
+            const snap = await getDocs(q);
+            
+            rawAppData = [];
+            snap.forEach(doc => {
+                const d = doc.data();
+                rawAppData.push({
+                    id: doc.id,
+                    ...d,
+                    date: d.appliedAt ? d.appliedAt.toDate() : new Date(),
+                    title: d.jobTitle || "Application",
+                    company: d.companyName || "Unknown",
+                    status: (d.status || "pending").toLowerCase()
+                });
+            });
+            window.applyFilter(); 
+        }
+
+        window.applyFilter = () => {
+            const filterVal = document.getElementById('timeFilter').value;
+            let filteredData = rawAppData;
+
+            if (filterVal !== 'all') {
+                const days = parseInt(filterVal);
+                const cutoff = new Date();
+                cutoff.setDate(cutoff.getDate() - days);
+                filteredData = rawAppData.filter(app => app.date >= cutoff);
+            }
+
+            document.getElementById('val-apps').innerText = filteredData.length;
+            document.getElementById('val-interviews').innerText = filteredData.filter(a => a.status === 'interview').length;
+            
+            updateCharts(filteredData);
+            updateActivityFeed(filteredData);
+        };
+
+        function updateActivityFeed(data) {
+            const container = document.getElementById('activity-feed');
+            container.innerHTML = '';
+            
+            if(data.length === 0) {
+                container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--text-muted);">No activity in this period.</div>';
+                return;
+            }
+
+            data.slice(0, 6).forEach(app => {
+                let icon = 'fa-paper-plane', color = 'var(--text-muted)', border = 'var(--border-color)';
+                let txt = `Applied to <strong>${app.title}</strong>`;
+                
+                if(app.status === 'interview') { 
+                    icon = 'fa-video'; color='var(--neon-purple)'; border='rgba(139, 92, 246, 0.5)';
+                    txt = `Interview for <strong>${app.title}</strong>`; 
+                }
+                else if(app.status === 'rejected') { 
+                    icon = 'fa-xmark'; color='var(--danger)'; border='rgba(239, 68, 68, 0.5)';
+                    txt = `Declined: <strong>${app.title}</strong>`; 
+                }
+                else if(app.status === 'hired') { 
+                    icon = 'fa-trophy'; color='var(--success)'; border='rgba(16, 185, 129, 0.5)';
+                    txt = `Hired: <strong>${app.title}</strong>`; 
+                }
+
+                container.innerHTML += `
+                    <div class="activity-item">
+                        <div class="act-icon" style="color:${color}; border-color:${border};"><i class="fa-solid ${icon}"></i></div>
+                        <div class="act-content">
+                            <div class="act-title">${txt}</div>
+                            <div class="act-meta">${app.company} • ${app.date.toLocaleDateString()}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function updateCharts(data) {
+            const textColor = '#94A3B8';
+            const gridColor = 'rgba(255,255,255,0.08)';
+
+            Chart.defaults.color = textColor;
+            Chart.defaults.borderColor = gridColor;
+
+            // 1. History
+            const daysMap = {};
+            data.forEach(a => { const d = a.date.toLocaleDateString(); daysMap[d] = (daysMap[d] || 0) + 1; });
+            const sortedDates = Object.keys(daysMap).sort((a,b) => new Date(a) - new Date(b));
+            renderChart('historyChart', 'line', sortedDates, sortedDates.map(d => daysMap[d]), 'Applications');
+
+            // 2. Status
+            const stats = { 'Pending': 0, 'Interview': 0, 'Rejected': 0, 'Hired': 0 };
+            data.forEach(a => {
+                let s = a.status.charAt(0).toUpperCase() + a.status.slice(1);
+                if(s === 'Viewed') s = 'Pending';
+                if(stats[s] !== undefined) stats[s]++; else stats['Pending']++;
+            });
+            renderChart('statusChart', 'doughnut', Object.keys(stats), Object.values(stats), 'Status');
+
+            // 3. Roles
+            const keys = { 'Tech':0, 'Admin':0, 'Sales':0, 'Marketing':0, 'Creatives':0 };
+            data.forEach(a => {
+                const t = a.title.toLowerCase();
+                if(t.match(/dev|eng|soft|data/)) keys['Tech']++;
+                else if(t.match(/admin|manag|clerk/)) keys['Admin']++;
+                else if(t.match(/sale|bus|acc/)) keys['Sales']++;
+                else if(t.match(/mark|soci|seo/)) keys['Marketing']++;
+                else if(t.match(/desi|art|writ|vid/)) keys['Creatives']++;
+            });
+            renderChart('roleChart', 'radar', Object.keys(keys), Object.values(keys), 'Demand');
+        }
+
+        function renderChart(id, type, labels, data, label) {
+            if (charts[id]) charts[id].destroy();
+            const ctx = document.getElementById(id).getContext('2d');
+            
+            // Brand Colors
+            const gold = '#D97706';
+            const purple = '#8b5cf6';
+            const success = '#10B981';
+            const danger = '#EF4444';
+            
+            const config = {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: label,
+                        data: data,
+                        backgroundColor: type==='line' ? 'rgba(217, 119, 6, 0.1)' : [gold, purple, danger, success, '#3B82F6'],
+                        borderColor: type==='line' ? gold : 'rgba(255,255,255,0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: type==='line'
+                    }]
+                },
+                options: {
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { 
+                            display: type !== 'line', 
+                            position: 'bottom', 
+                            labels: { boxWidth: 10, color: Chart.defaults.color } 
+                        } 
+                    },
+                    scales: type === 'line' 
+                        ? { x: { grid: { display:false } }, y: { beginAtZero:true, ticks:{stepSize:1} } } 
+                        : { r: { grid: { color: Chart.defaults.borderColor }, pointLabels: { color: Chart.defaults.color } } }
+                }
+            };
+            charts[id] = new Chart(ctx, config);
+        }
+
+        window.exportData = () => {
+            const csv = "Date,Job Title,Company,Status\n" + rawAppData.map(e => `${e.date.toLocaleDateString()},${e.title},${e.company},${e.status}`).join("\n");
+            const link = document.createElement("a");
+            link.href = "data:text/csv;charset=utf-8," + encodeURI(csv);
+            link.download = "eastlink_analytics.csv";
+            link.click();
+        };
+
+        // --- SHARED ---
+        function listenForBadges(uid) {
+            const up = (id, c) => { 
+                const el = document.getElementById(id); 
+                if(el) { el.innerText = c>9?'9+':c; el.style.display = c?'flex':'none'; }
+            };
+            onSnapshot(query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false)), s => up('notif-badge', s.size));
+            onSnapshot(query(collection(db, "messages"), where("receiverId", "==", uid), where("read", "==", false)), s => up('msg-badge', s.size));
+        }
+
+        async function loadSocials() {
+            try {
+                const d = await getDoc(doc(db, "site_settings", "social_links"));
+                if(d.exists()) {
+                    const s = d.data();
+                    const container = document.getElementById('social-container');
+                    if(container) {
+                        container.innerHTML = `
+                            <a href="${s.facebook||'#'}" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                            <a href="${s.whatsapp||'#'}" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                            <a href="${s.instagram||'#'}" target="_blank"><i class="fab fa-instagram"></i></a>
+                            <a href="${s.tiktok||'#'}" target="_blank"><i class="fab fa-tiktok"></i></a>
+                        `;
+                    }
+                }
+            } catch(e) {}
+        }
+
+        // --- PWA LOGIC ---
+        let deferredPrompt;
+        const pwaPopup = document.getElementById('pwa-install-popup');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if(!localStorage.getItem('pwaDismissed')) {
+                pwaPopup.style.display = 'flex';
+            }
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                pwaPopup.style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            pwaPopup.style.display = 'none';
+            localStorage.setItem('pwaDismissed', 'true');
+        };
+
+        if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js");
+    </script>
+</body>
+</html>

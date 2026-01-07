@@ -1,0 +1,11 @@
+/* TEAM */
+  Developer: FIDELIS
+  Contact: eastlinkrecruiters@gmail.com
+  Location: Nairobi, Kenya
+
+/* SITE */
+  Last update: 2025/12/30
+  Language: English
+  Doctype: HTML5
+  IDE: VS Code
+  Frameworks: Firebase, AOS, FontAwesome

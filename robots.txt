@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Do not index authentication pages
+Disallow: /signin.html
+Disallow: /signup.html
+Disallow: /reset-password.html
+
+# Do not index internal system files (if you have any later)
+Disallow: /admin/
+Disallow: /dashboard/
+
+# Point to your sitemap (Update domain when you go live)
+Sitemap: https://www.your-domain.com/sitemap.xml

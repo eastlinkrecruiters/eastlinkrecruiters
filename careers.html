@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Browse Careers | EastLink Recruiters</title>
+    <meta name="description" content="Find your next dream job with EastLink Recruiters. Browse thousands of active listings.">
+    
+    <!-- PWA Manifest & Favicon (Updated Paths) -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
+    <meta name="theme-color" content="#020617">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons & Animation -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        /* =========================================
+           THEME VARIABLES
+           ========================================= */
+        :root {
+            --primary: #f59e0b; /* Bright Gold/Orange */
+            --primary-dark: #d97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            
+            --bg: #020617; 
+            --bg-glass-70: rgba(15, 23, 42, 0.7); 
+            
+            --text: #F8FAFC;
+            --text-muted: #94A3B8;
+            
+            --border-color: rgba(255, 255, 255, 0.1);
+            --header-height: 80px;
+            --transition: all 0.3s ease;
+            --radius: 16px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            /* Relative path for GitHub Pages */
+            background-image: url('./assets/images/background.png');
+            background-attachment: fixed;
+            background-position: center;
+            background-size: cover;
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        /* Dark overlay - 20% Opacity */
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background: rgba(2, 6, 23, 0.2); 
+            z-index: -5; pointer-events: none;
+        }
+
+        h1, h2, h3, h4, .brand-font { font-family: 'Cinzel', serif; }
+        a { text-decoration: none; color: inherit; transition: var(--transition); }
+        ul { list-style: none; }
+        
+        .container { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* Buttons */
+        .btn-gold {
+            background: var(--primary); color: #000; padding: 10px 24px;
+            border-radius: 50px; font-weight: 700; display: inline-flex;
+            align-items: center; justify-content: center; border: none; cursor: pointer;
+            font-size: 0.9rem; transition: var(--transition);
+        }
+        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3); background: #fbbf24; }
+
+        .btn-outline {
+            background: transparent; border: 1px solid var(--border-color); color: var(--text);
+            padding: 8px 20px; border-radius: 50px; cursor: pointer; font-weight: 600; transition: var(--transition);
+        }
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+        /* --- SCROLL PROGRESS --- */
+        #scroll-progress {
+            position: fixed; top: 0; left: 0; height: 3px; background: var(--primary);
+            z-index: 2000; width: 0%; transition: width 0.1s;
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; width: 100%; height: var(--header-height);
+            z-index: 1000; transition: var(--transition); 
+            background: var(--bg-glass-70);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .nav-inner { height: 100%; display: flex; justify-content: space-between; align-items: center; }
+
+        .header-logo-text {
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem; font-weight: 700; color: var(--text);
+            letter-spacing: 1px; display: flex; align-items: center; gap: 12px;
+        }
+        .header-logo-text span { color: var(--primary); }
+
+        .menu-trigger {
+            display: inline-flex; align-items: center; gap: 12px; cursor: pointer;
+            padding: 8px 20px; border-radius: 99px;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);
+            color: var(--text); font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;
+            transition: var(--transition);
+        }
+        .menu-trigger:hover { border-color: var(--primary); background: rgba(245, 158, 11, 0.1); }
+
+        /* --- OVERLAY MENU --- */
+        .menu-overlay {
+            position: fixed; inset: 0; 
+            background: rgba(2, 6, 23, 0.98);
+            z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: var(--transition);
+        }
+        .menu-overlay.active { opacity: 1; pointer-events: all; }
+        .close-menu {
+            position: absolute; top: 30px; right: 30px;
+            width: 44px; height: 44px; border-radius: 50%;
+            border: 1px solid var(--border-color); color: var(--text-muted);
+            display: grid; place-items: center; cursor: pointer; transition: 0.3s; font-size: 1.2rem;
+        }
+        .close-menu:hover { border-color: var(--primary); color: var(--primary); transform: rotate(90deg); }
+        
+        .menu-links { text-align: center; display: flex; flex-direction: column; gap: 25px; }
+        .menu-link {
+            font-family: 'Cinzel', serif; font-size: 2.5rem; font-weight: 700;
+            color: var(--text); transition: 0.3s;
+        }
+        .menu-link:hover { color: var(--primary); }
+        .menu-actions { margin-top: 50px; display: flex; gap: 15px; align-items: center; }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            padding: calc(var(--header-height) + 60px) 0 60px; 
+            text-align: center; 
+        }
+        .hero h1 { font-size: 2.5rem; margin-bottom: 15px; color: var(--text); }
+        .hero p { color: var(--text-muted); margin-bottom: 40px; font-size: 1.1rem; }
+        
+        /* Search Box (Glass 70%) */
+        .search-box {
+            background: var(--bg-glass-70); padding: 10px; border-radius: 50px;
+            max-width: 800px; margin: 0 auto; display: flex; gap: 10px;
+            border: 1px solid var(--border-color); backdrop-filter: blur(12px);
+            flex-wrap: wrap; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+        .input-group { flex: 1; position: relative; min-width: 200px; }
+        .input-group i { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--primary); }
+        .input-group input {
+            width: 100%; border: none; padding: 15px 15px 15px 50px; font-size: 1rem;
+            outline: none; background: transparent; color: var(--text); font-family: 'Inter', sans-serif;
+        }
+        .input-group:first-child { border-right: 1px solid var(--border-color); }
+
+        /* --- PAGE GRID --- */
+        .page-grid {
+            display: grid; grid-template-columns: 280px 1fr; gap: 40px; align-items: start; margin-top: 40px;
+            padding-bottom: 4rem;
+        }
+
+        /* Sidebar Filters (Glass 70%) */
+        .filters {
+            background: var(--bg-glass-70); padding: 25px; border-radius: var(--radius);
+            border: 1px solid var(--border-color); position: sticky; top: 100px;
+            backdrop-filter: blur(12px);
+        }
+        .filter-group { margin-bottom: 25px; padding-bottom: 25px; border-bottom: 1px solid var(--border-color); }
+        .filter-group:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        
+        .filter-title { font-weight: 700; margin-bottom: 15px; font-size: 0.95rem; color: var(--text); font-family: 'Cinzel', serif; }
+        
+        .checkbox-label {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+            cursor: pointer; color: var(--text-muted); font-size: 0.9rem; transition: 0.2s;
+        }
+        .checkbox-label:hover { color: var(--primary); }
+        .checkbox-label input { accent-color: var(--primary); width: 16px; height: 16px; }
+        .tag-count { font-size: 0.7rem; background: var(--primary); color: #000; padding: 2px 6px; border-radius: 6px; margin-left: auto; font-weight: 700; }
+
+        /* Job List */
+        .job-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .job-count { font-weight: 600; color: var(--text-muted); font-size: 0.9rem; }
+        .sort-select {
+            padding: 8px 15px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);
+            border-radius: 8px; color: var(--text); outline: none; cursor: pointer;
+        }
+        .sort-select option { background: var(--bg); color: var(--text); }
+
+        /* Job Card (Glass 70%) */
+        .job-card {
+            background: var(--bg-glass-70); border: 1px solid var(--border-color);
+            border-radius: var(--radius); padding: 25px; margin-bottom: 20px;
+            transition: var(--transition); display: flex; gap: 20px; position: relative;
+            overflow: hidden; backdrop-filter: blur(12px);
+        }
+        .job-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .job-card.featured { border: 1px solid var(--primary); }
+        .job-card.featured::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--primary);
+        }
+
+        .logo-box {
+            width: 60px; height: 60px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px; display: grid; place-items: center;
+            font-weight: 700; font-size: 1.5rem; color: var(--text-muted);
+            border: 1px solid var(--border-color); flex-shrink: 0;
+        }
+        
+        .job-content { flex: 1; }
+        .job-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 5px; color: var(--text); font-family: 'Cinzel', serif; }
+        .company-name {
+            font-weight: 500; color: var(--text-muted); font-size: 0.95rem;
+            margin-bottom: 15px; display: flex; align-items: center; gap: 8px;
+        }
+        .verified-badge { color: var(--primary); font-size: 0.9rem; }
+        
+        .job-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .tag { padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 500; border: 1px solid var(--border-color); background: rgba(255,255,255,0.03); color: var(--text-muted); }
+        .tag i { margin-right: 5px; color: var(--primary); }
+
+        .job-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.85rem; color: var(--text-muted); padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Skeleton */
+        .skeleton { background: rgba(255,255,255,0.05); animation: shimmer 1.5s infinite; border-radius: 4px; }
+        @keyframes shimmer { 0% { opacity: 0.5; } 50% { opacity: 0.8; } 100% { opacity: 0.5; } }
+        .sk-card { padding: 25px; background: var(--bg-glass-70); border-radius: var(--radius); border: 1px solid var(--border-color); margin-bottom: 20px; display: flex; gap: 20px; backdrop-filter: blur(12px); }
+        .sk-logo { width: 60px; height: 60px; border-radius: 12px; }
+        .sk-lines { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+        .sk-line { height: 14px; width: 100%; }
+        .sk-line.short { width: 40%; }
+
+        /* FOOTER */
+        footer { 
+            background: var(--bg-glass-70); border-top: 1px solid var(--border-color); 
+            padding-top: 4rem; margin-top: auto; backdrop-filter: blur(12px);
+        }
+        /* UPDATED: Changed to 3 columns */
+        .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; margin-bottom: 4rem; text-align: left; }
+        
+        .f-col h4 { font-size: 0.9rem; color: var(--text); margin-bottom: 1.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-family: 'Cinzel', serif; }
+        .f-col ul { list-style: none; }
+        .f-col ul li { margin-bottom: 12px; }
+        .f-col a { color: var(--text-muted); font-size: 0.9rem; transition: 0.2s; }
+        .f-col a:hover { color: var(--primary); padding-left: 5px; }
+        .social-links { display: flex; gap: 10px; margin-top: 25px; }
+        .s-btn {
+            width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color); color: var(--text-muted);
+            display: grid; place-items: center; transition: 0.3s; font-size: 1rem;
+        }
+        .s-btn:hover { background: var(--primary); color: #000; border-color: var(--primary); }
+        .copyright { border-top: 1px solid var(--border-color); padding: 2rem 0; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .page-grid { grid-template-columns: 1fr; gap: 20px; }
+            .filters { display: none; } 
+            .search-box { flex-direction: column; border-radius: 20px; padding: 15px; }
+            .input-group:first-child { border-right: none; border-bottom: 1px solid var(--border-color); margin-bottom: 10px; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 600px) {
+            .footer-grid { grid-template-columns: 1fr; }
+            .job-card { flex-direction: column; }
+        }
+    </style>
+</head>
+<body style="background-color: #020617;">
+
+    <!-- PRELOADER (Safe Style) -->
+    <div id="preloader" style="position:fixed; inset:0; background:#020617; z-index:9999; display:flex; justify-content:center; align-items:center; transition: opacity 0.5s ease;">
+        <div style="text-align:center;">
+            <img src="./assets/images/logo.png" style="width:70px; height:auto; margin-bottom:20px; filter: drop-shadow(0 0 15px var(--primary));" alt="Loading...">
+            <div style="width:150px; height:2px; background:rgba(255,255,255,0.1); overflow:hidden; border-radius:2px;">
+                <div style="width:100%; height:100%; background:linear-gradient(135deg, #fbbf24 0%, #d97706 100%); animation:loading 1.5s infinite ease-in-out; transform-origin:left;"></div>
+            </div>
+            <style>@keyframes loading { 0% { transform: scaleX(0); } 50% { transform: scaleX(1); } 100% { transform: scaleX(0); transform-origin:right; } }</style>
+        </div>
+    </div>
+
+    <!-- Scroll Progress -->
+    <div id="scroll-progress"></div>
+
+    <!-- HEADER -->
+    <header id="header">
+        <div class="container nav-inner">
+            <a href="index.html" class="header-logo-text">
+                <img src="./assets/images/logo.png" style="height:35px; width:auto;" alt="Logo">
+                <div>EAST<span>LINK</span></div>
+            </a>
+            <div class="menu-trigger" onclick="toggleMenu()">
+                <span>MENU</span>
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- MENU OVERLAY -->
+    <div class="menu-overlay" id="menuOverlay">
+        <div class="close-menu" onclick="toggleMenu()"><i class="fas fa-times"></i></div>
+        <div class="menu-links">
+            <a href="about.html" class="menu-link">About Us</a>
+            <a href="signup.html" class="menu-link" style="color:var(--primary);">Opportunities</a>
+            <!-- MOBILE APP REMOVED -->
+        </div>
+        <div class="menu-actions">
+            <a href="signin.html" class="btn" style="background:transparent; border:1px solid var(--border-color); color:white; border-radius:50px; padding:12px 30px; text-decoration:none;">Sign In</a>
+            <a href="signup.html" class="btn" style="background:var(--primary); color:black; border-radius:50px; padding:12px 30px; font-weight:700; text-decoration:none;">Join Now</a>
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <main>
+        
+        <!-- Hero Search -->
+        <section class="hero" data-aos="fade-down">
+            <div class="container">
+                <h1 class="brand-font">Find Your Next Opportunity</h1>
+                <p>Browse active listings from top companies.</p>
+                <div class="search-box">
+                    <div class="input-group">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Job title, keywords, or company">
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <input type="text" id="locInput" placeholder="City or 'Remote'">
+                    </div>
+                    <button class="btn-gold" style="border-radius:30px; margin: 5px 5px 5px 0;" onclick="filterJobs()">Search</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Grid -->
+        <div class="container page-grid">
+            
+            <!-- Filters Sidebar -->
+            <aside class="filters" data-aos="fade-right">
+                <div class="filter-group">
+                    <div class="filter-title">Job Type</div>
+                    <label class="checkbox-label"><input type="checkbox" value="Full Time" onchange="filterJobs()"> Full Time</label>
+                    <label class="checkbox-label"><input type="checkbox" value="Part Time" onchange="filterJobs()"> Part Time</label>
+                    <label class="checkbox-label"><input type="checkbox" value="Contract" onchange="filterJobs()"> Contract</label>
+                    <label class="checkbox-label"><input type="checkbox" value="Freelance" onchange="filterJobs()"> Freelance</label>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-title">Work Style</div>
+                    <label class="checkbox-label"><input type="checkbox" value="Remote" onchange="filterJobs()"> Remote <span class="tag-count">Hot</span></label>
+                    <label class="checkbox-label"><input type="checkbox" value="On-Site" onchange="filterJobs()"> On-Site</label>
+                    <label class="checkbox-label"><input type="checkbox" value="Hybrid" onchange="filterJobs()"> Hybrid</label>
+                </div>
+
+                <div class="filter-group">
+                    <div class="filter-title">Category</div>
+                    <label class="checkbox-label"><input type="checkbox" value="Tech" onchange="filterJobs()"> Technology</label>
+                    <label class="checkbox-label"><input type="checkbox" value="Marketing" onchange="filterJobs()"> Marketing</label>
+                    <label class="checkbox-label"><input type="checkbox" value="Finance" onchange="filterJobs()"> Finance</label>
+                    <label class="checkbox-label"><input type="checkbox" value="Health" onchange="filterJobs()"> Healthcare</label>
+                </div>
+            </aside>
+
+            <!-- Job Results -->
+            <section class="job-results" data-aos="fade-up">
+                <div class="job-header">
+                    <div class="job-count"><span id="count-display">0</span> Jobs Found</div>
+                    <select class="sort-select" onchange="sortJobs(this.value)">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="salary">High Salary</option>
+                    </select>
+                </div>
+
+                <div id="jobs-container">
+                    <!-- Skeletons -->
+                    <div class="sk-card"><div class="skeleton sk-logo"></div><div class="sk-lines"><div class="skeleton sk-line short"></div><div class="skeleton sk-line"></div><div class="skeleton sk-line short"></div></div></div>
+                    <div class="sk-card"><div class="skeleton sk-logo"></div><div class="sk-lines"><div class="skeleton sk-line short"></div><div class="skeleton sk-line"></div><div class="skeleton sk-line short"></div></div></div>
+                    <div class="sk-card"><div class="skeleton sk-logo"></div><div class="sk-lines"><div class="skeleton sk-line short"></div><div class="skeleton sk-line"></div><div class="skeleton sk-line short"></div></div></div>
+                </div>
+
+                <div style="text-align: center; margin-top: 40px;">
+                    <button class="btn-outline" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Back to Top</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="f-col">
+                    <div class="logo" style="margin-bottom:20px; font-weight:700; font-size:1.4rem; display:flex; align-items:center; gap:10px; font-family: 'Cinzel', serif;">
+                        <img src="./assets/images/logo.png" style="height:35px; width:auto;" alt="EastLink">
+                        <div style="color:white;">EAST<span style="color:var(--primary);">LINK</span></div>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.6;">The leading platform for professional recruitment. We ensure quality, trust, and speed.</p>
+                    <div class="social-links">
+                        <a href="#" id="link-fb" class="s-btn" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" id="link-in" class="s-btn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" id="link-tw" class="s-btn" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="#" id="link-ig" class="s-btn" target="_blank"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="f-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="services.html">Our Services</a></li>
+                        <li><a href="careers.html">Careers</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="f-col">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="signin.html">Client Portal</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">&copy; <span id="year"></span> EastLink Recruitment Solutions. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" style="
+        display: none; 
+        position: fixed; bottom: 20px; right: 20px; 
+        background: rgba(15, 23, 42, 0.95); 
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        backdrop-filter: blur(12px);
+        padding: 20px; border-radius: 16px; 
+        z-index: 10000; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        max-width: 320px; animation: slideUp 0.5s ease-out;
+    ">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+            <img src="./assets/images/logo.png" style="width:50px; height:50px; border-radius:10px;">
+            <div>
+                <h4 style="color:#fff; margin:0; font-family:'Cinzel', serif;">Install EastLink</h4>
+                <p style="color:#94A3B8; margin:5px 0 0; font-size:0.8rem;">Add to Home Screen for fast access.</p>
+            </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button id="pwa-dismiss" style="flex:1; padding:10px; background:transparent; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:8px; cursor:pointer;">Later</button>
+            <button id="pwa-install-btn" style="flex:1; padding:10px; background:linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border:none; color:#000; font-weight:700; border-radius:8px; cursor:pointer;">Install</button>
+        </div>
+    </div>
+    <style>@keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }</style>
+
+    <!-- SCRIPTS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let allJobs = [];
+
+        // --- INIT UI ---
+        AOS.init({ duration: 800, offset: 50, once: true });
+        document.getElementById("year").textContent = new Date().getFullYear();
+
+        window.toggleMenu = () => {
+            const menu = document.getElementById('menuOverlay');
+            menu.classList.toggle('active');
+            document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : 'auto';
+        };
+
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("scroll-progress").style.width = scrolled + "%";
+        });
+
+        // --- LOAD JOBS ---
+        async function loadJobs() {
+            try {
+                const snapshot = await getDocs(collection(db, "jobs"));
+                allJobs = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if(data.status === 'approved' || data.status === 'active') {
+                        allJobs.push({ id: doc.id, ...data });
+                    }
+                });
+
+                // Default Sort: Newest
+                allJobs.sort((a,b) => (b.postedAt?.seconds || 0) - (a.postedAt?.seconds || 0));
+                renderJobs(allJobs);
+            } catch (error) {
+                console.error("Error loading jobs:", error);
+                document.getElementById('jobs-container').innerHTML = `
+                    <div style="text-align:center; padding: 40px; color: var(--text-muted);">
+                        <i class="fas fa-exclamation-circle fa-2x"></i><br>
+                        Unable to load jobs at this time.
+                    </div>`;
+            }
+        }
+
+        // --- RENDER ---
+        window.renderJobs = (jobs) => {
+            const container = document.getElementById('jobs-container');
+            const countDisplay = document.getElementById('count-display');
+            
+            countDisplay.innerText = jobs.length;
+            container.innerHTML = '';
+
+            if(jobs.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding: 60px; color: var(--text-muted);">
+                        <i class="fas fa-search fa-3x" style="opacity:0.3; margin-bottom:15px; color: var(--primary);"></i>
+                        <h3 class="brand-font" style="color:var(--text)">No jobs found</h3>
+                        <p>Try adjusting your search filters.</p>
+                    </div>`;
+                return;
+            }
+
+            jobs.forEach(job => {
+                const timeAgo = getTimeAgo(job.postedAt);
+                const salary = job.salary ? `Ksh ${parseInt(job.salary).toLocaleString()}` : 'Confidential';
+                const featuredClass = job.isFeatured ? 'featured' : '';
+                const logoChar = (job.company || 'C').charAt(0).toUpperCase();
+                
+                const html = `
+                <div class="job-card ${featuredClass}" data-aos="fade-up">
+                    <div class="logo-box">${logoChar}</div>
+                    <div class="job-content">
+                        <div class="job-title">${job.title}</div>
+                        <div class="company-name">
+                            ${job.company}
+                            ${job.isFeatured ? '<i class="fas fa-check-circle verified-badge" title="Verified Employer"></i>' : ''}
+                        </div>
+                        <div class="job-tags">
+                            <span class="tag"><i class="fas fa-map-marker-alt"></i> ${job.location || 'Remote'}</span>
+                            <span class="tag"><i class="fas fa-briefcase"></i> ${job.type || 'Full Time'}</span>
+                            <span class="tag"><i class="fas fa-money-bill"></i> ${salary}</span>
+                        </div>
+                        <div class="job-footer">
+                            <span><i class="far fa-clock"></i> Posted ${timeAgo}</span>
+                            <button class="btn-gold" style="padding:6px 18px; font-size:0.8rem;" onclick="viewJob('${job.id}')">
+                                ${job.isUrgent ? '<i class="fas fa-bolt" style="margin-right:5px;"></i>' : ''} View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+                container.innerHTML += html;
+            });
+        };
+
+        // --- FILTERS & SORT ---
+        window.filterJobs = () => {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            const loc = document.getElementById('locInput').value.toLowerCase();
+            const types = Array.from(document.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value.toLowerCase());
+
+            const filtered = allJobs.filter(job => {
+                const mTitle = (job.title || '').toLowerCase().includes(keyword);
+                const mComp = (job.company || '').toLowerCase().includes(keyword);
+                const mLoc = (job.location || '').toLowerCase().includes(loc);
+                
+                let mType = true;
+                if (types.length > 0) {
+                    const jobString = (job.type + " " + job.location + " " + job.description + " " + job.category).toLowerCase();
+                    mType = types.some(t => jobString.includes(t));
+                }
+
+                return (mTitle || mComp) && mLoc && mType;
+            });
+            renderJobs(filtered);
+        };
+
+        window.sortJobs = (criteria) => {
+            if (criteria === 'newest') {
+                allJobs.sort((a,b) => (b.postedAt?.seconds || 0) - (a.postedAt?.seconds || 0));
+            } else if (criteria === 'oldest') {
+                allJobs.sort((a,b) => (a.postedAt?.seconds || 0) - (b.postedAt?.seconds || 0));
+            } else if (criteria === 'salary') {
+                allJobs.sort((a,b) => (parseInt(b.salary) || 0) - (parseInt(a.salary) || 0));
+            }
+            filterJobs();
+        };
+
+        // --- HELPERS ---
+        window.viewJob = (id) => {
+            window.location.href = `seeker-job-details.html?id=${id}`;
+        };
+
+        function getTimeAgo(timestamp) {
+            if(!timestamp) return 'Recently';
+            const seconds = Math.floor((new Date() - new Date(timestamp.seconds * 1000)) / 1000);
+            let interval = seconds / 31536000;
+            if (interval > 1) return Math.floor(interval) + "y ago";
+            interval = seconds / 2592000;
+            if (interval > 1) return Math.floor(interval) + "mo ago";
+            interval = seconds / 86400;
+            if (interval > 1) return Math.floor(interval) + "d ago";
+            interval = seconds / 3600;
+            if (interval > 1) return Math.floor(interval) + "h ago";
+            return "Just now";
+        }
+        
+        async function loadSocials() {
+            try {
+                const docRef = doc(db, "site_settings", "general"); 
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if(data.facebook) document.getElementById('link-fb').href = data.facebook;
+                    if(data.linkedin) document.getElementById('link-in').href = data.linkedin;
+                    if(data.twitter) document.getElementById('link-tw').href = data.twitter;
+                    if(data.instagram) document.getElementById('link-ig').href = data.instagram;
+                }
+            } catch (error) {}
+        }
+
+        // Init Listeners
+        document.getElementById('searchInput').addEventListener('keyup', filterJobs);
+        document.getElementById('locInput').addEventListener('keyup', filterJobs);
+        loadJobs();
+        loadSocials();
+
+        // --- PWA LOGIC START ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('SW Registered'))
+                    .catch(err => console.log('SW Failed', err));
+            });
+        }
+        let deferredPrompt;
+        const pwaPopup = document.getElementById('pwa-install-popup');
+        const installBtn = document.getElementById('pwa-install-btn');
+        const dismissBtn = document.getElementById('pwa-dismiss');
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            setTimeout(() => { pwaPopup.style.display = 'block'; }, 3000);
+        });
+        installBtn.addEventListener('click', (e) => {
+            pwaPopup.style.display = 'none';
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => { deferredPrompt = null; });
+            }
+        });
+        dismissBtn.addEventListener('click', () => { pwaPopup.style.display = 'none'; });
+        window.addEventListener('appinstalled', () => { pwaPopup.style.display = 'none'; });
+        // --- PWA LOGIC END ---
+    </script>
+
+    <!-- SAFETY SCRIPT -->
+    <script>
+        function removePreloader() {
+            const preloader = document.getElementById('preloader');
+            if(preloader) {
+                preloader.style.opacity = '0';
+                setTimeout(() => preloader.style.display = 'none', 500);
+            }
+        }
+        window.addEventListener('load', removePreloader);
+        setTimeout(removePreloader, 3000); // Failsafe
+    </script>
+</body>
+</html>

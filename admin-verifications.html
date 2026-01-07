@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Identity Verifications | EastLink Admin</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#020617">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Dark Theme (Default) */
+            --bg-body: #020617; --bg-card: #0F172A; --bg-glass: rgba(15, 23, 42, 0.95);
+            --text-main: #F8FAFC; --text-muted: #94A3B8; --border-color: rgba(255, 255, 255, 0.08);
+            
+            /* Brand Colors */
+            --gold-base: #D97706; --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --neon-tech: #8B5CF6; --success: #10B981; --danger: #EF4444; --blue: #3B82F6;
+            
+            --sidebar-width: 280px; --header-height: 70px; --radius: 16px;
+            --font-head: 'Cinzel', serif; --font-body: 'Inter', sans-serif; --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        [data-theme="light"] {
+            --bg-body: #F1F5F9; --bg-card: #FFFFFF; --bg-glass: rgba(255, 255, 255, 0.95);
+            --text-main: #0F172A; --text-muted: #64748B; --border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        body { font-family: var(--font-body); background-color: var(--bg-body); color: var(--text-main); overflow-x: hidden; transition: background-color 0.3s ease; }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass); backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 1000;
+        }
+
+        .logo { font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.4rem; text-decoration: none; }
+        .logo span { color: var(--gold-base); }
+        .admin-badge { font-family: var(--font-body); font-size: 0.6rem; background: var(--bg-card); border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; margin-left: 5px; color: var(--text-muted); vertical-align: middle; }
+
+        /* HEADER ICONS */
+        .theme-toggle { cursor: pointer; font-size: 1.2rem; color: var(--text-muted); margin-right: 20px; transition: 0.3s; }
+        .header-icon-wrap { position: relative; margin-right: 20px; cursor: pointer; color: var(--text-muted); font-size: 1.2rem; transition: 0.3s; }
+        .header-icon-wrap:hover { color: var(--text-main); }
+        .header-icon-wrap .badge { position: absolute; top: -6px; right: -6px; background: var(--danger); color: white; font-size: 0.6rem; padding: 2px 5px; border-radius: 10px; font-weight: 700; border: 2px solid var(--bg-card); }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass); border-right: 1px solid var(--border-color); padding: 15px 0; 
+            overflow-y: auto; transition: transform 0.3s ease; z-index: 999;
+            display: flex; flex-direction: column;
+        }
+        .sidebar-content { flex-grow: 1; }
+        .nav-group-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; padding: 15px 24px 8px; letter-spacing: 1px; opacity: 0.8; }
+        .nav-item { display: flex; align-items: center; padding: 10px 24px; margin: 2px 0; color: var(--text-muted); text-decoration: none; font-weight: 500; transition: all 0.2s ease; font-size: 0.9rem; border-left: 3px solid transparent; }
+        .nav-item:hover { background: rgba(217, 119, 6, 0.05); color: var(--text-main); }
+        .nav-item.active { background: linear-gradient(90deg, rgba(217,119,6,0.1), transparent); color: var(--gold-base); border-left-color: var(--gold-base); }
+        .nav-item i { width: 24px; margin-right: 10px; font-size: 1.1rem; text-align: center; }
+        .sidebar-footer { padding: 20px; border-top: 1px solid var(--border-color); }
+
+        /* --- MAIN --- */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 25px; min-height: calc(100vh - var(--header-height)); }
+
+        .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+        .page-header h1 { font-family: var(--font-head); font-size: 1.5rem; color: var(--text-main); }
+        .page-header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 5px; }
+
+        /* VERIFICATION GRID */
+        .verify-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        
+        .verify-card { 
+            background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); 
+            padding: 25px; display: flex; flex-direction: column; position: relative; transition: 0.3s; 
+            overflow: hidden;
+        }
+        .verify-card:hover { transform: translateY(-3px); border-color: var(--gold-base); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        
+        /* Card Role Badge */
+        .role-badge { 
+            position: absolute; top: 20px; right: 20px; font-size: 0.65rem; padding: 4px 10px; 
+            border-radius: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+            backdrop-filter: blur(5px);
+        }
+        .role-employer { background: rgba(217, 119, 6, 0.15); color: var(--gold-base); border: 1px solid rgba(217, 119, 6, 0.3); }
+        .role-seeker { background: rgba(59, 130, 246, 0.15); color: var(--blue); border: 1px solid rgba(59, 130, 246, 0.3); }
+
+        /* Header Info */
+        .v-header { display: flex; gap: 15px; align-items: center; margin-bottom: 20px; }
+        .v-avatar { 
+            width: 55px; height: 55px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+            font-family: var(--font-head); font-weight: 700; font-size: 1.5rem; color: var(--text-main);
+        }
+        .v-info h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; font-family: var(--font-head); }
+        .v-info p { font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono); }
+
+        /* Doc Preview Area */
+        .doc-preview { 
+            background: rgba(0,0,0,0.3); border: 1px dashed var(--border-color); border-radius: 12px; 
+            height: 140px; display: flex; flex-direction: column; align-items: center; 
+            justify-content: center; cursor: pointer; margin-bottom: 25px; transition: 0.2s;
+            color: var(--text-muted); position: relative; overflow: hidden;
+        }
+        .doc-preview:hover { border-color: var(--gold-base); background: rgba(217, 119, 6, 0.05); color: var(--gold-base); }
+        .doc-preview i { font-size: 2rem; margin-bottom: 10px; }
+        .doc-preview span { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Actions */
+        .v-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: auto; }
+        .btn-v { 
+            padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; 
+            font-size: 0.85rem; font-family: var(--font-body); display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: transparent; border: 1px solid transparent;
+        }
+        .btn-accept { border-color: var(--success); color: var(--success); background: rgba(16, 185, 129, 0.05); }
+        .btn-accept:hover { background: var(--success); color: white; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+        
+        .btn-deny { border-color: var(--danger); color: var(--danger); background: rgba(239, 68, 68, 0.05); }
+        .btn-deny:hover { background: var(--danger); color: white; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; flex-direction: column; backdrop-filter: blur(5px); }
+        .modal.active { display: flex; animation: fadeIn 0.2s ease; }
+        .modal-content-wrapper { position: relative; max-width: 90%; max-height: 85vh; border: 1px solid var(--gold-base); border-radius: var(--radius); overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
+        .modal img { max-width: 100%; max-height: 80vh; display: block; }
+        .close-modal-btn { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.5); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .close-modal-btn:hover { background: var(--danger); }
+
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 998; backdrop-filter: blur(3px); }
+
+        /* PWA Popup */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+        @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 15px; }
+            .menu-toggle { display: block !important; }
+            .overlay.active { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div style="display:flex; align-items:center; gap:15px;">
+            <i class="fas fa-bars menu-toggle" style="font-size:1.3rem; color:var(--gold-base); cursor:pointer; display:none;" onclick="toggleSidebar()"></i>
+            <a href="admin-dashboard.html" class="logo"><span>East</span>Link <span class="admin-badge">ADMIN</span></a>
+        </div>
+
+        <div style="display:flex; align-items:center;">
+            <i class="fas fa-moon theme-toggle" id="theme-icon" onclick="toggleTheme()"></i>
+
+            <div class="header-icon-wrap" onclick="location.href='admin-support.html'">
+                <i class="fa-solid fa-envelope"></i>
+                <span class="badge" id="msg-badge" style="display:none;">0</span>
+            </div>
+            
+            <div class="header-icon-wrap" onclick="location.href='admin-notifications.html'">
+                <i class="fa-solid fa-bell"></i>
+                <span class="badge" id="notif-badge" style="display:none;">0</span>
+            </div>
+            
+            <div onclick="location.href='admin-settings.html'" style="width:35px; height:35px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gold-base);">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+        </div>
+    </header>
+
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-content">
+            <div class="nav-group-label">Analytics</div>
+            <a href="admin-dashboard.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+            
+            <div class="nav-group-label">User Management</div>
+            <a href="admin-users.html" class="nav-item"><i class="fa-solid fa-users"></i> Manage Users</a>
+            <a href="admin-plans.html" class="nav-item"><i class="fa-solid fa-tags"></i> Manage Plans</a>
+            <a href="admin-referrals.html" class="nav-item"><i class="fa-solid fa-share-nodes"></i> Referrals</a>
+            <a href="admin-verifications.html" class="nav-item active"><i class="fa-solid fa-id-badge"></i> Verifications</a>
+            
+            <div class="nav-group-label">Jobs & Service</div>
+            <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
+            <a href="admin-guaranteed-jobs.html" class="nav-item"><i class="fa-solid fa-certificate"></i> Guaranteed Jobs</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+
+            <div class="nav-group-label">Finance</div>
+            <a href="admin-deposits.html" class="nav-item"><i class="fa-solid fa-arrow-down"></i> Manage Deposits</a>
+            <a href="admin-withdrawals.html" class="nav-item"><i class="fa-solid fa-arrow-up"></i> Manage Withdrawals</a>
+            <a href="admin-deposit-issues.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> Deposit Errors</a>
+
+            <div class="nav-group-label">Content & Support</div>
+            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs</a>
+            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support Requests</a>
+            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
+            <a href="admin-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> System Config</a>
+        </div>
+        
+        <div class="sidebar-footer">
+            <a href="#" onclick="logout()" style="color:var(--danger); text-decoration:none; font-size:0.9rem; display:flex; align-items:center; gap:10px; font-weight:600; justify-content:center; background:rgba(239, 68, 68, 0.1); padding:10px; border-radius:8px; transition:0.2s;">
+                <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+            </a>
+        </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main>
+        <div class="page-header animate__animated animate__fadeIn">
+            <div>
+                <h1>Identity Verification</h1>
+                <p>Review submitted IDs and Business Permits for user authenticity.</p>
+            </div>
+        </div>
+
+        <div class="verify-grid animate__animated animate__fadeInUp" id="verifyContainer">
+            <div style="grid-column:1/-1; text-align:center; padding:50px; color:var(--text-muted);">
+                <i class="fas fa-circle-notch fa-spin" style="font-size:2rem; color:var(--gold-base);"></i>
+                <p style="margin-top:15px; font-family:var(--font-mono);">Accessing secure records...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Image Modal -->
+    <div class="modal" id="imgModal" onclick="closeModal(event)">
+        <div class="modal-content-wrapper animate__animated animate__zoomIn">
+            <button class="close-modal-btn" onclick="document.getElementById('imgModal').classList.remove('active')"><i class="fas fa-times"></i></button>
+            <img id="modalImage" src="" alt="Verification Document">
+        </div>
+    </div>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add EastLink Admin to home screen.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, updateDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+
+        // --- THEME & NAV ---
+        window.toggleTheme = () => {
+            const html = document.documentElement;
+            const next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('admin-theme', next);
+            document.getElementById('theme-icon').className = next === 'light' ? 'fas fa-sun theme-toggle' : 'fas fa-moon theme-toggle';
+        };
+        const savedTheme = localStorage.getItem('admin-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.getElementById('theme-icon').className = savedTheme === 'light' ? 'fas fa-sun theme-toggle' : 'fas fa-moon theme-toggle';
+
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').classList.toggle('active'); };
+        window.logout = () => { if(confirm("Confirm Log Out?")) signOut(auth).then(() => window.location.href = 'signin.html'); };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'signin.html'; return; }
+            const uDoc = await getDoc(doc(db, "users", user.uid));
+            if (!uDoc.exists() || uDoc.data().role !== 'admin') { window.location.href = 'signin.html'; return; }
+            
+            loadRequests();
+            
+            // Header Badges (Optional Context)
+            const txQ = query(collection(db, "transactions"), where("status", "==", "pending"));
+            onSnapshot(txQ, s => {
+                const b = document.getElementById('notif-badge');
+                if(s.size > 0) { b.innerText = s.size; b.style.display = 'block'; } else b.style.display = 'none';
+            });
+             const msgQ = query(collection(db, "support_tickets"), where("status", "==", "open"));
+             onSnapshot(msgQ, (snap) => {
+                const count = snap.size;
+                const badge = document.getElementById('msg-badge');
+                if(count > 0) { badge.innerText = count; badge.style.display = 'block'; } else badge.style.display = 'none';
+            });
+        });
+
+        function loadRequests() {
+            const q = query(collection(db, "users"), where("verificationStatus", "==", "pending"));
+            
+            onSnapshot(q, (snapshot) => {
+                const container = document.getElementById('verifyContainer');
+                container.innerHTML = '';
+                
+                if(snapshot.empty) {
+                    container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:80px; color:var(--text-muted);">
+                        <i class="fas fa-shield-alt" style="font-size:3rem; margin-bottom:20px; opacity:0.5; color:var(--success);"></i>
+                        <h3 style="color:var(--text-main); font-family:var(--font-head);">All Clear</h3>
+                        <p>No pending verification requests at this time.</p>
+                    </div>`;
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const d = doc.data();
+                    const name = d.fullName || d.companyName || "Unknown User";
+                    const role = d.role || "seeker";
+                    const initial = name.charAt(0).toUpperCase();
+                    const docUrl = d.verificationDocUrl || ""; 
+                    const roleClass = role === 'employer' ? 'role-employer' : 'role-seeker';
+
+                    // Generate Preview
+                    let previewHTML = '';
+                    if(docUrl) {
+                        previewHTML = `<div class="doc-preview" onclick="openImage('${docUrl}')">
+                            <i class="fas fa-file-invoice"></i>
+                            <span>View Document</span>
+                        </div>`;
+                    } else {
+                        previewHTML = `<div class="doc-preview" style="border-color:var(--danger); color:var(--danger); cursor:not-allowed;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>No File Uploaded</span>
+                        </div>`;
+                    }
+
+                    const card = document.createElement('div');
+                    card.className = 'verify-card';
+                    card.innerHTML = `
+                        <span class="role-badge ${roleClass}">${role}</span>
+                        <div class="v-header">
+                            <div class="v-avatar">${initial}</div>
+                            <div class="v-info">
+                                <h3>${name}</h3>
+                                <p>UID: <span style="font-family:var(--font-mono)">${doc.id.slice(0,6)}...</span></p>
+                            </div>
+                        </div>
+                        ${previewHTML}
+                        <div class="v-actions">
+                            <button class="btn-v btn-deny" onclick="verifyAction('${doc.id}', false)"><i class="fas fa-times"></i> Reject</button>
+                            <button class="btn-v btn-accept" onclick="verifyAction('${doc.id}', true)"><i class="fas fa-check"></i> Verify</button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            });
+        }
+
+        window.openImage = (url) => {
+            document.getElementById('modalImage').src = url;
+            document.getElementById('imgModal').classList.add('active');
+        };
+        
+        window.closeModal = (e) => {
+            if(e.target.id === 'imgModal') document.getElementById('imgModal').classList.remove('active');
+        }
+
+        window.verifyAction = async (uid, isApproved) => {
+            const action = isApproved ? "Approve" : "Reject";
+            if(!confirm(`${action} this verification request?`)) return;
+
+            try {
+                const status = isApproved ? "verified" : "rejected";
+                const isVerified = isApproved ? true : false;
+
+                await updateDoc(doc(db, "users", uid), {
+                    verificationStatus: status,
+                    isVerified: isVerified
+                });
+
+                // Send Notification
+                const title = isApproved ? "Verification Approved" : "Verification Declined";
+                const msg = isApproved ? "Your identity has been verified. You now have a blue badge!" : "Your verification document was rejected. Please ensure it is clear and valid.";
+                const type = isApproved ? "success" : "security";
+
+                await addDoc(collection(db, "notifications"), {
+                    userId: uid,
+                    title: title,
+                    message: msg,
+                    type: type,
+                    read: false,
+                    timestamp: serverTimestamp()
+                });
+
+                Toastify({ text: `User ${status.toUpperCase()}`, style: { background: isApproved ? "#10B981" : "#EF4444" } }).showToast();
+            } catch (e) { 
+                console.error(e);
+                Toastify({ text: "Error updating status", style: { background: "#EF4444" } }).showToast();
+            }
+        };
+
+        // PWA Logic
+        let deferredPrompt;
+        const pwaPopup = document.getElementById('pwa-install-popup');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if(!localStorage.getItem('pwaDismissed')) {
+                pwaPopup.style.display = 'flex';
+            }
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                pwaPopup.style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            pwaPopup.style.display = 'none';
+            localStorage.setItem('pwaDismissed', 'true');
+        };
+
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./service-worker.js");
+        }
+    </script>
+</body>
+</html>

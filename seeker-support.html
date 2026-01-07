@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Concierge Support | EastLink Employers</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0F172A">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Dashboard Theme Variables - Employer (Slightly more formal/gold focus) */
+            --bg-body: #0F172A;       
+            --bg-card: rgba(30, 41, 59, 0.65);
+            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.95);
+            --bg-input: rgba(255, 255, 255, 0.07);
+            --bg-hover: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8; 
+            --gold-base: #D97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --success: #10B981;
+            --danger: #EF4444;
+            --sidebar-width: 260px; 
+            --header-height: 70px;
+            --radius: 16px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background-image: url('assets/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: var(--text-main); 
+            height: 100vh; height: 100dvh; 
+            overflow: hidden; 
+        }
+
+        /* --- UTILS --- */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            width: 100%;
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 1000;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .logo { font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; }
+        .logo span { color: var(--gold-base); }
+        .hamburger { font-size: 1.4rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        .global-search-container { flex: 1; max-width: 450px; position: relative; margin: 0 20px; }
+        .global-search-input {
+            width: 100%; background: var(--bg-input); border: 1px solid var(--border-color);
+            padding: 10px 45px 10px 15px; border-radius: 12px; color: var(--text-main);
+            transition: all 0.3s ease; font-size: 0.9rem;
+        }
+        .global-search-input:focus { border-color: var(--gold-base); background: var(--bg-hover); box-shadow: 0 0 15px rgba(217, 119, 6, 0.15); }
+
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+        .icon-btn { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; color: var(--text-muted); cursor: pointer; transition: 0.3s; position: relative; }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); }
+        .notification-badge { position: absolute; top: 5px; right: 5px; min-width: 16px; height: 16px; background: var(--danger); border-radius: 10px; font-size: 0.6rem; color: white; font-weight: 700; display: none; place-items: center; justify-content: center; padding: 0 4px; border: 2px solid var(--bg-card); }
+        .profile-widget { width: 42px; height: 42px; position: relative; cursor: pointer; margin-left: 5px; }
+        .user-avatar { width: 100%; height: 100%; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-weight: 700; color: #fff; border: 2px solid var(--border-color); object-fit: cover; }
+        .user-avatar.img-mode { background: transparent; }
+
+        /* --- SIDEBAR (EMPLOYER LINKS) --- */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 20px 0; overflow-y: auto; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+        .nav-group { padding: 0 24px; margin-bottom: 20px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-item { display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: 0.3s; border-radius: 10px; margin-bottom: 4px; position: relative; }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
+        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
+        .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
+        .lock-icon { margin-left: auto; font-size: 0.7rem; opacity: 0.7; }
+        
+        /* Sidebar Badge */
+        .sidebar-badge {
+            background: var(--danger); color: #fff; border-radius: 12px;
+            padding: 2px 8px; font-size: 0.65rem; font-weight: 700;
+            margin-left: 10px; display: none; align-items: center; justify-content: center;
+        }
+
+        /* --- MAIN LAYOUT --- */
+        main { 
+            margin-left: var(--sidebar-width); margin-top: var(--header-height); 
+            height: calc(100vh - var(--header-height)); 
+            display: flex; flex-direction: column; padding: 20px;
+        }
+
+        /* --- CHAT STYLES --- */
+        .chat-container {
+            flex: 1; display: flex; flex-direction: column; 
+            background: var(--bg-glass); backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color); border-radius: var(--radius);
+            overflow: hidden; max-width: 1000px; margin: 0 auto; width: 100%;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            animation: zoomIn 0.5s var(--ease-bounce);
+        }
+
+        .chat-header {
+            padding: 15px 24px; border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .agent-profile { display: flex; align-items: center; gap: 12px; }
+        .agent-avatar { width: 45px; height: 45px; border-radius: 14px; background: var(--bg-input); color: var(--gold-base); display: grid; place-items: center; font-size: 1.3rem; border: 1px solid var(--border-color); position: relative; transition: all 0.5s ease; }
+        .status-dot { position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; background: var(--success); border-radius: 50%; border: 3px solid var(--bg-card); box-shadow: 0 0 5px var(--success); }
+        .agent-text h3 { font-family: var(--font-display); font-size: 1rem; color: var(--text-main); font-weight: 700; margin-bottom: 2px; }
+        .agent-text p { font-size: 0.75rem; color: var(--text-muted); }
+        
+        .agent-avatar.bot-mode { color: var(--text-muted); border-color: var(--border-color); }
+        .agent-avatar.live-mode { color: #fff; background: var(--gold-gradient); border-color: var(--gold-base); box-shadow: 0 0 15px rgba(217,119,6,0.4); }
+
+        .ticket-bar {
+            background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-family: var(--font-mono); font-size: 0.75rem;
+            padding: 8px 24px; border-bottom: 1px solid rgba(217, 119, 6, 0.2); display: none; justify-content: space-between; align-items: center; letter-spacing: 0.5px;
+        }
+
+        .messages-area {
+            flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 18px;
+            scroll-behavior: smooth; background: transparent;
+        }
+        .msg-wrapper { display: flex; flex-direction: column; max-width: 85%; animation: fadeInUp 0.4s ease; }
+        .msg-wrapper.bot, .msg-wrapper.admin { align-self: flex-start; }
+        .msg-wrapper.user { align-self: flex-end; align-items: flex-end; }
+        
+        .msg-bubble { padding: 14px 20px; border-radius: 18px; font-size: 0.95rem; line-height: 1.6; position: relative; word-wrap: break-word; }
+        .msg-wrapper.bot .msg-bubble { background: var(--bg-input); color: var(--text-main); border-bottom-left-radius: 4px; border: 1px solid var(--border-color); }
+        .msg-wrapper.admin .msg-bubble { background: rgba(217, 119, 6, 0.15); color: var(--text-main); border-bottom-left-radius: 4px; border: 1px solid rgba(217, 119, 6, 0.3); }
+        .msg-wrapper.user .msg-bubble { background: var(--gold-gradient); color: #0f172a; font-weight: 600; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.2); border: none; }
+        
+        .msg-meta { font-size: 0.7rem; color: var(--text-muted); margin-top: 6px; padding: 0 4px; font-family: var(--font-mono); opacity: 0.8; }
+        .msg-system { align-self: center; font-size: 0.75rem; color: var(--text-muted); background: var(--bg-input); padding: 6px 18px; border-radius: 20px; margin: 12px 0; border: 1px solid var(--border-color); font-family: var(--font-mono); text-align: center; }
+
+        .thinking-bubble { 
+            display: none; align-self: flex-start; background: var(--bg-input); 
+            padding: 10px 15px; border-radius: 16px; border-bottom-left-radius: 4px; 
+            border: 1px solid var(--border-color); margin-bottom: 10px;
+        }
+        .thinking-text { font-size: 0.75rem; color: var(--text-muted); font-style: italic; display: flex; gap: 4px; align-items: center; }
+
+        .chips-container {
+            padding: 12px 24px; border-top: 1px solid var(--border-color); display: flex; gap: 12px; overflow-x: auto; 
+            white-space: nowrap; background: rgba(15, 23, 42, 0.4); display: none; scrollbar-width: none;
+        }
+        .chip { 
+            padding: 8px 20px; border-radius: 24px; background: var(--bg-input); border: 1px solid var(--border-color); 
+            color: var(--text-main); font-size: 0.85rem; cursor: pointer; transition: 0.2s; font-weight: 500;
+        }
+        .chip:hover { border-color: var(--gold-base); color: var(--gold-base); background: rgba(217, 119, 6, 0.1); transform: translateY(-2px); }
+
+        .input-area {
+            padding: 20px 24px; background: rgba(15, 23, 42, 0.6); border-top: 1px solid var(--border-color);
+            display: flex; align-items: flex-end; gap: 14px;
+            padding-bottom: 90px; /* Mobile safe area */
+        }
+        @media(min-width: 993px) { .input-area { padding-bottom: 24px; } }
+
+        .btn-attach { width: 48px; height: 48px; border-radius: 14px; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-muted); display: grid; place-items: center; cursor: pointer; transition: 0.2s; }
+        .btn-attach:hover { color: var(--text-main); border-color: var(--gold-base); background: var(--bg-hover); }
+        
+        .chat-box { 
+            flex: 1; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 18px; 
+            color: var(--text-main); font-family: var(--font-body); font-size: 0.95rem; resize: none; height: 48px; max-height: 120px; 
+            line-height: 1.4; outline: none; transition: 0.3s; 
+        }
+        .chat-box:focus { border-color: var(--gold-base); background: rgba(0,0,0,0.2); }
+        
+        .btn-send { width: 48px; height: 48px; border-radius: 14px; background: var(--gold-gradient); border: none; color: #0F172A; display: grid; place-items: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3); font-size: 1.2rem; }
+        .btn-send:hover { transform: scale(1.05); }
+
+        .typing-indicator { display: none; padding: 12px 18px; background: var(--bg-input); border-radius: 16px; border-bottom-left-radius: 4px; width: fit-content; margin-bottom: 10px; border: 1px solid var(--border-color); }
+        .dot { width: 6px; height: 6px; background: var(--text-muted); border-radius: 50%; display: inline-block; animation: bounce 1.4s infinite ease-in-out both; margin: 0 2px; }
+        .dot:nth-child(1) { animation-delay: -0.32s; } .dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 998; backdrop-filter: blur(4px); display: none; }
+
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+        @media (max-width: 992px) {
+            .global-search-container { display: none; }
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 0; width: 100%; height: calc(100dvh - var(--header-height)); }
+            .chat-container { border-radius: 0; border: none; border-top: 1px solid var(--border-color); box-shadow: none; }
+            .hamburger { display: block; }
+            .msg-wrapper { max-width: 85%; }
+            .overlay.active { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER (Employer Version) -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="employer-dashboard.html" class="logo">EAST<span>LINK</span></a>
+        </div>
+        
+        <div class="global-search-container">
+            <input type="text" class="global-search-input" placeholder="Search knowledge base...">
+            <i class="fas fa-search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+        </div>
+
+        <div class="header-actions">
+            <div class="icon-btn" title="Messages" onclick="location.href='employer-messages.html'">
+                <i class="fa-regular fa-envelope"></i>
+                <div class="notification-badge" id="msg-badge">0</div>
+            </div>
+            <div class="icon-btn" title="Notifications" onclick="location.href='employer-notifications.html'">
+                <i class="fa-regular fa-bell"></i>
+                <div class="notification-badge" id="notif-badge">0</div>
+            </div>
+            <div class="profile-widget" onclick="location.href='employer-profile.html'">
+                <img src="" id="header-avatar-img" class="user-avatar img-mode" alt="Profile" style="display:none;">
+                <div id="header-avatar-fallback" class="user-avatar">E</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR (Employer Navigation) -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Company</div>
+            <a href="employer-dashboard.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Hiring</div>
+            <a href="employer-post-job.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post a Job</a>
+            <a href="employer-listings.html" class="nav-item"><i class="fa-solid fa-list-ul"></i> My Listings</a>
+            <a href="employer-candidates.html" class="nav-item"><i class="fa-solid fa-users"></i> Candidates</a>
+            <a href="employer-ats.html" class="nav-item link-std"><i class="fa-solid fa-filter"></i> ATS Lite <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="employer-wallet.html" class="nav-item"><i class="fa-solid fa-wallet"></i> Company Wallet</a>
+            <a href="employer-billing.html" class="nav-item"><i class="fa-solid fa-file-invoice-dollar"></i> Invoices</a>
+            <a href="employer-subscription.html" class="nav-item link-pro"><i class="fa-solid fa-crown"></i> Enterprise Plan <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Support</div>
+            <a href="employer-blog.html" class="nav-item"><i class="fa-solid fa-newspaper"></i> Hiring Insights</a>
+            <!-- Active State on Concierge with Badge -->
+            <a href="employer-support.html" class="nav-item active">
+                <i class="fa-solid fa-headset"></i> Concierge 
+                <span class="sidebar-badge" id="support-sidebar-badge">0</span>
+                <i class="fas fa-lock lock-icon"></i>
+            </a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Settings</div>
+            <a href="employer-company-profile.html" class="nav-item"><i class="fa-solid fa-building"></i> Company Profile</a>
+            <a href="employer-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- MAIN CHAT INTERFACE -->
+    <main>
+        <div class="chat-container">
+            <!-- Header -->
+            <div class="chat-header">
+                <div class="agent-profile">
+                    <div class="agent-avatar bot-mode" id="avatar-container">
+                        <i class="fas fa-robot" id="avatar-icon"></i>
+                        <div class="status-dot"></div>
+                    </div>
+                    <div class="agent-text">
+                        <h3 id="agent-name">EastLink SUPPORT</h3>
+                        <p id="agent-status">Analyzing Request...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ticket Info (Visible when ticket created) -->
+            <div class="ticket-bar" id="ticket-bar">
+                <span>TICKET: <span id="t-id" style="font-weight:700;">#---</span></span>
+                <span id="t-status" style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px;">OPEN</span>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="messages-area" id="chat-box">
+                <div class="thinking-bubble" id="thinking-bubble">
+                    <div class="thinking-text"><i class="fas fa-microchip fa-spin"></i> Processing...</div>
+                </div>
+                <div class="typing-indicator" id="typing-indicator">
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                </div>
+            </div>
+
+            <!-- Suggestion Chips -->
+            <div class="chips-container" id="chips-area"></div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="btn-attach" onclick="triggerUpload()"><i class="fas fa-paperclip"></i></div>
+                <input type="file" id="file-upload" style="display:none" accept="image/*" onchange="handleFileUpload()">
+                <textarea class="chat-box" id="user-input" placeholder="Type a message..." rows="1"></textarea>
+                <button class="btn-send" id="btn-send"><i class="fas fa-arrow-up"></i></button>
+            </div>
+        </div>
+    </main>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-briefcase"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Recruiter App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Manage hiring on the go.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, addDoc, onSnapshot, serverTimestamp, orderBy, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- DOM ELEMENTS ---
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+        const chipsArea = document.getElementById('chips-area');
+        const typingIndicator = document.getElementById('typing-indicator');
+        const thinkingBubble = document.getElementById('thinking-bubble');
+        
+        // --- GLOBAL STATE ---
+        let currentUser = null;
+        let userData = {};
+        let activeTicketId = null;
+        let isLiveMode = false; 
+        
+        // --- EMPLOYER INTELLIGENCE ENGINE STATES ---
+        const BotState = {
+            IDLE: 'idle',
+            WAITING_CHOICE: 'waiting_choice',
+            WAITING_CONFIRMATION: 'waiting_confirmation', 
+            
+            // Core 1: Billing/Finance
+            WAITING_INVOICE_ID: 'waiting_invoice_id',
+            
+            // Core 2: Hiring Strategy
+            WAITING_JD_CONTEXT: 'waiting_jd_context', // Optimized for Job Descriptions
+            WAITING_BUDGET_INPUT: 'waiting_budget_input', // Optimized for Salary budgets
+            
+            // Core 3: Platform Ops
+            WAITING_VERIFICATION_DOC: 'waiting_verification_doc',
+            WAITING_TICKET_DESC: 'waiting_ticket_desc'
+        };
+        
+        let currentBotState = BotState.IDLE;
+        let ticketDraft = { category: '', priority: 'normal', context: {} };
+
+        // --- AUTH & INIT ---
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) return window.location.href = 'employer-signin.html';
+            currentUser = user;
+
+            // Fetch Employer Profile
+            try {
+                const snap = await getDoc(doc(db, "employers", user.uid)); // Changed collection to employers
+                if (snap.exists()) {
+                    userData = snap.data();
+                    const img = document.getElementById('header-avatar-img');
+                    const fb = document.getElementById('header-avatar-fallback');
+                    if(userData.companyLogo) { img.src=userData.companyLogo; img.style.display='block'; fb.style.display='none'; }
+                    else { img.style.display='none'; fb.style.display='grid'; fb.innerText=(userData.companyName||'E').charAt(0); }
+                }
+            } catch(e) { console.log("Profile load error", e); }
+
+            listenForBadges(user.uid);
+            checkForOpenTicket(); 
+        });
+
+        // --- TICKET & BOT CHECK ---
+        function checkForOpenTicket() {
+            const q = query(collection(db, "support_tickets"), where("userId", "==", currentUser.uid), where("status", "==", "open"));
+            onSnapshot(q, (snap) => {
+                if (!snap.empty) {
+                    const ticketDoc = snap.docs[0];
+                    activateLiveMode(ticketDoc.id, ticketDoc.data());
+                } else {
+                    if (isLiveMode) { 
+                        resetToBotMode(); 
+                        addSystemMessage("Ticket Closed. Starting new session.");
+                    }
+                    if (currentBotState === BotState.IDLE) {
+                        initBotConversation();
+                    }
+                }
+            });
+        }
+
+        // ============================================================
+        //  EMPLOYER INTELLIGENCE CORE
+        // ============================================================
+
+        async function initBotConversation() {
+            if (currentBotState !== BotState.IDLE && currentBotState !== 'RESET') return;
+            currentBotState = BotState.WAITING_CHOICE;
+            
+            document.getElementById('agent-status').innerText = "Online • Business Support";
+            await simulateThinking("Loading Recruiter Protocols...");
+            
+            const name = userData.companyName || 'Partner';
+            addBotMessage(`Hello ${name}. I am the EastLink B2B Concierge. I handle billing inquiries, hiring optimization, and account verification.`);
+            await simulateTyping(600);
+            addBotMessage("How can I assist your hiring team today?");
+            
+            // STATE 1: EMPLOYER MENU
+            setChips(["💳 Billing & Invoices", "✍️ Optimize Job Post", "🔒 Account Verification"]);
+        }
+
+        async function processUserMessage(text) {
+            addUserMessage(text);
+            clearChips();
+
+            if (isLiveMode) { sendMessageToFirestore(text); return; }
+            if (currentBotState === BotState.IDLE) { await initBotConversation(); return; }
+
+            const cleanText = text.trim().toLowerCase();
+
+            // --- GLOBAL INTERRUPTS ---
+            if (['main menu', 'cancel', 'menu', 'reset'].includes(cleanText)) {
+                await initBotConversation();
+                return;
+            }
+
+            // --- IMMEDIATE ESCALATION ---
+            if (['agent', 'human', 'person', 'support', 'sales'].includes(cleanText)) {
+                startTicketPreBrief("General Agent Request");
+                return;
+            }
+
+            // --- CONVERSATION LOOP ---
+            if (currentBotState === BotState.WAITING_CONFIRMATION) {
+                if (cleanText.includes('yes') || cleanText.includes('thanks') || cleanText.includes('good')) {
+                    addBotMessage("Glad to be of service. Returning to standby.");
+                    await simulateTyping(1000);
+                    initBotConversation();
+                } else {
+                    addBotMessage("I see. Let me connect you with an Account Manager for specialized assistance.");
+                    startTicketPreBrief("Unresolved B2B Inquiry");
+                }
+                return;
+            }
+
+            if (currentBotState === BotState.WAITING_CHOICE) {
+                await analyzeUserIntent(text);
+                return;
+            }
+
+            // --- SPECIFIC STATE MACHINE EXECUTION (EMPLOYER CONTEXT) ---
+            switch (currentBotState) {
+
+                // --- CORE 1: FINANCE (Billing) ---
+                case BotState.WAITING_INVOICE_ID:
+                    if (cleanText.startsWith("inv-")) {
+                        await simulateThinking("Accessing Ledger...");
+                        await simulateTyping(1500);
+                        
+                        addBotMessage(`<b>INVOICE STATUS</b><br>ID: ${text.toUpperCase()}<br>Status: 🟢 <b>PAID</b><br><br><b>Details:</b> Cleared via ACH on ${new Date().toLocaleDateString()}. Receipts are available in your Company Wallet.`);
+                        addBotMessage("Do you need help with another invoice? (Yes/No)");
+                        currentBotState = BotState.WAITING_CONFIRMATION;
+                    } else {
+                        addBotMessage("❌ <b>Format Error.</b> Please enter the Invoice ID starting with 'INV-' (e.g., INV-2024-X).");
+                    }
+                    break;
+
+                // --- CORE 2: HIRING (JD Optimization) ---
+                case BotState.WAITING_JD_CONTEXT:
+                    await simulateThinking("Analyzing Market Keywords...");
+                    await simulateTyping(1500);
+                    addBotMessage(`<b>JD ANALYSIS REPORT</b><br>Role: <b>${text}</b><br><br><b>Optimization Tips:</b><br>1. 📈 <b>Demand High:</b> Add "Remote" to increase clicks by 40%.<br>2. ⚠️ <b>Salary Missing:</b> Posts with salary ranges get 2x more qualified applicants.<br><br><b>Suggestion:</b> I can auto-draft a description for you.`);
+                    addBotMessage("Was this analysis helpful? (Yes/No)");
+                    currentBotState = BotState.WAITING_CONFIRMATION;
+                    break;
+
+                // --- CORE 3: OPS (Verification) ---
+                case BotState.WAITING_VERIFICATION_DOC:
+                     addBotMessage(`<b>Security Protocol:</b><br>To verify your company, please upload your <b>Business Registration</b> or <b>Tax ID</b> document using the paperclip icon below.`);
+                     // The actual upload is handled by the file handler, but here we simulate the guidance
+                     currentBotState = BotState.WAITING_TICKET_DESC; // Route to ticket so human verifies
+                     ticketDraft.category = "Verification";
+                     ticketDraft.priority = "high";
+                     break;
+
+                // --- TICKET CREATION ---
+                case BotState.WAITING_TICKET_DESC:
+                    ticketDraft.description = text;
+                    await createTicketInFirestore();
+                    break;
+
+                default:
+                    await analyzeUserIntent(text);
+                    break;
+            }
+        }
+
+        // --- DEEP NLP ROUTER (Employer Focused) ---
+        async function analyzeUserIntent(text) {
+            const t = text.toLowerCase();
+            
+            if (t.match(/^(hi|hello|hey|greetings)/)) {
+                await simulateTyping(500);
+                addBotMessage("Greetings. I am ready to assist with Recruitment, Billing, or Account settings.");
+                return;
+            }
+
+            // 1. BILLING LOGIC
+            if (t.includes("bill") || t.includes("invoice") || t.includes("payment") || t.includes("cost")) {
+                await simulateThinking("Loading Financial Ledger...");
+                if (t.includes("status") || t.includes("missing") || t.includes("receipt")) {
+                    currentBotState = BotState.WAITING_INVOICE_ID;
+                    addBotMessage("Please enter the <b>Invoice ID</b> (e.g., INV-001) you are inquiring about.");
+                } else {
+                    addBotMessage("<b>Financial Services:</b><br>I can track payments or upgrade your subscription tier.");
+                    setChips(["Check Invoice Status", "Upgrade Plan", "🔙 Main Menu"]);
+                }
+                return;
+            }
+
+            // 2. HIRING / POSTING LOGIC
+            if (t.includes("job") || t.includes("post") || t.includes("candidate") || t.includes("hiring")) {
+                await simulateThinking("Loading Recruitment Matrix...");
+                if (t.includes("write") || t.includes("desc") || t.includes("optimize")) {
+                    currentBotState = BotState.WAITING_JD_CONTEXT;
+                    addBotMessage("✍️ <b>JD Optimizer Active.</b><br>Please paste the <b>Job Title</b> you are hiring for. I will compare it against top-performing listings.");
+                } else {
+                    addBotMessage("<b>Hiring Support:</b><br>I can help optimize your job posts or explain candidate ranking algorithms.");
+                    setChips(["Optimize Job Post", "Explain Ranking", "🔙 Main Menu"]);
+                }
+                return;
+            }
+
+            // 3. ACCOUNT / VERIFICATION
+            if (t.includes("verify") || t.includes("account") || t.includes("login") || t.includes("company")) {
+                 currentBotState = BotState.WAITING_VERIFICATION_DOC;
+                 addBotMessage("🛡️ <b>Verification Assistant.</b><br>Verified companies get a 'Trusted' badge and 3x more visibility. Do you want to start the verification process?");
+                 return;
+            }
+
+            // 4. FALLBACK / TICKET
+            addBotMessage("⚠️ <b>Request Unclear.</b><br>My database doesn't have an automated answer for this specific B2B query.<br><br>I am initializing a <b>Priority Ticket</b> for your Account Manager.");
+            await startTicketPreBrief("General Employer Inquiry");
+        }
+
+        async function startTicketPreBrief(category) {
+            currentBotState = BotState.WAITING_TICKET_DESC;
+            ticketDraft.category = category;
+            ticketDraft.priority = "high";
+            
+            await simulateThinking("Opening Ticket #...");
+            addBotMessage("📞 <b>Support Protocol</b><br>Please summarize your issue below so I can route it to the correct department.");
+            setChips(["Cancel"]);
+        }
+
+        // ============================================================
+        //  FIRESTORE & UTILS (Identical Logic)
+        // ============================================================
+
+        async function createTicketInFirestore() {
+            await simulateThinking("Routing to Support Team...");
+            await simulateTyping(1000);
+            
+            const ticketPayload = {
+                userId: currentUser.uid,
+                userName: userData.companyName || userData.fullName || "Employer",
+                userEmail: currentUser.email,
+                category: ticketDraft.category || "Employer Support",
+                priority: "high",
+                status: 'open',
+                subject: (ticketDraft.description || "Support Request").substring(0, 40) + "...",
+                description: ticketDraft.description, 
+                contextData: ticketDraft.context || {},
+                createdAt: serverTimestamp(),
+                lastUpdated: serverTimestamp(),
+                isReadByAdmin: false,
+                lastSender: 'user',
+                type: 'employer_ticket' // Differentiate from seeker tickets
+            };
+
+            try {
+                const docRef = await addDoc(collection(db, "support_tickets"), ticketPayload);
+                
+                // Bot Context
+                await addDoc(collection(db, "support_tickets", docRef.id, "messages"), {
+                    text: `[AI PRE-BRIEF]\nCategory: ${ticketDraft.category}\nInitial Summary: ${ticketDraft.description}`,
+                    sender: 'bot', 
+                    timestamp: serverTimestamp()
+                });
+
+                // Admin Prompt Injection
+                await addDoc(collection(db, "support_tickets", docRef.id, "messages"), {
+                    text: "✅ <b>Ticket Created.</b><br>An Enterprise Support Agent has been notified.<br><br>Please <b>provide any relevant details</b> (screenshots, invoice numbers, or candidate IDs) below.",
+                    sender: 'admin',
+                    timestamp: serverTimestamp()
+                });
+                
+            } catch (e) {
+                console.error(e);
+                addBotMessage("❌ Error creating ticket.");
+                setChips(["Try Again", "🔙 Main Menu"]);
+                currentBotState = BotState.WAITING_CHOICE; 
+            }
+        }
+
+        // ============================================================
+        //  LIVE MODE HANDLERS
+        // ============================================================
+
+        function activateLiveMode(ticketId, data) {
+            if (activeTicketId === ticketId) return; 
+            
+            isLiveMode = true;
+            activeTicketId = ticketId;
+            currentBotState = 'LIVE'; 
+
+            document.getElementById('agent-name').innerText = "Enterprise Agent";
+            document.getElementById('agent-status').innerText = "Online • Reviewing Account";
+            
+            const avatarContainer = document.getElementById('avatar-container');
+            avatarContainer.classList.remove('bot-mode');
+            avatarContainer.classList.add('live-mode');
+            document.getElementById('avatar-icon').className = "fas fa-headset";
+
+            document.getElementById('ticket-bar').style.display = 'flex';
+            document.getElementById('t-id').innerText = '#' + ticketId.substring(0,6).toUpperCase();
+
+            const badge = document.getElementById('support-sidebar-badge');
+            if(badge) { badge.innerText = '0'; badge.style.display = 'none'; }
+
+            chatBox.innerHTML = ''; 
+            
+            const q = query(collection(db, "support_tickets", ticketId, "messages"), orderBy('timestamp', 'asc'));
+            onSnapshot(q, (snapshot) => {
+                chatBox.innerHTML = ''; 
+                snapshot.forEach(doc => {
+                    const m = doc.data();
+                    let type = 'user';
+                    if (m.sender === 'bot') type = 'bot'; 
+                    else if (m.sender === 'admin' || m.sender === 'agent') type = 'admin';
+                    renderMessage(type, m.text, m.timestamp, m.attachment);
+                });
+                
+                chatBox.appendChild(thinkingBubble);
+                chatBox.appendChild(typingIndicator);
+                scrollToBottom();
+            });
+        }
+
+        function resetToBotMode() {
+            isLiveMode = false;
+            activeTicketId = null;
+            currentBotState = BotState.IDLE;
+            ticketDraft = { category: '', priority: 'normal', context: {} };
+
+            document.getElementById('agent-name').innerText = "EastLink SUPPORT";
+            document.getElementById('agent-status').innerText = "Analyzing Request...";
+            document.getElementById('ticket-bar').style.display = 'none';
+            
+            const avatarContainer = document.getElementById('avatar-container');
+            avatarContainer.classList.remove('live-mode');
+            avatarContainer.classList.add('bot-mode');
+            document.getElementById('avatar-icon').className = "fas fa-robot";
+            
+            chatBox.innerHTML = '';
+            chatBox.appendChild(thinkingBubble);
+            chatBox.appendChild(typingIndicator);
+        }
+
+        async function sendMessageToFirestore(text, attachmentUrl = null) {
+            if (!activeTicketId) return;
+            try {
+                // 1. Add message to subcollection
+                await addDoc(collection(db, "support_tickets", activeTicketId, "messages"), {
+                    text: text, 
+                    attachment: attachmentUrl, 
+                    sender: 'user', // 'user' represents the Employer in this context
+                    timestamp: serverTimestamp()
+                });
+                
+                // 2. Update parent ticket to notify Admin
+                await updateDoc(doc(db, "support_tickets", activeTicketId), {
+                    lastUpdated: serverTimestamp(), 
+                    lastSender: 'user', 
+                    isReadByAdmin: false
+                });
+            } catch (e) {
+                console.error("Send Error", e);
+                Toastify({text: "Failed to send.", style:{background:"var(--danger)"}}).showToast();
+            }
+        }
+
+        // ============================================================
+        //  UI RENDERERS & ANIMATIONS
+        // ============================================================
+
+        function renderMessage(type, text, timestamp, attachment) {
+            const wrapper = document.createElement('div'); 
+            wrapper.className = `msg-wrapper ${type}`;
+            
+            let content = (text || "").replace(/\n/g, '<br>');
+            if(attachment) content += `<br><a href="${attachment}" target="_blank"><img src="${attachment}" style="max-width:100%; border-radius:8px; margin-top:5px; border:1px solid var(--border-color);"></a>`;
+            
+            const timeStr = timestamp ? new Date(timestamp.seconds*1000).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'Just now';
+            
+            // Label logic: 'user' is the Employer, 'admin' is the Agent
+            const senderLabel = type === 'user' ? 'You' : (type === 'admin' ? 'Agent' : 'Support');
+
+            wrapper.innerHTML = `
+                <div class="msg-bubble animate__animated animate__fadeInUp">${content}</div>
+                <div class="msg-meta">${senderLabel} • ${timeStr}</div>
+            `;
+            
+            chatBox.insertBefore(wrapper, thinkingBubble); 
+            scrollToBottom();
+        }
+
+        function addBotMessage(html) { renderMessage('bot', html, null); }
+        function addUserMessage(html) { renderMessage('user', html, null); }
+        
+        function addSystemMessage(text) { 
+            const el = document.createElement('div'); el.className = 'msg-system'; el.innerText = text; 
+            chatBox.insertBefore(el, thinkingBubble); 
+            scrollToBottom();
+        }
+
+        function setChips(opts) {
+            chipsArea.innerHTML = '';
+            if(opts.length) {
+                chipsArea.style.display = 'flex';
+                opts.forEach(o => {
+                    const btn = document.createElement('div'); btn.className = 'chip'; btn.innerText = o;
+                    // Clicking a chip simulates user typing that text
+                    btn.onclick = () => processUserMessage(o);
+                    chipsArea.appendChild(btn);
+                });
+                scrollToBottom();
+            } else { chipsArea.style.display = 'none'; }
+        }
+        
+        function clearChips() { chipsArea.innerHTML = ''; chipsArea.style.display = 'none'; }
+
+        // --- ANIMATIONS ---
+        function simulateThinking(text) {
+            return new Promise(resolve => {
+                document.querySelector('.thinking-text').innerHTML = `<i class="fas fa-microchip fa-spin"></i> ${text}`;
+                thinkingBubble.style.display = 'flex';
+                scrollToBottom();
+                setTimeout(() => { thinkingBubble.style.display = 'none'; resolve(); }, 800 + Math.random()*500);
+            });
+        }
+        
+        function simulateTyping(ms) {
+            return new Promise(resolve => {
+                typingIndicator.style.display = 'block';
+                scrollToBottom();
+                setTimeout(() => { typingIndicator.style.display = 'none'; resolve(); }, ms);
+            });
+        }
+        
+        function scrollToBottom() { setTimeout(() => chatBox.scrollTop = chatBox.scrollHeight, 50); }
+
+        // --- UI EVENT LISTENERS ---
+        const send = () => { 
+            const t = userInput.value.trim(); 
+            if(t) { userInput.value = ''; processUserMessage(t); }
+        };
+        document.getElementById('btn-send').onclick = send;
+        
+        // Handle Enter key (Shift+Enter for new line)
+        userInput.onkeypress = (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }};
+
+        // --- FILE UPLOAD LOGIC ---
+        window.triggerUpload = () => document.getElementById('file-upload').click();
+        
+        window.handleFileUpload = () => {
+             const file = document.getElementById('file-upload').files[0];
+            if(file) {
+                Toastify({
+                    text: "Uploading attachment...", 
+                    style:{background:"var(--bg-card)", border:"1px solid var(--border-color)", color:"var(--text-main)"}
+                }).showToast();
+                
+                // Simulate upload delay, then send dummy image path to Firestore
+                setTimeout(() => { 
+                    sendMessageToFirestore("Attached File: " + file.name, "assets/images/logo.png"); 
+                }, 1500);
+            }
+        };
+
+        // --- SIDEBAR & NAVIGATION (Employer Links) ---
+        window.toggleSidebar = () => { 
+            document.getElementById('sidebar').classList.toggle('active'); 
+            const overlay = document.getElementById('overlay');
+            if(document.getElementById('sidebar').classList.contains('active')) {
+                overlay.style.display = 'block';
+            } else {
+                overlay.style.display = 'none';
+            }
+        };
+
+        window.closeSidebar = () => { 
+            document.getElementById('sidebar').classList.remove('active'); 
+            document.getElementById('overlay').style.display = 'none';
+        };
+
+        window.logout = () => signOut(auth).then(() => window.location.href = 'employer-signin.html');
+
+        // --- REALTIME BADGES ---
+        function listenForBadges(uid) {
+            // 1. Notifications
+            const notifQ = query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false));
+            onSnapshot(notifQ, s => {
+                const el = document.getElementById('notif-badge'); 
+                if(el){ 
+                    el.innerText = s.size > 9 ? '9+' : s.size; 
+                    el.style.display = s.empty ? 'none' : 'flex';
+                }
+            });
+            
+            // 2. Messages (If employers have chats)
+            const msgQ = query(collection(db, "chats"), where("participants", "array-contains", uid), where("hasUnread", "==", true));
+            onSnapshot(msgQ, (snap) => {
+                let unreadCount = 0;
+                snap.docs.forEach(doc => {
+                    const d = doc.data();
+                    if(d.lastSenderId !== uid) unreadCount++;
+                });
+
+                const el = document.getElementById('msg-badge'); 
+                if(el){ 
+                    el.innerText = unreadCount > 9 ? '9+' : unreadCount; 
+                    el.style.display = unreadCount > 0 ? 'flex' : 'none';
+                }
+            });
+
+            // 3. SUPPORT TICKET BADGE
+            // Count tickets where the last sender is NOT the user (meaning Agent replied)
+            const supportQ = query(collection(db, "support_tickets"), where("userId", "==", uid), where("status", "==", "open"));
+            onSnapshot(supportQ, (snap) => {
+                let unreadTickets = 0;
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    // If agent/admin sent last, it's unread. 
+                    // CRITICAL: Don't count it if we are currently looking at this exact ticket ID
+                    if (d.lastSender !== 'user' && doc.id !== activeTicketId) {
+                        unreadTickets++;
+                    }
+                });
+
+                const badge = document.getElementById('support-sidebar-badge');
+                if(badge) {
+                    badge.innerText = unreadTickets > 9 ? '9+' : unreadTickets;
+                    badge.style.display = unreadTickets > 0 ? 'flex' : 'none';
+                }
+            });
+        }
+        
+        // --- PWA LOGIC ---
+        let deferredPrompt;
+        const pwaPopup = document.getElementById('pwa-install-popup');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if(!localStorage.getItem('pwaDismissed')) {
+                pwaPopup.style.display = 'flex';
+            }
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                pwaPopup.style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            pwaPopup.style.display = 'none';
+            localStorage.setItem('pwaDismissed', 'true');
+        };
+
+        // PWA Registration
+        if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js");
+    </script>
+</body>
+</html>

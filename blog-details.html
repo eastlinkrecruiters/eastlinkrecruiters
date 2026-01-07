@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Article Details | EastLink Recruiters</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#020617">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons & Animation -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        /* =========================================
+           THEME VARIABLES
+           ========================================= */
+        :root {
+            --primary: #f59e0b; /* Bright Gold/Orange */
+            --primary-dark: #d97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            
+            --bg: #020617; 
+            
+            /* 70% Transparency for Containers (Glass Effect) */
+            --bg-glass-70: rgba(15, 23, 42, 0.7); 
+            
+            /* Text */
+            --text: #F8FAFC;
+            --text-muted: #94A3B8;
+            
+            --border-color: rgba(255, 255, 255, 0.1);
+            --header-height: 80px;
+            --transition: all 0.3s ease;
+            --radius: 16px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            background-image: url('assets/images/background.png');
+            background-attachment: fixed;
+            background-position: center;
+            background-size: cover;
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        /* Dark overlay - 20% Opacity */
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background: rgba(2, 6, 23, 0.2); 
+            z-index: -5; pointer-events: none;
+        }
+
+        h1, h2, h3, .brand-font { font-family: 'Cinzel', serif; }
+        a { text-decoration: none; color: inherit; transition: var(--transition); }
+        
+        /* --- SCROLL PROGRESS --- */
+        #scroll-progress {
+            position: fixed; top: 0; left: 0; height: 3px; background: var(--primary);
+            z-index: 2000; width: 0%; transition: width 0.1s;
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; width: 100%; height: var(--header-height);
+            z-index: 1000; transition: var(--transition); 
+            background: var(--bg-glass-70);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .nav-inner { height: 100%; display: flex; justify-content: space-between; align-items: center; }
+
+        .header-logo-text {
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem; font-weight: 700; color: var(--text);
+            letter-spacing: 1px; display: flex; align-items: center; gap: 12px;
+        }
+        .header-logo-text span { color: var(--primary); }
+
+        .menu-trigger {
+            display: inline-flex; align-items: center; gap: 12px; cursor: pointer;
+            padding: 8px 20px; border-radius: 99px;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);
+            color: var(--text); font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;
+            transition: var(--transition);
+        }
+        .menu-trigger:hover { border-color: var(--primary); background: rgba(245, 158, 11, 0.1); }
+
+        /* --- OVERLAY MENU --- */
+        .menu-overlay {
+            position: fixed; inset: 0; 
+            background: rgba(2, 6, 23, 0.98);
+            z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; pointer-events: none; transition: var(--transition);
+        }
+        .menu-overlay.active { opacity: 1; pointer-events: all; }
+        .close-menu {
+            position: absolute; top: 30px; right: 30px;
+            width: 44px; height: 44px; border-radius: 50%;
+            border: 1px solid var(--border-color); color: var(--text-muted);
+            display: grid; place-items: center; cursor: pointer; transition: 0.3s; font-size: 1.2rem;
+        }
+        .close-menu:hover { border-color: var(--primary); color: var(--primary); transform: rotate(90deg); }
+        
+        .menu-links { text-align: center; display: flex; flex-direction: column; gap: 25px; }
+        .menu-link {
+            font-family: 'Cinzel', serif; font-size: 2.5rem; font-weight: 700;
+            color: var(--text); transition: 0.3s;
+        }
+        .menu-link:hover { color: var(--primary); }
+        .menu-actions { margin-top: 50px; display: flex; gap: 15px; align-items: center; }
+
+        .container { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* --- ARTICLE LAYOUT --- */
+        .article-hero {
+            position: relative; width: 100%; height: 60vh; min-height: 400px;
+            background-size: cover; background-position: center;
+            display: flex; align-items: flex-end; justify-content: center;
+            padding-bottom: 60px; margin-bottom: 60px;
+            margin-top: var(--header-height);
+        }
+        .hero-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(0deg, var(--bg) 0%, rgba(2,6,23,0.7) 50%, rgba(2,6,23,0.3) 100%);
+        }
+        .hero-content {
+            position: relative; z-index: 2; max-width: 900px; text-align: center; padding: 0 20px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+        .category-pill {
+            display: inline-block; padding: 6px 18px; border-radius: 30px;
+            background: var(--primary); color: #000;
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+            margin-bottom: 20px;
+        }
+        .article-title {
+            font-family: 'Cinzel', serif; font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.2;
+            color: #fff; margin-bottom: 25px; text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .meta-row {
+            display: flex; justify-content: center; gap: 25px; color: rgba(255,255,255,0.8);
+            font-size: 0.95rem; font-weight: 500;
+        }
+        .meta-item i { color: var(--primary); margin-right: 6px; }
+
+        .content-container {
+            max-width: 1100px; margin: 0 auto; padding: 0 24px;
+            display: grid; grid-template-columns: 1fr 300px; gap: 60px;
+            position: relative; padding-bottom: 4rem;
+        }
+
+        /* Article Body (Glass Effect) */
+        .article-body {
+            font-family: 'Inter', sans-serif; font-size: 1.15rem; color: var(--text);
+            line-height: 1.9; opacity: 0.95;
+            background: var(--bg-glass-70); border: 1px solid var(--border-color);
+            padding: 40px; border-radius: var(--radius); backdrop-filter: blur(12px);
+        }
+        .article-body p { margin-bottom: 28px; }
+        .article-body h2 {
+            font-family: 'Cinzel', serif; font-size: 1.8rem; margin: 50px 0 25px;
+            color: var(--text); border-left: 3px solid var(--primary); padding-left: 20px;
+        }
+        .article-body blockquote {
+            margin: 40px 0; padding: 30px; background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color); border-left: 4px solid var(--primary);
+            font-style: italic; font-size: 1.25rem; color: var(--text);
+            border-radius: 0 12px 12px 0;
+        }
+        .article-body img { width: 100%; border-radius: var(--radius); margin: 30px 0; border: 1px solid var(--border-color); }
+
+        /* Sidebar */
+        .sidebar { position: relative; }
+        .sticky-wrapper { position: sticky; top: 120px; display: flex; flex-direction: column; gap: 30px; }
+        
+        .author-card, .share-card {
+            background: var(--bg-glass-70); padding: 30px; border-radius: var(--radius);
+            border: 1px solid var(--border-color); backdrop-filter: blur(12px);
+        }
+        .author-card { text-align: center; }
+        .author-avatar {
+            width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+            margin: 0 auto 15px; border: 2px solid var(--primary); padding: 3px;
+        }
+        .share-btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);
+            color: var(--text-muted); font-size: 0.9rem; transition: 0.3s; margin-top: 10px;
+        }
+        .share-btn:hover { background: rgba(255,255,255,0.05); color: var(--primary); border-color: var(--primary); }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* FOOTER */
+        footer { 
+            background: var(--bg-glass-70); border-top: 1px solid var(--border-color); 
+            padding-top: 4rem; margin-top: auto; backdrop-filter: blur(12px);
+        }
+        .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 4rem; text-align: left; }
+        .f-col h4 { font-size: 0.9rem; color: var(--text); margin-bottom: 1.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-family: 'Cinzel', serif; }
+        .f-col ul { list-style: none; }
+        .f-col ul li { margin-bottom: 12px; }
+        .f-col a { color: var(--text-muted); font-size: 0.9rem; transition: 0.2s; }
+        .f-col a:hover { color: var(--primary); padding-left: 5px; }
+        .social-links { display: flex; gap: 10px; margin-top: 25px; }
+        .s-btn {
+            width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color); color: var(--text-muted);
+            display: grid; place-items: center; transition: 0.3s; font-size: 1rem;
+        }
+        .s-btn:hover { background: var(--primary); color: #000; border-color: var(--primary); }
+        .copyright { border-top: 1px solid var(--border-color); padding: 2rem 0; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+
+        /* PWA Popup */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--primary);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .content-container { grid-template-columns: 1fr; }
+            .sidebar { order: 2; margin-top: 0; }
+            .sticky-wrapper { position: static; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 600px) {
+            .footer-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- PRELOADER -->
+    <div id="loader" style="position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; justify-content:center; align-items:center; transition: opacity 0.5s ease;">
+        <div style="text-align:center;">
+            <img src="assets/images/logo.png" style="width:70px; height:auto; margin-bottom:20px; filter: drop-shadow(0 0 15px var(--primary));">
+            <div style="width:150px; height:2px; background:rgba(255,255,255,0.1); overflow:hidden; border-radius:2px;">
+                <div style="width:100%; height:100%; background:var(--gold-gradient); animation:loading 1.5s infinite ease-in-out; transform-origin:left;"></div>
+            </div>
+            <style>@keyframes loading { 0% { transform: scaleX(0); } 50% { transform: scaleX(1); } 100% { transform: scaleX(0); transform-origin:right; } }</style>
+        </div>
+    </div>
+
+    <!-- Scroll Progress -->
+    <div id="scroll-progress"></div>
+
+    <!-- HEADER -->
+    <header id="header">
+        <div class="container nav-inner">
+            <a href="index.html" class="header-logo-text">
+                <img src="assets/images/logo.png" style="height:35px; width:auto;" alt="Logo">
+                <div>EAST<span>LINK</span></div>
+            </a>
+            <div class="menu-trigger" onclick="toggleMenu()">
+                <span>MENU</span>
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- MENU OVERLAY -->
+    <div class="menu-overlay" id="menuOverlay">
+        <div class="close-menu" onclick="toggleMenu()"><i class="fas fa-times"></i></div>
+        <div class="menu-links">
+            <a href="blog.html" class="menu-link"><i class="fas fa-arrow-left" style="font-size:0.5em; vertical-align:middle; margin-right:10px;"></i> Back to News</a>
+            <a href="index.html" class="menu-link">Home</a>
+            <a href="about.html" class="menu-link">About Us</a>
+        </div>
+        <div class="menu-actions">
+            <a href="signin.html" class="btn" style="background:transparent; border:1px solid var(--border-color); color:white; border-radius:50px; padding:12px 30px; text-decoration:none;">Sign In</a>
+            <a href="signup.html" class="btn" style="background:var(--primary); color:black; border-radius:50px; padding:12px 30px; font-weight:700; text-decoration:none;">Join Now</a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main id="main-content" style="opacity: 0; transition: opacity 0.5s;">
+        
+        <!-- HERO (Injected via JS) -->
+        <div id="hero-inject"></div>
+
+        <!-- CONTENT GRID -->
+        <div class="content-container">
+            
+            <!-- LEFT: Article Body -->
+            <article class="article-body" id="body-inject" data-aos="fade-up">
+                <!-- Content injected here -->
+            </article>
+
+            <!-- RIGHT: Sidebar -->
+            <aside class="sidebar" data-aos="fade-left" data-aos-delay="200">
+                <div class="sticky-wrapper">
+                    <!-- Author -->
+                    <div class="author-card">
+                        <img src="assets/images/logo.png" class="author-avatar" alt="Author" onerror="this.src='https://ui-avatars.com/api/?name=EL&background=f59e0b&color=fff'">
+                        <div class="brand-font" style="font-weight:700; margin-bottom:5px; color:var(--text);">EastLink Editors</div>
+                        <div style="font-size:0.8rem; color:var(--primary); text-transform:uppercase;">Recruitment Experts</div>
+                        <p style="font-size:0.9rem; color:var(--text-muted); margin-top:10px;">Insights on career growth and hiring trends in East Africa.</p>
+                    </div>
+
+                    <!-- Share -->
+                    <div class="share-card">
+                        <div style="font-weight:700; text-transform:uppercase; color:var(--text-muted); font-size:0.85rem; margin-bottom:15px;">Share Article</div>
+                        <a href="#" id="share-fb" target="_blank" class="share-btn"><i class="fab fa-facebook-f"></i> Facebook</a>
+                        <a href="#" id="share-tw" target="_blank" class="share-btn"><i class="fab fa-twitter"></i> Twitter</a>
+                        <a href="#" id="share-in" target="_blank" class="share-btn"><i class="fab fa-linkedin-in"></i> LinkedIn</a>
+                        <a href="#" id="share-wa" target="_blank" class="share-btn"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="f-col">
+                    <div class="logo" style="margin-bottom:20px; font-weight:700; font-size:1.4rem; display:flex; align-items:center; gap:10px; font-family: 'Cinzel', serif;">
+                        <img src="assets/images/logo.png" style="height:35px; width:auto;" alt="EastLink">
+                        <div style="color:white;">EAST<span style="color:var(--primary);">LINK</span></div>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.6;">The leading platform for professional recruitment. We ensure quality, trust, and speed.</p>
+                    <div class="social-links">
+                        <a href="#" id="link-fb" class="s-btn" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" id="link-in" class="s-btn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" id="link-tw" class="s-btn" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="#" id="link-ig" class="s-btn" target="_blank"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="f-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="services.html">Our Services</a></li>
+                        <li><a href="careers.html">Careers</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="f-col">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="signin.html">Client Portal</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div class="f-col">
+                    <h4>Get the App</h4>
+                    <a href="#" style="background:#0f172a; border:1px solid var(--border-color); padding:10px 15px; border-radius:12px; display:flex; align-items:center; gap:12px; color:var(--text); width:fit-content; transition:0.3s; text-decoration:none;">
+                        <i class="fab fa-android" style="font-size:1.8rem; color:#10B981;"></i>
+                        <div><div style="font-size:0.7rem; color:var(--text-muted);">Download on</div><div style="font-weight:700; font-size:0.9rem;">Android</div></div>
+                    </a>
+                </div>
+            </div>
+            <div class="copyright">&copy; <span id="year"></span> EastLink Recruitment Solutions. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add EastLink to home screen.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- INIT UI ---
+        AOS.init({ duration: 800, offset: 50, once: true });
+        document.getElementById("year").textContent = new Date().getFullYear();
+
+        window.toggleMenu = () => {
+            const menu = document.getElementById('menuOverlay');
+            menu.classList.toggle('active');
+            document.body.style.overflow = menu.classList.contains('active') ? 'hidden' : 'auto';
+        };
+
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("scroll-progress").style.width = scrolled + "%";
+        });
+
+        // --- LOAD ARTICLE ---
+        async function loadArticle() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            const loader = document.getElementById('loader');
+            const main = document.getElementById('main-content');
+            const heroInject = document.getElementById('hero-inject');
+            const bodyInject = document.getElementById('body-inject');
+
+            if (!id) {
+                bodyInject.innerHTML = `<p style="text-align:center;">Article ID missing.</p>`;
+                loader.style.opacity = '0'; setTimeout(()=>loader.style.display='none',500);
+                main.style.opacity = '1';
+                return;
+            }
+
+            try {
+                // IMPORTANT: Changed collection name to 'blogs' to match the news page
+                const docSnap = await getDoc(doc(db, "blogs", id));
+
+                if (!docSnap.exists()) {
+                    bodyInject.innerHTML = `<p style="text-align:center;">Article not found.</p>`;
+                } else {
+                    const d = docSnap.data();
+                    const date = d.timestamp ? new Date(d.timestamp.seconds*1000).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : 'Recent';
+                    const img = d.imageUrl || 'assets/images/background.png';
+                    const wordCount = d.content ? d.content.split(/\s+/).length : 0;
+                    const readTime = Math.ceil(wordCount / 200);
+
+                    // 1. Render Hero
+                    heroInject.innerHTML = `
+                        <div class="article-hero" style="background-image: url('${img}');">
+                            <div class="hero-overlay"></div>
+                            <div class="hero-content">
+                                <span class="category-pill">${d.category || 'Insights'}</span>
+                                <h1 class="article-title brand-font">${d.title}</h1>
+                                <div class="meta-row">
+                                    <div class="meta-item"><i class="far fa-calendar-alt"></i> ${date}</div>
+                                    <div class="meta-item"><i class="far fa-clock"></i> ${readTime} min read</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // 2. Format Body
+                    // Use HTML content directly if rich text, or format plain text
+                    let formattedContent = '';
+                    if(d.content && d.content.includes('<p>')) {
+                        // Already HTML
+                        formattedContent = d.content;
+                    } else {
+                        // Basic Formatting for plain text
+                        formattedContent = d.content 
+                        ? d.content.split('\n').map(para => {
+                            const p = para.trim();
+                            if(!p) return '';
+                            if(p.length < 60 && !p.endsWith('.') && (p.endsWith(':') || p.toUpperCase() === p)) {
+                                return `<h2>${p}</h2>`;
+                            }
+                            return `<p>${p}</p>`;
+                        }).join('')
+                        : '<p>No content available.</p>';
+                    }
+
+                    bodyInject.innerHTML = formattedContent;
+
+                    // 3. Update Social Links
+                    const currUrl = encodeURIComponent(window.location.href);
+                    const titleEnc = encodeURIComponent(d.title);
+                    document.getElementById('share-fb').href = `https://www.facebook.com/sharer/sharer.php?u=${currUrl}`;
+                    document.getElementById('share-tw').href = `https://twitter.com/intent/tweet?url=${currUrl}&text=${titleEnc}`;
+                    document.getElementById('share-in').href = `https://www.linkedin.com/shareArticle?mini=true&url=${currUrl}`;
+                    document.getElementById('share-wa').href = `whatsapp://send?text=${titleEnc}%20${currUrl}`;
+                }
+
+            } catch (e) {
+                console.error(e);
+                bodyInject.innerHTML = `<p style="text-align:center;color:#EF4444">Error loading content.</p>`;
+            }
+
+            // Hide Loader
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+                main.style.opacity = '1';
+            }, 500);
+        }
+
+        async function loadSocials() {
+            try {
+                const docRef = doc(db, "site_settings", "general"); 
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if(data.facebook) document.getElementById('link-fb').href = data.facebook;
+                    if(data.linkedin) document.getElementById('link-in').href = data.linkedin;
+                    if(data.twitter) document.getElementById('link-tw').href = data.twitter;
+                    if(data.instagram) document.getElementById('link-ig').href = data.instagram;
+                }
+            } catch (error) { }
+        }
+
+        loadArticle();
+        loadSocials();
+
+        // PWA Logic
+        let deferredPrompt;
+        const pwaPopup = document.getElementById('pwa-install-popup');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if(!localStorage.getItem('pwaDismissed')) {
+                pwaPopup.style.display = 'flex';
+            }
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                pwaPopup.style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            pwaPopup.style.display = 'none';
+            localStorage.setItem('pwaDismissed', 'true');
+        };
+
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./service-worker.js");
+        }
+    </script>
+</body>
+</html>

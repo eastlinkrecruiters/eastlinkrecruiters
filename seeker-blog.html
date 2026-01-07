@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>News & Insights | EastLink Recruiters</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0F172A">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Master Theme Variables */
+            --bg-body: #0F172A;       
+            --bg-card: rgba(30, 41, 59, 0.65);
+            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.95);
+            --bg-input: rgba(255, 255, 255, 0.07);
+            --bg-hover: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8; 
+            --gold-base: #D97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --neon-purple: #8b5cf6;
+            --success: #10B981;
+            --danger: #EF4444;
+            --sidebar-width: 260px; 
+            --header-height: 70px;
+            --radius: 16px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background-image: url('assets/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: var(--text-main); 
+            min-height: 100vh; overflow-x: hidden;
+            transition: background 0.3s ease;
+        }
+
+        /* --- GLASS UTILS --- */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s var(--ease-bounce), box-shadow 0.3s ease;
+        }
+
+        /* --- HEADER (Standardized) --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 1000;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .logo { font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; }
+        .logo span { color: var(--gold-base); }
+        .hamburger { font-size: 1.4rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        .global-search-container { flex: 1; max-width: 450px; position: relative; margin: 0 20px; }
+        .global-search-input {
+            width: 100%; background: var(--bg-input); border: 1px solid var(--border-color);
+            padding: 10px 45px 10px 15px; border-radius: 12px; color: var(--text-main);
+            transition: all 0.3s ease; font-size: 0.9rem;
+        }
+        .global-search-input:focus { border-color: var(--gold-base); background: var(--bg-hover); box-shadow: 0 0 15px rgba(217, 119, 6, 0.15); }
+
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+        .icon-btn { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; color: var(--text-muted); cursor: pointer; transition: 0.3s; position: relative; }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); transform: translateY(-2px); }
+        .notification-badge { position: absolute; top: 5px; right: 5px; min-width: 16px; height: 16px; background: var(--danger); border-radius: 10px; font-size: 0.6rem; color: white; font-weight: 700; display: none; place-items: center; justify-content: center; padding: 0 4px; border: 2px solid var(--bg-card); }
+        
+        .profile-widget { width: 42px; height: 42px; position: relative; cursor: pointer; margin-left: 5px; }
+        .user-avatar { width: 100%; height: 100%; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-weight: 700; color: #fff; border: 2px solid var(--border-color); object-fit: cover; }
+        .user-avatar.img-mode { background: transparent; }
+
+        /* --- SIDEBAR (Standardized) --- */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 20px 0; overflow-y: auto; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+        .nav-group { padding: 0 24px; margin-bottom: 20px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-item { display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: 0.3s; border-radius: 10px; margin-bottom: 4px; }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
+        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
+        .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
+        .lock-icon { margin-left: auto; font-size: 0.7rem; opacity: 0.7; }
+
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 998; backdrop-filter: blur(4px); display: none; }
+
+        /* --- MAIN LAYOUT --- */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 40px; min-height: calc(100vh - var(--header-height)); }
+        .page-container { max-width: 1200px; margin: 0 auto; }
+
+        /* Hero / Header Section */
+        .news-header { 
+            text-align: center; margin-bottom: 40px; padding: 40px 20px; position: relative; overflow: hidden;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(217, 119, 6, 0.1) 100%);
+        }
+        .news-header h1 { font-family: var(--font-head); font-size: 2.5rem; margin-bottom: 10px; color: var(--text-main); text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .news-header p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+
+        /* Search & Filter Bar */
+        .toolbar { 
+            display: flex; gap: 15px; margin-bottom: 40px; justify-content: center; 
+            max-width: 600px; margin-left: auto; margin-right: auto; position: relative;
+        }
+        .search-wrapper { flex: 1; position: relative; }
+        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--gold-base); }
+        .filter-input { 
+            width: 100%; background: var(--bg-glass); border: 1px solid var(--border-color); padding: 15px 15px 15px 45px;
+            border-radius: 30px; color: var(--text-main); font-size: 1rem; backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: 0.3s;
+        }
+        .filter-input:focus { border-color: var(--gold-base); box-shadow: 0 4px 25px rgba(217, 119, 6, 0.15); background: var(--bg-glass-heavy); }
+
+        /* Blog Grid */
+        .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
+        
+        .blog-card {
+            display: flex; flex-direction: column; overflow: hidden; height: 100%; position: relative;
+            background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius);
+            transition: all 0.3s var(--ease-bounce); cursor: pointer;
+        }
+        .blog-card:hover { transform: translateY(-10px); border-color: var(--gold-base); box-shadow: 0 15px 40px rgba(0,0,0,0.4); }
+        
+        .card-img-wrap { height: 200px; overflow: hidden; position: relative; }
+        .card-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+        .blog-card:hover .card-img { transform: scale(1.1); }
+        
+        .cat-badge { 
+            position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+            color: var(--gold-base); font-size: 0.7rem; padding: 5px 12px; border-radius: 20px; 
+            border: 1px solid rgba(217, 119, 6, 0.4); font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .card-body { padding: 25px; flex: 1; display: flex; flex-direction: column; }
+        .card-meta { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+        .card-title { font-family: var(--font-head); font-size: 1.2rem; color: var(--text-main); margin-bottom: 10px; line-height: 1.4; transition: 0.2s; }
+        .blog-card:hover .card-title { color: var(--gold-base); }
+        .card-excerpt { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        .read-more { 
+            margin-top: auto; display: flex; align-items: center; justify-content: space-between; 
+            padding-top: 15px; border-top: 1px solid var(--border-color); color: var(--text-main); font-weight: 600; font-size: 0.9rem;
+        }
+        .read-more i { transition: 0.3s; color: var(--gold-base); }
+        .blog-card:hover .read-more i { transform: translateX(5px); }
+
+        /* Article View (Reader) */
+        #article-view { display: none; }
+        .article-container { max-width: 800px; margin: 0 auto; background: var(--bg-glass); border-radius: 20px; padding: 40px; border: 1px solid var(--border-color); }
+        
+        .btn-back { 
+            display: inline-flex; align-items: center; gap: 10px; color: var(--text-muted); 
+            margin-bottom: 30px; cursor: pointer; transition: 0.3s; font-weight: 600;
+        }
+        .btn-back:hover { color: var(--gold-base); transform: translateX(-5px); }
+        
+        .article-hero-img { width: 100%; height: 400px; object-fit: cover; border-radius: 12px; margin-bottom: 30px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .article-title { font-family: var(--font-head); font-size: 2.5rem; color: var(--text-main); margin-bottom: 15px; line-height: 1.2; }
+        .article-meta { display: flex; gap: 20px; color: var(--text-muted); font-size: 0.9rem; border-bottom: 1px solid var(--border-color); padding-bottom: 25px; margin-bottom: 30px; }
+        
+        .article-content { color: var(--text-main); font-size: 1.1rem; line-height: 1.8; }
+        .article-content p { margin-bottom: 20px; color: #cbd5e1; }
+        .article-content h2 { color: var(--gold-base); margin-top: 30px; margin-bottom: 15px; font-family: var(--font-display); }
+
+        /* Footer */
+        .app-footer {
+            margin-top: 60px; padding: 30px; border-top: 1px solid var(--border-color);
+            background: var(--bg-glass); backdrop-filter: blur(20px);
+            display: flex; flex-direction: column; align-items: center; gap: 20px;
+            border-radius: var(--radius); text-align: center;
+        }
+        .social-links { display: flex; gap: 15px; }
+        .social-btn {
+            width: 40px; height: 40px; border-radius: 50%; background: var(--bg-input);
+            display: grid; place-items: center; color: var(--text-muted); text-decoration: none;
+            transition: 0.3s; border: 1px solid var(--border-color);
+        }
+        .social-btn:hover { background: var(--gold-base); color: white; transform: translateY(-3px); }
+        .footer-copy { font-size: 0.8rem; color: var(--text-muted); }
+
+        /* Floating Support */
+        .support-fab { 
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; 
+            background: var(--gold-gradient); color: white; border-radius: 50%; 
+            display: grid; place-items: center; font-size: 1.5rem; 
+            box-shadow: 0 10px 25px rgba(217, 119, 6, 0.4); z-index: 1100; 
+            cursor: pointer; text-decoration: none; transition: 0.3s var(--ease-bounce);
+        }
+        .support-fab:hover { transform: scale(1.1) rotate(15deg); }
+
+        /* PWA Popup */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+
+        @media (max-width: 900px) {
+            .global-search-container { display: none; }
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 20px; } .overlay.active { display: block; }
+            .hamburger { display: block; }
+            .news-header h1 { font-size: 1.8rem; }
+            .article-hero-img { height: 200px; }
+            .article-container { padding: 20px; }
+            .toolbar { max-width: 100%; }
+        }
+        .empty-state { grid-column: 1/-1; text-align: center; padding: 50px; color: var(--text-muted); border: 1px dashed var(--border-color); border-radius: 20px; background: var(--bg-input); }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="seeker-dashboard.html" class="logo">EAST<span>LINK</span></a>
+        </div>
+        
+        <div class="global-search-container">
+            <input type="text" class="global-search-input" placeholder="Search articles..." id="globalSearchInput">
+            <i class="fas fa-search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+        </div>
+
+        <div class="header-actions">
+            <div class="icon-btn" title="Messages" onclick="location.href='seeker-messages.html'">
+                <i class="fa-regular fa-envelope"></i>
+                <div class="notification-badge" id="msg-badge">0</div>
+            </div>
+            <div class="icon-btn" title="Notifications" onclick="location.href='seeker-notifications.html'">
+                <i class="fa-regular fa-bell"></i>
+                <div class="notification-badge" id="notif-badge">0</div>
+            </div>
+            <div class="profile-widget" onclick="location.href='seeker-profile.html'">
+                <img src="" id="header-avatar-img" class="user-avatar img-mode" alt="Profile" style="display:none;">
+                <div id="header-avatar-fallback" class="user-avatar">U</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Overview</div>
+            <a href="seeker-dashboard.html" class="nav-item"><i class="fa-solid fa-compass"></i> Dashboard</a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Job Hunt</div>
+            <a href="seeker-applications.html" class="nav-item"><i class="fa-solid fa-file-signature"></i> Applied Jobs</a>
+            <a href="seeker-jobs.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Browse Jobs</a>
+            <a href="seeker-featured-jobs.html" class="nav-item link-std"><i class="fa-solid fa-star"></i> Featured Jobs <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-urgentlyhiring.html" class="nav-item link-pro"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-guaranteed-jobs.html" class="nav-item link-pro"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="seeker-wallet.html" class="nav-item"><i class="fa-solid fa-wallet"></i> My Wallet</a>
+            <a href="seeker-premium.html" class="nav-item"><i class="fa-solid fa-crown"></i> My Plan</a>
+            <a href="seeker-referrals.html" class="nav-item link-std"><i class="fa-solid fa-user-plus"></i> Invite & Earn <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-invest.html" class="nav-item link-std"><i class="fa-solid fa-chart-line"></i> Invest <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Resources</div>
+            <a href="seeker-blog.html" class="nav-item active"><i class="fa-solid fa-newspaper"></i> News & Insights</a>
+            <a href="seeker-resources.html" class="nav-item link-pro"><i class="fa-solid fa-book"></i> Resources <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Settings</div>
+            <a href="seeker-profile.html" class="nav-item"><i class="fa-solid fa-user-gear"></i> Profile</a>
+            <a href="seeker-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="page-container">
+            
+            <!-- LIST VIEW -->
+            <div id="list-view">
+                <div class="glass-panel news-header animate__animated animate__fadeInDown">
+                    <h1>News & Insights</h1>
+                    <p>Expert career advice, market trends, and updates from EastLink.</p>
+                </div>
+
+                <div class="toolbar animate__animated animate__fadeIn">
+                    <div class="search-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="filter-input" id="searchInput" placeholder="Search articles..." onkeyup="filterPosts()">
+                    </div>
+                </div>
+
+                <div class="blog-grid" id="blog-grid">
+                    <div class="empty-state"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>
+                </div>
+            </div>
+
+            <!-- ARTICLE VIEW -->
+            <div id="article-view" class="animate__animated animate__zoomIn">
+                <div class="article-container">
+                    <div class="btn-back" onclick="showList()">
+                        <i class="fas fa-arrow-left-long"></i> Back to Articles
+                    </div>
+                    <div id="article-content">
+                        <!-- Content Injected Here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <footer class="app-footer animate__animated animate__fadeInUp">
+                <div class="social-links" id="social-container">
+                    <!-- Socials injected via JS -->
+                </div>
+                <div class="footer-copy">&copy; 2025 EastLink Recruiters. All Rights Reserved.</div>
+            </footer>
+        </div>
+    </main>
+
+    <!-- FLOATING SUPPORT -->
+    <a href="seeker-support.html" class="support-fab"><i class="fa-solid fa-headset"></i></a>
+    
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add to home screen for quick access.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, orderBy, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig); 
+        const auth = getAuth(app); 
+        const db = getFirestore(app);
+
+        let allPosts = [];
+        let currentUserTier = 0; // 0=Free, 1=Standard, 2=Pro
+
+        // --- UI UTILS ---
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').style.display = 'block'; };
+        window.closeSidebar = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').style.display = 'none'; };
+        window.logout = () => signOut(auth).then(() => window.location.href = 'signin.html');
+
+        // --- AUTH & DATA ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    // Load User Data
+                    const snap = await getDoc(doc(db, "users", user.uid));
+                    if(snap.exists()) {
+                        const d = snap.data();
+                        
+                        // PLAN/TIER LOGIC
+                        const rawPlan = (d.plan || d.subscription || 'free').toLowerCase();
+                        if(rawPlan.includes('pro') || rawPlan.includes('premium') || rawPlan.includes('gold') || rawPlan.includes('guaranteed')) {
+                            currentUserTier = 2; // Pro
+                        } else if(rawPlan.includes('standard')) {
+                            currentUserTier = 1; // Standard
+                        } else {
+                            currentUserTier = 0; // Free
+                        }
+
+                        // HEADER AVATAR LOGIC
+                        const avatarImg = document.getElementById('header-avatar-img');
+                        const avatarFallback = document.getElementById('header-avatar-fallback');
+                        if(d.photoURL || user.photoURL) {
+                            avatarImg.src = d.photoURL || user.photoURL;
+                            avatarImg.style.display = 'block';
+                            avatarFallback.style.display = 'none';
+                        } else {
+                            avatarImg.style.display = 'none';
+                            avatarFallback.style.display = 'grid';
+                            avatarFallback.innerText = (d.fullName || "U").charAt(0).toUpperCase();
+                        }
+
+                        // SIDEBAR UNLOCK LOGIC
+                        if(currentUserTier >= 1) {
+                            document.querySelectorAll('.link-std .lock-icon').forEach(el => el.style.display = 'none');
+                        }
+                        if(currentUserTier >= 2) {
+                            document.querySelectorAll('.link-pro .lock-icon').forEach(el => el.style.display = 'none');
+                        }
+                    }
+                } catch(e) { console.error("User Load Error", e); }
+                
+                listenForBadges(user.uid);
+            }
+            loadSocials();
+        });
+
+        // --- BLOG LOGIC ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+            if(id) loadSinglePost(id);
+            else loadPosts();
+        });
+
+        async function loadPosts() {
+            const grid = document.getElementById('blog-grid');
+            document.getElementById('list-view').style.display = 'block';
+            document.getElementById('article-view').style.display = 'none';
+
+            try {
+                // CORRECTED COLLECTION: blog_posts
+                const q = query(collection(db, "blog_posts"), orderBy("createdAt", "desc"));
+                
+                const snap = await getDocs(q);
+                
+                grid.innerHTML = '';
+                allPosts = [];
+
+                if(snap.empty) {
+                    grid.innerHTML = `<div class="empty-state"><i class="fas fa-newspaper" style="font-size:2rem; margin-bottom:15px;"></i><p>No articles found.</p></div>`;
+                    return;
+                }
+
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    d.id = doc.id;
+                    allPosts.push(d);
+                    renderCard(d, grid);
+                });
+
+            } catch(e) {
+                console.error(e);
+                grid.innerHTML = `<div class="empty-state" style="color:var(--danger)">Unable to load articles.</div>`;
+            }
+        }
+
+        function renderCard(d, container) {
+            // Handle createdAt or timestamp
+            let date = 'Recent';
+            if(d.createdAt && d.createdAt.seconds) date = new Date(d.createdAt.seconds*1000).toLocaleDateString();
+            else if(d.timestamp && d.timestamp.seconds) date = new Date(d.timestamp.seconds*1000).toLocaleDateString();
+
+            const img = d.imageUrl || 'assets/images/logo.png'; 
+            
+            // Text rendering fallback
+            const rawContent = d.snippet || d.content || '';
+            const plainText = rawContent.replace(/<[^>]+>/g, ''); // Strip HTML tags
+            const excerpt = plainText.length > 120 ? plainText.substring(0, 120) + '...' : plainText;
+
+            // Calculate animation delay for staggered effect
+            const delay = container.children.length * 0.1;
+
+            container.innerHTML += `
+                <div class="blog-card animate__animated animate__fadeInUp" onclick="window.location.href='?id=${d.id}'" style="animation-delay: ${delay}s">
+                    <div class="card-img-wrap">
+                        <img src="${img}" class="card-img" loading="lazy" onerror="this.src='https://via.placeholder.com/400x250?text=EastLink'">
+                        <span class="cat-badge">${d.category || 'Insights'}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-meta">
+                            <span><i class="far fa-calendar-alt"></i> ${date}</span>
+                        </div>
+                        <h3 class="card-title">${d.title}</h3>
+                        <p class="card-excerpt">${excerpt}</p>
+                        <div class="read-more">
+                            <span>Read Article</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadSinglePost(id) {
+            document.getElementById('list-view').style.display = 'none';
+            const view = document.getElementById('article-view');
+            view.style.display = 'block';
+            const content = document.getElementById('article-content');
+            
+            content.innerHTML = `<div style="text-align:center; padding:50px;"><i class="fas fa-circle-notch fa-spin" style="font-size:2rem; color:var(--gold-base)"></i></div>`;
+
+            try {
+                // Fetch from blog_posts
+                let docSnap = await getDoc(doc(db, "blog_posts", id));
+                if(!docSnap.exists()) {
+                     content.innerHTML = `<div class="empty-state">Article not found.</div>`;
+                     return;
+                }
+
+                const d = docSnap.data();
+                
+                // Date Handling
+                let date = 'Recent';
+                if(d.createdAt && d.createdAt.seconds) date = new Date(d.createdAt.seconds*1000).toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric'});
+                else if(d.timestamp && d.timestamp.seconds) date = new Date(d.timestamp.seconds*1000).toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric'});
+
+                const img = d.imageUrl || 'assets/images/logo.png';
+                
+                // Content Formatting
+                let body = '';
+                if(d.content) {
+                    // Check if content already has HTML tags
+                    if(d.content.includes('<p>') || d.content.includes('<div>')) {
+                        body = d.content;
+                    } else {
+                        // Convert newlines to paragraphs for plain text
+                        body = d.content.split('\n').map(p => p.trim() ? `<p>${p}</p>` : '').join('');
+                    }
+                }
+
+                content.innerHTML = `
+                    <h1 class="article-title">${d.title}</h1>
+                    <div class="article-meta">
+                        <span><i class="far fa-calendar"></i> ${date}</span>
+                        <span><i class="far fa-folder"></i> ${d.category || 'News'}</span>
+                        <span><i class="far fa-user"></i> ${d.author || 'EastLink Team'}</span>
+                    </div>
+                    <img src="${img}" class="article-hero-img" onerror="this.src='https://via.placeholder.com/800x400?text=EastLink'">
+                    <div class="article-content">${body}</div>
+                `;
+                window.scrollTo(0,0);
+
+            } catch(e) {
+                console.error(e);
+                content.innerHTML = `<div class="empty-state" style="color:var(--danger)">Error loading article.</div>`;
+            }
+        }
+
+        window.filterPosts = () => {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const grid = document.getElementById('blog-grid');
+            grid.innerHTML = '';
+
+            const filtered = allPosts.filter(p => {
+                const title = (p.title || "").toLowerCase();
+                const cat = (p.category || "").toLowerCase();
+                return title.includes(term) || cat.includes(term);
+            });
+            
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div class="empty-state">No matches found.</div>`;
+            } else {
+                filtered.forEach(d => renderCard(d, grid));
+            }
+        }
+
+        window.showList = () => {
+            // Remove ID from URL without reload
+            const url = new URL(window.location);
+            url.searchParams.delete('id');
+            window.history.pushState({}, '', url);
+
+            document.getElementById('article-view').style.display = 'none';
+            document.getElementById('list-view').style.display = 'block';
+            if(allPosts.length === 0) loadPosts();
+        }
+
+        // --- SHARED ---
+        function listenForBadges(uid) {
+            onSnapshot(query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false)), 
+                s => { const el = document.getElementById('notif-badge'); if(el){ el.innerText = s.size > 9 ? '9+' : s.size; el.style.display = s.empty ? 'none' : 'flex'; }});
+            onSnapshot(query(collection(db, "messages"), where("receiverId", "==", uid), where("read", "==", false)), 
+                s => { const el = document.getElementById('msg-badge'); if(el){ el.innerText = s.size > 9 ? '9+' : s.size; el.style.display = s.empty ? 'none' : 'flex'; }});
+        }
+
+        async function loadSocials() {
+            try {
+                const d = await getDoc(doc(db, "admin_settings", "social_links"));
+                if(d.exists()) {
+                    const s = d.data();
+                    const c = document.getElementById('social-container');
+                    c.innerHTML = '';
+                    if(s.facebook) c.innerHTML += `<a href="${s.facebook}" target="_blank" class="social-btn"><i class="fab fa-facebook-f"></i></a>`;
+                    if(s.whatsapp) c.innerHTML += `<a href="${s.whatsapp}" target="_blank" class="social-btn"><i class="fab fa-whatsapp"></i></a>`;
+                    if(s.instagram) c.innerHTML += `<a href="${s.instagram}" target="_blank" class="social-btn"><i class="fab fa-instagram"></i></a>`;
+                }
+            } catch(e) {}
+        }
+
+        // --- PWA LOGIC ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('pwa-install-popup').style.display = 'block';
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('pwa-install-popup').style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            document.getElementById('pwa-install-popup').style.display = 'none';
+        };
+
+        if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js");
+    </script>
+</body>
+</html>

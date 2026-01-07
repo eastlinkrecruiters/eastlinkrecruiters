@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Terms of Service | EastLink Recruiters</title>
+    
+    <!-- PWA Manifest & Favicon (Updated Paths) -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
+    <meta name="theme-color" content="#020617">
+
+    <!-- Icons (Optional, page works without them) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        /* CORE STYLES - NO EXTERNAL DEPENDENCIES */
+        :root {
+            --primary: #f59e0b;
+            --bg: #020617; 
+            --text: #F8FAFC;
+            --text-muted: #94A3B8;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: sans-serif;
+            background-color: #020617; /* Hardcoded Dark Background */
+            color: #F8FAFC;
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* HEADER */
+        header {
+            position: fixed; top: 0; width: 100%; height: 80px;
+            z-index: 1000; background: rgba(2, 6, 23, 0.9);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .nav-inner { height: 100%; display: flex; justify-content: space-between; align-items: center; }
+        .header-logo-text { font-size: 1.4rem; font-weight: 700; color: white; display: flex; align-items: center; gap: 10px; }
+        .header-logo-text span { color: var(--primary); }
+
+        .menu-trigger {
+            padding: 8px 20px; border-radius: 99px; border: 1px solid var(--border-color);
+            color: white; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 10px;
+        }
+
+        /* MENU OVERLAY */
+        .menu-overlay {
+            position: fixed; inset: 0; background: #020617;
+            z-index: 2000; display: none; flex-direction: column; 
+            justify-content: center; align-items: center;
+        }
+        .menu-overlay.active { display: flex; }
+        .close-menu { position: absolute; top: 30px; right: 30px; font-size: 1.5rem; cursor: pointer; color: white; }
+        .menu-links { display: flex; flex-direction: column; gap: 25px; text-align: center; }
+        .menu-link { font-size: 2rem; font-weight: 700; color: white; }
+        .menu-actions { margin-top: 40px; display: flex; gap: 15px; }
+        .btn { padding: 12px 30px; border-radius: 50px; font-weight: 700; }
+
+        /* CONTENT */
+        .page-intro { padding: 140px 0 40px; text-align: center; border-bottom: 1px solid var(--border-color); margin-bottom: 60px; }
+        .page-intro h2 { font-size: 2.5rem; margin-bottom: 10px; color: white; }
+        
+        .docs-layout { display: grid; grid-template-columns: 280px 1fr; gap: 60px; padding-bottom: 80px; align-items: start; }
+        
+        /* Sidebar */
+        .docs-sidebar {
+            position: sticky; top: 120px; background: rgba(15, 23, 42, 0.5); 
+            border: 1px solid var(--border-color); padding: 30px; border-radius: 16px;
+        }
+        .toc-list li { list-style: none; margin-bottom: 10px; }
+        .toc-link { color: var(--text-muted); display: block; font-size: 0.9rem; }
+        .toc-link:hover { color: var(--primary); }
+
+        /* Main Text */
+        .docs-content {
+            background: rgba(15, 23, 42, 0.5); padding: 50px; border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+        .section-block { margin-bottom: 50px; }
+        .section-block h2 { font-size: 1.8rem; color: white; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+        .section-block p, .section-block li { color: var(--text-muted); margin-bottom: 15px; }
+        .section-block ul { padding-left: 20px; }
+
+        .highlight-box {
+            background: rgba(245, 158, 11, 0.1); border-left: 4px solid var(--primary);
+            padding: 25px; border-radius: 8px; margin: 30px 0;
+        }
+        .highlight-box p { color: white; margin: 0; }
+
+        /* FOOTER */
+        footer { background: rgba(15, 23, 42, 0.8); border-top: 1px solid var(--border-color); padding-top: 4rem; margin-top: auto; }
+        .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; margin-bottom: 4rem; }
+        .f-col h4 { color: white; margin-bottom: 1.5rem; text-transform: uppercase; font-size: 0.9rem; }
+        .f-col ul { list-style: none; }
+        .f-col a { color: var(--text-muted); font-size: 0.9rem; }
+        .social-links { display: flex; gap: 10px; margin-top: 20px; }
+        .s-btn { 
+            width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border-color); 
+            color: white; display: grid; place-items: center; 
+        }
+        .copyright { border-top: 1px solid var(--border-color); padding: 2rem 0; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+
+        @media (max-width: 900px) {
+            .docs-layout { grid-template-columns: 1fr; }
+            .docs-sidebar { display: none; } /* Hide sidebar on mobile */
+            .docs-content { padding: 20px; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 600px) {
+            .footer-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="container nav-inner">
+            <a href="index.html" class="header-logo-text">
+                <img src="./assets/images/logo.png" style="height:35px; width:auto;" alt="">
+                <div>EAST<span>LINK</span></div>
+            </a>
+            <div class="menu-trigger" onclick="toggleMenu()">
+                <span>MENU</span>
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- MENU OVERLAY -->
+    <div class="menu-overlay" id="menuOverlay">
+        <div class="close-menu" onclick="toggleMenu()">&times;</div>
+        <div class="menu-links">
+            <a href="index.html" class="menu-link">Home</a>
+            <a href="about.html" class="menu-link">About Us</a>
+            <a href="contact.html" class="menu-link">Contact</a>
+        </div>
+        <div class="menu-actions">
+            <a href="signin.html" class="btn" style="border:1px solid white; color:white;">Sign In</a>
+            <a href="signup.html" class="btn" style="background:var(--primary); color:black;">Join Now</a>
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <main>
+        <div class="container">
+            
+            <div class="page-intro">
+                <h2>Terms of Service</h2>
+                <p>Effective Date: <span style="color:var(--primary);">January 1, 2025</span></p>
+            </div>
+
+            <div class="docs-layout">
+                
+                <!-- Sidebar -->
+                <aside class="docs-sidebar">
+                    <div style="font-weight:700; color:var(--primary); margin-bottom:15px;">CONTENTS</div>
+                    <ul class="toc-list">
+                        <li><a href="#acceptance" class="toc-link">1. Acceptance of Terms</a></li>
+                        <li><a href="#accounts" class="toc-link">2. User Accounts</a></li>
+                        <li><a href="#services" class="toc-link">3. Services & Fees</a></li>
+                        <li><a href="#conduct" class="toc-link">4. User Conduct</a></li>
+                        <li><a href="#termination" class="toc-link">5. Termination</a></li>
+                        <li><a href="#liability" class="toc-link">6. Limitation of Liability</a></li>
+                        <li><a href="#contact" class="toc-link">7. Contact Us</a></li>
+                    </ul>
+                </aside>
+
+                <!-- Main Text Content -->
+                <article class="docs-content">
+                    
+                    <div id="acceptance" class="section-block">
+                        <h2>1. Acceptance of Terms</h2>
+                        <p>Welcome to EastLink Recruiters ("EastLink," "we," "us," or "our"). By accessing or using our website, mobile applications, and recruitment services (collectively, the "Services"), you agree to be bound by these Terms of Service ("Terms").</p>
+                        <p>If you do not agree to these Terms, you may not access or use the Services. We reserve the right to modify these Terms at any time. Your continued use of the Services constitutes your acceptance of such modifications.</p>
+                    </div>
+
+                    <div id="accounts" class="section-block">
+                        <h2>2. User Accounts</h2>
+                        <h3 style="color:var(--primary); margin:20px 0 10px;">2.1 Registration</h3>
+                        <p>To access certain features, you must register for an account as either a "Job Seeker" or an "Employer." You agree to provide accurate, current, and complete information during the registration process.</p>
+                        
+                        <h3 style="color:var(--primary); margin:20px 0 10px;">2.2 Account Security</h3>
+                        <p>You are responsible for safeguarding your password and for all activities that occur under your account. You agree to notify us immediately of any unauthorized use of your account.</p>
+                        
+                        <div class="highlight-box">
+                            <p><strong>Important:</strong> EastLink reserves the right to suspend or terminate accounts that are suspected of being fake, fraudulent, or created for purposes other than genuine recruitment.</p>
+                        </div>
+                    </div>
+
+                    <div id="services" class="section-block">
+                        <h2>3. Services & Fees</h2>
+                        <h3 style="color:var(--primary); margin:20px 0 10px;">3.1 For Job Seekers</h3>
+                        <p>Basic access to the platform is free. Certain premium features, such as the "Pro Seeker" badge, highlighted profiles, or "Guaranteed Placement" services, may require payment of fees.</p>
+
+                        <h3 style="color:var(--primary); margin:20px 0 10px;">3.2 For Employers</h3>
+                        <p>Employers may post jobs, search the database, and contact candidates. These services are subject to fees as outlined on our Services page or Subscription dashboard.</p>
+
+                        <h3 style="color:var(--primary); margin:20px 0 10px;">3.3 Payment Policy</h3>
+                        <p>All fees are non-refundable unless otherwise stated in a specific written agreement. We use secure third-party payment processors (e.g., Stripe, M-Pesa) and do not store your full credit card details.</p>
+                    </div>
+
+                    <div id="conduct" class="section-block">
+                        <h2>4. User Conduct</h2>
+                        <p>You agree not to use the Services to:</p>
+                        <ul>
+                            <li>Post any content that is unlawful, harmful, threatening, abusive, harassing, defamatory, or discriminatory.</li>
+                            <li>Impersonate any person or entity or falsely state your affiliation with a person or entity.</li>
+                            <li>Post jobs that require upfront fees from candidates (scams).</li>
+                            <li>Scrape or data mine the EastLink database.</li>
+                        </ul>
+                        <p>We reserve the right to remove any content that violates these Terms or is deemed inappropriate.</p>
+                    </div>
+
+                    <div id="termination" class="section-block">
+                        <h2>5. Termination</h2>
+                        <p>We may terminate or suspend your account and access to the Services immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms.</p>
+                        <p>Upon termination, your right to use the Services will immediately cease. If you wish to terminate your account, you may simply discontinue using the Services or delete your account via the Settings dashboard.</p>
+                    </div>
+
+                    <div id="liability" class="section-block">
+                        <h2>6. Limitation of Liability</h2>
+                        <p>EastLink Recruiters acts as a venue to connect Employers and Job Seekers. We do not screen or censor the listings offered. We are not involved in the actual transaction between employers and candidates.</p>
+                        <p>To the fullest extent permitted by law, EastLink shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly.</p>
+                    </div>
+
+                    <div id="contact" class="section-block">
+                        <h2>7. Contact Us</h2>
+                        <p>If you have any questions about these Terms, please contact us at:</p>
+                        <p>
+                            <strong>Email:</strong> <a href="mailto:eastlinkrecruiters@gmail.com" style="color:var(--primary);">eastlinkrecruiters@gmail.com</a><br>
+                            <strong>Phone:</strong> <a href="tel:+254781842387" style="color:var(--primary);">+254 781 842 387</a><br>
+                            <strong>Address:</strong> Nairobi, Kenya
+                        </p>
+                    </div>
+
+                </article>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="f-col">
+                    <div style="font-weight:700; font-size:1.4rem; color:white; margin-bottom:20px;">EAST<span style="color:var(--primary);">LINK</span></div>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">The leading platform for professional recruitment. We ensure quality, trust, and speed.</p>
+                    <div class="social-links">
+                        <a href="#" class="s-btn"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="s-btn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="s-btn"><i class="fa-brands fa-x-twitter"></i></a>
+                    </div>
+                </div>
+                <div class="f-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="services.html">Our Services</a></li>
+                        <li><a href="careers.html">Careers</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                    </ul>
+                </div>
+                <div class="f-col">
+                    <h4>Support</h4>
+                    <ul>
+                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="signin.html">Client Portal</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">&copy; 2025 EastLink Recruitment Solutions. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" style="
+        display: none; 
+        position: fixed; bottom: 20px; right: 20px; 
+        background: rgba(15, 23, 42, 0.95); 
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        backdrop-filter: blur(12px);
+        padding: 20px; border-radius: 16px; 
+        z-index: 10000; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        max-width: 320px; animation: slideUp 0.5s ease-out;
+    ">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+            <img src="./assets/images/logo.png" style="width:50px; height:50px; border-radius:10px;">
+            <div>
+                <h4 style="color:#fff; margin:0; font-family:sans-serif;">Install EastLink</h4>
+                <p style="color:#94A3B8; margin:5px 0 0; font-size:0.8rem;">Add to Home Screen for fast access.</p>
+            </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button id="pwa-dismiss" style="flex:1; padding:10px; background:transparent; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:8px; cursor:pointer;">Later</button>
+            <button id="pwa-install-btn" style="flex:1; padding:10px; background:linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border:none; color:#000; font-weight:700; border-radius:8px; cursor:pointer;">Install</button>
+        </div>
+    </div>
+    <style>@keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }</style>
+
+    <!-- Minimal Scripts -->
+    <script>
+        // Menu Toggle
+        function toggleMenu() {
+            const menu = document.getElementById('menuOverlay');
+            if (menu.classList.contains('active')) {
+                menu.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            } else {
+                menu.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // --- PWA LOGIC START ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('SW Registered'))
+                    .catch(err => console.log('SW Failed', err));
+            });
+        }
+        let deferredPrompt;
+        const pwaPopup = document.getElementById('pwa-install-popup');
+        const installBtn = document.getElementById('pwa-install-btn');
+        const dismissBtn = document.getElementById('pwa-dismiss');
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            setTimeout(() => { pwaPopup.style.display = 'block'; }, 3000);
+        });
+        installBtn.addEventListener('click', (e) => {
+            pwaPopup.style.display = 'none';
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => { deferredPrompt = null; });
+            }
+        });
+        dismissBtn.addEventListener('click', () => { pwaPopup.style.display = 'none'; });
+        window.addEventListener('appinstalled', () => { pwaPopup.style.display = 'none'; });
+        // --- PWA LOGIC END ---
+    </script>
+</body>
+</html>
