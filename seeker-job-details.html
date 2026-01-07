@@ -588,7 +588,7 @@
                 console.log(`Apps this month: ${monthlyAppsCount}`);
             } catch (e) {
                 console.error("Error checking limits:", e);
-                monthlyAppsCount = 999; // Fail safe to lock if error
+                monthlyAppsCount = 0; // FIX: Default to 0 if error occurs
             }
         }
 
@@ -1023,3 +1023,4 @@
     </script>
 </body>
 </html>
+
