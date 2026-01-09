@@ -228,6 +228,20 @@
         .form-control { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; background: rgba(0,0,0,0.3); color: var(--text-main); font-family: var(--font-body); }
         .form-control:disabled { opacity: 0.6; cursor: not-allowed; }
         select.form-control option { background: var(--bg-body); color: var(--text-main); }
+        
+        .modal-actions { margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color); }
+        .btn-outline-red {
+             width: 100%; padding: 10px; margin-bottom: 10px;
+             border: 1px solid var(--danger); background: rgba(239, 68, 68, 0.05); color: var(--danger);
+             border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s;
+        }
+        .btn-outline-red:hover { background: var(--danger); color: white; }
+        .btn-outline-blue {
+             width: 100%; padding: 10px; margin-bottom: 10px;
+             border: 1px solid var(--blue); background: rgba(59, 130, 246, 0.05); color: var(--blue);
+             border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s;
+        }
+        .btn-outline-blue:hover { background: var(--blue); color: white; }
 
         /* PWA Popup */
         .pwa-install-popup {
@@ -374,7 +388,8 @@
             <button class="btn-action" style="background:var(--bg-hover); border:1px solid var(--border-color);" onclick="loadData()">
                 <i class="fas fa-sync-alt"></i>
             </button>
-            <button class="btn-action" onclick="exportData()"><i class="fas fa-download"></i> Export CSV</button>
+            <button class="btn-action" onclick="exportData()"><i class="fas fa-file-csv"></i> Export CSV</button>
+            <button class="btn-action" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
         </div>
 
         <!-- Table -->
@@ -386,7 +401,7 @@
                             <th>User Profile</th>
                             <th>Role & Plan</th>
                             <th>Status</th>
-                            <th>Joined Date</th>
+                            <th>Joined Date & Time</th>
                             <th style="text-align:right;">Actions</th>
                         </tr>
                     </thead>
@@ -433,6 +448,13 @@
                         <!-- Populated dynamically -->
                     </select>
                 </div>
+
+                <!-- Admin Management Actions -->
+                <div class="modal-actions">
+                    <label style="margin-bottom:10px;">Dangerous Actions</label>
+                    <button class="btn-outline-blue" onclick="triggerResetPassword()"><i class="fas fa-key"></i> Send Password Reset</button>
+                    <button class="btn-outline-red" onclick="deleteUser()"><i class="fas fa-trash-alt"></i> Delete User Account</button>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" id="btn-ban" onclick="toggleBan()" style="padding:10px 15px; border:1px solid var(--danger); background:rgba(239, 68, 68, 0.1); color:var(--danger); border-radius:8px; cursor:pointer; font-weight:600; font-size:0.85rem; transition:0.3s;">
@@ -459,11 +481,12 @@
     </div>
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, setDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, deleteDoc, setDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
         const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
@@ -579,9 +602,17 @@
                 const name = u.fullName || u.companyName || 'Unknown';
                 const init = name.charAt(0).toUpperCase();
                 
-                let date = 'N/A';
+                // --- DATE LOGIC ---
+                let dateStr = 'N/A';
                 const ts = u.joinedAt || u.createdAt;
-                if(ts) date = ts.seconds ? new Date(ts.seconds * 1000).toLocaleDateString() : new Date(ts).toLocaleDateString();
+                if(ts) {
+                    const d = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
+                    // Shows Date and Time (e.g. 11/18/2025, 2:30 PM)
+                    dateStr = d.toLocaleString('en-US', { 
+                        month:'numeric', day:'numeric', year:'numeric', 
+                        hour:'numeric', minute:'2-digit', hour12:true 
+                    });
+                }
                 
                 let planHtml = '<span class="badge badge-free">Free</span>';
                 if(u.plan && u.plan !== 'basic' && u.plan !== 'starter' && u.plan !== 'free') {
@@ -604,7 +635,7 @@
                         </td>
                         <td>${planHtml}</td>
                         <td>${statusHtml}</td>
-                        <td style="font-family:var(--font-display); font-size:0.85rem; color:var(--text-muted);">${date}</td>
+                        <td style="font-family:var(--font-display); font-size:0.85rem; color:var(--text-muted);">${dateStr}</td>
                         <td style="text-align:right;">
                             <button class="btn-icon" onclick="editUser('${u.id}')" title="Edit User"><i class="fas fa-cog"></i></button>
                         </td>
@@ -653,6 +684,45 @@
             updateBanBtn();
         };
 
+        // --- NEW: Reset Password Functionality ---
+        window.triggerResetPassword = async () => {
+            if(!editU || !editU.email) return;
+            if(!confirm(`Send password reset email to ${editU.email}?`)) return;
+            
+            try {
+                await sendPasswordResetEmail(auth, editU.email);
+                Toastify({ text: "Reset Email Sent!", duration: 3000, style: { background: "#3B82F6" } }).showToast();
+            } catch(e) {
+                console.error(e);
+                Toastify({ text: "Error sending email", duration: 3000, style: { background: "#EF4444" } }).showToast();
+            }
+        };
+
+        // --- NEW: Delete User Function ---
+        window.deleteUser = async () => {
+            if(!editU) return;
+            // Double confirmation for safety
+            const confirmMsg = `⚠️ DANGER ZONE ⚠️\n\nYou are about to PERMANENTLY DELETE the user:\n${editU.email}\n\nThis action cannot be undone. Are you sure?`;
+            if(!confirm(confirmMsg)) return;
+
+            try {
+                // Delete from Firestore
+                await deleteDoc(doc(db, "users", editU.id));
+                
+                // Update Local State without reloading
+                allUsers = allUsers.filter(u => u.id !== editU.id);
+                
+                calculateStats();
+                renderTable();
+                closeModal();
+                
+                Toastify({ text: "User Account Deleted Permanently", duration: 4000, style: { background: "#EF4444" } }).showToast();
+            } catch(e) {
+                console.error("Delete error:", e);
+                Toastify({ text: "Error deleting user: " + e.message, duration: 4000, style: { background: "#EF4444" } }).showToast();
+            }
+        };
+
         window.saveChanges = async () => {
             const newRole = document.getElementById('edit-role').value;
             const newPlan = document.getElementById('edit-plan').value;
@@ -682,13 +752,20 @@
 
         window.exportData = () => {
             const filtered = allUsers.filter(u => (u.role || 'seeker') === curRole);
-            let csv = "ID,Name,Email,Role,Plan,Status,Joined\n";
+            let csv = "ID,Name,Email,Role,Plan,Status,Joined Date,Joined Time\n";
             
             filtered.forEach(u => {
-                let date = '';
+                let datePart = '';
+                let timePart = '';
                 const ts = u.joinedAt || u.createdAt;
-                if(ts) date = ts.seconds ? new Date(ts.seconds * 1000).toLocaleDateString() : new Date(ts).toLocaleDateString();
-                csv += `${u.id},"${u.fullName||u.companyName||''}",${u.email},${u.role},${u.plan},${u.isBanned?'Banned':'Active'},${date}\n`;
+                
+                if(ts) {
+                    const d = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
+                    datePart = d.toLocaleDateString();
+                    timePart = d.toLocaleTimeString();
+                }
+
+                csv += `${u.id},"${u.fullName||u.companyName||''}",${u.email},${u.role},${u.plan},${u.isBanned?'Banned':'Active'},${datePart},${timePart}\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -696,6 +773,82 @@
             link.href = URL.createObjectURL(blob);
             link.download = `users_export_${curRole}.csv`;
             link.click();
+        };
+
+        // --- NEW: PDF Export Function ---
+        window.exportPDF = () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const filtered = allUsers.filter(u => (u.role || 'seeker') === curRole);
+
+            // Title
+            doc.setFontSize(18);
+            doc.text(`User Report: ${curRole.toUpperCase()}`, 14, 22);
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 28);
+
+            // Table Header setup
+            let y = 40;
+            doc.setDrawColor(200);
+            doc.setLineWidth(0.1);
+            doc.line(14, 32, 196, 32);
+
+            doc.setTextColor(0);
+            doc.setFont(undefined, 'bold');
+            doc.setFontSize(9);
+            
+            // Header Row
+            doc.text("Name", 14, y);
+            doc.text("Email", 65, y);
+            doc.text("Plan", 125, y);
+            doc.text("Status", 145, y);
+            doc.text("Joined On", 165, y);
+            
+            doc.line(14, y + 2, 196, y + 2);
+            y += 8;
+
+            // Body Rows
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(50);
+
+            filtered.forEach(u => {
+                // Pagination
+                if (y > 280) {
+                    doc.addPage();
+                    y = 20;
+                    // Re-print headers (optional)
+                }
+
+                const name = (u.fullName || u.companyName || 'Unknown').substring(0, 25);
+                const email = (u.email || 'N/A').substring(0, 30);
+                const plan = (u.plan || 'Free').toUpperCase();
+                const status = u.isBanned ? 'BANNED' : 'Active';
+                
+                // Date formatting for PDF
+                let dateStr = '-';
+                if(u.joinedAt || u.createdAt) {
+                    const ts = u.joinedAt || u.createdAt;
+                    const d = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
+                    dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                }
+
+                doc.text(name, 14, y);
+                doc.text(email, 65, y);
+                doc.text(plan, 125, y);
+                
+                // Color status red if banned
+                if(u.isBanned) doc.setTextColor(220, 38, 38);
+                doc.text(status, 145, y);
+                doc.setTextColor(50); // Reset color
+
+                doc.text(dateStr, 165, y);
+                
+                y += 7;
+            });
+
+            doc.save(`EastLink_Users_${curRole}.pdf`);
         };
 
         function initBadges() {
