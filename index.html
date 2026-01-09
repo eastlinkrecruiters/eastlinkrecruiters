@@ -309,7 +309,7 @@
             background: var(--bg-glass-70); border-top: 1px solid var(--border-color); 
             padding-top: 4rem; margin-top: 4rem; backdrop-filter: blur(12px);
         }
-        /* UPDATED: Changed from 4 columns to 3 columns to remove the app download column */
+        
         .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; margin-bottom: 4rem; }
         
         .f-col h4 { font-size: 0.9rem; color: var(--text); margin-bottom: 1.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-family: 'Cinzel', serif; }
@@ -334,10 +334,20 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        /* MAINTENANCE OVERLAY */
+        #maintenance-screen {
+            position: fixed; inset: 0; background: #020617; z-index: 10000;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 20px; background-image: url('./assets/images/background.png');
+            background-size: cover;
+        }
+        #maintenance-screen::before {
+             content: ''; position: absolute; inset: 0; background: rgba(2, 6, 23, 0.9); z-index: -1;
+        }
+
         /* RESPONSIVE */
         @media (max-width: 900px) {
             .hero-content { grid-template-columns: 1fr; gap: 3rem; padding-top: 0; }
-            /* Mobile Order: Text Top, Visual Bottom */
             .hero-text-content { order: 1; }
             .hero-visual { order: 2; margin-top: 20px; }
             
@@ -357,6 +367,17 @@
     </style>
 </head>
 <body>
+
+    <!-- MAINTENANCE SCREEN -->
+    <div id="maintenance-screen">
+        <img src="./assets/images/logo.png" style="width: 80px; height: auto; margin-bottom: 20px; filter: grayscale(100%) brightness(1.2);">
+        <h1 style="color: var(--primary); font-family: 'Cinzel', serif; margin-bottom: 10px;">System Maintenance</h1>
+        <p style="color: var(--text-muted); max-width: 500px; font-size: 1rem;">
+            We are currently performing scheduled upgrades to enhance the EastLink experience. 
+            The platform will be back online shortly.
+        </p>
+        <div class="spinner" style="margin-top: 20px;"></div>
+    </div>
 
     <!-- PRELOADER -->
     <div id="preloader" style="position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; justify-content:center; align-items:center; transition: opacity 0.5s ease;">
@@ -656,7 +677,8 @@
         // --- FIREBASE LOGIC ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, collection, query, orderBy, limit, getDocs, doc, getDoc, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        // Added onSnapshot to imports
+        import { getFirestore, collection, query, orderBy, limit, getDocs, doc, getDoc, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
         const app = initializeApp(firebaseConfig);
@@ -667,6 +689,22 @@
         let isUserLoggedIn = false;
         onAuthStateChanged(auth, (user) => {
             isUserLoggedIn = !!user;
+        });
+
+        // --- MAINTENANCE MODE LISTENER ---
+        // This listens to the exact same document your admin settings update
+        onSnapshot(doc(db, "site_settings", "config"), (docSnap) => {
+            const overlay = document.getElementById('maintenance-screen');
+            if(docSnap.exists()) {
+                const data = docSnap.data();
+                if (data.maintenanceMode) {
+                    overlay.style.display = 'flex';
+                    document.body.style.overflow = 'hidden'; // Lock scrolling
+                } else {
+                    overlay.style.display = 'none';
+                    document.body.style.overflow = 'auto'; // Restore scrolling
+                }
+            }
         });
 
         // TAG LOADER
