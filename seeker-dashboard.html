@@ -288,6 +288,24 @@
         .skeleton { background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 4px; color: transparent !important; }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
+        /* --- MAINTENANCE SCREEN STYLES (ADDED) --- */
+        #maintenance-screen {
+            position: fixed; inset: 0; background: #020617; z-index: 20000;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; padding: 20px; background-image: url('./assets/images/background.png');
+            background-size: cover;
+        }
+        #maintenance-screen::before {
+             content: ''; position: absolute; inset: 0; background: rgba(2, 6, 23, 0.95); z-index: -1;
+        }
+        .maint-wa-btn:hover { background: #128C7E !important; transform: translateY(-2px); }
+        .maint-admin-btn:hover { border-color: var(--gold-base) !important; color: var(--gold-base) !important; }
+        .spinner {
+            width: 20px; height: 20px; border: 2px solid rgba(245, 158, 11, 0.3); border-top: 2px solid var(--gold-base);
+            border-radius: 50%; animation: spin 1s linear infinite; display: inline-block;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         @media (max-width: 992px) {
             .global-search-container { display: none; }
             .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
@@ -300,6 +318,48 @@
     </style>
 </head>
 <body>
+
+    <!-- MAINTENANCE SCREEN -->
+    <div id="maintenance-screen">
+        <img src="./assets/images/logo.png" style="width: 80px; height: auto; margin-bottom: 20px; filter: grayscale(100%) brightness(1.2);">
+        <h1 style="color: var(--gold-base); font-family: 'Cinzel', serif; margin-bottom: 10px;">System Maintenance</h1>
+        <p style="color: var(--text-muted); max-width: 500px; font-size: 1rem; margin-bottom: 25px;">
+            We are currently upgrading the platform.
+        </p>
+
+        <!-- Professional Instructions Box -->
+        <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; max-width: 500px; text-align: left; margin-bottom: 25px; backdrop-filter: blur(10px);">
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5;">
+                <strong style="color: var(--gold-base);">To avoid unnecessary traffic:</strong><br>
+                Please submit applications directly via our WhatsApp line.
+            </p>
+            
+            <div style="font-size: 0.85rem; color: #94A3B8; margin-bottom: 10px;">
+                <strong style="color: #fff;">Pro Members:</strong><br>
+                Send: "PRO USER [Name], [Email], [Applied Job]"
+            </div>
+            
+            <div style="font-size: 0.85rem; color: #94A3B8;">
+                <strong style="color: #fff;">New Applicants:</strong><br>
+                Send: "PRO USER [Name], [Email], [Job Interest]"<br>
+                <em style="opacity: 0.7;">(Ensure you have your CV ready)</em>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+            <a href="https://wa.me/254751821624?text=PRO%20USER%20" class="maint-wa-btn" style="background: #25D366; color: white; border: none; padding: 12px 30px; border-radius: 30px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
+                <i class="fab fa-whatsapp" style="font-size: 1.1rem;"></i> Apply via WhatsApp
+            </a>
+
+            <!-- Sign In / Sign Out Redirect (User Logic) -->
+            <a href="signin.html" id="maint-auth-btn" class="maint-admin-btn" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.6); padding: 12px 25px; border-radius: 30px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 8px; transition: 0.3s; text-decoration: none;">
+                <i class="fas fa-sign-in-alt"></i> Sign In
+            </a>
+        </div>
+        
+        <div class="spinner" style="margin-top: 30px;"></div>
+    </div>
 
     <!-- HEADER -->
     <header>
@@ -537,7 +597,7 @@
         window.showUpgradeModal = () => document.getElementById('upgradeModal').classList.add('open');
         window.closeUpgradeModal = () => document.getElementById('upgradeModal').classList.remove('open');
 
-        // ACCESS CHECKER HELPER (Links & Modal Buttons)
+        // ACCESS CHECKER HELPER
         window.checkAccess = (requiredTier, url) => {
             const tierMap = { 'free': 0, 'standard': 1, 'pro': 2 };
             let currentTierStr = 'free';
@@ -558,9 +618,30 @@
         const saved = localStorage.getItem('theme') || 'dark';
         document.documentElement.setAttribute('data-theme', saved);
 
+        // --- MAINTENANCE MODE LISTENER ---
+        // Listens to global config changes
+        onSnapshot(doc(db, "site_settings", "config"), (docSnap) => {
+            const overlay = document.getElementById('maintenance-screen');
+            if(docSnap.exists()) {
+                const data = docSnap.data();
+                if (data.maintenanceMode) {
+                    overlay.style.display = 'flex';
+                    document.body.style.overflow = 'hidden'; 
+                } else {
+                    overlay.style.display = 'none';
+                    document.body.style.overflow = 'auto'; 
+                }
+            }
+        });
+
         // --- CORE DATA LOADING ---
         onAuthStateChanged(auth, async (user) => {
             if(!user) return window.location.href = 'signin.html';
+
+            // 1. CHECK SIGN IN STATUS & HIDE BUTTON IN MAINTENANCE SCREEN
+            // Since user is logged in, hide the "Sign In" button on the maintenance overlay
+            const authBtn = document.getElementById('maint-auth-btn');
+            if(authBtn) authBtn.style.display = 'none';
 
             try {
                 // REALTIME LISTENER FOR USER PROFILE
@@ -568,17 +649,17 @@
                     if(userDoc.exists()) {
                         const data = userDoc.data();
                         
-                        // 1. Plan Detection & Normalization
+                        // Plan Detection & Normalization
                         const rawPlan = data.plan || data.tier || data.subscription || 'free';
                         const p = String(rawPlan).toLowerCase().trim();
                         if(p.includes('gold') || p.includes('premium') || p.includes('pro')) currentUserPlan = 'pro';
                         else if(p.includes('standard')) currentUserPlan = 'standard';
                         else currentUserPlan = 'free';
 
-                        // 2. Update UI
+                        // Update UI
                         initDashboard(data, user);
                         
-                        // 3. Load Widgets (Only if not loaded)
+                        // Load Widgets (Only if not loaded)
                         if(!document.getElementById('stat-applied').innerText || document.getElementById('stat-applied').innerText === '0') {
                             loadAsyncWidgets(user.uid);
                             loadBlogPosts(); 
@@ -586,7 +667,7 @@
                     }
                 });
                 
-                // 4. Setup Badge Listeners
+                // Setup Badge Listeners
                 setupRealtimeListeners(user.uid);
 
             } catch(e) { 
@@ -785,14 +866,12 @@
             }
         }
 
-        // --- FIXED: UNIVERSAL JOB LOADER (FAIL-SAFE) ---
+        // --- UNIVERSAL JOB LOADER ---
         async function loadGuaranteedJobs() {
             const container = document.getElementById('job-feed-content');
-            console.log("Starting Universal Job Load...");
-
             if(!container) return;
             
-            // Show skeleton if empty
+            // Show skeleton
             if(!container.hasChildNodes() || container.innerHTML.includes('skeleton')) {
                 container.innerHTML = '<div class="skeleton" style="height:150px; border-radius:12px;"></div><div class="skeleton" style="height:150px; border-radius:12px;"></div><div class="skeleton" style="height:150px; border-radius:12px;"></div>';
             }
@@ -801,29 +880,24 @@
                 const jobsRef = collection(db, "jobs");
                 let snap;
 
-                // ATTEMPT 1: Strict "Guaranteed"
                 try {
                     const q1 = query(jobsRef, where("listingType", "==", "Guaranteed"), limit(3));
                     snap = await getDocs(q1);
-                } catch(e) { console.log("Attempt 1 failed", e); }
+                } catch(e) { }
 
-                // ATTEMPT 2: Lowercase "guaranteed"
                 if (!snap || snap.empty) {
                     try {
-                        console.log("Attempt 1 empty. Trying lowercase 'guaranteed'...");
                         const q2 = query(jobsRef, where("listingType", "==", "guaranteed"), limit(3));
                         snap = await getDocs(q2);
-                    } catch(e) { console.log("Attempt 2 failed", e); }
+                    } catch(e) { }
                 }
 
-                // ATTEMPT 3: FALLBACK - LOAD ANY JOBS (Fail-Safe)
+                // Fallback
                 if (!snap || snap.empty) {
-                    console.warn("Guaranteed tags missing. Loading ANY jobs to populate dashboard.");
-                    const q3 = query(jobsRef, limit(3)); // Just get whatever is there
+                    const q3 = query(jobsRef, limit(3)); 
                     snap = await getDocs(q3);
                 }
                 
-                // If STILL empty, the database is truly empty
                 if (!snap || snap.empty) {
                     container.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:20px; color:var(--text-muted);">No jobs found in database.</div>`;
                     return;
@@ -835,10 +909,7 @@
                 docs.forEach((job, index) => {
                     const logo = job.employerLogo ? `<img src="${job.employerLogo}" class="company-logo">` : `<div class="company-logo">${(job.company||'C').charAt(0)}</div>`;
                     
-                    // Access Logic
                     let isLocked = (currentUserPlan !== 'pro'); 
-                    // Note: If we fell back to non-guaranteed jobs, we might want to unlock them, 
-                    // but to keep the UI consistent with "Guaranteed Section", we keep lock logic.
                     
                     let clickAction = `location.href='seeker-job-details.html?id=${job.id}'`;
                     let cardClass = "job-card animate__animated animate__fadeInUp";
@@ -848,15 +919,11 @@
                         clickAction = "showUpgradeModal()";
                     }
 
-                    // Salary Logic
                     const sal = job.salary || job.salaryRange || '';
                     let salaryDisplay = (isLocked) ? '<span class="blur-text">$$$ - $$$</span>' : (sal ? `$${sal}` : 'Negotiable');
 
-                    // Badges 
-                    // Use actual data if available, otherwise fake it for the "Guaranteed" section visual
                     let typeBadge = '<span class="tag guaranteed">Guaranteed</span>';
                     
-                    // If we are in fallback mode, check real type
                     if(job.listingType && job.listingType.toLowerCase() !== 'guaranteed') {
                         typeBadge = `<span class="tag" style="background:var(--bg-glass-hover); border:1px solid var(--border-color);">${job.listingType}</span>`;
                     }
