@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Job Moderation | EastLink Admin</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0F172A">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Executive Theme */
+            --bg-body: #0F172A;       
+            --bg-card: rgba(30, 41, 59, 0.65);
+            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.95);
+            --bg-input: rgba(255, 255, 255, 0.07);
+            --bg-hover: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8; 
+            --gold-base: #D97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --neon-purple: #8b5cf6;
+            --ai-gradient: linear-gradient(135deg, #3B82F6 0%, #8b5cf6 100%);
+            --success: #10B981;
+            --danger: #EF4444;
+            
+            /* DIMENSIONS */
+            --sidebar-width: 260px; 
+            --header-height: 60px;
+            --radius: 16px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background-image: url('assets/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Utils */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 20px; z-index: 1000;
+        }
+        
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        .logo { 
+            font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.15rem;
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; 
+        }
+        .logo span { color: var(--gold-base); }
+        .admin-badge { 
+            font-family: var(--font-body); font-size: 0.55rem; background: var(--bg-input); 
+            border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; 
+            margin-left: 8px; color: var(--text-muted); letter-spacing: 0.5px;
+        }
+        .hamburger { font-size: 1.2rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+        .icon-btn { 
+            width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; font-size: 0.9rem;
+            color: var(--text-muted); cursor: pointer; transition: all 0.3s; position: relative;
+        }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); }
+        .notification-badge { 
+            position: absolute; top: 2px; right: 2px; min-width: 14px; height: 14px; 
+            background: var(--danger); border-radius: 10px; font-size: 0.55rem; color: white; 
+            font-weight: 700; display: none; place-items: center; justify-content: center;
+            padding: 0 3px; border: 2px solid var(--bg-card);
+        }
+        .profile-widget {
+            width: 34px; height: 34px; background: var(--bg-input); border-radius: 10px; 
+            display: grid; place-items: center; border: 1px solid var(--border-color); 
+            color: var(--gold-base); font-size: 0.9rem; cursor: pointer; margin-left: 4px;
+        }
+        .profile-widget:hover { background: var(--bg-hover); }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 15px 0; overflow-y: auto; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+        .nav-group { padding: 0 20px; margin-bottom: 15px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-item { 
+            display: flex; align-items: center; padding: 10px 12px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.85rem; transition: all 0.3s ease; border-radius: 8px; margin-bottom: 2px;
+        }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
+        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
+        .nav-item i { width: 22px; text-align: center; margin-right: 8px; }
+
+        /* --- MAIN CONTENT --- */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 25px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
+        
+        .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
+        .page-title h1 { font-family: var(--font-head); font-size: 1.5rem; color: var(--text-main); margin-bottom: 5px; }
+        .page-title p { color: var(--text-muted); font-size: 0.85rem; }
+
+        .btn-guaranteed {
+            background: var(--gold-gradient); color: #000; padding: 10px 20px; border-radius: 30px; text-decoration: none;
+            font-weight: 600; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3); transition: 0.3s;
+            display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-body); font-size: 0.9rem;
+        }
+        .btn-guaranteed:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+        /* TABS */
+        .tabs-container { 
+            display: flex; gap: 5px; margin-bottom: 25px; padding: 4px; 
+            background: var(--bg-input); border-radius: 12px; width: fit-content; border: 1px solid var(--border-color);
+        }
+        .tab-btn { 
+            padding: 8px 20px; background: transparent; border: none; border-radius: 8px; 
+            font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.2s; white-space: nowrap;
+            font-family: var(--font-body); font-size: 0.85rem;
+        }
+        .tab-btn:hover { color: var(--text-main); }
+        .tab-btn.active { background: var(--bg-glass); color: var(--gold-base); box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+
+        /* JOB CARDS */
+        .jobs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+        
+        .job-card {
+            padding: 24px; position: relative; display: flex; flex-direction: column; gap: 15px; 
+            transition: 0.3s; border-top: 3px solid transparent;
+        }
+        .job-card:hover { transform: translateY(-5px); border-top-color: var(--gold-base); }
+        
+        .jc-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        .jc-company { font-weight: 700; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .plan-badge { font-size: 0.6rem; padding: 2px 8px; border-radius: 4px; font-weight: 700; margin-left: 5px; border: 1px solid transparent; }
+        .plan-pro { background: rgba(217, 119, 6, 0.15); color: var(--gold-base); border-color: rgba(217, 119, 6, 0.3); }
+        .plan-basic { background: var(--bg-input); color: var(--text-muted); border-color: var(--border-color); }
+        
+        .jc-title { font-size: 1.1rem; font-weight: 700; color: var(--text-main); line-height: 1.3; margin-top: 5px; font-family: var(--font-head); }
+        .jc-meta { font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 12px; font-family: var(--font-display); }
+        .jc-meta i { color: var(--gold-base); opacity: 0.8; }
+
+        .status-pill { 
+            font-size: 0.65rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; 
+            text-transform: uppercase; align-self: flex-start; border: 1px solid transparent; letter-spacing: 0.5px;
+        }
+        .st-pending { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); border-color: rgba(217, 119, 6, 0.3); }
+        .st-approved { background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
+        .st-rejected { background: rgba(239, 68, 68, 0.1); color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
+        .st-closed { background: rgba(148, 163, 184, 0.1); color: var(--text-muted); border-color: var(--border-color); }
+
+        .type-indicator-row { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 5px; }
+        .type-badge { font-size: 0.6rem; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border-color); color: var(--text-muted); }
+        .tb-feat { border-color: var(--gold-base); color: var(--gold-base); background: rgba(251, 191, 36, 0.05); }
+        .tb-urg { border-color: var(--neon-purple); color: var(--neon-purple); background: rgba(139, 92, 246, 0.05); }
+        .tb-guar { border-color: #ec4899; color: #ec4899; background: rgba(236, 72, 153, 0.05); font-weight: 700; }
+
+        .jc-actions { margin-top: auto; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border-color); padding-top: 15px; }
+        .btn-sm { 
+            padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; cursor: pointer; 
+            border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); transition: 0.2s;
+        }
+        .btn-sm:hover { background: var(--bg-hover); border-color: var(--text-muted); }
+        
+        /* MODAL */
+        .modal { 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
+            z-index: 2000; backdrop-filter: blur(5px); align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal.active { display: flex; }
+        .modal-content { 
+            background: var(--bg-glass-heavy); width: 100%; max-width: 700px; border-radius: var(--radius); 
+            padding: 0; max-height: 90vh; overflow-y: auto; position: relative; border: 1px solid var(--border-color); 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column;
+        }
+        
+        .modal-header { padding: 20px 25px; border-bottom: 1px solid var(--border-color); background: rgba(255,255,255,0.02); display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 25px; overflow-y: auto; }
+
+        /* AI SECTION */
+        .ai-panel {
+            background: rgba(139, 92, 246, 0.05); border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 12px; padding: 20px; margin-bottom: 25px; position: relative; overflow: hidden;
+        }
+        .ai-panel::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--ai-gradient);
+        }
+        .ai-title { font-family: var(--font-head); color: var(--text-main); display: flex; align-items: center; gap: 10px; font-size: 1rem; margin-bottom: 15px; }
+        .ai-title i { color: #a78bfa; }
+        .ai-content { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; min-height: 60px; }
+        .ai-loader { display: none; align-items: center; gap: 10px; color: var(--neon-purple); font-weight: 600; font-size: 0.9rem; }
+        .ai-score-bar { height: 6px; background: var(--bg-input); border-radius: 3px; margin-top: 10px; overflow: hidden; }
+        .ai-score-fill { height: 100%; background: var(--ai-gradient); width: 0%; transition: width 1.5s ease; }
+        .btn-ai { 
+            background: var(--bg-input); border: 1px solid rgba(139, 92, 246, 0.3); color: #c4b5fd;
+            padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; display: inline-flex; gap: 6px;
+            align-items: center; transition: 0.3s;
+        }
+        .btn-ai:hover { background: rgba(139, 92, 246, 0.1); color: white; border-color: var(--neon-purple); }
+
+        /* CONTROLS */
+        .approval-controls {
+            background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px;
+            margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+        }
+        .control-group { display: flex; flex-direction: column; gap: 15px; }
+        .control-row { display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px; }
+        .switch-label { font-weight: 600; font-size: 0.85rem; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+        
+        .toggle-switch { position: relative; width: 40px; height: 22px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); transition: .3s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--gold-base); }
+        input:checked + .slider:before { transform: translateX(18px); }
+
+        .select-input {
+            width: 100%; padding: 12px; background: var(--bg-glass-heavy); border: 1px solid var(--border-color);
+            border-radius: 8px; color: var(--text-main); outline: none; margin-top: 5px; cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .select-input:focus { border-color: var(--gold-base); }
+
+        .danger-zone { border-top: 1px solid var(--border-color); padding-top: 20px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .modal-footer { display: flex; gap: 10px; justify-content: flex-end; padding: 20px 25px; border-top: 1px solid var(--border-color); background: rgba(0,0,0,0.2); }
+        .btn-act { padding: 10px 24px; border: none; border-radius: 30px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 0.9rem; }
+        .btn-approve { background: var(--success); color: white; } .btn-approve:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .btn-close { background: #64748B; color: white; } .btn-close:hover { background: #475569; }
+        .btn-delete { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); } .btn-delete:hover { background: var(--danger); color: white; }
+
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 998; backdrop-filter: blur(4px); }
+
+        /* PWA Popup */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+        @media (max-width: 768px) {
+            .approval-controls { grid-template-columns: 1fr; }
+            .danger-zone { flex-direction: column; gap: 10px; align-items: stretch; }
+            .btn-delete { width: 100%; text-align: center; }
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 20px 10px; width: 100%; }
+            .hamburger { display: block; }
+            .header-left { gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="admin-dashboard.html" class="logo">East<span>Link</span> <span class="admin-badge">ADMIN</span></a>
+        </div>
+        
+        <div class="header-actions">
+            <div class="icon-btn" onclick="location.href='admin-support.html'" title="Support Tickets">
+                <i class="fa-solid fa-envelope"></i>
+                <div class="notification-badge" id="msg-badge">0</div>
+            </div>
+            <div class="icon-btn" onclick="location.href='admin-notifications.html'" title="System Alerts">
+                <i class="fa-solid fa-bell"></i>
+                <div class="notification-badge" id="notif-badge">0</div>
+            </div>
+            <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Analytics</div>
+            <a href="admin-dashboard.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        </div>
+        
+        <div class="nav-group">
+            <div class="nav-label">User Management</div>
+            <a href="admin-users.html" class="nav-item"><i class="fa-solid fa-users"></i> Manage Users</a>
+            <a href="admin-plans.html" class="nav-item"><i class="fa-solid fa-tags"></i> Manage Plans</a>
+            <a href="admin-referrals.html" class="nav-item"><i class="fa-solid fa-share-nodes"></i> Referrals</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Jobs & Service</div>
+            <a href="admin-jobs-mod.html" class="nav-item active"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
+            <a href="admin-guaranteed-jobs.html" class="nav-item"><i class="fa-solid fa-certificate"></i> Guaranteed Jobs</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="admin-deposits.html" class="nav-item"><i class="fa-solid fa-arrow-down"></i> Deposits</a>
+            <a href="admin-withdrawals.html" class="nav-item"><i class="fa-solid fa-arrow-up"></i> Withdrawals</a>
+            <a href="admin-deposit-issues.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> Errors</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">System</div>
+            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
+            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
+            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- MAIN -->
+    <main>
+        <div class="page-header animate__animated animate__fadeInDown">
+            <div class="page-title">
+                <h1>Job Moderation</h1>
+                <p>Review, approve, reject, or manage existing job postings.</p>
+            </div>
+            <a href="admin-guaranteed-jobs.html" class="btn-guaranteed">
+                <i class="fas fa-certificate"></i> Guaranteed Applications
+            </a>
+        </div>
+
+        <div class="tabs-container animate__animated animate__fadeInUp">
+            <button class="tab-btn active" onclick="filterJobs('pending', this)">Pending</button>
+            <button class="tab-btn" onclick="filterJobs('approved', this)">Active</button>
+            <button class="tab-btn" onclick="filterJobs('closed', this)">Closed</button>
+            <button class="tab-btn" onclick="filterJobs('rejected', this)">Rejected</button>
+        </div>
+
+        <div class="jobs-grid animate__animated animate__fadeInUp animate__delay-1s" id="jobsGrid">
+            <!-- Grid Items Loaded via JS -->
+            <div style="grid-column:1/-1; text-align:center; padding:50px; color:var(--text-muted); opacity:0.6;">
+                <i class="fas fa-circle-notch fa-spin fa-2x" style="color:var(--gold-base);"></i><br><br>Loading jobs...
+            </div>
+        </div>
+    </main>
+
+    <!-- FULL MANAGEMENT MODAL -->
+    <div class="modal" id="actionModal">
+        <div class="modal-content animate__animated animate__zoomIn">
+            <div class="modal-header">
+                <h2 id="m-title" style="font-family:var(--font-head); color:var(--text-main); font-size:1.1rem; margin:0;">Job Title</h2>
+                <i class="fas fa-times" onclick="closeModal()" style="cursor:pointer; font-size:1.2rem; color:var(--text-muted);"></i>
+            </div>
+            
+            <div class="modal-body">
+                <!-- AI Insight Panel -->
+                <div class="ai-panel">
+                    <div class="ai-title">
+                        <i class="fas fa-robot"></i> EastLink AI Insights
+                        <button class="btn-ai" onclick="runAIAnalysis()"><i class="fas fa-sparkles"></i> Run Analysis</button>
+                    </div>
+                    <div class="ai-loader" id="ai-loader">
+                        <i class="fas fa-circle-notch fa-spin"></i> Analyzing context, bias, and quality...
+                    </div>
+                    <div class="ai-content" id="ai-result">
+                        Run the AI engine to get quality scores, compliance checks, and suggestions for this listing.
+                    </div>
+                    <div class="ai-score-bar"><div class="ai-score-fill" id="ai-bar"></div></div>
+                </div>
+
+                <!-- Info Block -->
+                <div style="background:var(--bg-input); padding:15px; border-radius:12px; margin-bottom:20px; font-size:0.9rem; border:1px solid var(--border-color);">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <strong style="color:var(--text-muted);">Employer:</strong> <span id="m-company" style="color:var(--text-main); font-weight:600;">--</span>
+                    </div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <strong style="color:var(--text-muted);">Employer Plan:</strong> <span id="m-plan" class="plan-badge">Fetching...</span>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:20px; color:var(--text-muted); font-size:0.9rem; line-height:1.6; max-height:150px; overflow-y:auto; padding-right:10px;">
+                    <p id="m-desc">Job description...</p>
+                </div>
+
+                <!-- Management Controls -->
+                <div class="approval-controls">
+                    <div class="control-group">
+                        <h4 style="color:var(--gold-base); font-size:0.8rem; text-transform:uppercase;">Primary Classification</h4>
+                        
+                        <div style="margin-bottom:10px;">
+                            <label class="switch-label" style="font-size:0.8rem; margin-bottom:5px;">Select Job Category</label>
+                            <select id="listing-type" class="select-input" onchange="autoUpdateFlags()">
+                                <option value="standard">Standard (Free)</option>
+                                <option value="featured">Featured Job</option>
+                                <option value="urgent">Urgently Hiring</option>
+                                <option value="guaranteed">Guaranteed Job</option>
+                            </select>
+                            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:5px; font-style:italic;">
+                                * Auto-selects the appropriate flags below.
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="switch-label" style="font-size:0.8rem; margin-bottom:5px;">Approval Status</label>
+                            <select id="job-status-select" class="select-input">
+                                <option value="pending">Pending Approval</option>
+                                <option value="approved">Active / Approved</option>
+                                <option value="closed">Closed / Filled</option>
+                                <option value="rejected">Rejected</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <h4 style="color:var(--gold-base); font-size:0.8rem; text-transform:uppercase;">Visibility Flags</h4>
+                        
+                        <div class="control-row">
+                            <div class="switch-label"><i class="fas fa-star" style="color:var(--gold-base);"></i> Featured</div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="toggle-featured">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="control-row">
+                            <div class="switch-label"><i class="fas fa-bolt" style="color:var(--danger);"></i> Urgent</div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="toggle-urgent">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="control-row">
+                            <div class="switch-label"><i class="fas fa-shield-halved" style="color:#ec4899;"></i> Guaranteed</div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="toggle-guaranteed">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="danger-zone">
+                    <span style="font-size:0.85rem; color:var(--text-muted);">Permanent Action:</span>
+                    <button class="btn-act btn-delete" onclick="deleteJob()"><i class="fas fa-trash"></i> Delete Listing</button>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-act btn-close" onclick="closeModal()">Cancel</button>
+                <button class="btn-act btn-approve" onclick="saveJobChanges()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add to home screen for quick access.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, orderBy, onSnapshot, updateDoc, deleteDoc, addDoc, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig); 
+        const auth = getAuth(app); 
+        const db = getFirestore(app);
+
+        let allJobs = [];
+        let currentFilter = 'pending';
+        let selectedJobId = null;
+
+        // --- UI UTILS ---
+        window.toggleSidebar = () => { 
+            document.getElementById('sidebar').classList.toggle('active'); 
+            document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
+        };
+        
+        window.logout = () => {
+            if(confirm("Confirm Log Out?")) {
+                signOut(auth).then(() => window.location.href = 'signin.html');
+            }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'signin.html'; return; }
+            initBadges();
+            initData();
+        });
+
+        function initBadges() {
+            const txQ = query(collection(db, "transactions"), where("status", "==", "pending"));
+            onSnapshot(txQ, s => {
+                const b = document.getElementById('notif-badge');
+                if(s.size > 0) { b.innerText = s.size; b.style.display = 'flex'; } else b.style.display = 'none';
+            });
+            const msgQ = query(collection(db, "support_tickets"), where("status", "==", "open"));
+             onSnapshot(msgQ, (snap) => {
+                const badge = document.getElementById('msg-badge');
+                if(snap.size > 0) { badge.innerText = snap.size; badge.style.display = 'flex'; } else badge.style.display = 'none';
+            });
+        }
+
+        function initData() {
+            const q = query(collection(db, "jobs")); 
+            onSnapshot(q, (snap) => {
+                allJobs = [];
+                snap.forEach(doc => { allJobs.push({ id: doc.id, ...doc.data() }); });
+                allJobs.sort((a,b) => (b.postedAt?.seconds || 0) - (a.postedAt?.seconds || 0));
+                renderGrid();
+            });
+        }
+
+        window.renderGrid = () => {
+            const grid = document.getElementById('jobsGrid');
+            grid.innerHTML = '';
+
+            const filtered = allJobs.filter(j => {
+                const s = (j.status || 'pending').toLowerCase();
+                if (currentFilter === 'approved') return (s === 'approved' || s === 'active');
+                if (currentFilter === 'closed') return (s === 'closed' || s === 'filled');
+                return s === currentFilter;
+            });
+
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px; color:var(--text-muted); opacity:0.6;">No ${currentFilter} jobs found.</div>`;
+                return;
+            }
+
+            filtered.forEach(job => {
+                let planBadge = `<span class="plan-badge plan-basic">BASIC</span>`;
+                if(job.employerPlan === 'Pro' || job.employerPlan === 'scale') planBadge = `<span class="plan-badge plan-pro">PRO</span>`;
+                
+                let statusClass = 'st-pending';
+                if(job.status === 'approved' || job.status === 'active') statusClass = 'st-approved';
+                else if(job.status === 'rejected') statusClass = 'st-rejected';
+                else if(job.status === 'closed') statusClass = 'st-closed';
+
+                // Type Indicators
+                let indicators = '';
+                if(job.isFeatured) indicators += `<span class="type-badge tb-feat">Featured</span>`;
+                if(job.isUrgent) indicators += `<span class="type-badge tb-urg">Urgent</span>`;
+                if(job.isGuaranteed) indicators += `<span class="type-badge tb-guar">Guaranteed</span>`;
+
+                grid.innerHTML += `
+                    <div class="glass-panel job-card animate__animated animate__fadeInUp">
+                        <div class="jc-header">
+                            <div>
+                                <span class="jc-company">${job.company}</span>
+                                ${planBadge}
+                            </div>
+                            <span class="status-pill ${statusClass}">${job.status}</span>
+                        </div>
+                        <div class="jc-title">${job.title}</div>
+                        <div class="jc-meta">
+                            <span><i class="fas fa-map-marker-alt"></i> ${job.location}</span>
+                            <span><i class="fas fa-money-bill-wave"></i> ${job.salary || 'N/A'}</span>
+                        </div>
+                        <div class="type-indicator-row">${indicators}</div>
+                        <div class="jc-actions">
+                            <button class="btn-sm" onclick="openModal('${job.id}')">Manage <i class="fas fa-sliders-h"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+        };
+
+        window.filterJobs = (status, btn) => {
+            currentFilter = status;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderGrid();
+        };
+
+        // --- INTELLIGENT MODAL LOGIC ---
+        
+        // 1. Open and Populate
+        window.openModal = async (id) => {
+            selectedJobId = id;
+            const job = allJobs.find(j => j.id === id);
+            if(!job) return;
+
+            // Reset AI
+            document.getElementById('ai-result').innerHTML = "Run the AI engine to get quality scores, compliance checks, and suggestions for this listing.";
+            document.getElementById('ai-bar').style.width = "0%";
+            document.getElementById('ai-loader').style.display = "none";
+
+            // Basic Info
+            document.getElementById('m-title').innerText = job.title;
+            document.getElementById('m-company').innerText = job.company;
+            document.getElementById('m-desc').innerText = job.description ? job.description.substring(0, 300) + '...' : 'No description provided.';
+            
+            // Set Toggles (Booleans)
+            document.getElementById('toggle-featured').checked = job.isFeatured === true;
+            document.getElementById('toggle-urgent').checked = job.isUrgent === true;
+            document.getElementById('toggle-guaranteed').checked = job.isGuaranteed === true;
+
+            // Set Dropdowns
+            const statusSelect = document.getElementById('job-status-select');
+            const typeSelect = document.getElementById('listing-type');
+            
+            // Map existing flags to the "Category Dropdown" for UX convenience
+            let derivedType = 'standard';
+            if(job.isGuaranteed) derivedType = 'guaranteed';
+            else if(job.isUrgent) derivedType = 'urgent';
+            else if(job.isFeatured) derivedType = 'featured';
+            
+            // Set values
+            const currentStatus = (job.status || 'pending').toLowerCase();
+            statusSelect.value = [...statusSelect.options].some(o => o.value === currentStatus) ? currentStatus : 'pending';
+            typeSelect.value = derivedType;
+
+            // Fetch Plan
+            document.getElementById('m-plan').innerText = "Loading...";
+            document.getElementById('m-plan').className = "plan-badge";
+            
+            if(job.employerId) {
+                getDoc(doc(db, "users", job.employerId)).then(uSnap => {
+                    if(uSnap.exists()) {
+                        const plan = uSnap.data().plan || 'Basic';
+                        const el = document.getElementById('m-plan');
+                        el.innerText = plan.toUpperCase();
+                        el.className = `plan-badge ${plan === 'pro' || plan === 'scale' ? 'plan-pro' : 'plan-basic'}`;
+                    } else {
+                        document.getElementById('m-plan').innerText = "Unknown";
+                    }
+                });
+            }
+
+            document.getElementById('actionModal').classList.add('active');
+        };
+
+        // 2. Auto-Update Flags based on Category Dropdown
+        window.autoUpdateFlags = () => {
+            const cat = document.getElementById('listing-type').value;
+            const feat = document.getElementById('toggle-featured');
+            const urg = document.getElementById('toggle-urgent');
+            const guar = document.getElementById('toggle-guaranteed');
+
+            // Reset all first
+            feat.checked = false;
+            urg.checked = false;
+            guar.checked = false;
+
+            // Apply Logic
+            if(cat === 'featured') feat.checked = true;
+            if(cat === 'urgent') urg.checked = true;
+            if(cat === 'guaranteed') guar.checked = true;
+        };
+
+        window.closeModal = () => {
+            document.getElementById('actionModal').classList.remove('active');
+            selectedJobId = null;
+        };
+
+        // 3. Save & Categorize
+        window.saveJobChanges = async () => {
+            if(!selectedJobId) return;
+            const btn = document.querySelector('.btn-approve');
+            const originalText = btn.innerText;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            
+            // Read values
+            const isFeatured = document.getElementById('toggle-featured').checked;
+            const isUrgent = document.getElementById('toggle-urgent').checked;
+            const isGuaranteed = document.getElementById('toggle-guaranteed').checked;
+            const newStatus = document.getElementById('job-status-select').value;
+            
+            // Determine String-based listing type for legacy filters
+            let listingTypeString = 'standard';
+            if(isGuaranteed) listingTypeString = 'guaranteed';
+            else if(isUrgent) listingTypeString = 'urgent';
+            else if(isFeatured) listingTypeString = 'featured';
+
+            try {
+                // Update Firestore with ALL flags to ensure cross-page visibility
+                await updateDoc(doc(db, "jobs", selectedJobId), {
+                    status: newStatus,
+                    isFeatured: isFeatured,
+                    isUrgent: isUrgent,
+                    isGuaranteed: isGuaranteed,
+                    listingType: listingTypeString, // Critical for routing
+                    category: listingTypeString,    // Redundancy for search
+                    updatedAt: serverTimestamp()
+                });
+                
+                // Notification Logic
+                if((newStatus === 'approved' || newStatus === 'active')) {
+                    const job = allJobs.find(j => j.id === selectedJobId);
+                    if(job && job.status !== 'approved' && job.employerId) {
+                         await addDoc(collection(db, "notifications"), {
+                            userId: job.employerId,
+                            title: "Job Approved",
+                            message: `Your job "${job.title}" is now active and listed as ${listingTypeString.toUpperCase()}.`,
+                            type: "success",
+                            read: false,
+                            timestamp: serverTimestamp()
+                        });
+                    }
+                }
+
+                closeModal();
+                Toastify({ text: "Job Updated & Categorized", style: { background: "#10B981" } }).showToast();
+            } catch(e) {
+                console.error(e);
+                Toastify({ text: "Error: " + e.message, style: { background: "#EF4444" } }).showToast();
+            } finally {
+                btn.innerText = originalText;
+            }
+        };
+
+        window.deleteJob = async () => {
+            if(!selectedJobId) return;
+            if(!confirm("⚠️ DANGER: This will permanently delete this job listing. Are you sure?")) return;
+            
+            try {
+                await deleteDoc(doc(db, "jobs", selectedJobId));
+                closeModal();
+                Toastify({ text: "Job Deleted Permanently", style: { background: "#EF4444" } }).showToast();
+            } catch(e) { console.error(e); }
+        };
+
+        // --- AI ENGINE (Analysis) ---
+        window.runAIAnalysis = async () => {
+            if(!selectedJobId) return;
+            const loader = document.getElementById('ai-loader');
+            const resultDiv = document.getElementById('ai-result');
+            const bar = document.getElementById('ai-bar');
+            
+            loader.style.display = 'flex';
+            resultDiv.style.opacity = '0.5';
+            
+            const job = allJobs.find(j => j.id === selectedJobId);
+            const desc = (job.description || "").toLowerCase();
+            const title = (job.title || "").toLowerCase();
+
+            // Simulate AI Processing
+            await new Promise(r => setTimeout(r, 1200));
+
+            // Scoring Logic
+            let score = 100;
+            let issues = [];
+            let positives = [];
+
+            // 1. Length & Detail
+            if(desc.length < 150) { score -= 25; issues.push("Description is too short."); }
+            else if(desc.length > 5000) { score -= 10; issues.push("Description is excessively long."); }
+            else { positives.push("Optimal length."); }
+
+            // 2. Keywords
+            if(!desc.includes('salary') && !desc.includes('pay') && !job.salary) { score -= 15; issues.push("Missing salary details."); }
+            else { positives.push("Compensation transparency."); }
+
+            // 3. Bias Check
+            const biasWords = ['ninja', 'rockstar', 'salesman', 'waitress', 'guys'];
+            const foundBias = biasWords.filter(w => desc.includes(w) || title.includes(w));
+            if(foundBias.length > 0) { 
+                score -= 15; 
+                issues.push(`Avoid gendered/informal terms: "${foundBias.join(', ')}"`); 
+            }
+
+            // 4. Formatting
+            if(desc.includes('\n') || desc.includes('<br>')) positives.push("Good formatting.");
+            else { score -= 5; issues.push("Consider using paragraphs/bullet points."); }
+
+            if(score < 0) score = 0;
+
+            // Output
+            let color = score >= 80 ? '#10B981' : (score >= 50 ? '#F59E0B' : '#EF4444');
+            let recommendation = score >= 80 ? "Recommended: Approve" : (score >= 50 ? "Recommended: Review" : "Action: Edit/Reject");
+
+            let reportHtml = `
+                <div style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-weight:700; font-size:1.1rem; color:${color}">Quality Score: ${score}/100</span>
+                    <span style="font-size:0.75rem; background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:4px; border:1px solid ${color}; color:${color}">${recommendation}</span>
+                </div>
+            `;
+
+            if(positives.length > 0) {
+                reportHtml += `<div style="margin-bottom:8px; color:#34D399; font-size:0.8rem;">
+                    <strong style="color:var(--text-main); font-size:0.75rem; text-transform:uppercase;">Strengths:</strong>
+                    ${positives.map(p => `<span style="display:block; margin-left:10px;">• ${p}</span>`).join('')}
+                </div>`;
+            }
+
+            if(issues.length > 0) {
+                reportHtml += `<div style="margin-top:10px; color:#F87171; font-size:0.8rem;">
+                    <strong style="color:var(--text-main); font-size:0.75rem; text-transform:uppercase;">Issues:</strong>
+                    ${issues.map(i => `<span style="display:block; margin-left:10px;">• ${i}</span>`).join('')}
+                </div>`;
+            }
+
+            // Update UI
+            loader.style.display = 'none';
+            resultDiv.style.opacity = '1';
+            resultDiv.innerHTML = reportHtml;
+            bar.style.background = color;
+            bar.style.width = '0%';
+            setTimeout(() => { bar.style.width = `${score}%`; }, 100);
+        };
+
+        // PWA
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; setTimeout(() => document.getElementById('pwa-install-popup').style.display = 'block', 3000); });
+        window.installPWA = async () => { if(deferredPrompt) { deferredPrompt.prompt(); const {outcome} = await deferredPrompt.userChoice; if(outcome==='accepted') document.getElementById('pwa-install-popup').style.display = 'none'; deferredPrompt=null; }};
+        window.dismissPWA = () => document.getElementById('pwa-install-popup').style.display = 'none';
+        if("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js").catch(console.log);
+
+    </script>
+</body>
+</html>

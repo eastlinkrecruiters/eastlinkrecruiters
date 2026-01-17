@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Featured Jobs | EastLink Recruiters</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0F172A">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Master Theme Variables */
+            --bg-body: #0F172A;       
+            --bg-card: rgba(30, 41, 59, 0.65);
+            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.95);
+            --bg-input: rgba(255, 255, 255, 0.07);
+            --bg-hover: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 255, 255, 0.12);
+            
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8; 
+            
+            /* Gradients & Colors */
+            --gold-base: #D97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --urgent-orange: #ea580c;
+            --danger-gradient: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
+            --purple-gradient: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%); /* Featured Gradient */
+            --pink-gradient: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+            --neon-purple: #8b5cf6;
+            --success: #10B981;
+            --danger: #EF4444;
+            
+            --sidebar-width: 260px; 
+            --header-height: 70px;
+            --radius: 16px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background-image: url('assets/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+            transition: background 0.3s ease;
+        }
+
+        /* Utils & Glassmorphism */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s var(--ease-bounce), box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        
+        /* Header */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 1000;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .logo { 
+            font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.3rem; 
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; 
+        }
+        .logo span { color: var(--gold-base); }
+        .hamburger { font-size: 1.4rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        /* Search */
+        .global-search-container { flex: 1; max-width: 450px; position: relative; margin: 0 20px; }
+        .global-search-input {
+            width: 100%; background: var(--bg-input); border: 1px solid var(--border-color);
+            padding: 10px 45px 10px 15px; border-radius: 12px; color: var(--text-main);
+            transition: all 0.3s ease; font-size: 0.9rem;
+        }
+        .global-search-input:focus { border-color: var(--gold-base); background: var(--bg-hover); box-shadow: 0 0 15px rgba(217, 119, 6, 0.15); }
+
+        /* Header Actions */
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+        .icon-btn { 
+            width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px;
+            color: var(--text-muted); cursor: pointer; transition: all 0.3s var(--ease-bounce); position: relative;
+        }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); transform: translateY(-2px); }
+        .notification-badge { 
+            position: absolute; top: 5px; right: 5px; min-width: 16px; height: 16px; 
+            background: var(--danger); border-radius: 10px; font-size: 0.6rem; color: white; 
+            font-weight: 700; display: none; place-items: center; justify-content: center; border: 2px solid var(--bg-card);
+        }
+        .profile-widget { width: 42px; height: 42px; position: relative; cursor: pointer; transition: transform 0.3s var(--ease-bounce); margin-left: 5px; flex-shrink: 0; }
+        .profile-widget:hover { transform: scale(1.05); }
+        .user-avatar { 
+            width: 100%; height: 100%; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; 
+            font-weight: 700; color: #fff; border: 2px solid var(--border-color); object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 20px 0; overflow-y: auto; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column; backdrop-filter: blur(20px);
+        }
+        .nav-group { padding: 0 24px; margin-bottom: 20px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-item { 
+            display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.9rem; transition: all 0.3s ease; border-radius: 10px; margin-bottom: 4px;
+        }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
+        .nav-item.active { background: rgba(139, 92, 246, 0.1); color: var(--neon-purple); font-weight: 600; border-left: 3px solid var(--neon-purple); }
+        .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
+        .lock-icon { margin-left: auto; font-size: 0.7rem; opacity: 0.7; }
+
+        /* Main Content */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
+        
+        /* Page Specific */
+        .page-header { margin-bottom: 30px; display:flex; flex-direction: column; gap: 5px; }
+        .page-header h2 { font-family: var(--font-head); font-size: 1.8rem; color: var(--text-main); font-weight: 700; display: flex; align-items: center; gap: 10px; }
+        .page-header p { color: var(--text-muted); font-size: 0.95rem; }
+
+        /* Filters */
+        .filter-bar { 
+            display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 25px; 
+            background: var(--bg-glass); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color);
+        }
+        .filter-item { position: relative; }
+        .filter-input, .filter-select { 
+            width: 100%; padding: 10px 15px 10px 35px; background: var(--bg-input); border: 1px solid var(--border-color); 
+            border-radius: 8px; color: var(--text-main); outline: none; transition: 0.2s;
+        }
+        .filter-input:focus, .filter-select:focus { border-color: var(--gold-base); background: var(--bg-hover); }
+        .filter-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem; }
+
+        /* Featured Grid */
+        .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+        
+        .job-card { 
+            display: flex; flex-direction: column; padding: 25px; height: 100%;
+            position: relative; transition: all 0.3s var(--ease-bounce);
+            overflow: hidden; 
+            border: 1px solid var(--border-color);
+            /* Feature Specific: Purple border top */
+            border-top: 3px solid var(--neon-purple);
+        }
+        .job-card:hover { transform: translateY(-8px); border-color: var(--neon-purple); box-shadow: 0 15px 40px rgba(139, 92, 246, 0.15); }
+
+        /* --- NEW FEATURES CSS --- */
+        
+        /* Tier Badges */
+        .tier-badge {
+            position: absolute; top: 0; right: 0; 
+            padding: 6px 14px; border-bottom-left-radius: 16px; 
+            font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+            display: flex; align-items: center; gap: 6px; z-index: 10;
+        }
+        .badge-guaranteed { background: var(--gold-gradient); color: #000; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4); }
+        .badge-urgent { background: var(--danger-gradient); color: white; animation: pulse-red 2s infinite; }
+        .badge-featured { background: var(--purple-gradient); color: white; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4); }
+        .badge-standard { background: rgba(255,255,255,0.05); color: var(--text-muted); border-left: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+
+        /* Card Head */
+        .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; margin-top: 15px; }
+        
+        .c-logo { 
+            width: 55px; height: 55px; background: var(--bg-hover); border-radius: 12px; border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; flex-shrink: 0;
+        }
+        .c-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .c-logo-fallback { font-family: var(--font-head); font-weight: 700; font-size: 1.5rem; background: var(--purple-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .card-body { flex: 1; margin-left: 15px; }
+        .c-info h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); font-family: var(--font-display); margin-bottom: 5px; line-height: 1.3; }
+        .c-info p { font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+        .verified-tick { color: #38bdf8; font-size: 0.8rem; margin-left: 4px; }
+
+        /* Match Ring */
+        .match-ring-container { position: absolute; top: 25px; right: 20px; width: 40px; height: 40px; }
+        .match-ring { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(var(--neon-purple) var(--pct), var(--bg-input) 0); display: grid; place-items: center; position: relative; }
+        .match-inner { width: 32px; height: 32px; background: var(--bg-body); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 700; color: var(--neon-purple); }
+        .blur-match { filter: blur(4px); opacity: 0.5; }
+
+        /* Tags */
+        .c-tags { display: flex; gap: 8px; margin-bottom: 25px; flex-wrap: wrap; }
+        .tag { font-size: 0.75rem; padding: 6px 12px; background: var(--bg-input); color: var(--text-muted); border-radius: 20px; display: flex; align-items: center; gap: 5px; border: 1px solid var(--border-color); font-weight: 500; }
+        .tag-new { color: var(--success); border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.1); }
+
+        /* Salary Logic */
+        .salary-row { 
+            margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); 
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; 
+        }
+        .salary-val { font-family: var(--font-mono); font-weight: 600; color: var(--success); font-size: 0.95rem; }
+        .blur-salary { filter: blur(6px); opacity: 0.5; user-select: none; transition: 0.3s; }
+        .job-card:hover .blur-salary { opacity: 0.7; }
+        .unlock-link { font-size: 0.7rem; color: var(--neon-purple); text-transform: uppercase; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+
+        /* BUTTONS */
+        .btn-group { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: auto; }
+        .btn-apply { 
+            width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: 700; 
+            cursor: pointer; transition: 0.3s var(--ease-bounce); display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; font-size: 0.9rem; 
+        }
+        
+        /* Direct Pay Button */
+        .btn-pay { background: var(--pink-gradient); color: white; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3); }
+        .btn-pay:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(236, 72, 153, 0.5); }
+
+        /* Internal View Button */
+        .btn-view { background: var(--purple-gradient); color: white; }
+        .btn-view:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3); }
+
+        /* Locked Button */
+        .btn-locked { 
+            width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); 
+            background: var(--bg-input); color: var(--text-muted); font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s;
+        }
+        .btn-locked:hover { border-color: var(--neon-purple); color: var(--neon-purple); background: var(--bg-hover); }
+
+        /* Save Job Button */
+        .btn-save { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: var(--text-muted); }
+        .btn-save:hover { background: var(--bg-hover); color: var(--text-main); }
+        .btn-save.saved { background: rgba(251, 191, 36, 0.15); border-color: var(--gold-base); color: var(--gold-base); }
+
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 998; backdrop-filter: blur(4px); }
+        
+        .skeleton { 
+            background: linear-gradient(90deg, var(--bg-input) 25%, var(--bg-hover) 50%, var(--bg-input) 75%); 
+            background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; 
+        }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* Upgrade Modal */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(12px);
+            z-index: 3000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-overlay.open { display: flex; opacity: 1; }
+        .popup-content {
+            background: #1e293b; border: 1px solid var(--neon-purple);
+            padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center;
+            position: relative; transform: scale(0.9); transition: transform 0.3s;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            background: linear-gradient(160deg, #1e293b 0%, #0f172a 100%);
+        }
+        .modal-overlay.open .popup-content { transform: scale(1); }
+        .close-popup { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 1.2rem; color: var(--text-muted); cursor: pointer; }
+
+        /* PWA Popup */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+        @media (max-width: 992px) {
+            .global-search-container { display: none; }
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 20px 10px; width: 100%; } 
+            .filter-bar { grid-template-columns: 1fr; }
+            .hamburger { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="seeker-dashboard.html" class="logo">EAST<span>LINK</span></a>
+        </div>
+        
+        <div class="global-search-container">
+            <input type="text" class="global-search-input" placeholder="Search featured jobs...">
+            <i class="fas fa-search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+        </div>
+
+        <div class="header-actions">
+            <div class="icon-btn" title="Messages" onclick="location.href='seeker-messages.html'">
+                <i class="fa-regular fa-envelope"></i><div class="notification-badge" id="msg-badge">0</div>
+            </div>
+            <div class="icon-btn" title="Notifications" onclick="location.href='seeker-notifications.html'">
+                <i class="fa-regular fa-bell"></i><div class="notification-badge" id="notif-badge">0</div>
+            </div>
+            <div class="profile-widget" onclick="location.href='seeker-profile.html'">
+                <img src="" id="header-avatar-img" class="user-avatar" alt="Profile" style="display:none;">
+                <div id="header-avatar-fallback" class="user-avatar">U</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Overview</div>
+            <a href="seeker-dashboard.html" class="nav-item"><i class="fa-solid fa-compass"></i> Dashboard</a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Job Hunt</div>
+            <a href="seeker-applications.html" class="nav-item"><i class="fa-solid fa-file-signature"></i> Applied Jobs</a>
+            <a href="seeker-jobs.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Browse Jobs</a>
+            <a href="seeker-featured-jobs.html" class="nav-item active link-std"><i class="fa-solid fa-star"></i> Featured Jobs <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-urgentlyhiring.html" class="nav-item link-pro"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-guaranteed-jobs.html" class="nav-item link-pro"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="seeker-wallet.html" class="nav-item"><i class="fa-solid fa-wallet"></i> My Wallet</a>
+            <a href="seeker-premium.html" class="nav-item"><i class="fa-solid fa-crown"></i> My Plan</a>
+            <div onclick="checkAccess('standard', 'seeker-referrals.html')" class="nav-item link-std"><i class="fa-solid fa-user-plus"></i> Invite & Earn <i class="fas fa-lock lock-icon"></i></div>
+            <div onclick="checkAccess('standard', 'seeker-invest.html')" class="nav-item link-std"><i class="fa-solid fa-chart-line"></i> Invest <i class="fas fa-lock lock-icon"></i></div>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Resources</div>
+            <a href="seeker-blog.html" class="nav-item"><i class="fa-solid fa-newspaper"></i> News & Insights</a>
+            <div onclick="checkAccess('pro', 'seeker-resources.html')" class="nav-item link-pro"><i class="fa-solid fa-book"></i> Resources <i class="fas fa-lock lock-icon"></i></div>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Settings</div>
+            <a href="seeker-profile.html" class="nav-item"><i class="fa-solid fa-user-gear"></i> Profile</a>
+            <a href="seeker-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="page-header animate__animated animate__fadeInDown">
+            <h2><i class="fas fa-star" style="color:var(--neon-purple)"></i> Featured Jobs</h2>
+            <p>Priority listings. <span style="color:var(--text-muted); font-size:0.9em;">Free users view only. Standard & Pro apply.</span></p>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-bar animate__animated animate__fadeInUp">
+            <div class="filter-item">
+                <i class="fas fa-search filter-icon"></i>
+                <input type="text" class="filter-input" id="keywordSearch" placeholder="Keywords..." onkeyup="filterJobs()">
+            </div>
+            <div class="filter-item">
+                <i class="fas fa-map-marker-alt filter-icon"></i>
+                <input type="text" class="filter-input" id="locationSearch" placeholder="Location..." onkeyup="filterJobs()">
+            </div>
+            <div class="filter-item">
+                <i class="fas fa-folder filter-icon"></i>
+                <select class="filter-select" id="categorySelect" onchange="filterJobs()"><option value="">All Categories</option></select>
+            </div>
+            <div class="filter-item">
+                <i class="fas fa-briefcase filter-icon"></i>
+                <select class="filter-select" id="typeSelect" onchange="filterJobs()"><option value="">All Types</option></select>
+            </div>
+        </div>
+
+        <!-- Grid -->
+        <div class="job-grid" id="jobs-container">
+            <!-- Loading Skeletons -->
+            <div class="glass-panel job-card">
+                <div class="card-head"><div class="skeleton" style="width:55px; height:55px; border-radius:12px;"></div><div style="flex:1"><div class="skeleton" style="width:60%; height:20px; margin-bottom:5px;"></div><div class="skeleton" style="width:40%; height:15px;"></div></div></div>
+                <div class="skeleton" style="height:30px; margin-bottom:20px; border-radius:20px;"></div>
+                <div class="skeleton" style="height:40px; border-radius:10px;"></div>
+            </div>
+            <div class="glass-panel job-card">
+                <div class="card-head"><div class="skeleton" style="width:55px; height:55px; border-radius:12px;"></div><div style="flex:1"><div class="skeleton" style="width:60%; height:20px; margin-bottom:5px;"></div><div class="skeleton" style="width:40%; height:15px;"></div></div></div>
+                <div class="skeleton" style="height:30px; margin-bottom:20px; border-radius:20px;"></div>
+                <div class="skeleton" style="height:40px; border-radius:10px;"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- UPGRADE MODAL -->
+    <div class="modal-overlay" id="upgradeModal">
+        <div class="popup-content animate__animated animate__zoomIn">
+            <button class="close-popup" onclick="closeUpgradeModal()"><i class="fas fa-times"></i></button>
+            <i class="fa-solid fa-crown" style="font-size: 3rem; color: var(--gold-base); margin-bottom: 15px;"></i>
+            <h2 style="font-family: var(--font-head); margin-bottom: 10px;">Standard Access Required</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px; line-height: 1.5;">
+                Featured applications are reserved for <span style="color: var(--success); font-weight: 700;">Standard</span> & <span style="color: var(--gold-base); font-weight: 700;">Pro</span> members.
+                <br>Upgrade to unlock applications and see salary ranges.
+            </p>
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <button onclick="closeUpgradeModal()" style="padding: 12px 20px; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 12px; cursor: pointer;">Cancel</button>
+                <button onclick="location.href='seeker-premium.html'" style="padding: 12px 25px; background: var(--gold-gradient); border: none; color: black; font-weight: 700; border-radius: 12px; cursor: pointer; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);">Upgrade Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLOATING SUPPORT -->
+    <a href="seeker-support.html" style="position:fixed; bottom:30px; right:30px; width:60px; height:60px; background:var(--neon-purple); color:white; border-radius:50%; display:grid; place-items:center; font-size:1.5rem; box-shadow:0 10px 25px rgba(139, 92, 246, 0.4); z-index:1100; cursor:pointer; text-decoration:none; transition:0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+        <i class="fa-solid fa-headset"></i>
+    </a>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add to home screen for quick access.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig); 
+        const auth = getAuth(app); 
+        const db = getFirestore(app);
+
+        // PLAN LOGIC: 0=Free, 1=Standard, 2=Pro
+        let currentUserTier = 0; 
+        let allJobs = []; 
+        let bookmarks = new Set();
+        let currentUserId = null;
+
+        // --- UI UTILS ---
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
+        };
+        window.closeSidebar = () => {
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('overlay').style.display = 'none';
+        };
+        window.logout = () => signOut(auth).then(() => window.location.href = 'signin.html');
+        
+        window.showUpgradeModal = () => document.getElementById('upgradeModal').classList.add('open');
+        window.closeUpgradeModal = () => document.getElementById('upgradeModal').classList.remove('open');
+
+        // Sidebar Navigation Check
+        window.checkAccess = (requiredTier, url) => {
+            const tierMap = { 'free': 0, 'standard': 1, 'pro': 2 };
+            // Map current tier number back to string for simple check logic
+            let currentTierStr = 'free';
+            if(currentUserTier === 1) currentTierStr = 'standard';
+            if(currentUserTier === 2) currentTierStr = 'pro';
+
+            const userLevel = currentUserTier;
+            const reqLevel = tierMap[requiredTier] || 0;
+
+            if (userLevel >= reqLevel) {
+                location.href = url;
+            } else {
+                window.showUpgradeModal();
+            }
+        };
+
+        // Theme Init
+        document.documentElement.setAttribute('data-theme', 'dark');
+
+        // --- AUTH & DATA ---
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'signin.html'; return; }
+            currentUserId = user.uid;
+            listenForBadges(user.uid);
+
+            try {
+                // Fetch Profile
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if(userDoc.exists()) {
+                    const data = userDoc.data();
+                    const rawPlan = (data.plan || data.subscription || 'free').toLowerCase();
+                    
+                    // DETERMINE TIER
+                    if(rawPlan.includes('pro') || rawPlan.includes('premium') || rawPlan.includes('gold')) {
+                        currentUserTier = 2; // Pro
+                    } else if(rawPlan.includes('standard')) {
+                        currentUserTier = 1; // Standard
+                    } else {
+                        currentUserTier = 0; // Free
+                    }
+                    
+                    // Saved Jobs
+                    bookmarks = new Set(data.savedJobs || []);
+
+                    // Header Avatar
+                    const avatarImg = document.getElementById('header-avatar-img');
+                    const avatarFallback = document.getElementById('header-avatar-fallback');
+                    if(data.photoURL || user.photoURL) {
+                        avatarImg.src = data.photoURL || user.photoURL;
+                        avatarImg.style.display = 'block';
+                        avatarFallback.style.display = 'none';
+                    } else {
+                        avatarImg.style.display = 'none';
+                        avatarFallback.style.display = 'grid';
+                        avatarFallback.innerText = (data.fullName || "U").charAt(0).toUpperCase();
+                    }
+
+                    // Unlock Sidebar Icons if not free
+                    if(currentUserTier > 0) {
+                         const lockFea = document.querySelector('.nav-item.active .lock-icon');
+                         if(lockFea) lockFea.style.display = 'none';
+                    }
+                }
+                
+                subscribeToFeaturedJobs();
+
+            } catch (e) { console.error("Profile Error", e); }
+        });
+
+        function subscribeToFeaturedJobs() {
+            const container = document.getElementById('jobs-container');
+            
+            // Query only jobs that are active
+            const q = query(
+                collection(db, "jobs"), 
+                where("status", "==", "active")
+            );
+
+            onSnapshot(q, (snap) => {
+                allJobs = [];
+                const categories = new Set();
+                const types = new Set();
+
+                snap.forEach(doc => {
+                    const job = { id: doc.id, ...doc.data() };
+                    
+                    const isActive = job.status === 'active' && !job.isDeleted && !job.isClosed;
+
+                    // Filter for FEATURED listings only
+                    if (
+                        isActive &&
+                        (job.listingType === 'featured' || job.isFeatured === true) && 
+                        job.category !== 'interview'
+                    ) {
+                        allJobs.push(job);
+                        if(job.category) categories.add(job.category);
+                        if(job.type) types.add(job.type);
+                    }
+                });
+
+                populateFilters(categories, types);
+                renderJobs(allJobs);
+
+            }, (err) => {
+                console.error(err);
+                container.innerHTML = `
+                    <div class="glass-panel" style="grid-column:1/-1; padding:40px; text-align:center; color:var(--text-muted);">
+                        <i class="fas fa-wifi fa-2x"></i>
+                        <h3 style="margin:10px 0;">Connection Error</h3>
+                        <p>Unable to sync featured jobs.</p>
+                    </div>`;
+            });
+        }
+
+        function populateFilters(categories, types) {
+            const catSelect = document.getElementById('categorySelect');
+            if(catSelect.options.length <= 1) categories.forEach(c => catSelect.innerHTML += `<option value="${c}">${c}</option>`);
+            
+            const typeSelect = document.getElementById('typeSelect');
+            if(typeSelect.options.length <= 1) types.forEach(t => typeSelect.innerHTML += `<option value="${t}">${t}</option>`);
+        }
+
+        window.filterJobs = () => {
+            const keyword = document.getElementById('keywordSearch').value.toLowerCase();
+            const location = document.getElementById('locationSearch').value.toLowerCase();
+            const category = document.getElementById('categorySelect').value;
+            const type = document.getElementById('typeSelect').value;
+            
+            const filtered = allJobs.filter(job => 
+                (job.title.toLowerCase().includes(keyword) || job.company.toLowerCase().includes(keyword)) &&
+                (job.location.toLowerCase().includes(location)) &&
+                (category === "" || job.category === category) &&
+                (type === "" || job.type === type)
+            );
+
+            renderJobs(filtered);
+        };
+
+        function renderJobs(jobs) {
+            const container = document.getElementById('jobs-container');
+            
+            if(jobs.length === 0) {
+                container.innerHTML = `
+                    <div class="glass-panel" style="grid-column:1/-1; text-align:center; padding:60px; color:var(--text-muted);">
+                        <i class="fas fa-star fa-3x" style="margin-bottom:20px; opacity:0.2; color:var(--neon-purple);"></i>
+                        <h3>No Featured Listings</h3>
+                        <p>Check back later for priority opportunities.</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            
+            jobs.forEach((job, index) => {
+                const delay = index * 0.05;
+
+                // --- 1. Dynamic Tier Badges ---
+                let badgeHTML = '';
+                const rawType = (job.listingType || 'featured').toLowerCase();
+
+                if (rawType.includes('guaranteed') || job.isGuaranteed) {
+                    badgeHTML = `<div class="tier-badge badge-guaranteed"><i class="fas fa-shield-halved"></i> Guaranteed</div>`;
+                } else if (rawType.includes('urgent')) {
+                    badgeHTML = `<div class="tier-badge badge-urgent"><i class="fas fa-bolt"></i> Urgent</div>`;
+                } else {
+                    badgeHTML = `<div class="tier-badge badge-featured"><i class="fas fa-star"></i> Featured</div>`;
+                }
+
+                // --- 2. Smart Salary Logic ---
+                // Free: Locked/Blurred
+                // Standard: Range
+                // Pro: Exact
+                let salaryDisplay = "";
+                let rawSal = job.salary ? String(job.salary) : "Competitive";
+                let numSal = parseInt(rawSal.replace(/\D/g, ''));
+
+                if (currentUserTier === 0) {
+                    // Free
+                     salaryDisplay = `
+                        <span class="blur-salary">KES XX,XXX</span> 
+                        <span class="unlock-link" onclick="window.showUpgradeModal()"><i class="fas fa-lock"></i> Unlock</span>
+                    `;
+                } else if (currentUserTier === 1) {
+                    // Standard (Range)
+                    if (!isNaN(numSal) && numSal > 0) {
+                        let min = (numSal * 0.9).toLocaleString();
+                        let max = (numSal * 1.1).toLocaleString();
+                        salaryDisplay = `KES ${min} - ${max} (Est.)`;
+                    } else {
+                        salaryDisplay = rawSal;
+                    }
+                } else {
+                    // Pro (Exact)
+                    if (!isNaN(numSal) && numSal > 0) {
+                        salaryDisplay = `KES ${numSal.toLocaleString()}`;
+                    } else {
+                        salaryDisplay = rawSal;
+                    }
+                }
+
+                // --- 3. Logo & Verification ---
+                let logoHTML = '';
+                if (job.employerLogo) {
+                    logoHTML = `<img src="${job.employerLogo}" alt="Logo">`;
+                } else {
+                    const initial = (job.company || 'C').charAt(0).toUpperCase();
+                    logoHTML = `<div class="c-logo-fallback">${initial}</div>`;
+                }
+                const verifiedTick = rawType.includes('guaranteed') ? `<i class="fas fa-check-circle verified-tick" title="Verified"></i>` : '';
+
+                // --- 4. Match Ring ---
+                const matchScore = Math.floor(Math.random() * (95 - 75 + 1) + 75); 
+                const matchRingHTML = `
+                    <div class="match-ring-container ${currentUserTier===0 ? 'blur-match' : ''}" title="AI Match Score">
+                        <div class="match-ring" style="background: conic-gradient(var(--neon-purple) ${matchScore * 3.6}deg, var(--bg-input) 0);">
+                            <div class="match-inner">${matchScore}%</div>
+                        </div>
+                    </div>`;
+
+                // --- 5. Bookmark State ---
+                const isSaved = bookmarks.has(job.id);
+                const saveBtnText = isSaved ? 'Saved' : 'Save Job';
+                const saveBtnClass = isSaved ? 'btn-save saved' : 'btn-save';
+                const saveBtnIcon = isSaved ? 'fas fa-check' : 'far fa-bookmark';
+
+                // --- 6. Button Logic ---
+                
+                // A. Apply Directly (Always Unlocked)
+                const btnDirectHTML = `
+                    <button class="btn-apply btn-pay" onclick="window.location.href='seeker-apply-directly.html?id=${job.id}'">
+                        <i class="fas fa-bolt"></i> Apply Directly
+                    </button>
+                `;
+
+                // B. View & Apply (Internal)
+                // Free = Locked. Standard & Pro = Unlocked.
+                let btnInternalHTML = "";
+                
+                if (currentUserTier > 0) {
+                    // Standard or Pro -> Unlocked
+                    btnInternalHTML = `
+                        <button class="btn-apply btn-view" onclick="window.location.href='seeker-job-details.html?id=${job.id}'">
+                            <i class="fas fa-eye"></i> View & Apply
+                        </button>
+                    `;
+                } else {
+                    // Free -> Locked
+                    btnInternalHTML = `
+                        <button class="btn-locked" onclick="window.showUpgradeModal()">
+                            <i class="fas fa-lock"></i> Locked (Standard+)
+                        </button>
+                    `;
+                }
+                
+                // C. Save Job Button
+                const btnSaveHTML = `
+                    <button class="btn-apply ${saveBtnClass}" onclick="toggleSave('${job.id}', this)">
+                        <i class="${saveBtnIcon}"></i> <span>${saveBtnText}</span>
+                    </button>
+                `;
+
+                const isNew = (Date.now() - (job.postedAt?.seconds*1000)) < (3 * 24 * 60 * 60 * 1000);
+
+                container.innerHTML += `
+                    <div class="glass-panel job-card animate__animated animate__fadeInUp" style="animation-delay: ${delay}s;">
+                        ${badgeHTML}
+                        ${matchRingHTML}
+                        
+                        <div class="card-head">
+                            <div class="c-logo">${logoHTML}</div>
+                            <div class="card-body">
+                                <div class="c-info">
+                                    <h3>${job.title}</h3>
+                                    <p>${job.company} ${verifiedTick}</p>
+                                </div>
+                            </div>
+                            <!-- Header bookmark icon removed -->
+                        </div>
+
+                        <div class="c-tags">
+                            <span class="tag"><i class="fas fa-map-marker-alt"></i> ${job.location || 'Remote'}</span>
+                            <span class="tag"><i class="fas fa-briefcase"></i> ${job.type || 'Full Time'}</span>
+                            ${isNew ? '<span class="tag tag-new">New</span>' : ''}
+                        </div>
+                        
+                        <div class="salary-row">
+                            <div class="salary-val">${salaryDisplay}</div>
+                            <div style="font-size:0.7rem; color:var(--text-muted);">${new Date(job.postedAt?.seconds*1000 || Date.now()).toLocaleDateString()}</div>
+                        </div>
+
+                        <div class="btn-group">
+                            ${btnInternalHTML}
+                            ${btnDirectHTML}
+                            ${btnSaveHTML} <!-- Added Save Button Here -->
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- SAVE / BOOKMARK ---
+        window.toggleSave = async (jobId, btn) => {
+            if(!currentUserId) {
+                window.location.href = 'signin.html';
+                return;
+            }
+
+            // Determine current state based on button class
+            const isCurrentlySaved = btn.classList.contains('saved');
+            const isSaving = !isCurrentlySaved;
+            
+            // Get elements inside button
+            const icon = btn.querySelector('i');
+            const span = btn.querySelector('span');
+
+            // Optimistic Toggle UI
+            if(isSaving) {
+                bookmarks.add(jobId);
+                btn.classList.add('saved');
+                if(icon) icon.className = 'fas fa-check';
+                if(span) span.innerText = 'Saved';
+                btn.classList.add('animate__animated', 'animate__pulse');
+            } else {
+                bookmarks.delete(jobId);
+                btn.classList.remove('saved');
+                if(icon) icon.className = 'far fa-bookmark';
+                if(span) span.innerText = 'Save Job';
+                btn.classList.remove('animate__animated', 'animate__pulse');
+            }
+
+            // Firestore Update
+            const userRef = doc(db, "users", currentUserId);
+            try {
+                if(isSaving) {
+                    await updateDoc(userRef, { savedJobs: arrayUnion(jobId) });
+                    if(typeof Toastify !== 'undefined') {
+                        Toastify({ text: "Job Saved", duration: 2000, style: { background: "var(--success)", borderRadius: "10px" } }).showToast();
+                    }
+                } else {
+                    await updateDoc(userRef, { savedJobs: arrayRemove(jobId) });
+                }
+            } catch(e) {
+                console.error("Error updating bookmark:", e);
+                // Revert UI on error
+                if(isSaving) {
+                    bookmarks.delete(jobId);
+                    btn.classList.remove('saved');
+                    if(icon) icon.className = 'far fa-bookmark';
+                    if(span) span.innerText = 'Save Job';
+                } else {
+                    bookmarks.add(jobId);
+                    btn.classList.add('saved');
+                    if(icon) icon.className = 'fas fa-check';
+                    if(span) span.innerText = 'Saved';
+                }
+            }
+        };
+
+        function listenForBadges(uid) {
+            const update = (id, c) => { const el = document.getElementById(id); if(el) { el.innerText = c>9?'9+':c; el.style.display = c?'flex':'none'; }};
+            onSnapshot(query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false)), s => update('notif-badge', s.size));
+            onSnapshot(query(collection(db, "messages"), where("receiverId", "==", uid), where("read", "==", false)), s => update('msg-badge', s.size));
+        }
+
+        // --- PWA LOGIC ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('pwa-install-popup').style.display = 'block';
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('pwa-install-popup').style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            document.getElementById('pwa-install-popup').style.display = 'none';
+        };
+
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./service-worker.js").catch(e => console.log(e));
+        }
+    </script>
+</body>
+</html>
