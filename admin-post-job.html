@@ -312,10 +312,7 @@
                             <label>Company Name *</label>
                             <input type="text" id="companyName" placeholder="e.g. EastLink Recruiters" oninput="saveDraft()" required>
                         </div>
-                        <div class="form-group">
-                            <label>Company Logo URL (Optional)</label>
-                            <input type="url" id="companyLogo" oninput="saveDraft()" placeholder="https://...">
-                        </div>
+                        <!-- Company Logo section removed as requested -->
                     </div>
                 </div>
 
@@ -375,7 +372,9 @@
                     
                     <div class="form-group">
                         <label>Key Requirements *</label>
-                        <textarea id="requirements" rows="8" placeholder="- List specific skills and qualifications..." oninput="saveDraft()" required></textarea>
+                        <textarea id="requirements" rows="8" oninput="saveDraft()" required>1. Experience in related field
+2. Good communication skills
+3. Must be a kenyan citizen with a valid National ID.</textarea>
                     </div>
                 </div>
 
@@ -401,7 +400,7 @@
                         <div class="form-group">
                             <label style="color:var(--gold-base);">Listing Type (Important)</label>
                             <select id="listingTypeSelector" onchange="saveDraft()" style="border-color:var(--gold-base); font-weight:700;">
-                                <option value="free">Standard (Free)</option>
+                                <option value="standard">Standard</option>
                                 <option value="featured">Featured Listing</option>
                                 <option value="urgent">Urgently Hiring</option>
                                 <option value="guaranteed">Guaranteed Job</option>
@@ -458,6 +457,8 @@
             localStorage.removeItem('admin_job_draft');
             document.getElementById('jobForm').reset();
             document.getElementById('location').value = "NAIROBI";
+            // Re-assert default requirements after reset
+            document.getElementById('requirements').value = "1. Experience in related field\n2. Good communication skills\n3. Must be a kenyan citizen with a valid National ID.";
         };
 
         // --- UI HELPERS ---
@@ -551,8 +552,8 @@
                 tags: tags,
                 category: document.getElementById('category').value,
                 tier: document.getElementById('listingTypeSelector').value, 
-                link: document.getElementById('applyLink').value,
-                logo: document.getElementById('companyLogo').value
+                link: document.getElementById('applyLink').value
+                // Logo removed from draft
             };
             localStorage.setItem('admin_job_draft', JSON.stringify(data));
             
@@ -689,7 +690,7 @@
                 employerId: currentUser.uid, 
                 postedBy: 'admin',           
                 company: compName,
-                employerLogo: document.getElementById('companyLogo').value.trim() || null,
+                employerLogo: null, // Removed logo URL logic
                 
                 category: categoryVal, 
                 title: title,
@@ -728,6 +729,9 @@
                 tags = [];
                 renderTags();
                 document.getElementById('location').value = "NAIROBI";
+                
+                // Re-populate default requirements after successful submission & reset
+                document.getElementById('requirements').value = "1. Experience in related field\n2. Good communication skills\n3. Must be a kenyan citizen with a valid National ID.";
                 
                 Toastify({ text: "Job Published Successfully!", style: { background: "var(--success)" } }).showToast();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
