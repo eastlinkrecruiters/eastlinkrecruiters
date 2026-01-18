@@ -346,7 +346,7 @@
                         </div>
                         <div class="form-group">
                             <label>Location *</label>
-                            <input type="text" id="location" placeholder="e.g. Nairobi, Kenya" oninput="saveDraft()" required>
+                            <input type="text" id="location" value="NAIROBI" oninput="saveDraft()" required>
                         </div>
                         <div class="form-group">
                             <label>Salary Range (Optional)</label>
@@ -364,13 +364,13 @@
                     <div class="section-title" style="color: var(--neon-purple);">
                         <span><i class="fas fa-magic"></i> Intelligent Description</span>
                         <button class="ai-btn" onclick="generateAIContent()">
-                            <i class="fas fa-sparkles"></i> AI Auto-Fill
+                            <i class="fas fa-sparkles"></i> AI Title Analysis
                         </button>
                     </div>
                     
                     <div class="form-group">
                         <label>Role Description *</label>
-                        <textarea id="description" rows="10" placeholder="Detailed overview of the role..." oninput="saveDraft()" required></textarea>
+                        <textarea id="description" rows="10" placeholder="AI will generate this based on Title..." oninput="saveDraft()" required></textarea>
                     </div>
                     
                     <div class="form-group">
@@ -453,6 +453,13 @@
 
         let currentUser = null;
 
+        // --- CLEAR FORM ON REFRESH ---
+        window.onload = function() {
+            localStorage.removeItem('admin_job_draft');
+            document.getElementById('jobForm').reset();
+            document.getElementById('location').value = "NAIROBI";
+        };
+
         // --- UI HELPERS ---
         window.toggleSidebar = () => { 
             document.getElementById('sidebar').classList.toggle('active'); 
@@ -512,7 +519,7 @@
             
             currentUser = user;
             initBadges();
-            loadDraft();
+            // REMOVED loadDraft() call to prevent restoring old sessions
         });
 
         function initBadges() {
@@ -555,32 +562,10 @@
             setTimeout(() => status.style.display = 'none', 2000);
         };
 
-        function loadDraft() {
-            const saved = localStorage.getItem('admin_job_draft');
-            if(saved) {
-                const data = JSON.parse(saved);
-                document.getElementById('companyName').value = data.company || '';
-                document.getElementById('title').value = data.title || '';
-                document.getElementById('location').value = data.location || '';
-                document.getElementById('salary').value = data.salary || '';
-                document.getElementById('type').value = data.type || 'Full Time';
-                document.getElementById('description').value = data.desc || '';
-                document.getElementById('requirements').value = data.reqs || '';
-                document.getElementById('category').value = data.category || 'job';
-                document.getElementById('listingTypeSelector').value = data.tier || 'free'; // Default to free
-                document.getElementById('applyLink').value = data.link || '';
-                document.getElementById('companyLogo').value = data.logo || '';
-                tags = data.tags || [];
-                renderTags();
-                if(data.title) Toastify({ text: "Draft Restored", style: { background: "#3B82F6" }, duration: 2000 }).showToast();
-            }
-        }
-
-        // --- INTELLIGENT AI ENGINE (UPDATED) ---
+        // --- INTELLIGENT AI ENGINE (TITLE ANALYSIS ONLY) ---
         window.generateAIContent = async () => {
-            const titleInput = document.getElementById('title').value;
-            const locInput = document.getElementById('location').value || "the location";
-            const compName = document.getElementById('companyName').value || "the company";
+            const titleInput = document.getElementById('title').value.trim();
+            const locationVal = "NAIROBI";
             
             if(!titleInput) {
                 Toastify({ text: "Please enter a Job Title first!", style: { background: "#EF4444" } }).showToast();
@@ -590,119 +575,80 @@
 
             // UI Feedback
             const descArea = document.getElementById('description');
-            const reqArea = document.getElementById('requirements');
             const btn = document.querySelector('.ai-btn');
             const originalBtnText = btn.innerHTML;
             
-            btn.innerHTML = '<i class="fas fa-brain fa-spin"></i> Analyzing...';
+            btn.innerHTML = '<i class="fas fa-brain fa-spin"></i> Analyzing Title...';
             btn.disabled = true;
             descArea.parentElement.classList.add('generating');
 
-            // --- KNOWLEDGE BASE ---
-            const knowledgeBase = [
-                {
-                    keywords: ["frontend", "react", "angular", "vue", "web", "ui", "javascript"],
-                    domain: "Technology",
-                    skills: ["React/Vue", "JavaScript (ES6+)", "HTML5/CSS3", "Git", "Responsive Design"],
-                    resps: ["Develop and maintain high-quality user-facing features.", "Build reusable code and libraries.", "Ensure technical feasibility of UI/UX designs."],
-                    reqs: ["Proven experience in modern JavaScript frameworks.", "Strong understanding of web markup."]
-                },
-                {
-                    keywords: ["backend", "node", "python", "java", "php", "engineer"],
-                    domain: "Technology",
-                    skills: ["Node.js/Python", "SQL/NoSQL", "REST APIs", "AWS"],
-                    resps: ["Design and implement low-latency applications.", "Integrate data storage solutions.", "Write clean, maintainable code."],
-                    reqs: ["Strong proficiency in backend languages.", "Experience with database management."]
-                },
-                {
-                    keywords: ["sales", "business", "account", "representative"],
-                    domain: "Sales",
-                    skills: ["CRM", "Negotiation", "Lead Generation", "Closing"],
-                    resps: ["Conduct market research to identify possibilities.", "Seek out new sales opportunities.", "Negotiate/close deals."],
-                    reqs: ["Proven experience as a Sales Executive.", "Proficiency in English.", "Fast learner and passion for sales."]
-                },
-                {
-                    keywords: ["accountant", "finance", "auditor"],
-                    domain: "Finance",
-                    skills: ["Financial Reporting", "Quickbooks", "Taxation", "CPA"],
-                    resps: ["Prepare budget forecasts.", "Handle monthly, quarterly and annual closings.", "Reconcile accounts payable and receivable."],
-                    reqs: ["Proven working experience as an Accountant.", "CPA (K) or equivalent."]
-                },
-                {
-                    keywords: ["admin", "assistant", "secretary", "office"],
-                    domain: "Administration",
-                    skills: ["Office Management", "MS Office", "Organization"],
-                    resps: ["Answer and direct phone calls.", "Organize and schedule appointments.", "Maintain a filing system."],
-                    reqs: ["Proven experience as an Admin Assistant.", "Proficiency in MS Office."]
-                },
-                {
-                    keywords: ["driver", "delivery"],
-                    domain: "Logistics",
-                    skills: ["Driving License", "Navigation", "Safety"],
-                    resps: ["Transport clients or goods safely.", "Inspect vehicles for safety issues.", "Plan routes and meet schedules."],
-                    reqs: ["Valid professional driving license.", "Clean driving record.", "Knowledge of area roads."]
-                }
-            ];
-
-            // Analyze Seniority & Tone
-            const tLower = titleInput.toLowerCase();
-            let seniority = "Mid-Level";
-            let yearsExp = "2-3 years";
-            let roleTone = "executing"; 
-            
-            if (tLower.includes("intern") || tLower.includes("trainee")) { seniority = "Entry-Level"; yearsExp = "0-1 years"; roleTone = "learning"; }
-            else if (tLower.includes("senior")) { seniority = "Senior"; yearsExp = "5+ years"; roleTone = "mentoring"; }
-            else if (tLower.includes("manager") || tLower.includes("head")) { seniority = "Management"; yearsExp = "7+ years"; roleTone = "strategic"; }
-
-            // Find Match
-            let matchedProfile = knowledgeBase.find(profile => profile.keywords.some(k => tLower.includes(k)));
-            if (!matchedProfile) {
-                matchedProfile = {
-                    domain: "Professional",
-                    skills: ["Communication", "Problem Solving", "Teamwork"],
-                    resps: ["Collaborate with team members.", "Maintain high standards of quality.", "Report on progress."],
-                    reqs: ["Relevant Degree/Diploma.", "Strong communication skills.", "Ability to work in a team."]
-                };
-            }
-
             await new Promise(r => setTimeout(r, 1500)); 
 
-            // Construct Description (Clean - No company name in body, No **)
-            let desc = `ROLE OVERVIEW\n`;
-            desc += `We are seeking a dedicated ${titleInput} to join our team in ${locInput}. `;
-            if (roleTone === 'learning') desc += `This is an excellent opportunity to launch your career in ${matchedProfile.domain}.`;
-            else if (roleTone === 'strategic') desc += `In this role, you will drive strategic initiatives within the ${matchedProfile.domain} department.`;
-            else desc += `The ideal candidate is a proactive professional ready to contribute to our success.`;
-
-            desc += `\n\nKEY RESPONSIBILITIES\n`;
-            matchedProfile.resps.forEach(r => desc += `• ${r}\n`);
-            if (seniority === "Management") desc += `• Supervise and mentor junior staff members.\n`;
-
-            // Construct Requirements (Clean Headings)
-            let reqs = `QUALIFICATIONS\n`;
-            reqs += `• Education: Relevant Degree/Diploma in ${matchedProfile.domain}.\n`;
-            reqs += `• Experience: ${yearsExp} of professional experience.\n`;
-            matchedProfile.reqs.forEach(r => reqs += `• ${r}\n`);
-            reqs += `• Must be based in or willing to relocate to ${locInput}.\n`;
-
-            // Update UI
-            descArea.value = desc;
-            reqArea.value = reqs;
+            // --- DEEP TITLE ANALYSIS ---
+            const lowerTitle = titleInput.toLowerCase();
+            let seniority = "an experienced";
+            let actionVerb = "execute";
+            let roleFocus = "day-to-day operations";
             
-            // Add Tags
-            const newTags = [...matchedProfile.skills];
-            if(seniority !== "Mid-Level") newTags.push(seniority);
-            tags = [...new Set([...tags, ...newTags])];
-            renderTags();
+            // Detect Seniority
+            if (lowerTitle.includes('manager') || lowerTitle.includes('lead') || lowerTitle.includes('head') || lowerTitle.includes('director')) {
+                seniority = "a strategic and leadership-oriented";
+                actionVerb = "oversee and drive";
+                roleFocus = "departmental goals and team performance";
+            } else if (lowerTitle.includes('senior')) {
+                seniority = "a highly skilled Senior";
+                actionVerb = "lead and implement";
+                roleFocus = "complex projects and mentorship";
+            } else if (lowerTitle.includes('junior') || lowerTitle.includes('intern') || lowerTitle.includes('trainee')) {
+                seniority = "a motivated Entry-Level";
+                actionVerb = "support and learn";
+                roleFocus = "operational tasks and skill development";
+            } else if (lowerTitle.includes('assistant') || lowerTitle.includes('admin')) {
+                seniority = "an organized";
+                actionVerb = "coordinate and facilitate";
+                roleFocus = "administrative efficiency and support";
+            }
+
+            // Detect Domain Context
+            let domainContext = "ensure operational excellence.";
+            if (lowerTitle.includes('sales') || lowerTitle.includes('business dev')) domainContext = "drive revenue growth and market expansion.";
+            else if (lowerTitle.includes('accountant') || lowerTitle.includes('finance')) domainContext = "maintain financial integrity and compliance.";
+            else if (lowerTitle.includes('developer') || lowerTitle.includes('engineer') || lowerTitle.includes('tech')) domainContext = "build innovative technical solutions.";
+            else if (lowerTitle.includes('nurse') || lowerTitle.includes('doctor') || lowerTitle.includes('medical')) domainContext = "provide high-quality patient care.";
+            else if (lowerTitle.includes('driver') || lowerTitle.includes('logistics')) domainContext = "ensure safe and timely transportation/delivery.";
+            else if (lowerTitle.includes('customer') || lowerTitle.includes('support')) domainContext = "deliver exceptional customer satisfaction.";
+            else if (lowerTitle.includes('teacher') || lowerTitle.includes('tutor')) domainContext = "foster an engaging learning environment.";
+
+            // Construct Description
+            let desc = `ROLE OVERVIEW\n`;
+            desc += `We are looking for ${seniority} ${titleInput} to join our team in ${locationVal}. `;
+            desc += `In this role, you will ${actionVerb} ${roleFocus} to ${domainContext} `;
+            desc += `The ideal candidate is professional, proactive, and ready to make a tangible impact on our success.\n\n`;
+            
+            desc += `KEY RESPONSIBILITIES\n`;
+            desc += `• Execute core duties related to ${titleInput} with precision and efficiency.\n`;
+            desc += `• Collaborate with team members to achieve organizational objectives.\n`;
+            desc += `• Maintain high standards of quality in all assigned tasks.\n`;
+            desc += `• Identify areas for improvement and propose effective solutions.\n`;
+            
+            if(lowerTitle.includes('manager') || lowerTitle.includes('head')) {
+                 desc += `• Mentor and supervise junior staff members to ensure team growth.\n`;
+                 desc += `• Develop strategic plans to meet long-term business goals.\n`;
+            } else {
+                 desc += `• Report progress regularly to supervisors and stakeholders.\n`;
+            }
+
+            // Update ONLY Description
+            descArea.value = desc;
             
             saveDraft();
 
             // Reset Button
-            btn.innerHTML = '<i class="fas fa-check"></i> Analysis Complete';
+            btn.innerHTML = '<i class="fas fa-check"></i> Description Generated';
             descArea.parentElement.classList.remove('generating');
             setTimeout(() => { btn.innerHTML = originalBtnText; btn.disabled = false; }, 2000);
             
-            Toastify({ text: `Content generated for ${titleInput}`, style: { background: "var(--ai-gradient)" } }).showToast();
+            Toastify({ text: `Role Description generated for ${titleInput}`, style: { background: "var(--ai-gradient)" } }).showToast();
         };
 
         // --- SUBMIT JOB ---
@@ -766,16 +712,24 @@
             try {
                 await addDoc(collection(db, "jobs"), jobData);
                 
-                // Clear Draft on success
+                // --- CLEAR FORM LOGIC ---
                 localStorage.removeItem('admin_job_draft');
+                document.getElementById('jobForm').reset();
+                tags = [];
+                renderTags();
+                document.getElementById('location').value = "NAIROBI";
                 
                 Toastify({ text: "Job Posted Successfully!", style: { background: "var(--success)" } }).showToast();
-                setTimeout(() => window.location.href = 'admin-jobs-mod.html', 1500);
+                
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
             } catch (e) {
                 console.error("Error:", e);
                 Toastify({ text: "Error saving listing.", style: { background: "var(--danger)" } }).showToast();
+            } finally {
                 btn.disabled = false; 
-                btn.innerText = "Try Again";
+                btn.innerText = "Publish as Admin";
             }
         };
 
