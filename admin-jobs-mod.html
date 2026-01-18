@@ -173,8 +173,8 @@
         .plan-basic { background: var(--bg-input); color: var(--text-muted); border-color: var(--border-color); }
         
         .jc-title { font-size: 1.1rem; font-weight: 700; color: var(--text-main); line-height: 1.3; margin-top: 5px; font-family: var(--font-head); }
-        .jc-meta { font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 12px; font-family: var(--font-display); }
-        .jc-meta i { color: var(--gold-base); opacity: 0.8; }
+        .jc-meta { font-size: 0.85rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 6px; font-family: var(--font-display); }
+        .jc-meta i { color: var(--gold-base); opacity: 0.8; width: 16px; text-align: center; }
 
         .status-pill { 
             font-size: 0.65rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; 
@@ -212,6 +212,25 @@
         
         .modal-header { padding: 20px 25px; border-bottom: 1px solid var(--border-color); background: rgba(255,255,255,0.02); display: flex; justify-content: space-between; align-items: center; }
         .modal-body { padding: 25px; overflow-y: auto; }
+
+        /* Applicants Section */
+        .applicants-section {
+            margin-top: 20px; border: 1px solid var(--border-color); border-radius: 12px;
+            background: rgba(0,0,0,0.2); overflow: hidden;
+        }
+        .applicants-header {
+            padding: 10px 15px; background: rgba(255,255,255,0.03); 
+            font-size: 0.85rem; font-weight: 700; color: var(--text-main); border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .applicants-list { max-height: 200px; overflow-y: auto; padding: 10px; }
+        .app-item {
+            padding: 10px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;
+        }
+        .app-item:last-child { border-bottom: none; }
+        .app-name { font-size: 0.85rem; color: var(--text-main); font-weight: 600; }
+        .app-email { font-size: 0.75rem; color: var(--text-muted); }
+        .app-date { font-size: 0.7rem; color: var(--gold-base); font-family: var(--font-display); }
 
         /* AI SECTION */
         .ai-panel {
@@ -422,6 +441,19 @@
                     <p id="m-desc">Job description...</p>
                 </div>
 
+                <!-- Applicants List Section (NEW) -->
+                <div class="applicants-section">
+                    <div class="applicants-header">
+                        <span><i class="fas fa-users"></i> Recent Applicants</span>
+                        <span style="font-size:0.7rem; color:var(--gold-base);">Newest First</span>
+                    </div>
+                    <div class="applicants-list" id="m-applicants-list">
+                        <!-- Loaded dynamically -->
+                        <div style="padding:15px; text-align:center; color:var(--text-muted);">Loading applicants...</div>
+                    </div>
+                </div>
+                <br>
+
                 <!-- Management Controls -->
                 <div class="approval-controls">
                     <div class="control-group">
@@ -513,7 +545,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, orderBy, onSnapshot, updateDoc, deleteDoc, addDoc, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, query, orderBy, onSnapshot, updateDoc, deleteDoc, addDoc, serverTimestamp, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
         const app = initializeApp(firebaseConfig); 
@@ -536,6 +568,14 @@
             }
         };
 
+        // Helper: Format Date
+        const formatDate = (timestamp) => {
+            if(!timestamp) return 'Date unknown';
+            const date = timestamp.toDate();
+            return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) + 
+                   ' • ' + date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        };
+
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = 'signin.html'; return; }
             initBadges();
@@ -556,11 +596,15 @@
         }
 
         function initData() {
+            // Sorting by postedAt descending (Newest first) is done here in the array sort
             const q = query(collection(db, "jobs")); 
             onSnapshot(q, (snap) => {
                 allJobs = [];
                 snap.forEach(doc => { allJobs.push({ id: doc.id, ...doc.data() }); });
+                
+                // SORT: Newest First
                 allJobs.sort((a,b) => (b.postedAt?.seconds || 0) - (a.postedAt?.seconds || 0));
+                
                 renderGrid();
             });
         }
@@ -609,6 +653,7 @@
                         <div class="jc-meta">
                             <span><i class="fas fa-map-marker-alt"></i> ${job.location}</span>
                             <span><i class="fas fa-money-bill-wave"></i> ${job.salary || 'N/A'}</span>
+                            <span style="font-size:0.75rem; margin-top:4px; color:var(--text-muted);"><i class="far fa-clock"></i> ${formatDate(job.postedAt)}</span>
                         </div>
                         <div class="type-indicator-row">${indicators}</div>
                         <div class="jc-actions">
@@ -628,7 +673,6 @@
 
         // --- INTELLIGENT MODAL LOGIC ---
         
-        // 1. Open and Populate
         window.openModal = async (id) => {
             selectedJobId = id;
             const job = allJobs.find(j => j.id === id);
@@ -653,13 +697,11 @@
             const statusSelect = document.getElementById('job-status-select');
             const typeSelect = document.getElementById('listing-type');
             
-            // Map existing flags to the "Category Dropdown" for UX convenience
             let derivedType = 'standard';
             if(job.isGuaranteed) derivedType = 'guaranteed';
             else if(job.isUrgent) derivedType = 'urgent';
             else if(job.isFeatured) derivedType = 'featured';
             
-            // Set values
             const currentStatus = (job.status || 'pending').toLowerCase();
             statusSelect.value = [...statusSelect.options].some(o => o.value === currentStatus) ? currentStatus : 'pending';
             typeSelect.value = derivedType;
@@ -681,22 +723,86 @@
                 });
             }
 
+            // LOAD APPLICANTS
+            loadApplicants(id);
+
             document.getElementById('actionModal').classList.add('active');
         };
 
-        // 2. Auto-Update Flags based on Category Dropdown
+        // NEW FUNCTION: Fetch and List Applicants
+        async function loadApplicants(jobId) {
+            const list = document.getElementById('m-applicants-list');
+            list.innerHTML = '<div style="padding:15px; text-align:center; color:var(--text-muted);"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
+
+            try {
+                // Assuming "applications" collection where jobId matches. 
+                // Adjust collection name if yours is different (e.g., job_applications)
+                const q = query(collection(db, "applications"), where("jobId", "==", jobId), orderBy("appliedAt", "desc"));
+                const snap = await getDocs(q);
+
+                if(snap.empty) {
+                    list.innerHTML = '<div style="padding:15px; text-align:center; color:var(--text-muted);">No applicants yet.</div>';
+                    return;
+                }
+
+                let html = '';
+                
+                // We need to fetch user details for each application to get name/email
+                // Using Promise.all for efficiency
+                const promises = snap.docs.map(async (appDoc) => {
+                    const appData = appDoc.data();
+                    let name = "Unknown User";
+                    let email = "No Email";
+                    
+                    // Try to get user details from users collection
+                    if(appData.userId) {
+                        try {
+                            const userSnap = await getDoc(doc(db, "users", appData.userId));
+                            if(userSnap.exists()) {
+                                const u = userSnap.data();
+                                name = u.fullName || u.displayName || name;
+                                email = u.email || email;
+                            }
+                        } catch(err) { console.log("User fetch err", err); }
+                    }
+
+                    // Fallback if data is stored in application doc
+                    if(appData.applicantName) name = appData.applicantName;
+                    if(appData.applicantEmail) email = appData.applicantEmail;
+
+                    return `
+                        <div class="app-item">
+                            <div>
+                                <div class="app-name">${name}</div>
+                                <div class="app-email">${email}</div>
+                            </div>
+                            <div class="app-date">${formatDate(appData.appliedAt)}</div>
+                        </div>
+                    `;
+                });
+
+                const results = await Promise.all(promises);
+                list.innerHTML = results.join('');
+
+            } catch (e) {
+                console.error("Applicant Load Error:", e);
+                // Fallback for indexing errors (orderBy requires index)
+                if(e.code === 'failed-precondition') {
+                    list.innerHTML = '<div style="padding:10px; color:var(--danger); font-size:0.8rem;">Missing Index for sorting. Check console.</div>';
+                } else {
+                    list.innerHTML = '<div style="padding:10px; color:var(--danger); font-size:0.8rem;">Error loading applicants.</div>';
+                }
+            }
+        }
+
         window.autoUpdateFlags = () => {
             const cat = document.getElementById('listing-type').value;
             const feat = document.getElementById('toggle-featured');
             const urg = document.getElementById('toggle-urgent');
             const guar = document.getElementById('toggle-guaranteed');
 
-            // Reset all first
-            feat.checked = false;
-            urg.checked = false;
-            guar.checked = false;
+            feat.checked = false; urg.checked = false; guar.checked = false;
 
-            // Apply Logic
             if(cat === 'featured') feat.checked = true;
             if(cat === 'urgent') urg.checked = true;
             if(cat === 'guaranteed') guar.checked = true;
@@ -707,38 +813,33 @@
             selectedJobId = null;
         };
 
-        // 3. Save & Categorize
         window.saveJobChanges = async () => {
             if(!selectedJobId) return;
             const btn = document.querySelector('.btn-approve');
             const originalText = btn.innerText;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
             
-            // Read values
             const isFeatured = document.getElementById('toggle-featured').checked;
             const isUrgent = document.getElementById('toggle-urgent').checked;
             const isGuaranteed = document.getElementById('toggle-guaranteed').checked;
             const newStatus = document.getElementById('job-status-select').value;
             
-            // Determine String-based listing type for legacy filters
             let listingTypeString = 'standard';
             if(isGuaranteed) listingTypeString = 'guaranteed';
             else if(isUrgent) listingTypeString = 'urgent';
             else if(isFeatured) listingTypeString = 'featured';
 
             try {
-                // Update Firestore with ALL flags to ensure cross-page visibility
                 await updateDoc(doc(db, "jobs", selectedJobId), {
                     status: newStatus,
                     isFeatured: isFeatured,
                     isUrgent: isUrgent,
                     isGuaranteed: isGuaranteed,
-                    listingType: listingTypeString, // Critical for routing
-                    category: listingTypeString,    // Redundancy for search
+                    listingType: listingTypeString, 
+                    category: listingTypeString,    
                     updatedAt: serverTimestamp()
                 });
                 
-                // Notification Logic
                 if((newStatus === 'approved' || newStatus === 'active')) {
                     const job = allJobs.find(j => j.id === selectedJobId);
                     if(job && job.status !== 'approved' && job.employerId) {
@@ -754,7 +855,7 @@
                 }
 
                 closeModal();
-                Toastify({ text: "Job Updated & Categorized", style: { background: "#10B981" } }).showToast();
+                Toastify({ text: "Job Updated", style: { background: "#10B981" } }).showToast();
             } catch(e) {
                 console.error(e);
                 Toastify({ text: "Error: " + e.message, style: { background: "#EF4444" } }).showToast();
@@ -788,24 +889,19 @@
             const desc = (job.description || "").toLowerCase();
             const title = (job.title || "").toLowerCase();
 
-            // Simulate AI Processing
             await new Promise(r => setTimeout(r, 1200));
 
-            // Scoring Logic
             let score = 100;
             let issues = [];
             let positives = [];
 
-            // 1. Length & Detail
             if(desc.length < 150) { score -= 25; issues.push("Description is too short."); }
             else if(desc.length > 5000) { score -= 10; issues.push("Description is excessively long."); }
             else { positives.push("Optimal length."); }
 
-            // 2. Keywords
             if(!desc.includes('salary') && !desc.includes('pay') && !job.salary) { score -= 15; issues.push("Missing salary details."); }
             else { positives.push("Compensation transparency."); }
 
-            // 3. Bias Check
             const biasWords = ['ninja', 'rockstar', 'salesman', 'waitress', 'guys'];
             const foundBias = biasWords.filter(w => desc.includes(w) || title.includes(w));
             if(foundBias.length > 0) { 
@@ -813,13 +909,11 @@
                 issues.push(`Avoid gendered/informal terms: "${foundBias.join(', ')}"`); 
             }
 
-            // 4. Formatting
             if(desc.includes('\n') || desc.includes('<br>')) positives.push("Good formatting.");
             else { score -= 5; issues.push("Consider using paragraphs/bullet points."); }
 
             if(score < 0) score = 0;
 
-            // Output
             let color = score >= 80 ? '#10B981' : (score >= 50 ? '#F59E0B' : '#EF4444');
             let recommendation = score >= 80 ? "Recommended: Approve" : (score >= 50 ? "Recommended: Review" : "Action: Edit/Reject");
 
@@ -844,7 +938,6 @@
                 </div>`;
             }
 
-            // Update UI
             loader.style.display = 'none';
             resultDiv.style.opacity = '1';
             resultDiv.innerHTML = reportHtml;
