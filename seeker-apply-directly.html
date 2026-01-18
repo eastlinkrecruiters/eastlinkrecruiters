@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Direct Application | EastLink Recruiters</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
+    <meta name="theme-color" content="#1e293b">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Executive Theme Variables */
+            --bg-body: #1e293b;       
+            --bg-glass: rgba(255, 255, 255, 0.03); 
+            --bg-glass-hover: rgba(255, 255, 255, 0.08);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.90);
+            --bg-input: rgba(0, 0, 0, 0.2);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-highlight: rgba(255, 255, 255, 0.15);
+            
+            --text-main: #F1F5F9;     
+            --text-muted: #94A3B8; 
+            
+            /* Gradients */
+            --gold-base: #fbbf24;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --mpesa-green: #4CAF50;
+            --mpesa-gradient: linear-gradient(135deg, #4CAF50 0%, #1b5e20 100%);
+            --purple-gradient: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+            --success-gradient: linear-gradient(135deg, #34d399 0%, #059669 100%);
+            --danger-gradient: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
+            --pink-gradient: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+            --blue-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            
+            --sidebar-width: 260px; 
+            --header-height: 70px;
+            --radius: 16px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            
+            --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background: url('./assets/images/background.png') no-repeat center center fixed;
+            background-size: cover;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+        }
+
+        /* --- COMPONENTS --- */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid var(--border-color);
+            border-top: 1px solid var(--border-highlight);
+            border-radius: var(--radius);
+            width: 100%;
+            transition: all 0.25s var(--ease-snap);
+        }
+        
+        /* Header */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 1000;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        
+        .logo { 
+            font-family: var(--font-head); 
+            font-weight: 700; color: var(--text-main); font-size: 1.3rem; 
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; 
+            display: flex; align-items: center; 
+        }
+        .logo span { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .hamburger { font-size: 1.4rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        /* Search */
+        .global-search-container { flex: 1; max-width: 450px; position: relative; margin: 0 20px; }
+        .global-search-input {
+            width: 100%; background: var(--bg-input); border: 1px solid var(--border-color);
+            padding: 10px 45px 10px 15px; border-radius: 12px; color: var(--text-main);
+            transition: all 0.3s ease; font-size: 0.9rem;
+        }
+        .global-search-input:focus { border-color: var(--gold-base); background: rgba(0,0,0,0.3); box-shadow: 0 0 15px rgba(217, 119, 6, 0.2); }
+        .search-results-dropdown {
+            position: absolute; top: 115%; left: 0; width: 100%; background: var(--bg-glass-heavy);
+            backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 12px; 
+            max-height: 300px; overflow-y: auto; display: none; z-index: 2000; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .search-result-item { padding: 12px 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
+        .search-result-item:hover { background: var(--bg-glass-hover); padding-left: 20px; }
+
+        /* Actions */
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+        .icon-btn { 
+            width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px;
+            color: var(--text-muted); cursor: pointer; transition: all 0.3s var(--ease-snap); position: relative;
+            background: rgba(255,255,255,0.03); border: 1px solid transparent;
+        }
+        .icon-btn:hover { background: var(--bg-glass-hover); color: var(--text-main); transform: translateY(-2px); border-color: rgba(255,255,255,0.1); }
+        
+        .notification-badge { 
+            position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; 
+            background: var(--danger-gradient); border-radius: 50%; font-size: 0.6rem; color: white; font-weight: 700;
+            display: none; place-items: center; justify-content: center; border: 2px solid var(--bg-body);
+        }
+        
+        .profile-widget { width: 42px; height: 42px; position: relative; cursor: pointer; transition: transform 0.3s; margin-left: 5px; flex-shrink: 0; }
+        .profile-widget:hover { transform: scale(1.05); }
+        .user-avatar { 
+            width: 100%; height: 100%; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; 
+            font-weight: 700; color: #fff; border: 2px solid var(--border-color); object-fit: cover;
+        }
+        .user-avatar.img-mode { background: transparent; }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 20px 0; overflow-y: auto; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column; backdrop-filter: blur(20px);
+        }
+        .nav-group { padding: 0 24px; margin-bottom: 20px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-item { 
+            display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.9rem; transition: all 0.2s ease; border-radius: 10px; margin-bottom: 4px; position: relative;
+        }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-glass-hover); transform: translateX(5px); }
+        .nav-item.active { background: linear-gradient(90deg, rgba(251, 191, 36, 0.15) 0%, transparent 100%); color: var(--gold-base); font-weight: 600; border-left: 3px solid var(--gold-base); }
+        .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
+        .lock-icon { font-size: 0.7rem; margin-left: auto; color: var(--text-muted); opacity: 0.5; }
+
+        /* Layout */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; }
+
+        /* --- APPLICATION FORM SPECIFIC STYLES --- */
+        .app-container {
+            width: 100%;
+            max-width: 650px;
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-top: 3px solid var(--gold-base); 
+            border-radius: var(--radius);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+            margin-top: 20px;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* Dynamic Border Colors based on type */
+        .app-container.type-guaranteed { border-top-color: #ec4899; }
+        .app-container.type-urgent { border-top-color: #EF4444; }
+        .app-container.type-featured { border-top-color: #a78bfa; }
+        .app-container.type-standard { border-top-color: #3b82f6; }
+
+        .app-header {
+            padding: 25px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.1);
+        }
+        .app-header h2 { font-family: var(--font-head); font-size: 1.2rem; display: flex; align-items: center; gap: 10px; color: var(--text-main); margin: 0; }
+        .back-btn { color: var(--text-muted); cursor: pointer; font-size: 1.2rem; transition: 0.3s; padding: 5px; }
+        .back-btn:hover { color: var(--gold-base); transform: translateX(-3px); }
+
+        /* Progress Bar */
+        .progress-bar { height: 4px; background: rgba(255,255,255,0.05); width: 100%; }
+        .progress-fill { height: 100%; background: var(--gold-gradient); width: 33%; transition: width 0.4s ease; }
+        .type-guaranteed .progress-fill { background: var(--pink-gradient); box-shadow: 0 0 10px #ec4899; }
+        .type-standard .progress-fill { background: var(--blue-gradient); box-shadow: 0 0 10px #3b82f6; }
+
+        /* Steps */
+        .step-content { padding: 30px; display: none; animation: fadeIn 0.4s; }
+        .step-content.active { display: block; }
+        
+        .job-summary { background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; margin-bottom: 25px; display: flex; align-items: center; gap: 15px; }
+        .js-icon { width: 45px; height: 45px; background: var(--gold-gradient); border-radius: 10px; display: grid; place-items: center; font-weight: 700; color: #000; font-size: 1.3rem; flex-shrink: 0; }
+        
+        .type-guaranteed .js-icon { background: var(--pink-gradient); color: white; }
+        .type-featured .js-icon { background: var(--purple-gradient); color: white; }
+        .type-urgent .js-icon { background: var(--danger-gradient); color: white; }
+        .type-standard .js-icon { background: var(--blue-gradient); color: white; }
+
+        /* Forms */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
+        .form-group input, .form-group textarea, .form-group select { 
+            width: 100%; padding: 14px; background: var(--bg-input); 
+            border: 1px solid var(--border-color); border-radius: 12px; 
+            color: var(--text-main); outline: none; font-family: var(--font-body); font-size: 0.95rem; transition: 0.3s;
+        }
+        .form-group input:focus, .form-group textarea:focus { border-color: var(--gold-base); background: rgba(0,0,0,0.3); }
+
+        /* --- UPDATED PAYMENT CARD STYLE (BUY GOODS) --- */
+        .payment-card { 
+            background: linear-gradient(160deg, #1b5e20 0%, #0F172A 100%);
+            border: 1px solid rgba(76, 175, 80, 0.3); 
+            border-radius: 16px; 
+            padding: 30px; 
+            text-align: center; 
+            margin-bottom: 25px; 
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.1);
+        }
+        
+        .mpesa-logo-lg {
+            width: 80px;
+            height: auto;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+            background: white;
+            padding: 5px;
+            border-radius: 8px;
+        }
+
+        .pay-instruction-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 10px;
+            text-align: left;
+        }
+
+        .pi-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px dashed rgba(255,255,255,0.1);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        .pi-row:last-child { border-bottom: none; }
+        
+        .pi-value {
+            font-family: var(--font-mono);
+            font-weight: 700;
+            color: white;
+            font-size: 1.2rem;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .text-mpesa { color: var(--mpesa-green); }
+        .text-gold { color: var(--gold-base); }
+
+        .copy-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--text-muted);
+            width: 28px; height: 28px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+        .copy-btn:hover { background: var(--mpesa-green); color: white; }
+
+        /* Footer Buttons */
+        .app-footer { padding: 25px; border-top: 1px solid var(--border-color); display: flex; gap: 15px; background: rgba(0,0,0,0.1); }
+        .btn { flex: 1; padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; border: none; font-size: 1rem; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-back { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); }
+        .btn-back:hover { background: var(--bg-glass-hover); color: var(--text-main); }
+        
+        .btn-next { background: var(--gold-gradient); color: #000; box-shadow: 0 5px 20px rgba(251, 191, 36, 0.2); }
+        .btn-next:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(251, 191, 36, 0.3); }
+        
+        .type-guaranteed .btn-next { background: var(--pink-gradient); color: white; box-shadow: 0 5px 20px rgba(236, 72, 153, 0.2); }
+        
+        .btn-submit { background: var(--success-gradient); color: white; box-shadow: 0 5px 20px rgba(16, 185, 129, 0.2); display: none; }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3); }
+        
+        .check-container { display: flex; gap: 12px; margin-bottom: 0; align-items: flex-start; cursor: pointer; }
+        .check-container input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--success); cursor: pointer; }
+        .check-text { font-size: 0.9rem; color: var(--text-muted); line-height: 1.4; }
+
+        /* Loading Overlay */
+        .loading-screen { position: absolute; inset: 0; background: var(--bg-body); z-index: 50; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; }
+        
+        .hidden { display: none !important; }
+
+        @media (max-width: 992px) {
+            .global-search-container { display: none; }
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 20px 10px; width: 100%; }
+            .hamburger { display: block; }
+            .app-container { margin-top: 5px; border-radius: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="seeker-dashboard.html" class="logo">EAST<span>LINK</span></a>
+        </div>
+        
+        <div class="global-search-container">
+            <input type="text" id="searchInput" class="global-search-input" placeholder="Search jobs, skills, or companies...">
+            <i class="fas fa-search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+            <div id="searchResults" class="search-results-dropdown"></div>
+        </div>
+
+        <div class="header-actions">
+            <div class="icon-btn" onclick="location.href='seeker-messages.html'"><i class="fa-regular fa-envelope"></i><div class="notification-badge" id="msg-badge">0</div></div>
+            <div class="icon-btn" onclick="location.href='seeker-notifications.html'"><i class="fa-regular fa-bell"></i><div class="notification-badge" id="notif-badge">0</div></div>
+            <div class="profile-widget" onclick="location.href='seeker-profile.html'">
+                <img src="" id="header-avatar-img" class="user-avatar img-mode" style="display:none;">
+                <div id="header-avatar-fallback" class="user-avatar">U</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Overview</div>
+            <a href="seeker-dashboard.html" class="nav-item"><i class="fa-solid fa-compass"></i> Dashboard</a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Job Hunt</div>
+            <a href="seeker-applications.html" class="nav-item active"><i class="fa-solid fa-file-signature"></i> Applied Jobs</a>
+            <a href="seeker-jobs.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Browse Jobs</a>
+            <div onclick="checkAccess('standard', 'seeker-featured-jobs.html')" class="nav-item link-std" style="cursor:pointer;"><i class="fa-solid fa-star"></i> Featured Jobs <i class="fas fa-lock lock-icon" id="lock-featured"></i></div>
+            <div onclick="checkAccess('pro', 'seeker-urgentlyhiring.html')" class="nav-item link-pro" style="cursor:pointer;"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended <i class="fas fa-lock lock-icon" id="lock-urgent"></i></div>
+            <div onclick="checkAccess('pro', 'seeker-guaranteed-jobs.html')" class="nav-item link-pro" style="cursor:pointer;"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs <i class="fas fa-lock lock-icon" id="lock-guaranteed"></i></div>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="seeker-wallet.html" class="nav-item"><i class="fa-solid fa-wallet"></i> My Wallet</a>
+            <a href="seeker-premium.html" class="nav-item"><i class="fa-solid fa-crown"></i> My Plan</a>
+            <div onclick="checkAccess('standard', 'seeker-referrals.html')" class="nav-item link-std" style="cursor:pointer;"><i class="fa-solid fa-user-plus"></i> Invite & Earn <i class="fas fa-lock lock-icon" id="lock-referral"></i></div>
+            <div onclick="checkAccess('standard', 'seeker-invest.html')" class="nav-item link-std" style="cursor:pointer;"><i class="fa-solid fa-chart-line"></i> Invest <i class="fas fa-lock lock-icon" id="lock-invest"></i></div>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Resources</div>
+            <a href="seeker-blog.html" class="nav-item"><i class="fa-solid fa-newspaper"></i> News & Insights</a>
+            <div onclick="checkAccess('pro', 'seeker-resources.html')" class="nav-item link-pro" style="cursor:pointer;"><i class="fa-solid fa-book"></i> Resources <i class="fas fa-lock lock-icon" id="lock-resources"></i></div>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Settings</div>
+            <a href="seeker-profile.html" class="nav-item"><i class="fa-solid fa-user-gear"></i> Profile</a>
+            <a href="seeker-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="closeSidebar()" style="position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:998; display:none;"></div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <!-- APPLICATION FORM CONTAINER -->
+        <div class="app-container" id="main-container">
+            
+            <!-- Loading -->
+            <div class="loading-screen" id="loading-screen">
+                <i class="fas fa-circle-notch fa-spin fa-2x" style="color: var(--gold-base);"></i>
+                <p style="color:var(--text-muted); margin-top:10px; font-weight:500;">Initializing Application...</p>
+            </div>
+
+            <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+
+            <!-- Header -->
+            <div class="app-header">
+                <i class="fas fa-arrow-left back-btn" onclick="changeStep(-1)"></i>
+                <h2 id="header-title">Direct Application</h2>
+                <div style="width:20px;"></div>
+            </div>
+
+            <!-- STEP 1: INFORMATION -->
+            <div class="step-content active" id="step-1">
+                <div class="job-summary animate__animated animate__fadeIn">
+                    <div class="js-icon" id="job-icon"><i class="fas fa-briefcase"></i></div>
+                    <div>
+                        <h4 id="job-title-display" style="font-size:1.1rem; color:var(--text-main); margin-bottom:3px;">Loading...</h4>
+                        <p style="font-size:0.85rem; color:var(--text-muted);" id="job-company-display">...</p>
+                        <div id="job-tier-badge" style="font-size:0.7rem; color:var(--gold-base); text-transform:uppercase; font-weight:700; margin-top:6px; letter-spacing:0.5px;"></div>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom:20px; font-size:1rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">1. Applicant Details</h3>
+                
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="app-name" placeholder="Enter your full name">
+                </div>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                    <div class="form-group">
+                        <label>Age</label>
+                        <input type="number" id="app-age" placeholder="e.g. 25">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="app-phone" placeholder="07...">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Current Location</label>
+                    <input type="text" id="app-location" placeholder="e.g. Nairobi, Westlands">
+                </div>
+
+                <div class="form-group">
+                    <label>National ID / Passport</label>
+                    <input type="text" id="app-national-id" placeholder="ID Number">
+                </div>
+
+                <div class="form-group">
+                    <label>Skills & Experience Summary</label>
+                    <textarea id="app-experience" rows="4" placeholder="Briefly list your key skills and past roles..."></textarea>
+                </div>
+            </div>
+
+            <!-- STEP 2: PAYMENT (Updated to BUY GOODS 3076015) -->
+            <div class="step-content" id="step-2">
+                <div style="text-align:center; margin-bottom:20px;">
+                    <h3 style="margin-bottom:5px; font-size:1.2rem;">Processing Fee</h3>
+                    <p style="font-size:0.85rem; color:var(--text-muted);">Secure payment via M-Pesa</p>
+                </div>
+
+                <div class="payment-card animate__animated animate__zoomIn">
+                    <img src="./assets/images/mpesa.png" class="mpesa-logo-lg" alt="M-Pesa">
+                    <div style="font-size:0.85rem; color:var(--text-muted); margin-bottom:10px;">Go to M-Pesa > Lipa na M-Pesa > Buy Goods</div>
+                    
+                    <div class="pay-instruction-box">
+                        <div class="pi-row">
+                            <span>Till Number</span>
+                            <div class="pi-value text-mpesa">
+                                <span id="till-display">3076015</span>
+                                <button class="copy-btn" onclick="copyText(document.getElementById('till-display').innerText)"><i class="fa-regular fa-copy"></i></button>
+                            </div>
+                        </div>
+                        <div class="pi-row">
+                            <span>Amount</span>
+                            <span class="pi-value text-gold" id="pay-amount">KES ---</span>
+                        </div>
+                    </div>
+
+                    <div style="font-size:0.75rem; color:rgba(255,255,255,0.4); margin-top:15px; font-style:italic;">
+                        After payment, receive the M-Pesa confirmation code and click "Next Step".
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3: VERIFICATION / SUBMISSION -->
+            <div class="step-content" id="step-3">
+                <h3 style="margin-bottom:20px; font-size:1rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">3. Finalize & Submit</h3>
+
+                <!-- Payment Verification -->
+                <div id="verification-section">
+                    <div class="form-group">
+                        <label style="color:var(--mpesa-green); font-weight:700;">M-Pesa Transaction Code</label>
+                        <input type="text" id="app-txn-code" placeholder="e.g. QKD82..." style="text-transform:uppercase; letter-spacing:2px; font-family:var(--font-mono); border-color:var(--border-color); font-size:1.1rem; text-align:center; color:var(--mpesa-green); font-weight:700;">
+                        <p style="font-size:0.75rem; color:var(--text-muted); margin-top:5px; text-align:center;">Enter the code received from M-Pesa after payment.</p>
+                    </div>
+
+                    <div style="background:rgba(255,255,255,0.03); border-radius:12px; padding:20px; margin-bottom:20px; border:1px solid var(--border-color);">
+                        <label class="check-container">
+                            <input type="checkbox" id="check-paid">
+                            <span class="check-text">I confirm that I have paid <span id="confirm-amount-text" style="font-weight:700; color:white;"></span> via M-Pesa.</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Terms -->
+                <div style="background:rgba(255,255,255,0.03); border-radius:12px; padding:20px; margin-bottom:20px; border:1px solid var(--border-color);">
+                    <label class="check-container">
+                        <input type="checkbox" id="check-terms">
+                        <span class="check-text">I agree to the Terms of Service & Privacy Policy for EastLink Recruiters.</span>
+                    </label>
+                </div>
+
+                <div style="text-align:center; color:var(--success); font-size:0.9rem; background:rgba(16, 185, 129, 0.1); padding:15px; border-radius:10px; border:1px solid rgba(16, 185, 129, 0.2);">
+                    <i class="fab fa-whatsapp"></i> 
+                    After submitting, you will be redirected to <b>WhatsApp</b> to send your professional application preview.
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="app-footer">
+                <button class="btn btn-back" id="btn-back" onclick="changeStep(-1)" style="visibility:hidden;">Back</button>
+                <button class="btn btn-next" id="btn-next" onclick="changeStep(1)">Next Step <i class="fas fa-arrow-right"></i></button>
+                <button class="btn btn-submit" id="btn-submit" onclick="submitApplication()">Submit Application <i class="fas fa-paper-plane"></i></button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- UPGRADE MODAL -->
+    <div class="modal-overlay" id="upgradeModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(12px);z-index:3000;display:none;justify-content:center;align-items:center;">
+        <div class="popup-content" style="background:#1e293b;border:1px solid var(--border-color);padding:30px;border-radius:20px;width:90%;max-width:400px;text-align:center;">
+            <i class="fa-solid fa-crown" style="font-size:3rem;color:var(--gold-base);margin-bottom:15px;"></i>
+            <h2 style="font-family:var(--font-head);margin-bottom:10px;">Upgrade Required</h2>
+            <p style="color:var(--text-muted);margin-bottom:25px;">This feature is locked.</p>
+            <button onclick="document.getElementById('upgradeModal').style.display='none'" style="padding:10px 20px;background:transparent;border:1px solid var(--border-color);color:white;border-radius:12px;">Close</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, addDoc, collection, serverTimestamp, onSnapshot, query, where, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        // CONFIG
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig); 
+        const auth = getAuth(app); 
+        const db = getFirestore(app);
+
+        // UI HELPERS
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none'; };
+        window.closeSidebar = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').style.display = 'none'; };
+        window.logout = () => signOut(auth).then(() => window.location.href = 'signin.html');
+        
+        // Copy Helper
+        window.copyText = (text) => {
+            navigator.clipboard.writeText(text).then(() => {
+                Toastify({text:"Copied to clipboard!", duration: 2000, style:{background:"var(--success-gradient)"}}).showToast();
+            });
+        };
+
+        let currentUserPlan = 'free'; 
+        window.checkAccess = (requiredTier, url) => {
+            const tierMap = { 'free': 0, 'standard': 1, 'pro': 2 };
+            let currentTierStr = ['pro','gold'].some(t=>currentUserPlan.includes(t))?'pro':(currentUserPlan.includes('standard')?'standard':'free');
+            if (tierMap[currentTierStr] >= tierMap[requiredTier]) location.href = url;
+            else document.getElementById('upgradeModal').style.display = 'flex';
+        };
+
+        // GLOBAL SEARCH
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        let debounceTimer;
+        
+        if(searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(debounceTimer);
+                const term = e.target.value.toLowerCase().trim();
+                if(term.length < 2) { searchResults.style.display = 'none'; return; }
+                
+                debounceTimer = setTimeout(async () => {
+                    try {
+                        const q = query(collection(db, "jobs"), limit(20));
+                        const snap = await getDocs(q);
+                        
+                        const matches = snap.docs.filter(d => {
+                            const data = d.data();
+                            return (data.title || '').toLowerCase().includes(term) || 
+                                   (data.company || '').toLowerCase().includes(term);
+                        });
+
+                        if(matches.length > 0) {
+                            searchResults.innerHTML = matches.map(d => `
+                                <div class="search-result-item" onclick="location.href='seeker-job-details.html?id=${d.id}'">
+                                    <i class="fas fa-search" style="color:var(--text-muted)"></i>
+                                    <div>
+                                        <div style="font-weight:600;font-size:0.9rem;">${d.data().title}</div>
+                                        <div style="font-size:0.75rem;color:var(--text-muted);">${d.data().company}</div>
+                                    </div>
+                                </div>
+                            `).join('');
+                            searchResults.style.display = 'block';
+                        } else {
+                            searchResults.style.display = 'none';
+                        }
+                    } catch(e) { console.error("Search Error", e); }
+                }, 400); 
+            });
+            
+            document.addEventListener('click', (e) => { 
+                if (!document.querySelector('.global-search-container').contains(e.target)) {
+                    searchResults.style.display = 'none'; 
+                }
+            });
+        }
+
+        // APPLICATION LOGIC
+        let currentStep = 1;
+        let jobId = new URLSearchParams(window.location.search).get('id');
+        let jobData = null;
+        let currentFee = 0;
+        let jobTypeLabel = "Standard Application";
+        
+        // Settings with Defaults (updated dynamically)
+        let costSettings = { 
+            standard: 330, 
+            featured: 550, 
+            urgent: 850, 
+            guaranteed: 850 
+        };
+        
+        let paymentInfo = { 
+            till: "3076015", 
+            waNumber: "254119524616" 
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'signin.html'; return; }
+            if (!jobId) { history.back(); return; }
+
+            // 1. Fetch User Data (Pre-fill & Avatar)
+            onSnapshot(doc(db, "users", user.uid), (doc) => {
+                if(doc.exists()) {
+                    const d = doc.data();
+                    currentUserPlan = (d.plan||'free').toLowerCase();
+                    
+                    // Pre-fill form
+                    if(document.getElementById('app-name')) {
+                        document.getElementById('app-name').value = d.fullName || "";
+                        document.getElementById('app-phone').value = d.phone || d.phoneNumber || "";
+                        document.getElementById('app-location').value = d.location || "";
+                    }
+
+                    // Avatar Logic
+                    const avatarImg = document.getElementById('header-avatar-img');
+                    const avatarFallback = document.getElementById('header-avatar-fallback');
+                    if(d.photoURL || user.photoURL) {
+                        avatarImg.src = d.photoURL || user.photoURL;
+                        avatarImg.style.display = 'block';
+                        avatarFallback.style.display = 'none';
+                    } else {
+                        avatarImg.style.display = 'none';
+                        avatarFallback.style.display = 'grid';
+                        avatarFallback.innerText = (d.fullName || "U").charAt(0).toUpperCase();
+                    }
+                }
+            });
+
+            // Badge Listeners
+            onSnapshot(query(collection(db, "notifications"), where("userId", "==", user.uid), where("read", "==", false)), (s) => {
+                const b = document.getElementById('notif-badge'); if(b) {b.style.display=s.size?'flex':'none'; b.innerText=s.size;}
+            });
+            onSnapshot(query(collection(db, "messages"), where("receiverId", "==", user.uid), where("read", "==", false)), (s) => {
+                const b = document.getElementById('msg-badge'); if(b) {b.style.display=s.size?'flex':'none'; b.innerText=s.size;}
+            });
+
+            try {
+                // 2. Fetch Global Settings (Admin Controlled Costs & Payment)
+                const settingsSnap = await getDoc(doc(db, "site_settings", "global_settings"));
+                if(settingsSnap.exists()) {
+                    const s = settingsSnap.data();
+                    
+                    // Update Costs from Admin Settings
+                    if(s.costs) {
+                        costSettings.standard = s.costs.standard || 330;
+                        costSettings.featured = s.costs.featured || 550;
+                        costSettings.urgent = s.costs.urgent || 850;
+                        costSettings.guaranteed = s.costs.guaranteed || 850;
+                    }
+                    
+                    // Update Payment Info
+                    if(s.paymentInfo) {
+                        paymentInfo.till = s.paymentInfo.till || paymentInfo.till;
+                        paymentInfo.waNumber = s.paymentInfo.waNumber || s.paymentInfo.number || paymentInfo.waNumber;
+                    }
+                }
+
+                // Update UI with Payment Info
+                document.getElementById('till-display').innerText = paymentInfo.till;
+
+                // 3. Fetch Job Data
+                const jobSnap = await getDoc(doc(db, "jobs", jobId));
+                if(jobSnap.exists()) {
+                    jobData = jobSnap.data();
+                    determineJobCost(jobData);
+                    
+                    document.getElementById('job-title-display').innerText = jobData.title;
+                    document.getElementById('job-company-display').innerText = jobData.company;
+                    
+                    // Job Icon Logic
+                    if(jobData.employerLogo) {
+                         document.getElementById('job-icon').innerHTML = `<img src="${jobData.employerLogo}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;">`;
+                    }
+                    
+                    document.getElementById('job-tier-badge').innerText = jobTypeLabel;
+                } else {
+                    alert("Job not found."); window.history.back();
+                }
+
+                document.getElementById('loading-screen').style.display = 'none';
+
+            } catch(e) { console.error("Init Error", e); }
+        });
+
+        function determineJobCost(job) {
+            const container = document.getElementById('main-container');
+            const type = (job.listingType || job.listing_type || 'standard').toLowerCase();
+            const isG = job.isGuaranteed || type.includes('guaranteed');
+            const isU = job.isUrgent || type.includes('urgent');
+            const isF = job.isFeatured || type.includes('featured');
+
+            // Reset classes
+            container.className = 'app-container'; 
+
+            if (isG) {
+                currentFee = costSettings.guaranteed; // 850
+                jobTypeLabel = "Guaranteed Placement"; 
+                container.classList.add('type-guaranteed');
+            } 
+            else if (isU) {
+                currentFee = costSettings.urgent; // 850
+                jobTypeLabel = "Urgently Hiring"; 
+                container.classList.add('type-urgent');
+            }
+            else if (isF) {
+                currentFee = costSettings.featured; // 550
+                jobTypeLabel = "Featured Application"; 
+                container.classList.add('type-featured');
+            }
+            else {
+                // Default to STANDARD (Was Free, now Paid)
+                currentFee = costSettings.standard; // 330
+                jobTypeLabel = "Standard Application"; 
+                container.classList.add('type-standard');
+            }
+
+            // Update Cost UI
+            document.getElementById('pay-amount').innerText = "KES " + currentFee;
+            document.getElementById('confirm-amount-text').innerText = "KES " + currentFee;
+        }
+
+        window.changeStep = (dir) => {
+            if(dir === -1 && currentStep === 1) { window.history.back(); return; }
+            
+            // Validate Step 1
+            if(currentStep === 1 && dir === 1) {
+                const name = document.getElementById('app-name').value;
+                const phone = document.getElementById('app-phone').value;
+                const id = document.getElementById('app-national-id').value;
+                
+                if(!name || !phone || !id) return Toastify({text:"Please fill in all required details.", style:{background:"var(--danger)"}}).showToast();
+            }
+            
+            let nextStep = currentStep + dir;
+            
+            // Note: We no longer skip Step 2 because ALL applications are now paid (Standard/Featured/etc)
+            currentStep = nextStep;
+            updateUI();
+        };
+
+        function updateUI() {
+            document.querySelectorAll('.step-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+            
+            const pct = (currentStep / 3) * 100;
+            document.getElementById('progress-fill').style.width = `${pct}%`;
+
+            const btnBack = document.getElementById('btn-back');
+            const btnNext = document.getElementById('btn-next');
+            const btnSubmit = document.getElementById('btn-submit');
+
+            btnBack.style.visibility = 'visible';
+            
+            if(currentStep === 3) {
+                btnNext.style.display = 'none'; 
+                btnSubmit.style.display = 'flex';
+            } else {
+                btnNext.style.display = 'flex'; 
+                btnSubmit.style.display = 'none';
+            }
+        }
+
+        window.submitApplication = async () => {
+            const user = auth.currentUser;
+            if(!user) return;
+
+            const checkTerms = document.getElementById('check-terms').checked;
+            const txnCode = document.getElementById('app-txn-code').value.trim();
+            const checkPaid = document.getElementById('check-paid').checked;
+
+            // Strict Validation for Payment
+            if(!txnCode) return Toastify({text:"Please enter M-Pesa Transaction Code", style:{background:"var(--danger)"}}).showToast();
+            if(txnCode.length < 8) return Toastify({text:"Invalid Transaction Code", style:{background:"var(--danger)"}}).showToast();
+            if(!checkPaid) return Toastify({text:"Please confirm payment checkbox", style:{background:"var(--danger)"}}).showToast();
+            if(!checkTerms) return Toastify({text:"Please accept Terms & Conditions", style:{background:"var(--danger)"}}).showToast();
+
+            const btn = document.getElementById('btn-submit');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
+            btn.disabled = true;
+
+            try {
+                // 1. Check for Duplicates
+                const dupQ = query(collection(db, "applications"), 
+                    where("seekerId", "==", user.uid), 
+                    where("jobId", "==", jobId));
+                const dupSnap = await getDocs(dupQ);
+                
+                if(!dupSnap.empty) {
+                    Toastify({text: "You have already applied for this job!", style:{background:"var(--danger)"}}).showToast();
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    return;
+                }
+
+                // 2. Prepare Data
+                const appData = {
+                    seekerId: user.uid,
+                    seekerName: document.getElementById('app-name').value,
+                    seekerAge: document.getElementById('app-age').value,
+                    seekerPhone: document.getElementById('app-phone').value,
+                    seekerLocation: document.getElementById('app-location').value,
+                    seekerNationalId: document.getElementById('app-national-id').value,
+                    seekerExp: document.getElementById('app-experience').value, 
+                    
+                    jobId: jobId,
+                    jobTitle: jobData.title,
+                    company: jobData.company,
+                    
+                    appliedAt: serverTimestamp(),
+                    status: 'pending', 
+                    applicationType: 'Direct Application',
+                    
+                    // Payment Data
+                    jobType: jobTypeLabel, // Standard / Featured / etc.
+                    feeRequired: currentFee,
+                    payment: { 
+                        method: 'M-Pesa Buy Goods', 
+                        tillNumber: paymentInfo.till,
+                        amount: currentFee, 
+                        txnCode: txnCode.toUpperCase(), 
+                        verified: false 
+                    }
+                };
+
+                // 3. Save to Firestore
+                await addDoc(collection(db, "applications"), appData);
+                
+                // 4. Generate Professional WhatsApp Preview
+                // Clean phone number format to international without '+'
+                const cleanWaNumber = paymentInfo.waNumber.replace(/^0/, '254').replace(/\+/g, '');
+                
+                // Get Date Time String
+                const now = new Date();
+                const dateTimeStr = now.toLocaleDateString() + " " + now.toLocaleTimeString();
+
+                // Professional Template 
+                const waMessage = `
+*EASTLINK RECRUITERS - APPLICATION*
+--------------------------------
+*JOB DETAILS*
+*Position:* ${appData.jobTitle}
+*Company:* ${appData.company}
+*Category:* ${jobTypeLabel}
+*Ref:* ${jobId.substring(0,5).toUpperCase()}
+
+*APPLICANT PROFILE*
+*Name:* ${appData.seekerName}
+*Phone:* ${appData.seekerPhone}
+*ID No:* ${appData.seekerNationalId}
+*Location:* ${appData.seekerLocation}
+*Age:* ${appData.seekerAge}
+
+*PAYMENT CONFIRMATION*
+*Method:* Buy Goods (Till ${paymentInfo.till})
+*Amount:* KES ${currentFee}
+*Trans ID:* ${appData.payment.txnCode}
+*Date:* ${dateTimeStr}
+--------------------------------
+*Request:* Please review my application attached.
+`.trim();
+
+                Toastify({text: "Application Submitted! Opening WhatsApp...", duration: 3000, style:{background:"var(--success)"}}).showToast();
+                
+                // Redirect to WhatsApp
+                setTimeout(() => { 
+                    window.location.href = `https://wa.me/${cleanWaNumber}?text=${encodeURIComponent(waMessage)}`; 
+                }, 1500);
+
+            } catch(e) {
+                console.error(e);
+                Toastify({text:"Error: " + e.message, style:{background:"var(--danger)"}}).showToast();
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        };
+
+        if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js").catch(console.log);
+    </script>
+</body>
+</html>

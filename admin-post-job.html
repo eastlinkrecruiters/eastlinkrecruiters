@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Post Job (Admin) | EastLink</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
+    <meta name="theme-color" content="#0F172A">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Executive Theme */
+            --bg-body: #0F172A;       
+            --bg-card: rgba(30, 41, 59, 0.65);
+            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.95);
+            --bg-input: rgba(255, 255, 255, 0.07);
+            --bg-hover: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8; 
+            --gold-base: #D97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --ai-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --neon-purple: #8b5cf6;
+            --success: #10B981;
+            --danger: #EF4444;
+            --blue: #3B82F6;
+            
+            /* COMPACT HEADER SETTINGS */
+            --sidebar-width: 260px; 
+            --header-height: 60px;
+            
+            --radius: 16px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background-image: url('./assets/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+            transition: background 0.3s ease;
+        }
+
+        /* Utils & Glassmorphism */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            width: 100%;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 20px; z-index: 1000;
+        }
+        
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        
+        .logo { 
+            font-family: var(--font-head); 
+            font-weight: 700; color: var(--text-main); font-size: 1.15rem;
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; 
+            display: flex; align-items: center; 
+        }
+        .logo span { color: var(--gold-base); }
+        .admin-badge { 
+            font-family: var(--font-body); font-size: 0.55rem; background: var(--bg-input); 
+            border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; 
+            margin-left: 8px; color: var(--text-muted); letter-spacing: 0.5px;
+        }
+        
+        .hamburger { font-size: 1.2rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        /* Header Actions */
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+        .icon-btn { 
+            width: 32px; height: 32px;
+            display: grid; place-items: center; border-radius: 8px; font-size: 0.9rem;
+            color: var(--text-muted); cursor: pointer; transition: all 0.3s var(--ease-bounce); position: relative;
+        }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); }
+        
+        .notification-badge { 
+            position: absolute; top: 2px; right: 2px; 
+            min-width: 14px; height: 14px; 
+            background: var(--danger); border-radius: 10px; 
+            font-size: 0.55rem; color: white; font-weight: 700;
+            display: none; place-items: center; justify-content: center;
+            padding: 0 3px; border: 2px solid var(--bg-card);
+        }
+        
+        .profile-widget {
+            width: 34px; height: 34px;
+            position: relative; cursor: pointer;
+            transition: transform 0.3s; margin-left: 4px; flex-shrink: 0;
+            background: var(--bg-input); border-radius: 10px; display: grid; place-items: center;
+            border: 1px solid var(--border-color); color: var(--gold-base); font-size: 0.9rem;
+        }
+        .profile-widget:hover { background: var(--bg-hover); }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 15px 0; overflow-y: auto; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+        .nav-group { padding: 0 20px; margin-bottom: 15px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-item { 
+            display: flex; align-items: center; padding: 10px 12px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.85rem; transition: all 0.3s ease; border-radius: 8px; margin-bottom: 2px;
+        }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
+        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
+        .nav-item i { width: 22px; text-align: center; margin-right: 8px; }
+        
+        /* --- MAIN --- */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 25px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 998; backdrop-filter: blur(4px); }
+
+        /* FORM SPECIFIC STYLES */
+        .content-wrapper { max-width: 900px; margin: 0 auto; }
+
+        .section-title { 
+            font-family: var(--font-head); font-size: 1rem; color: var(--text-main); 
+            margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); 
+            display: flex; justify-content: space-between; align-items: center; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 20px; }
+        
+        label { display: block; font-size: 0.75rem; font-weight: 600; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select, textarea { 
+            width: 100%; padding: 12px 15px; background: var(--bg-input); 
+            border: 1px solid var(--border-color); border-radius: 8px; 
+            color: var(--text-main); font-family: var(--font-body); outline: none; transition: 0.3s; 
+            font-size: 0.9rem;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--gold-base); background: var(--bg-hover); }
+
+        /* UPDATED AI BUTTON */
+        .ai-btn {
+            background: var(--gold-gradient); color: white; padding: 8px 20px; border-radius: 30px;
+            font-size: 0.75rem; font-weight: 700; border: none; cursor: pointer; transition: 0.3s;
+            display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
+            font-family: var(--font-body);
+        }
+        .ai-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .ai-btn:disabled { opacity: 0.7; cursor: wait; }
+        .ai-btn i { animation: pulse 2s infinite; }
+
+        /* AI SHIMMER EFFECT */
+        @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
+        .generating textarea {
+            background: linear-gradient(to right, rgba(255,255,255,0.03) 8%, rgba(255,255,255,0.08) 18%, rgba(255,255,255,0.03) 33%);
+            background-size: 1000px 100%; animation: shimmer 2s infinite linear; color: transparent;
+        }
+
+        /* TAGS INPUT */
+        .tag-container {
+            border: 1px solid var(--border-color); border-radius: 10px; padding: 8px; 
+            display: flex; flex-wrap: wrap; gap: 8px; background: var(--bg-input); min-height: 48px;
+            transition: 0.3s;
+        }
+        .tag-container:focus-within { border-color: var(--gold-base); background: rgba(255,255,255,0.1); }
+        .tag { 
+            background: rgba(217, 119, 6, 0.15); color: var(--gold-base); padding: 4px 12px; 
+            border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; 
+            gap: 6px; border: 1px solid rgba(217, 119, 6, 0.2); 
+        }
+        .tag i { cursor: pointer; font-size: 0.7rem; opacity: 0.7; } .tag i:hover { opacity: 1; }
+        .tag-input { border: none; outline: none; flex-grow: 1; padding: 5px; font-size: 0.9rem; background: transparent; color: var(--text-main); min-width: 100px; }
+
+        /* Submit Button */
+        .btn-submit { 
+            background: var(--gold-gradient); color: white; padding: 15px 40px; 
+            border: none; border-radius: 10px; font-weight: 700; cursor: pointer; 
+            width: 100%; font-size: 0.95rem; transition: 0.3s; margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(217, 119, 6, 0.2);
+            font-family: var(--font-head); text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(217, 119, 6, 0.4); }
+        .btn-submit:disabled { background: var(--bg-input); color: var(--text-muted); cursor: not-allowed; box-shadow: none; transform: none; }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 20px 10px; width: 100%; max-width: 100vw; overflow-x: hidden; }
+            .form-grid { grid-template-columns: 1fr; }
+            .hamburger { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="admin-dashboard.html" class="logo">East<span>Link</span> <span class="admin-badge">ADMIN</span></a>
+        </div>
+        
+        <div class="header-actions">
+            <div class="icon-btn" onclick="location.href='admin-support.html'" title="Support Tickets">
+                <i class="fa-solid fa-envelope"></i>
+                <div class="notification-badge" id="msg-badge">0</div>
+            </div>
+            <div class="icon-btn" onclick="location.href='admin-notifications.html'" title="System Alerts">
+                <i class="fa-solid fa-bell"></i>
+                <div class="notification-badge" id="notif-badge">0</div>
+            </div>
+            <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Analytics</div>
+            <a href="admin-dashboard.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        </div>
+        
+        <div class="nav-group">
+            <div class="nav-label">User Management</div>
+            <a href="admin-users.html" class="nav-item"><i class="fa-solid fa-users"></i> Manage Users</a>
+            <a href="admin-plans.html" class="nav-item"><i class="fa-solid fa-tags"></i> Manage Plans</a>
+            <a href="admin-referrals.html" class="nav-item"><i class="fa-solid fa-share-nodes"></i> Referrals</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Jobs & Service</div>
+            <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
+            <a href="admin-guaranteed-jobs.html" class="nav-item link-pro"><i class="fa-solid fa-certificate" style="color:var(--gold-base);"></i> Guaranteed Jobs</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+            <a href="admin-post-job.html" class="nav-item active"><i class="fa-solid fa-pen-to-square"></i> Post Job</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="admin-deposits.html" class="nav-item"><i class="fa-solid fa-arrow-down" style="color:var(--success);"></i> Deposits</a>
+            <a href="admin-withdrawals.html" class="nav-item"><i class="fa-solid fa-arrow-up" style="color:var(--danger);"></i> Withdrawals</a>
+            <a href="admin-deposit-issues.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> Errors</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">System</div>
+            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
+            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
+            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
+            <a href="admin-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> System Config</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- MAIN -->
+    <main>
+        <div class="content-wrapper">
+            <div style="margin-bottom:25px; display:flex; align-items:center; justify-content:space-between;">
+                <div>
+                    <h2 style="font-family:var(--font-head); color:var(--text-main); font-size:1.5rem;">Post Administrative Job</h2>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Post jobs on behalf of companies or general listings. <span id="draft-status" style="color:var(--success); font-weight:500; display:none; margin-left:10px; font-size:0.8rem;"><i class="fas fa-save"></i> Draft Saved</span></p>
+                </div>
+            </div>
+
+            <!-- FORM -->
+            <form id="jobForm" onsubmit="return false;" class="animate__animated animate__fadeInUp">
+                
+                <!-- Section 1: Company Info (Admin Exclusive) -->
+                <div class="glass-panel">
+                    <h3 class="section-title"><i class="fas fa-building"></i> Company Identity</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Company Name *</label>
+                            <input type="text" id="companyName" placeholder="e.g. EastLink Recruiters" oninput="saveDraft()" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Company Logo URL (Optional)</label>
+                            <input type="url" id="companyLogo" oninput="saveDraft()" placeholder="https://...">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Basic Info -->
+                <div class="glass-panel">
+                    <h3 class="section-title"><i class="fas fa-info-circle"></i> Basic Information</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Listing Category *</label>
+                            <select id="category" onchange="toggleCategory(); saveDraft();">
+                                <option value="job">Direct Application (Standard Job)</option>
+                                <option value="interview">Interview Listing (Booking)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Job Title *</label>
+                            <input type="text" id="title" placeholder="e.g. Senior Sales Manager" oninput="saveDraft()" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Job Type *</label>
+                            <select id="type" onchange="saveDraft()">
+                                <option value="Full Time">Full Time</option>
+                                <option value="Part Time">Part Time</option>
+                                <option value="Contract">Contract</option>
+                                <option value="Internship">Internship</option>
+                                <option value="Remote">Remote</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Location *</label>
+                            <input type="text" id="location" value="NAIROBI" oninput="saveDraft()" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Salary Range (Optional)</label>
+                            <input type="text" id="salary" oninput="saveDraft()" placeholder="e.g. 80k - 120k KES">
+                        </div>
+                        <div class="form-group">
+                            <label>Deadline</label>
+                            <input type="date" id="deadline" onchange="saveDraft()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: AI Description -->
+                <div class="glass-panel animate__animated animate__fadeInUp animate__delay-1s" style="border-color: rgba(139, 92, 246, 0.3);">
+                    <div class="section-title" style="color: var(--neon-purple);">
+                        <span><i class="fas fa-magic"></i> Intelligent Description</span>
+                        <button class="ai-btn" onclick="generateAIContent()">
+                            <i class="fas fa-sparkles"></i> AI Title Analysis
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Role Description *</label>
+                        <textarea id="description" rows="10" placeholder="AI will generate this based on Title..." oninput="saveDraft()" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Key Requirements *</label>
+                        <textarea id="requirements" rows="8" placeholder="- List specific skills and qualifications..." oninput="saveDraft()" required></textarea>
+                    </div>
+                </div>
+
+                <!-- Section 4: Skills & Controls -->
+                <div class="glass-panel animate__animated animate__fadeInUp animate__delay-2s">
+                    <h3 class="section-title"><i class="fas fa-sliders-h"></i> Admin Controls & Tags</h3>
+                    
+                    <!-- New Tag Input -->
+                    <div class="form-group" style="margin-bottom:25px;">
+                        <label>Skills / Tags (Type & Enter)</label>
+                        <div class="tag-container" id="tag-container">
+                            <input type="text" class="tag-input" id="tag-input" placeholder="Add skill (e.g. Python, Sales)...">
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>External Apply Link (Optional)</label>
+                            <input type="url" id="applyLink" oninput="saveDraft()" placeholder="https://your-company-site.com/apply">
+                        </div>
+                        
+                        <!-- UPDATED: Explicit Listing Type -->
+                        <div class="form-group">
+                            <label style="color:var(--gold-base);">Listing Type (Important)</label>
+                            <select id="listingTypeSelector" onchange="saveDraft()" style="border-color:var(--gold-base); font-weight:700;">
+                                <option value="free">Standard (Free)</option>
+                                <option value="featured">Featured Listing</option>
+                                <option value="urgent">Urgently Hiring</option>
+                                <option value="guaranteed">Guaranteed Job</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn-submit" onclick="submitJob()" id="submitBtn">Publish as Admin</button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup" style="
+        display: none; 
+        position: fixed; bottom: 20px; right: 20px; 
+        background: rgba(15, 23, 42, 0.95); 
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        backdrop-filter: blur(12px);
+        padding: 20px; border-radius: 16px; 
+        z-index: 10000; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        max-width: 320px; animation: slideUp 0.5s ease-out;
+    ">
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+            <img src="./assets/images/logo.png" style="width:50px; height:50px; border-radius:10px;" onerror="this.src='https://placehold.co/50x50/orange/white?text=EL'">
+            <div>
+                <h4 style="color:#fff; margin:0; font-family:'Cinzel', serif;">Install EastLink</h4>
+                <p style="color:#94A3B8; margin:5px 0 0; font-size:0.8rem;">Add to Home Screen for fast access.</p>
+            </div>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button id="pwa-dismiss" onclick="document.getElementById('pwa-install-popup').style.display='none'" style="flex:1; padding:10px; background:transparent; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:8px; cursor:pointer;">Later</button>
+            <button id="pwa-install-btn" style="flex:1; padding:10px; background:linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border:none; color:#000; font-weight:700; border-radius:8px; cursor:pointer;">Install</button>
+        </div>
+    </div>
+    <style>@keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }</style>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, addDoc, updateDoc, collection, serverTimestamp, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+
+        // --- CLEAR FORM ON REFRESH ---
+        window.onload = function() {
+            localStorage.removeItem('admin_job_draft');
+            document.getElementById('jobForm').reset();
+            document.getElementById('location').value = "NAIROBI";
+        };
+
+        // --- UI HELPERS ---
+        window.toggleSidebar = () => { 
+            document.getElementById('sidebar').classList.toggle('active'); 
+            document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
+        };
+        
+        window.logout = () => {
+            if(confirm("Confirm Log Out?")) signOut(auth).then(() => window.location.href = 'signin.html');
+        };
+
+        window.toggleCategory = () => {
+            const cat = document.getElementById('category').value;
+            const btn = document.getElementById('submitBtn');
+            if(cat === 'interview') btn.innerText = "Publish Interview Listing";
+            else btn.innerText = "Publish as Admin";
+        };
+
+        // --- TAG LOGIC ---
+        const tagContainer = document.getElementById('tag-container');
+        const tagInput = document.getElementById('tag-input');
+        let tags = [];
+
+        tagInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const val = tagInput.value.trim();
+                if (val && !tags.includes(val)) {
+                    tags.push(val);
+                    renderTags();
+                    tagInput.value = '';
+                    saveDraft();
+                }
+            }
+        });
+
+        function renderTags() {
+            document.querySelectorAll('.tag').forEach(t => t.remove());
+            tags.forEach(tag => {
+                const tagEl = document.createElement('div');
+                tagEl.className = 'tag animate__animated animate__fadeIn';
+                tagEl.innerHTML = `${tag} <i class="fas fa-times" onclick="removeTag('${tag}')"></i>`;
+                tagContainer.insertBefore(tagEl, tagInput);
+            });
+        }
+        window.removeTag = (tag) => { tags = tags.filter(t => t !== tag); renderTags(); saveDraft(); };
+
+        // --- AUTH & LOAD ---
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'signin.html'; return; }
+            
+            const uDoc = await getDoc(doc(db, "users", user.uid));
+            if(!uDoc.exists() || uDoc.data().role !== 'admin') {
+                alert("Access Denied: Admin privileges required.");
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            currentUser = user;
+            initBadges();
+        });
+
+        function initBadges() {
+            const txQ = query(collection(db, "transactions"), where("status", "==", "pending"));
+            onSnapshot(txQ, (snap) => {
+                const count = snap.size;
+                const badge = document.getElementById('notif-badge');
+                if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
+                else badge.style.display = 'none';
+            });
+            const msgQ = query(collection(db, "support_tickets"), where("status", "==", "open"));
+             onSnapshot(msgQ, (snap) => {
+                const count = snap.size;
+                const badge = document.getElementById('msg-badge');
+                if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
+                else badge.style.display = 'none';
+            });
+        }
+
+        // --- DRAFT LOGIC ---
+        window.saveDraft = () => {
+            const data = {
+                company: document.getElementById('companyName').value,
+                title: document.getElementById('title').value,
+                location: document.getElementById('location').value,
+                salary: document.getElementById('salary').value,
+                type: document.getElementById('type').value,
+                desc: document.getElementById('description').value,
+                reqs: document.getElementById('requirements').value,
+                tags: tags,
+                category: document.getElementById('category').value,
+                tier: document.getElementById('listingTypeSelector').value, 
+                link: document.getElementById('applyLink').value,
+                logo: document.getElementById('companyLogo').value
+            };
+            localStorage.setItem('admin_job_draft', JSON.stringify(data));
+            
+            const status = document.getElementById('draft-status');
+            status.style.display = 'inline-block';
+            setTimeout(() => status.style.display = 'none', 2000);
+        };
+
+        // --- INTELLIGENT AI ENGINE (TITLE ANALYSIS) ---
+        window.generateAIContent = async () => {
+            const titleInput = document.getElementById('title').value.trim();
+            const locationVal = "NAIROBI";
+            
+            if(!titleInput) {
+                Toastify({ text: "Please enter a Job Title first!", style: { background: "#EF4444" } }).showToast();
+                document.getElementById('title').focus();
+                return;
+            }
+
+            // UI Feedback
+            const descArea = document.getElementById('description');
+            const btn = document.querySelector('.ai-btn');
+            const originalBtnText = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fas fa-brain fa-spin"></i> Analyzing Title...';
+            btn.disabled = true;
+            descArea.parentElement.classList.add('generating');
+
+            await new Promise(r => setTimeout(r, 1500)); 
+
+            // --- DEEP TITLE ANALYSIS ---
+            const lowerTitle = titleInput.toLowerCase();
+            let seniority = "an experienced";
+            let actionVerb = "execute";
+            let roleFocus = "day-to-day operations";
+            
+            // Detect Seniority
+            if (lowerTitle.includes('manager') || lowerTitle.includes('lead') || lowerTitle.includes('head') || lowerTitle.includes('director')) {
+                seniority = "a strategic and leadership-oriented";
+                actionVerb = "oversee and drive";
+                roleFocus = "departmental goals and team performance";
+            } else if (lowerTitle.includes('senior')) {
+                seniority = "a highly skilled Senior";
+                actionVerb = "lead and implement";
+                roleFocus = "complex projects and mentorship";
+            } else if (lowerTitle.includes('junior') || lowerTitle.includes('intern') || lowerTitle.includes('trainee')) {
+                seniority = "a motivated Entry-Level";
+                actionVerb = "support and learn";
+                roleFocus = "operational tasks and skill development";
+            } else if (lowerTitle.includes('assistant') || lowerTitle.includes('admin')) {
+                seniority = "an organized";
+                actionVerb = "coordinate and facilitate";
+                roleFocus = "administrative efficiency and support";
+            }
+
+            // Detect Domain Context
+            let domainContext = "ensure operational excellence.";
+            if (lowerTitle.includes('sales') || lowerTitle.includes('business dev')) domainContext = "drive revenue growth and market expansion.";
+            else if (lowerTitle.includes('accountant') || lowerTitle.includes('finance')) domainContext = "maintain financial integrity and compliance.";
+            else if (lowerTitle.includes('developer') || lowerTitle.includes('engineer') || lowerTitle.includes('tech')) domainContext = "build innovative technical solutions.";
+            else if (lowerTitle.includes('nurse') || lowerTitle.includes('doctor') || lowerTitle.includes('medical')) domainContext = "provide high-quality patient care.";
+            else if (lowerTitle.includes('driver') || lowerTitle.includes('logistics')) domainContext = "ensure safe and timely transportation/delivery.";
+            else if (lowerTitle.includes('customer') || lowerTitle.includes('support')) domainContext = "deliver exceptional customer satisfaction.";
+            else if (lowerTitle.includes('teacher') || lowerTitle.includes('tutor')) domainContext = "foster an engaging learning environment.";
+
+            // Construct Description
+            let desc = `ROLE OVERVIEW\n`;
+            desc += `We are looking for ${seniority} ${titleInput} to join our team in ${locationVal}. `;
+            desc += `In this role, you will ${actionVerb} ${roleFocus} to ${domainContext} `;
+            desc += `The ideal candidate is professional, proactive, and ready to make a tangible impact on our success.\n\n`;
+            
+            desc += `KEY RESPONSIBILITIES\n`;
+            desc += `• Execute core duties related to ${titleInput} with precision and efficiency.\n`;
+            desc += `• Collaborate with team members to achieve organizational objectives.\n`;
+            desc += `• Maintain high standards of quality in all assigned tasks.\n`;
+            desc += `• Identify areas for improvement and propose effective solutions.\n`;
+            
+            if(lowerTitle.includes('manager') || lowerTitle.includes('head')) {
+                 desc += `• Mentor and supervise junior staff members to ensure team growth.\n`;
+                 desc += `• Develop strategic plans to meet long-term business goals.\n`;
+            } else {
+                 desc += `• Report progress regularly to supervisors and stakeholders.\n`;
+            }
+
+            // Update ONLY Description
+            descArea.value = desc;
+            
+            saveDraft();
+
+            // Reset Button
+            btn.innerHTML = '<i class="fas fa-check"></i> Description Generated';
+            descArea.parentElement.classList.remove('generating');
+            setTimeout(() => { btn.innerHTML = originalBtnText; btn.disabled = false; }, 2000);
+            
+            Toastify({ text: `Role Description generated for ${titleInput}`, style: { background: "var(--ai-gradient)" } }).showToast();
+        };
+
+        // --- SUBMIT JOB ---
+        window.submitJob = async () => {
+            if(!currentUser) return alert("Session expired. Please refresh.");
+            
+            const btn = document.getElementById('submitBtn');
+            const title = document.getElementById('title').value.trim();
+            const desc = document.getElementById('description').value.trim();
+            const requirementsText = document.getElementById('requirements').value.trim();
+            const loc = document.getElementById('location').value.trim();
+            const compName = document.getElementById('companyName').value.trim();
+            
+            if(!title || !desc || !requirementsText || !loc || !compName) {
+                return Toastify({ text: "Please fill all required fields", style: { background: "var(--danger)" } }).showToast();
+            }
+
+            btn.disabled = true; 
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Publishing...';
+
+            // Clean Requirements
+            const reqArray = requirementsText.split('\n').map(line => line.replace(/^•\s*/, '').trim()).filter(line => line.length > 0 && !line.includes('QUALIFICATIONS'));
+
+            // Determine Boolean Flags for Seeker Page Visibility
+            const listingTypeRaw = document.getElementById('listingTypeSelector').value;
+            let isFeatured = false;
+            let isUrgent = false;
+            let isGuaranteed = false;
+            
+            if(listingTypeRaw === 'featured') isFeatured = true;
+            if(listingTypeRaw === 'urgent') isUrgent = true;
+            if(listingTypeRaw === 'guaranteed') isGuaranteed = true;
+            
+            // Map category for legacy filtering
+            let categoryVal = document.getElementById('category').value;
+            if(isGuaranteed) categoryVal = 'guaranteed'; 
+
+            const jobData = {
+                employerId: currentUser.uid, 
+                postedBy: 'admin',           
+                company: compName,
+                employerLogo: document.getElementById('companyLogo').value.trim() || null,
+                
+                category: categoryVal, 
+                title: title,
+                type: document.getElementById('type').value,
+                location: loc,
+                salary: document.getElementById('salary').value,
+                description: desc,
+                requirements: reqArray, 
+                tags: tags,             
+                applyLink: document.getElementById('applyLink').value || null,
+                deadline: document.getElementById('deadline').value ? new Date(document.getElementById('deadline').value) : null,
+                
+                // Specific Flags for Seeker Filtering
+                listingType: listingTypeRaw, 
+                isFeatured: isFeatured,
+                isUrgent: isUrgent,
+                isGuaranteed: isGuaranteed,
+                
+                // FORCE 'active' STATUS for Admin posts so they appear immediately
+                status: "active",
+                
+                // Mock Plan so it looks authoritative in feed
+                employerPlan: "scale", 
+                
+                applicantCount: 0,
+                postedAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+            };
+
+            try {
+                await addDoc(collection(db, "jobs"), jobData);
+                
+                // --- CLEAR FORM LOGIC ---
+                localStorage.removeItem('admin_job_draft');
+                document.getElementById('jobForm').reset();
+                tags = [];
+                renderTags();
+                document.getElementById('location').value = "NAIROBI";
+                
+                Toastify({ text: "Job Published Successfully!", style: { background: "var(--success)" } }).showToast();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            } catch (e) {
+                console.error("Error:", e);
+                Toastify({ text: "Error publishing: " + e.message, style: { background: "var(--danger)" } }).showToast();
+            } finally {
+                btn.disabled = false; 
+                btn.innerText = "Publish as Admin";
+            }
+        };
+
+        // --- PWA LOGIC ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('pwa-install-popup').style.display = 'block';
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('pwa-install-popup').style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            document.getElementById('pwa-install-popup').style.display = 'none';
+        };
+
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
+        }
+    </script>
+</body>
+</html>
