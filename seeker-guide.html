@@ -296,20 +296,19 @@
             <h2 style="font-family: var(--font-head); margin-bottom: 20px; border-left: 4px solid var(--gold-base); padding-left: 15px;">Membership Tiers</h2>
             <section class="tiers-grid">
                 
-                <!-- 1. Free Jobs -->
-                <div class="tier-card tier-free">
-                    <div class="tier-badge" style="background:#334155; color:#94a3b8;">Basic Access</div>
-                    <div class="tier-icon"><i class="fas fa-briefcase" style="color:var(--text-muted)"></i></div>
-                    <h3 class="tier-title">Free Listings</h3>
-                    <div class="tier-price">No Fee</div>
+                <!-- 1. Standard Jobs (Replaced Free) -->
+                <div class="tier-card tier-free" style="border-top: 4px solid var(--text-muted);">
+                    <div class="tier-badge" style="background:rgba(255,255,255,0.1); color:var(--text-main);">Basic</div>
+                    <div class="tier-icon"><i class="fas fa-briefcase" style="color:var(--text-main)"></i></div>
+                    <h3 class="tier-title">Standard Jobs</h3>
+                    <div class="tier-price">KES 330 <span style="font-size:0.7rem; font-weight:400; color:var(--text-muted);">/ processing</span></div>
                     <ul class="tier-features">
-                        <li><i class="fas fa-check"></i> Available to Free Plan members</li>
-                        <li><i class="fas fa-check"></i> Application is 100% Free</li>
-                        <li><i class="fas fa-exclamation-triangle warn-icon"></i> Unverified Aggregations</li>
-                        <li><i class="fas fa-times cross-icon"></i> No Background Checks</li>
-                        <li><i class="fas fa-times cross-icon"></i> No Admin Follow-up</li>
+                        <li><i class="fas fa-check"></i> Verified Employers</li>
+                        <li><i class="fas fa-check"></i> Standard Processing</li>
+                        <li><i class="fas fa-check"></i> Basic Email Support</li>
+                        <li><i class="fas fa-check"></i> Secure Application</li>
                     </ul>
-                    <p style="font-size:0.8rem; color:var(--text-muted); margin-top:auto;">*Self-service only. We are not liable for issues arising from unverified external listings.</p>
+                    <p style="font-size:0.8rem; color:var(--text-muted); margin-top:auto;">Entry-level verified opportunities. Fee covers basic administrative verification.</p>
                 </div>
 
                 <!-- 2. Featured Jobs -->
@@ -435,7 +434,7 @@
                     <li><strong>Logistics:</strong> Platform maintenance and direct follow-up calls.</li>
                 </ul>
                 <p style="color:var(--text-muted); font-size:0.95rem; margin-top:10px;">
-                    Free jobs will always remain free to apply.
+                   All listing tiers require a processing fee to ensure verification.
                 </p>
             </div>
 
@@ -444,8 +443,8 @@
                 <h2 style="font-family: var(--font-head); margin-bottom: 20px; text-align:center;">Frequently Asked Questions</h2>
                 
                 <div class="faq-item" onclick="this.classList.toggle('active')">
-                    <div class="faq-head">Is placement guaranteed for Free jobs? <i class="fas fa-chevron-down"></i></div>
-                    <div class="faq-body">No. Free jobs are aggregated listings. We do not verify these employers, and applications are self-service. We recommend caution.</div>
+                    <div class="faq-head">Is placement guaranteed for Standard jobs? <i class="fas fa-chevron-down"></i></div>
+                    <div class="faq-body">Standard jobs are competitive. While we verify employers, placement depends on your qualifications. For guaranteed placement, consider the Guaranteed/Pro tier.</div>
                 </div>
 
                 <div class="faq-item" onclick="this.classList.toggle('active')">
@@ -467,7 +466,7 @@
                 </div>
                 
                 <div class="contact-grid">
-                    <a href="https://wa.me/254751821624" target="_blank" class="contact-btn btn-whatsapp">
+                    <a href="https://wa.me/254119524616" target="_blank" class="contact-btn btn-whatsapp">
                         <i class="fab fa-whatsapp" style="font-size:1.5rem;"></i>
                         <div>
                             <div style="font-size:0.8rem; opacity:0.9;">Chat with us</div>
@@ -485,13 +484,13 @@
             </section>
 
             <div style="text-align:center; margin-top:50px; color:var(--text-muted); font-size:0.8rem; opacity:0.6;">
-                &copy; 2024 EastLink Recruiters. All Rights Reserved.
+                &copy; 2025 EastLink Recruiters. All Rights Reserved.
             </div>
         </div>
     </main>
 
     <!-- FLOATING SUPPORT -->
-    <a href="seeker-support.html" class="floating-support" style="position:fixed; bottom:30px; right:30px; width:60px; height:60px; background:var(--gold-gradient); border-radius:50%; display:grid; place-items:center; color:black; font-size:1.5rem; box-shadow:0 10px 25px rgba(217, 119, 6, 0.4); z-index:2000; text-decoration:none; transition: transform 0.3s;"><i class="fa-solid fa-headset"></i></a>
+    <a href="https://wa.me/254119524616" target="_blank" class="floating-support" style="position:fixed; bottom:30px; right:30px; width:60px; height:60px; background:var(--gold-gradient); border-radius:50%; display:grid; place-items:center; color:black; font-size:1.5rem; box-shadow:0 10px 25px rgba(217, 119, 6, 0.4); z-index:2000; text-decoration:none; transition: transform 0.3s;"><i class="fa-solid fa-headset"></i></a>
 
     <!-- UPGRADE MODAL -->
     <div class="modal-overlay" id="upgradeModal">
@@ -500,7 +499,7 @@
             <i class="fa-solid fa-crown" style="font-size: 3rem; color: var(--gold-base); margin-bottom: 15px;"></i>
             <h2 style="font-family: var(--font-head); margin-bottom: 10px;">Upgrade Required</h2>
             <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px; line-height: 1.5;">
-                This feature is available for <span style="color: var(--success); font-weight: 700;">Standard</span> & <span style="color: var(--gold-base); font-weight: 700;">Pro</span> members only.
+                This feature is available for <span style="color: #38bdf8; font-weight: 700;">Standard</span> & <span style="color: var(--gold-base); font-weight: 700;">Pro</span> members only.
             </p>
             <div style="display:flex; gap:10px; justify-content:center;">
                 <button onclick="closeUpgradeModal()" style="padding: 12px 20px; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 12px; cursor: pointer;">Cancel</button>
@@ -508,6 +507,22 @@
             </div>
         </div>
     </div>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); border: 1px solid var(--gold-base); border-radius: 20px; padding: 20px; z-index: 3000; box-shadow: 0 10px 40px rgba(0,0,0,0.5); animation: slideUp 0.5s ease;">
+        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+            <div style="width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000;"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add to home screen for quick access.</div>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="installPWA()" style="flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000;">Install</button>
+            <button onclick="dismissPWA()" style="flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer;">Later</button>
+        </div>
+    </div>
+    <style>@keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }</style>
 
     <!-- SCRIPTS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
@@ -537,11 +552,12 @@
             let currentTier = 'free';
             if(['standard'].some(p => userPlan.includes(p))) currentTier = 'standard';
             if(['pro', 'gold', 'premium'].some(p => userPlan.includes(p))) currentTier = 'pro';
+            
             if (tierMap[currentTier] >= tierMap[requiredTier]) location.href = url;
             else window.showUpgradeModal();
         };
 
-        // AUTH
+        // AUTH & DATA
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = 'signin.html'; return; }
             
@@ -561,25 +577,47 @@
                 }
             });
 
-            // Notifications & Messages
+            // Notifications
             onSnapshot(query(collection(db, "notifications"), where("userId", "==", user.uid), where("read", "==", false)), (snap) => {
                 const b = document.getElementById('notif-badge'); 
-                if(b) { 
-                    b.style.display = snap.size ? 'flex' : 'none'; 
-                    b.innerText = snap.size; 
-                }
+                if(b) { b.style.display = snap.size ? 'flex' : 'none'; b.innerText = snap.size; }
             });
             
+            // Messages
             onSnapshot(query(collection(db, "messages"), where("receiverId", "==", user.uid), where("read", "==", false)), (snap) => {
                 const b = document.getElementById('msg-badge'); 
-                if(b) { 
-                    b.style.display = snap.size ? 'flex' : 'none'; 
-                    b.innerText = snap.size; 
-                }
+                if(b) { b.style.display = snap.size ? 'flex' : 'none'; b.innerText = snap.size; }
             });
         });
 
-        // Simple scroll reveal animation
+        // --- PWA LOGIC ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('pwa-install-popup').style.display = 'block';
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('pwa-install-popup').style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            document.getElementById('pwa-install-popup').style.display = 'none';
+        };
+
+        // Service Worker
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./service-worker.js").catch(e => console.log(e));
+        }
+
+        // ANIMATIONS
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -589,9 +627,8 @@
             });
         }, { threshold: 0.1 });
 
-        // Apply animations to specific elements to trigger when scrolled into view
         document.querySelectorAll('.tier-card, .timeline-item, .quick-link-card, .faq-item, .process-section, .profile-tips').forEach(el => { 
-            el.style.opacity = 0; // Hide initially
+            el.style.opacity = 0; 
             el.classList.add('animate__animated'); 
             observer.observe(el); 
         });
