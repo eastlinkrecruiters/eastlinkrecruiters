@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
@@ -305,9 +305,14 @@
                         System performance metrics and real-time administrative insights. <br>
                         <span id="current-date" style="color:var(--gold-base); font-family:var(--font-display);">Loading date...</span>
                     </p>
-                    <button class="btn-action" onclick="window.location.href='admin-post-guaranteed.html'">
-                        <i class="fas fa-plus-circle"></i> Post Guaranteed Job
-                    </button>
+                    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                        <button class="btn-action" onclick="window.location.href='admin-post-job.html'">
+                            <i class="fas fa-pen-to-square"></i> Post Job
+                        </button>
+                        <button class="btn-action" onclick="window.location.href='admin-candidates.apps.html'" style="background: var(--neon-purple);">
+                            <i class="fas fa-file-signature"></i> Applicants
+                        </button>
+                    </div>
                 </div>
             </div>
             
