@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Interview Schedule | EastLink Admin</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0F172A">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Executive Theme */
+            --bg-body: #0F172A;       
+            --bg-card: rgba(30, 41, 59, 0.65);
+            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.95);
+            --bg-input: rgba(255, 255, 255, 0.07);
+            --bg-hover: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8; 
+            --gold-base: #D97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --neon-purple: #8b5cf6;
+            --neon-blue: #38bdf8;
+            --success: #10B981;
+            --danger: #EF4444;
+            --blue: #3B82F6;
+            
+            /* COMPACT HEADER SETTINGS */
+            --sidebar-width: 260px; 
+            --header-height: 60px;
+            
+            --radius: 16px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background-image: url('assets/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+            transition: background 0.3s ease;
+        }
+
+        /* Utils & Glassmorphism */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            width: 100%;
+        }
+        
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 20px; z-index: 1000;
+        }
+        
+        .header-left { display: flex; align-items: center; gap: 12px; }
+        
+        .logo { 
+            font-family: var(--font-head); 
+            font-weight: 700; color: var(--text-main); font-size: 1.15rem;
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; 
+            display: flex; align-items: center; 
+        }
+        .logo span { color: var(--gold-base); }
+        .admin-badge { 
+            font-family: var(--font-body); font-size: 0.55rem; background: var(--bg-input); 
+            border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; 
+            margin-left: 8px; color: var(--text-muted); letter-spacing: 0.5px;
+        }
+        
+        .hamburger { font-size: 1.2rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        /* Header Actions - Compact */
+        .header-actions { display: flex; align-items: center; gap: 8px; }
+        .icon-btn { 
+            width: 32px; height: 32px;
+            display: grid; place-items: center; border-radius: 8px; font-size: 0.9rem;
+            color: var(--text-muted); cursor: pointer; transition: all 0.3s var(--ease-bounce); position: relative;
+        }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); }
+        
+        .notification-badge { 
+            position: absolute; top: 2px; right: 2px; 
+            min-width: 14px; height: 14px; 
+            background: var(--danger); border-radius: 10px; 
+            font-size: 0.55rem; color: white; font-weight: 700;
+            display: none; place-items: center; justify-content: center;
+            padding: 0 3px; border: 2px solid var(--bg-card);
+        }
+        
+        .profile-widget {
+            width: 34px; height: 34px;
+            position: relative; cursor: pointer;
+            transition: transform 0.3s; margin-left: 4px; flex-shrink: 0;
+            background: var(--bg-input); border-radius: 10px; display: grid; place-items: center;
+            border: 1px solid var(--border-color); color: var(--gold-base); font-size: 0.9rem;
+        }
+        .profile-widget:hover { background: var(--bg-hover); }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 15px 0; overflow-y: auto; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+        .nav-group { padding: 0 20px; margin-bottom: 15px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-item { 
+            display: flex; align-items: center; padding: 10px 12px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.85rem; transition: all 0.3s ease; border-radius: 8px; margin-bottom: 2px;
+        }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
+        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
+        .nav-item i { width: 22px; text-align: center; margin-right: 8px; }
+        
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 998; backdrop-filter: blur(4px); }
+
+        /* --- MAIN CONTENT & INTERVIEW STYLES --- */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 25px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
+
+        .page-header { 
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; 
+            flex-wrap: wrap; gap: 20px;
+        }
+        .btn-create { 
+            background: var(--neon-blue); color: #000; padding: 10px 24px; border-radius: 30px; 
+            text-decoration: none; font-weight: 700; font-size: 0.9rem; border: none; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3); transition: 0.3s; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-create:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(56, 189, 248, 0.5); }
+
+        /* KPI Strip (Reused) */
+        .kpi-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 24px; }
+        .kpi-card { 
+            padding: 20px; display: flex; flex-direction: column; justify-content: space-between; 
+            cursor: default; position: relative; overflow: hidden; min-height: 120px;
+        }
+        .kpi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: var(--text-muted); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+        .kpi-value { font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; color: var(--text-main); }
+        .kpi-trend { font-size: 0.75rem; margin-top: 5px; color: var(--text-muted); }
+
+        /* TABS */
+        .tab-container { display: flex; gap: 20px; margin-bottom: 25px; border-bottom: 1px solid var(--border-color); }
+        .tab-btn {
+            background: none; border: none; padding: 10px 20px; color: var(--text-muted); 
+            font-family: var(--font-body); font-size: 0.95rem; cursor: pointer; position: relative; transition: 0.3s;
+        }
+        .tab-btn:hover { color: var(--text-main); }
+        .tab-btn.active { color: var(--text-main); font-weight: 700; }
+        .tab-btn.active::after { content:''; position: absolute; bottom: -1px; left:0; width:100%; height: 3px; background: var(--neon-blue); box-shadow: 0 -2px 10px var(--neon-blue); }
+
+        /* SLOT CARDS */
+        .slot-card {
+            background: var(--bg-glass); border: 1px solid var(--border-color); border-radius: var(--radius);
+            padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
+            transition: 0.3s;
+        }
+        .slot-card:hover { background: var(--bg-hover); border-color: var(--neon-blue); transform: translateY(-2px); }
+        
+        .slot-left { display: flex; gap: 15px; align-items: center; }
+        .slot-date-box { 
+            width: 50px; height: 50px; background: rgba(56, 189, 248, 0.1); color: var(--neon-blue); 
+            border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            font-weight: 700; border: 1px solid rgba(56, 189, 248, 0.3); font-family: var(--font-display);
+        }
+        .slot-details h4 { color: var(--text-main); font-size: 1rem; margin-bottom: 4px; }
+        .slot-details p { color: var(--text-muted); font-size: 0.85rem; display: flex; align-items: center; gap: 10px; }
+        
+        .slot-type-badge { font-size: 0.65rem; padding: 2px 8px; border-radius: 20px; border: 1px solid var(--border-color); text-transform: uppercase; }
+        .type-public { color: var(--success); border-color: var(--success); background: rgba(16, 185, 129, 0.1); }
+        .type-private { color: var(--gold-base); border-color: var(--gold-base); background: rgba(217, 119, 6, 0.1); }
+
+        .btn-group { display:flex; gap: 8px; }
+        .btn-icon-sm { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-muted); cursor: pointer; display: inline-grid; place-items: center; transition: 0.2s; }
+        .btn-icon-sm:hover { color: var(--text-main); background: var(--bg-hover); transform: translateY(-2px); }
+        .btn-edit:hover { color: var(--blue); border-color: var(--blue); background: rgba(59, 130, 246, 0.1); }
+        .btn-delete:hover { color: var(--danger); border-color: var(--danger); background: rgba(239,68,68,0.1); }
+
+        /* CREATE MODAL */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-card { background: #1e293b; border: 1px solid var(--border-color); width: 90%; max-width: 450px; padding: 30px; border-radius: 20px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; }
+        .form-input { width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-main); outline: none; transition: 0.3s; }
+        .form-input:focus { border-color: var(--neon-blue); background: var(--bg-hover); }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 20px 16px; width: 100%; }
+            .kpi-strip { grid-template-columns: 1fr; }
+            .hamburger { display: block; }
+            .header-left { gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="admin-dashboard.html" class="logo">East<span>Link</span> <span class="admin-badge">ADMIN</span></a>
+        </div>
+        
+        <div class="header-actions">
+            <!-- Messages -->
+            <div class="icon-btn" onclick="location.href='admin-support.html'" title="Support Tickets">
+                <i class="fa-solid fa-envelope"></i>
+                <div class="notification-badge" id="msg-badge">0</div>
+            </div>
+            
+            <!-- Notifications -->
+            <div class="icon-btn" onclick="location.href='admin-notifications.html'" title="System Alerts">
+                <i class="fa-solid fa-bell"></i>
+                <div class="notification-badge" id="notif-badge">0</div>
+            </div>
+            
+            <!-- Profile -->
+            <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Analytics</div>
+            <a href="admin-dashboard.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        </div>
+        
+        <div class="nav-group">
+            <div class="nav-label">User Management</div>
+            <a href="admin-users.html" class="nav-item"><i class="fa-solid fa-users"></i> Manage Users</a>
+            <a href="admin-plans.html" class="nav-item"><i class="fa-solid fa-tags"></i> Manage Plans</a>
+            <a href="admin-referrals.html" class="nav-item"><i class="fa-solid fa-share-nodes"></i> Referrals</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Jobs & Service</div>
+            <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
+            <a href="admin-interviews.html" class="nav-item active"><i class="fa-solid fa-calendar-check"></i> Interview Schedule</a>
+            <a href="admin-guaranteed-jobs.html" class="nav-item link-pro"><i class="fa-solid fa-certificate" style="color:var(--gold-base);"></i> Guaranteed Jobs</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+            <a href="admin-post-job.html" class="nav-item"><i class="fa-solid fa-pen-to-square"></i> Post Job</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="admin-deposits.html" class="nav-item"><i class="fa-solid fa-arrow-down" style="color:var(--success);"></i> Deposits</a>
+            <a href="admin-withdrawals.html" class="nav-item"><i class="fa-solid fa-arrow-up" style="color:var(--danger);"></i> Withdrawals</a>
+            <a href="admin-deposit-issues.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> Errors</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">System</div>
+            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
+            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
+            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        
+        <div class="page-header animate__animated animate__fadeInDown">
+            <div>
+                <h2 style="font-size:1.6rem; color:var(--text-main); font-family:var(--font-head); margin-bottom:5px;">Interview Management</h2>
+                <p style="color:var(--text-muted); font-size:0.9rem;">Manage public slots and candidate meetings.</p>
+            </div>
+            <button onclick="openCreateModal()" class="btn-create">
+                <i class="fas fa-plus"></i> Create Slot
+            </button>
+        </div>
+
+        <!-- KPI Strip -->
+        <div class="kpi-strip animate__animated animate__fadeIn">
+            <div class="glass-panel kpi-card">
+                <div class="kpi-header">Total Events <i class="fas fa-calendar-alt" style="color:var(--neon-blue)"></i></div>
+                <div class="kpi-value" id="stat-total">0</div>
+                <div class="kpi-trend">All Scheduled</div>
+            </div>
+            <div class="glass-panel kpi-card">
+                <div class="kpi-header">Upcoming <i class="fas fa-clock" style="color:var(--success)"></i></div>
+                <div class="kpi-value" id="stat-upcoming" style="color:var(--success)">0</div>
+                <div class="kpi-trend">Future Events</div>
+            </div>
+            <div class="glass-panel kpi-card">
+                <div class="kpi-header">Candidate Interviews <i class="fas fa-user-clock" style="color:var(--gold-base)"></i></div>
+                <div class="kpi-value" id="stat-private" style="color:var(--gold-base)">0</div>
+                <div class="kpi-trend">Private Sessions</div>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="tab-container animate__animated animate__fadeIn">
+            <button class="tab-btn active" onclick="switchTab('public', this)">Public Slots (Open)</button>
+            <button class="tab-btn" onclick="switchTab('private', this)">Candidate Interviews (Private)</button>
+        </div>
+
+        <div id="loading-spinner" style="text-align:center; padding:40px; color:var(--text-muted);">
+            <i class="fas fa-circle-notch fa-spin fa-2x"></i>
+        </div>
+
+        <!-- LIST CONTAINER -->
+        <div id="schedule-list" class="animate__animated animate__fadeInUp"></div>
+
+    </main>
+
+    <!-- CREATE/EDIT SLOT MODAL -->
+    <div class="modal-overlay" id="createModal">
+        <div class="modal-card animate__animated animate__zoomIn">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 style="font-family:var(--font-head); color:var(--text-main);" id="modal-title">New Public Slot</h3>
+                <i class="fas fa-times" onclick="closeCreateModal()" style="cursor:pointer; color:var(--text-muted);"></i>
+            </div>
+            <form id="createSlotForm" onsubmit="handleSaveSlot(event)">
+                <input type="hidden" id="inp-id"> <!-- ID Field for Edits -->
+                
+                <div class="form-group">
+                    <label class="form-label">Event Title</label>
+                    <input type="text" class="form-input" id="inp-title" placeholder="e.g. Open Interview Session" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Company / Host</label>
+                    <input type="text" class="form-input" id="inp-company" value="EastLink Recruiters" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Date & Time</label>
+                    <input type="datetime-local" class="form-input" id="inp-date" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Meeting Link (Optional)</label>
+                    <input type="url" class="form-input" id="inp-link" placeholder="https://meet.google.com/...">
+                </div>
+                <div style="margin-top:25px;">
+                    <button type="submit" class="btn-create" style="width:100%; justify-content:center; border-radius:10px;" id="btn-save">Publish Slot</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc, orderBy, Timestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        // CONFIG
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let publicSlots = [];
+        let privateInterviews = [];
+        let currentTab = 'public';
+
+        // --- UI UTILS ---
+        window.toggleSidebar = () => { 
+            document.getElementById('sidebar').classList.toggle('active'); 
+            document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
+        };
+        
+        window.logout = () => {
+            if(confirm("Confirm Log Out?")) {
+                signOut(auth).then(() => window.location.href = 'signin.html');
+            }
+        };
+        
+        // Modal Handlers
+        window.openCreateModal = () => {
+            document.getElementById('createModal').style.display = 'flex';
+            document.getElementById('createSlotForm').reset();
+            document.getElementById('inp-id').value = ""; // Clear ID
+            document.getElementById('modal-title').innerText = "New Public Slot";
+            document.getElementById('btn-save').innerText = "Publish Slot";
+        };
+
+        window.openEditModal = (id, title, company, dateIso, link) => {
+            document.getElementById('createModal').style.display = 'flex';
+            document.getElementById('inp-id').value = id;
+            document.getElementById('inp-title').value = title;
+            document.getElementById('inp-company').value = company;
+            // Format Date for Input (YYYY-MM-DDTHH:mm)
+            const d = new Date(dateIso);
+            const formatted = d.getFullYear() + "-" + 
+                String(d.getMonth() + 1).padStart(2, '0') + "-" + 
+                String(d.getDate()).padStart(2, '0') + "T" + 
+                String(d.getHours()).padStart(2, '0') + ":" + 
+                String(d.getMinutes()).padStart(2, '0');
+            document.getElementById('inp-date').value = formatted;
+            document.getElementById('inp-link').value = link || "";
+            
+            document.getElementById('modal-title').innerText = "Edit Slot";
+            document.getElementById('btn-save').innerText = "Update Slot";
+        };
+
+        window.closeCreateModal = () => document.getElementById('createModal').style.display = 'none';
+
+        // --- AUTH & INIT ---
+        onAuthStateChanged(auth, (user) => {
+            if (!user) return window.location.href = 'signin.html'; 
+            initBadges();
+            fetchData();
+        });
+
+        // --- DATA FETCHING (Corrected for Permissions) ---
+        async function fetchData() {
+            document.getElementById('loading-spinner').style.display = 'block';
+            document.getElementById('schedule-list').innerHTML = '';
+            
+            // Reset Arrays
+            publicSlots = [];
+            privateInterviews = [];
+
+            // 1. Fetch Public Slots (Should always work)
+            try {
+                const publicQ = query(collection(db, "interviews")); // Removed orderBy for safety
+                const publicSnap = await getDocs(publicQ);
+                publicSlots = publicSnap.docs.map(d => ({
+                    id: d.id,
+                    ...d.data(),
+                    dateObj: d.data().date ? new Date(d.data().date.seconds * 1000) : new Date(),
+                    type: 'public'
+                }));
+                // Sort manually in JS
+                publicSlots.sort((a,b) => a.dateObj - b.dateObj);
+            } catch (e) {
+                console.error("Public Slots Error:", e);
+                Toastify({ text: "Error loading public slots", style: { background: "var(--danger)" } }).showToast();
+            }
+
+            // 2. Fetch Private Interviews (Only works if you are Admin)
+            try {
+                const appQ = query(collection(db, "applications"), where("status", "in", ["interview", "screening", "offer"]));
+                const appSnap = await getDocs(appQ);
+                privateInterviews = appSnap.docs.map(d => {
+                    const data = d.data();
+                    let dObj = new Date();
+                    if(data.interviewDate) dObj = new Date(data.interviewDate.seconds * 1000);
+                    else if(data.updatedAt) dObj = new Date(data.updatedAt.seconds * 1000);
+                    
+                    return {
+                        id: d.id,
+                        title: data.jobTitle || "Job Interview",
+                        company: data.company,
+                        dateObj: dObj,
+                        candidateName: data.seekerName || "Candidate",
+                        status: data.status,
+                        type: 'private'
+                    };
+                });
+                privateInterviews.sort((a,b) => a.dateObj - b.dateObj);
+            } catch (e) {
+                console.log("Private Access Denied (Not Admin):", e.message);
+                // Fail silently for non-admins so page still works
+            }
+
+            // 3. Render
+            document.getElementById('loading-spinner').style.display = 'none';
+            updateStats();
+            renderList();
+        }
+
+        function updateStats() {
+            const now = new Date();
+            const all = [...publicSlots, ...privateInterviews];
+            const upcoming = all.filter(i => i.dateObj > now);
+            
+            document.getElementById('stat-total').innerText = all.length;
+            document.getElementById('stat-upcoming').innerText = upcoming.length;
+            document.getElementById('stat-private').innerText = privateInterviews.length;
+        }
+
+        // --- RENDER ---
+        window.switchTab = (tab, btn) => {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderList();
+        };
+
+        function renderList() {
+            const container = document.getElementById('schedule-list');
+            const data = currentTab === 'public' ? publicSlots : privateInterviews;
+            
+            if(data.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:40px;">No ${currentTab} events found.</div>`;
+                return;
+            }
+
+            container.innerHTML = data.map(item => {
+                const mon = item.dateObj.toLocaleString('default', { month: 'short' });
+                const day = item.dateObj.getDate();
+                const time = item.dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const badge = item.type === 'public' 
+                    ? `<span class="slot-type-badge type-public">Public Slot</span>`
+                    : `<span class="slot-type-badge type-private">Candidate: ${item.candidateName}</span>`;
+
+                const subtext = item.type === 'public' 
+                    ? `<i class="fas fa-building"></i> ${item.company}` 
+                    : `<i class="fas fa-info-circle"></i> Status: ${item.status.toUpperCase()}`;
+
+                // Action Buttons Logic
+                let actions = '';
+                if(item.type === 'public') {
+                    // Pass data to Edit Function
+                    const safeTitle = item.title.replace(/'/g, "\\'");
+                    const safeCompany = item.company.replace(/'/g, "\\'");
+                    const dateIso = item.dateObj.toISOString();
+                    const safeLink = (item.link || "").replace(/'/g, "\\'");
+                    
+                    actions = `
+                    <div class="btn-group">
+                        <button class="btn-icon-sm btn-edit" title="Edit Slot" 
+                            onclick="openEditModal('${item.id}', '${safeTitle}', '${safeCompany}', '${dateIso}', '${safeLink}')">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <button class="btn-icon-sm btn-delete" title="Delete Slot" onclick="deleteSlot('${item.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>`;
+                } else {
+                    actions = `<button class="btn-icon-sm" title="View Application" onclick="location.href='admin-applications.html'"><i class="fas fa-eye"></i></button>`;
+                }
+
+                return `
+                <div class="slot-card animate__animated animate__fadeIn">
+                    <div class="slot-left">
+                        <div class="slot-date-box">
+                            <span style="font-size:0.7rem; text-transform:uppercase;">${mon}</span>
+                            <span style="font-size:1.2rem;">${day}</span>
+                        </div>
+                        <div class="slot-details">
+                            <h4>${item.title} ${badge}</h4>
+                            <p>${subtext} • <i class="far fa-clock"></i> ${time}</p>
+                        </div>
+                    </div>
+                    <div>
+                        ${actions}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // --- ACTIONS (CREATE / EDIT / DELETE) ---
+        window.handleSaveSlot = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-save');
+            const originalText = btn.innerText;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            
+            try {
+                const id = document.getElementById('inp-id').value;
+                const title = document.getElementById('inp-title').value;
+                const company = document.getElementById('inp-company').value;
+                const dateVal = document.getElementById('inp-date').value;
+                const link = document.getElementById('inp-link').value;
+
+                const slotData = {
+                    title, company, link,
+                    date: Timestamp.fromDate(new Date(dateVal)),
+                    status: 'active',
+                    listingType: 'Standard'
+                };
+
+                if(id) {
+                    // Update
+                    await updateDoc(doc(db, "interviews", id), slotData);
+                    Toastify({ text: "Slot Updated Successfully", style: { background: "var(--blue)" } }).showToast();
+                } else {
+                    // Create
+                    slotData.createdAt = Timestamp.now();
+                    await addDoc(collection(db, "interviews"), slotData);
+                    Toastify({ text: "Slot Created Successfully", style: { background: "var(--success)" } }).showToast();
+                }
+
+                closeCreateModal();
+                fetchData(); 
+
+            } catch(err) {
+                console.error(err);
+                Toastify({ text: "Operation Failed: " + err.message, style: { background: "var(--danger)" } }).showToast();
+            } finally {
+                btn.innerHTML = originalText;
+            }
+        };
+
+        window.deleteSlot = async (id) => {
+            if(!confirm("Are you sure you want to delete this slot?")) return;
+            
+            try {
+                await deleteDoc(doc(db, "interviews", id));
+                Toastify({ text: "Slot Deleted", style: { background: "var(--success)" } }).showToast();
+                fetchData();
+            } catch(e) {
+                Toastify({ text: "Error deleting", style: { background: "var(--danger)" } }).showToast();
+            }
+        };
+
+        // --- HEADER BADGES ---
+        function initBadges() {
+            const txQ = query(collection(db, "transactions"), where("status", "==", "pending"));
+            onSnapshot(txQ, (snap) => {
+                const count = snap.size;
+                const badge = document.getElementById('notif-badge');
+                if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
+                else badge.style.display = 'none';
+            });
+            
+            const msgQ = query(collection(db, "support_tickets"), where("status", "==", "open"));
+             onSnapshot(msgQ, (snap) => {
+                const count = snap.size;
+                const badge = document.getElementById('msg-badge');
+                if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
+                else badge.style.display = 'none';
+            });
+        }
+    </script>
+</body>
+</html>

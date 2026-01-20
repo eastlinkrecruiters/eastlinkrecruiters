@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Booked Interviews | EastLink Recruiters</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#0F172A">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Master Theme Variables */
+            --bg-body: #0F172A;       
+            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.95);
+            --bg-input: rgba(255, 255, 255, 0.07);
+            --bg-hover: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8; 
+            --gold-base: #D97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --neon-purple: #8b5cf6;
+            --purple-gradient: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+            --success: #10B981;
+            --danger: #EF4444;
+            --sidebar-width: 260px; 
+            --header-height: 70px;
+            --radius: 16px;
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background-image: url('assets/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+        }
+
+        /* --- GLASS UTILS --- */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s var(--ease-bounce), box-shadow 0.3s ease;
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 1000;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .logo { font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; }
+        .logo span { color: var(--gold-base); }
+        .hamburger { font-size: 1.4rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        .header-actions { display: flex; align-items: center; gap: 10px; }
+        .icon-btn { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; color: var(--text-muted); cursor: pointer; transition: 0.3s; position: relative; }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); transform: translateY(-2px); }
+        .notification-badge { position: absolute; top: 5px; right: 5px; min-width: 16px; height: 16px; background: var(--danger); border-radius: 10px; font-size: 0.6rem; color: white; font-weight: 700; display: none; place-items: center; justify-content: center; padding: 0 4px; border: 2px solid var(--bg-glass); }
+        
+        .profile-widget { width: 42px; height: 42px; position: relative; cursor: pointer; margin-left: 5px; }
+        .user-avatar { width: 100%; height: 100%; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-weight: 700; color: #fff; border: 2px solid var(--border-color); object-fit: cover; }
+        .user-avatar.img-mode { background: transparent; }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 20px 0; overflow-y: auto; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column;
+            backdrop-filter: blur(20px);
+        }
+        .nav-group { padding: 0 24px; margin-bottom: 20px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-item { display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: 0.3s; border-radius: 10px; margin-bottom: 4px; position: relative; }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
+        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
+        .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
+        
+        .lock-icon { margin-left: auto; font-size: 0.7rem; opacity: 0; transition: 0.3s; }
+        .nav-item.locked { opacity: 0.6; cursor: not-allowed; }
+        .nav-item.locked:hover { transform: none; background: transparent; color: var(--text-muted); }
+        .nav-item.locked .lock-icon { opacity: 1; color: var(--text-muted); }
+
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 998; backdrop-filter: blur(4px); display: none; }
+
+        /* --- MAIN LAYOUT --- */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
+        
+        .page-header { 
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; 
+            flex-wrap: wrap; gap: 20px;
+        }
+        .btn-action { 
+            background: var(--bg-input); color: var(--text-main); padding: 10px 24px; border-radius: 12px; 
+            text-decoration: none; font-weight: 600; font-size: 0.9rem; border: 1px solid var(--border-color); cursor: pointer;
+            transition: 0.3s; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-action:hover { background: var(--bg-hover); border-color: var(--text-muted); }
+
+        /* --- BOOKING CARDS --- */
+        .bookings-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 24px;
+        }
+
+        .booking-card {
+            background: var(--bg-glass); border-radius: var(--radius); border: 1px solid var(--border-color);
+            overflow: hidden; display: flex; flex-direction: column; transition: 0.3s;
+            position: relative;
+        }
+        .booking-card:hover { transform: translateY(-5px); border-color: var(--gold-base); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        
+        /* Status Bar */
+        .status-bar { height: 4px; width: 100%; background: var(--border-color); }
+        .status-bar.confirmed { background: var(--success); box-shadow: 0 0 10px var(--success); }
+        .status-bar.pending { background: var(--gold-base); }
+
+        .bc-body { padding: 24px; flex: 1; display: flex; flex-direction: column; }
+        
+        .bc-date-row { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px; }
+        .bc-cal-icon { 
+            width: 50px; height: 50px; background: rgba(255,255,255,0.05); border-radius: 12px; 
+            display: grid; place-items: center; font-size: 1.2rem; color: var(--gold-base); border: 1px solid var(--border-color);
+        }
+        
+        .bc-title { font-family: var(--font-display); font-size: 1.2rem; font-weight: 700; margin-bottom: 5px; color: var(--text-main); }
+        .bc-company { color: var(--text-muted); font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+        
+        .bc-meta { 
+            margin-top: auto; padding-top: 20px; border-top: 1px dashed var(--border-color); 
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .meta-item { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: var(--text-muted); }
+        .meta-item i { width: 16px; text-align: center; color: var(--neon-purple); }
+
+        .bc-actions { 
+            background: rgba(0,0,0,0.2); padding: 15px 24px; display: flex; justify-content: space-between; align-items: center;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-join { 
+            padding: 8px 20px; background: var(--success); color: white; border-radius: 8px; 
+            text-decoration: none; font-weight: 700; font-size: 0.85rem; border: none; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); transition: 0.3s;
+        }
+        .btn-join:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5); }
+        .btn-join.disabled { background: var(--bg-input); color: var(--text-muted); cursor: not-allowed; box-shadow: none; }
+
+        .btn-cancel {
+            background: transparent; color: var(--text-muted); font-size: 0.8rem; border: none; cursor: pointer;
+            text-decoration: underline; transition: 0.2s;
+        }
+        .btn-cancel:hover { color: var(--danger); }
+
+        /* Empty State */
+        .empty-state {
+            grid-column: 1 / -1; text-align: center; padding: 60px 20px;
+            background: var(--bg-glass); border-radius: var(--radius); border: 1px dashed var(--border-color);
+        }
+        .empty-icon { font-size: 3rem; color: var(--bg-input); margin-bottom: 20px; }
+
+        /* Modal & Upgrade Modal (Reused Styles) */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-card { background: #1e293b; border: 1px solid var(--border-color); width: 90%; max-width: 400px; padding: 30px; border-radius: 20px; text-align: center; }
+
+        /* Upgrade Modal Specifics */
+        .upgrade-modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2100;
+            display: none; place-items: center; backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+        .upgrade-modal {
+            background: #0F172A; border: 1px solid var(--border-color);
+            width: 90%; max-width: 400px; border-radius: 20px; padding: 30px;
+            text-align: center; position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: zoomIn 0.3s ease;
+        }
+        .modal-icon-lock {
+            font-size: 2.5rem; color: var(--gold-base); margin-bottom: 15px;
+            background: rgba(217, 119, 6, 0.1); width: 80px; height: 80px;
+            display: grid; place-items: center; border-radius: 50%; margin-left: auto; margin-right: auto;
+        }
+        .modal-title { font-family: var(--font-head); font-size: 1.5rem; margin-bottom: 10px; color: var(--text-main); }
+        .modal-desc { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 25px; }
+        .btn-upgrade {
+            display: block; width: 100%; padding: 14px; border-radius: 12px;
+            background: var(--gold-gradient); color: #000; font-weight: 700;
+            text-decoration: none; border: none; cursor: pointer; font-size: 1rem;
+            margin-bottom: 10px; transition: 0.3s;
+        }
+        .btn-upgrade:hover { transform: scale(1.02); }
+        .btn-close-modal {
+            background: transparent; color: var(--text-muted); border: none;
+            cursor: pointer; font-size: 0.9rem; text-decoration: underline;
+        }
+        @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+        @keyframes zoomIn { from{opacity:0; transform:scale(0.9);} to{opacity:1; transform:scale(1);} }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 20px 16px; width: 100%; }
+            .bookings-grid { grid-template-columns: 1fr; }
+            .hamburger { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="seeker-dashboard.html" class="logo">EAST<span>LINK</span></a>
+        </div>
+        <div class="header-actions">
+            <div class="icon-btn" onclick="location.href='seeker-messages.html'"><i class="fa-regular fa-envelope"></i><div class="notification-badge" id="msg-badge">0</div></div>
+            <div class="icon-btn" onclick="location.href='seeker-notifications.html'"><i class="fa-regular fa-bell"></i><div class="notification-badge" id="notif-badge">0</div></div>
+            <div class="profile-widget" onclick="location.href='seeker-profile.html'">
+                <img src="" id="header-avatar-img" class="user-avatar img-mode" style="display:none;">
+                <div id="header-avatar-fallback" class="user-avatar">U</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Overview</div>
+            <a href="seeker-dashboard.html" class="nav-item"><i class="fa-solid fa-compass"></i> Dashboard</a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Job Hunt</div>
+            <a href="seeker-applications.html" class="nav-item"><i class="fa-solid fa-file-signature"></i> Applied Jobs</a>
+            <a href="seeker-interviews.html" class="nav-item active"><i class="fa-solid fa-calendar-check"></i> Interviews</a>
+            <a href="seeker-jobs.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Browse Jobs</a>
+            <a href="seeker-featured-jobs.html" class="nav-item link-std" id="nav-featured"><i class="fa-solid fa-star"></i> Featured Jobs <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-urgentlyhiring.html" class="nav-item link-pro" id="nav-urgent"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-guaranteed-jobs.html" class="nav-item link-pro" id="nav-guaranteed"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="seeker-wallet.html" class="nav-item"><i class="fa-solid fa-wallet"></i> My Wallet</a>
+            <a href="seeker-premium.html" class="nav-item"><i class="fa-solid fa-crown"></i> My Plan</a>
+            <a href="seeker-referrals.html" class="nav-item link-std" id="nav-referrals"><i class="fa-solid fa-user-plus"></i> Invite & Earn <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-invest.html" class="nav-item link-std" id="nav-invest"><i class="fa-solid fa-chart-line"></i> Invest <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Resources</div>
+            <a href="seeker-blog.html" class="nav-item"><i class="fa-solid fa-newspaper"></i> News & Insights</a>
+            <a href="seeker-resources.html" class="nav-item link-pro" id="nav-resources"><i class="fa-solid fa-book"></i> Resources <i class="fas fa-lock lock-icon"></i></a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Settings</div>
+            <a href="seeker-profile.html" class="nav-item"><i class="fa-solid fa-user-gear"></i> Profile</a>
+            <a href="seeker-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        
+        <div class="page-header animate__animated animate__fadeInDown">
+            <div>
+                <h2 style="font-size:1.8rem; color:var(--text-main); font-family:var(--font-head); margin-bottom:5px;">My Booked Interviews</h2>
+                <p style="color:var(--text-muted); font-size:0.95rem;">Manage your confirmed interview slots.</p>
+            </div>
+            <button onclick="location.href='seeker-interviews.html'" class="btn-action">
+                <i class="fas fa-arrow-left"></i> Back to Schedule
+            </button>
+        </div>
+
+        <div id="loading-spinner" style="text-align:center; padding:60px; color:var(--text-muted);">
+            <i class="fas fa-circle-notch fa-spin fa-2x"></i><br><br>Fetching your bookings...
+        </div>
+
+        <div class="bookings-grid" id="bookings-container">
+            <!-- Cards Injected Here -->
+        </div>
+
+    </main>
+
+    <!-- CONFIRMATION MODAL -->
+    <div class="modal-overlay" id="cancelModal">
+        <div class="modal-card animate__animated animate__zoomIn">
+            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--danger); margin-bottom: 20px;"></i>
+            <h3 style="font-family: var(--font-head); margin-bottom: 10px; color: var(--text-main);">Cancel Booking?</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px;">
+                Are you sure you want to cancel your interview with <span id="modal-company-name" style="color:white; font-weight:700;"></span>?
+                <br>This slot will be released to others.
+            </p>
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <button onclick="closeModal()" style="padding: 12px 20px; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 12px; cursor: pointer;">Keep It</button>
+                <button id="confirm-cancel-btn" style="padding: 12px 25px; background: var(--danger); border: none; color: white; font-weight: 700; border-radius: 12px; cursor: pointer;">Yes, Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upgrade / Lock Modal -->
+    <div class="upgrade-modal-overlay" id="upgrade-modal">
+        <div class="upgrade-modal">
+            <div class="modal-icon-lock"><i class="fas fa-lock"></i></div>
+            <h3 class="modal-title" id="modal-title">Access Locked</h3>
+            <p class="modal-desc" id="modal-desc">
+                This feature requires a higher tier plan. Upgrade now to unlock exclusive access.
+            </p>
+            <button class="btn-upgrade" onclick="location.href='seeker-premium.html'">Upgrade Now</button>
+            <button class="btn-close-modal" onclick="closeUpgradeModal()">I'll stay on my current plan</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, arrayRemove, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        // CONFIG
+        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
+        let selectedBookingToRemove = null;
+        let userTier = 'Free'; 
+
+        // --- UI HELPERS ---
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = 'block'; };
+        window.closeSidebar = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').style.display = 'none'; };
+        window.logout = () => signOut(auth).then(() => window.location.href = 'signin.html');
+        window.closeModal = () => {
+            document.getElementById('cancelModal').style.display = 'none';
+            selectedBookingToRemove = null;
+        };
+        window.onclick = (e) => { if(e.target.id === 'upgrade-modal') closeUpgradeModal(); };
+
+        // --- AUTH & LOAD ---
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) return window.location.href = 'signin.html';
+            currentUser = user;
+            
+            initProfile(user);
+            setupRealtimeListeners(user.uid);
+            await checkUserTier(user.uid);
+            
+            // Listen to User Profile for Bookings
+            onSnapshot(doc(db, "users", user.uid), (doc) => {
+                if(doc.exists()) {
+                    const data = doc.data();
+                    renderBookings(data.bookedInterviews || []);
+                } else {
+                    renderBookings([]);
+                }
+            });
+        });
+
+        // --- TIER LOGIC ---
+        async function checkUserTier(uid) {
+            try {
+                const docSnap = await getDoc(doc(db, "users", uid));
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const raw = data.plan || data.tier || 'free';
+                    if(raw.toLowerCase().includes('pro') || raw.toLowerCase().includes('premium')) userTier = 'Pro';
+                    else if(raw.toLowerCase().includes('standard')) userTier = 'Standard';
+                    else userTier = 'Free';
+                }
+            } catch (error) { console.error("Error fetching tier:", error); }
+            updateUIForTier();
+        }
+
+        function updateUIForTier() {
+            const links = ['nav-featured', 'nav-urgent', 'nav-guaranteed', 'nav-resources', 'nav-referrals', 'nav-invest'];
+            links.forEach(id => unlockLink(id));
+
+            if (userTier === 'Free') {
+                lockLink('nav-featured', 'Standard', 'Featured Jobs are locked.', 'Upgrade to Standard to view verified roles.');
+                lockLink('nav-urgent', 'Pro', 'Urgent Roles are locked.', 'Upgrade to Pro for immediate placement roles.');
+                lockLink('nav-guaranteed', 'Pro', 'Exclusive Access Only.', 'Guaranteed jobs are reserved for Pro members.');
+                lockLink('nav-referrals', 'Standard', 'Referral Program Locked.', 'Unlock the ability to earn by referring friends.');
+                lockLink('nav-invest', 'Standard', 'Investment Access Locked.', 'Crowdfunding opportunities are for paying members only.');
+                lockLink('nav-resources', 'Pro', 'Premium Resources.', 'Executive guides are Pro-only.');
+            } 
+            else if (userTier === 'Standard') {
+                lockLink('nav-urgent', 'Pro', 'Urgent Hiring Mode.', 'Priority application needed.');
+                lockLink('nav-guaranteed', 'Pro', 'Executive Search Only.', 'Retained searches are for Pro members.');
+                lockLink('nav-resources', 'Pro', 'Advanced Insights.', 'Deep market analysis is locked.');
+            }
+        }
+
+        function lockLink(elementId, requiredTier, title, desc) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            el.classList.add('locked');
+            el.onclick = (e) => { e.preventDefault(); showUpgradeModal(title, desc); };
+        }
+
+        function unlockLink(elementId) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            el.classList.remove('locked');
+            el.onclick = null;
+        }
+
+        window.showUpgradeModal = (title, desc) => {
+            document.getElementById('modal-title').innerText = title || "Access Restricted";
+            document.getElementById('modal-desc').innerText = desc || "Upgrade your plan to unlock this feature.";
+            document.getElementById('upgrade-modal').style.display = 'grid';
+        };
+
+        window.closeUpgradeModal = () => {
+            document.getElementById('upgrade-modal').style.display = 'none';
+        };
+
+        // --- RENDER BOOKINGS ---
+        function renderBookings(bookings) {
+            const container = document.getElementById('bookings-container');
+            const spinner = document.getElementById('loading-spinner');
+            
+            spinner.style.display = 'none';
+            container.innerHTML = '';
+
+            // Sort by date (Upcoming first)
+            bookings.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            if(bookings.length === 0) {
+                container.innerHTML = `
+                <div class="empty-state animate__animated animate__fadeIn">
+                    <div class="empty-icon"><i class="far fa-calendar"></i></div>
+                    <h3 style="color:var(--text-main); margin-bottom:10px;">No Booked Interviews</h3>
+                    <p style="color:var(--text-muted); margin-bottom:20px;">You haven't booked any interview slots yet.</p>
+                    <button onclick="location.href='seeker-interviews.html'" class="btn-action" style="background:var(--gold-gradient); color:black; border:none; display:inline-flex;">
+                        Browse Schedule
+                    </button>
+                </div>`;
+                return;
+            }
+
+            const now = new Date();
+
+            bookings.forEach((booking, index) => {
+                const dateObj = new Date(booking.date);
+                const isPast = dateObj < now;
+                const isReady = (dateObj - now) < (15 * 60 * 1000) && !isPast; // 15 mins before
+                
+                const day = dateObj.getDate();
+                const month = dateObj.toLocaleString('default', { month: 'short' });
+                const time = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const fullDate = dateObj.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+                // Generate Google Calendar Link
+                const startTime = dateObj.toISOString().replace(/-|:|\.\d\d\d/g, "");
+                const endDate = new Date(dateObj.getTime() + 30*60000).toISOString().replace(/-|:|\.\d\d\d/g, ""); 
+                const calLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=Interview+with+${encodeURIComponent(booking.company)}&dates=${startTime}/${endDate}&details=Interview+Scheduled+via+EastLink&location=Online`;
+
+                // Status Logic
+                let statusBarClass = isPast ? 'pending' : 'confirmed'; 
+                
+                // Button Logic
+                let joinBtnState = isReady ? '' : 'disabled';
+                let joinBtnText = isReady ? 'Join Meeting' : 'Waiting to Start';
+                if (isPast) { joinBtnState = 'disabled'; joinBtnText = 'Completed'; }
+                
+                container.innerHTML += `
+                <div class="booking-card animate__animated animate__fadeInUp" style="animation-delay:${index * 0.1}s">
+                    <div class="status-bar ${statusBarClass}"></div>
+                    <div class="bc-body">
+                        <div class="bc-date-row">
+                            <div class="bc-cal-icon">
+                                <i class="far fa-calendar-check"></i>
+                            </div>
+                            <div>
+                                <div class="bc-title">${booking.title}</div>
+                                <div class="bc-company"><i class="fas fa-building"></i> ${booking.company}</div>
+                            </div>
+                        </div>
+
+                        <div class="bc-meta">
+                            <div class="meta-item">
+                                <i class="far fa-clock"></i> <span>${fullDate} @ ${time}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-video"></i> <span>Video Interview (Online)</span>
+                            </div>
+                            <a href="${calLink}" target="_blank" class="meta-item" style="color:var(--gold-base); text-decoration:none; cursor:pointer;">
+                                <i class="far fa-calendar-plus" style="color:var(--gold-base);"></i> <span>Add to Google Calendar</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="bc-actions">
+                        <button class="btn-cancel" onclick='triggerCancel(${JSON.stringify(booking).replace(/'/g, "&apos;")})'>Cancel Booking</button>
+                        <button class="btn-join ${joinBtnState}" ${isReady ? `onclick="window.open('${booking.link || '#' }', '_blank')"` : ''}>
+                            ${joinBtnText}
+                        </button>
+                    </div>
+                </div>`;
+            });
+        }
+
+        // --- CANCEL LOGIC ---
+        window.triggerCancel = (bookingObj) => {
+            selectedBookingToRemove = bookingObj;
+            document.getElementById('modal-company-name').innerText = bookingObj.company;
+            document.getElementById('cancelModal').style.display = 'flex';
+        };
+
+        document.getElementById('confirm-cancel-btn').addEventListener('click', async () => {
+            if(!currentUser || !selectedBookingToRemove) return;
+
+            // UI Feedback
+            Toastify({ text: "Cancelling booking...", style: { background: "var(--gold-gradient)", color: "black" } }).showToast();
+            closeModal();
+
+            try {
+                // Remove from Firestore array
+                const userRef = doc(db, "users", currentUser.uid);
+                await updateDoc(userRef, {
+                    bookedInterviews: arrayRemove(selectedBookingToRemove)
+                });
+                
+                Toastify({ text: "Booking Cancelled.", style: { background: "var(--success)" } }).showToast();
+
+            } catch (error) {
+                console.error("Error removing booking:", error);
+                Toastify({ text: "Could not cancel. Try again.", style: { background: "var(--danger)" } }).showToast();
+            }
+        });
+
+        // --- MISC HELPERS ---
+        async function initProfile(user) {
+            const img = document.getElementById('header-avatar-img');
+            const fb = document.getElementById('header-avatar-fallback');
+            let photoUrl = user.photoURL;
+            try {
+                const uDoc = await getDoc(doc(db, "users", user.uid));
+                if(uDoc.exists()) photoUrl = uDoc.data().photoURL || photoUrl;
+            } catch(e){}
+            if(photoUrl) {
+                img.src = photoUrl; img.style.display = 'block'; fb.style.display = 'none';
+            } else {
+                img.style.display = 'none'; fb.style.display = 'grid'; fb.innerText = (user.displayName || 'U').charAt(0).toUpperCase();
+            }
+        }
+
+        function setupRealtimeListeners(uid) {
+            onSnapshot(query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false)), 
+                s => { const el = document.getElementById('notif-badge'); if(el){ el.innerText = s.size > 9 ? '9+' : s.size; el.style.display = s.empty ? 'none' : 'flex'; }});
+            onSnapshot(query(collection(db, "messages"), where("receiverId", "==", uid), where("read", "==", false)), 
+                s => { const el = document.getElementById('msg-badge'); if(el){ el.innerText = s.size > 9 ? '9+' : s.size; el.style.display = s.empty ? 'none' : 'flex'; }});
+        }
+
+    </script>
+</body>
+</html>
