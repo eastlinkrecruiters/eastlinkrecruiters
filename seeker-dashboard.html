@@ -449,7 +449,7 @@
                     <button id="ai-apply-btn" style="width:100%; padding:10px; background:var(--purple-gradient); border:none; border-radius:8px; color:white; font-weight:600; cursor:pointer;">View Job</button>
                 </div>
 
-                <!-- NEW: Quick Actions Widget (Replaces Interviews) -->
+                <!-- Quick Actions Widget -->
                 <div class="glass-panel" style="padding:24px;">
                     <h3 style="font-size:1rem; font-weight:700; margin-bottom:20px;">Quick Actions</h3>
                     <div style="display:flex; flex-direction:column; gap:10px;">
@@ -488,12 +488,17 @@
 
     </main>
 
-    <!-- FOOTER -->
+    <!-- FOOTER (UPDATED: WhatsApp & Email Only) -->
     <footer class="app-footer">
         <div class="social-links">
-            <a href="#" id="link-fb" class="social-btn" target="_blank" title="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-            <a href="#" id="link-tiktok" class="social-btn" target="_blank" title="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-            <a href="#" id="link-insta" class="social-btn" target="_blank" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <!-- WhatsApp -->
+            <a href="#" id="link-whatsapp" class="social-btn" target="_blank" title="Contact on WhatsApp">
+                <i class="fa-brands fa-whatsapp" style="color: #25D366;"></i>
+            </a>
+            <!-- Email -->
+            <a href="#" id="link-email" class="social-btn" title="Send Email">
+                <i class="fa-regular fa-envelope" style="color: #ea4335;"></i>
+            </a>
         </div>
         <p class="footer-copy">&copy; 2024 EastLink Recruiters. All rights reserved.</p>
     </footer>
@@ -553,7 +558,6 @@
         let activeTierFilter = 'all'; 
         let bookmarks = new Set();
         let currentUserId = null;
-        // Removed bookedInterviewIds as they are no longer needed
 
         // --- UI HELPERS ---
         window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = 'block'; };
@@ -590,7 +594,6 @@
                         // Update UI
                         initDashboardUI(data, user);
                         checkUsage(user.uid);
-                        // Removed loadInterviewWidget call
                         
                         if(allFetchedJobs.length > 0) renderJobs();
                     }
@@ -872,21 +875,41 @@
             } catch(e) { console.error(e); }
         };
 
-        // --- SOCIAL MEDIA LINKS ---
+        // --- CONTACT LINKS (UPDATED: WhatsApp & Email) ---
         async function loadSocialLinks() {
+            // Default Fallbacks
+            const defaultWa = "https://wa.me/254119524616";
+            const defaultEmail = "mailto:eastlinkrecruiters@gmail.com";
+
+            // Set Initial Defaults
+            document.getElementById('link-whatsapp').href = defaultWa;
+            document.getElementById('link-email').href = defaultEmail;
+
             try {
-                const docRef = doc(db, "site_settings", "general");
+                // Try fetching dynamic settings from Admin Config (global_settings)
+                const docRef = doc(db, "site_settings", "global_settings");
                 const docSnap = await getDoc(docRef);
                 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    if(data.facebook) document.getElementById('link-fb').href = data.facebook;
-                    if(data.tiktok) document.getElementById('link-tiktok').href = data.tiktok;
-                    if(data.instagram) document.getElementById('link-insta').href = data.instagram;
+                    
+                    // Check for contactInfo object (Admin saves it here)
+                    if(data.contactInfo) {
+                        // WhatsApp
+                        if(data.contactInfo.whatsapp) {
+                            let wa = data.contactInfo.whatsapp;
+                            // Ensure it's formatted as a link if it's just a number
+                            if(!wa.startsWith('http')) wa = `https://wa.me/${wa.replace(/\D/g,'')}`;
+                            document.getElementById('link-whatsapp').href = wa;
+                        }
+                        // Email
+                        if(data.contactInfo.email) {
+                            document.getElementById('link-email').href = `mailto:${data.contactInfo.email}`;
+                        }
+                    }
                 }
             } catch (e) {
-                console.log("Social links error:", e);
-                // Fail silently, default # links remain
+                console.log("Contact links error (Using defaults):", e);
             }
         }
 
