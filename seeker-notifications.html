@@ -411,7 +411,15 @@
             return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
         }
 
+        // --- ICON CONFIG: SYNCED WITH ADMIN ACTIONS ---
         const iconConfig = {
+            // Admin Action Types
+            'success': { icon: 'fa-check-circle', class: 'type-success', text: 'View Application' },
+            'error': { icon: 'fa-exclamation-triangle', class: 'type-danger', text: 'Get Help' },
+            'warning': { icon: 'fa-exclamation-circle', class: 'type-danger', text: 'View Status' },
+            'info': { icon: 'fa-info-circle', class: 'type-info', text: 'View Application' },
+            
+            // Legacy/Other Types
             'application_approved': { icon: 'fa-check', class: 'type-success', text: 'View Application' },
             'application_rejected': { icon: 'fa-xmark', class: 'type-danger', text: 'View Application' },
             'new_message': { icon: 'fa-comment-alt', class: 'type-info', text: 'Reply' },
@@ -507,6 +515,9 @@
                 const timeString = timeAgo(jsDate);
                 const isUnread = !n.read;
                 const delay = index * 0.05;
+                
+                // Admin page uses 'body', existing logic might use 'message'. Handle both.
+                const contentText = n.body || n.message || "No specific details provided.";
 
                 return `
                     <div class="notif-item animate__animated animate__fadeInUp ${isUnread ? 'unread' : ''}" style="animation-delay:${delay}s" onclick="openModal('${n.id}')">
@@ -518,7 +529,7 @@
                                 <span class="notif-title">${n.title}</span>
                                 <span class="notif-time">${timeString}</span>
                             </div>
-                            <div class="notif-body">${n.message}</div>
+                            <div class="notif-body">${contentText}</div>
                         </div>
                         ${isUnread ? '<div class="unread-dot"></div>' : ''}
                     </div>
@@ -543,7 +554,8 @@
             const jsDate = n.timestamp ? new Date(n.timestamp.seconds * 1000) : new Date();
 
             document.getElementById('modal-title').textContent = n.title;
-            document.getElementById('modal-body').textContent = n.message;
+            // Handle body/message sync
+            document.getElementById('modal-body').textContent = n.body || n.message || "No details provided.";
             document.getElementById('modal-time').textContent = jsDate.toLocaleString();
             
             const iconContainer = document.getElementById('modal-icon-container');
@@ -551,9 +563,16 @@
             document.getElementById('modal-icon').className = `fas ${config.icon}`;
             
             const actionBtn = document.getElementById('modal-action-btn');
+            // If user explicitly sent a link in notification (future proof)
+            // Or default navigation based on context (e.g. go to applications)
             if(activeLink) {
                 actionBtn.textContent = n.actionText || config.text;
                 actionBtn.style.display = 'block';
+            } else if (n.type === 'success' || n.type === 'info' || n.type === 'warning' || n.type === 'error') {
+                 // For admin-generated status updates, link to applications page
+                 activeLink = 'seeker-applications.html';
+                 actionBtn.textContent = config.text;
+                 actionBtn.style.display = 'block';
             } else {
                 actionBtn.style.display = 'none';
             }
