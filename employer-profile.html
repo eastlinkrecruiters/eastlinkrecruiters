@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#020617">
     
     <!-- Fonts & Icons -->
@@ -21,12 +22,12 @@
         :root {
             /* Theme Variables */
             --bg-body: #020617;       
-            --bg-card: #0f172a; 
-            --bg-glass: rgba(15, 23, 42, 0.95); 
+            --bg-card: rgba(15, 23, 42, 0.6); 
+            --bg-glass: rgba(15, 23, 42, 0.85); 
             --bg-glass-heavy: rgba(15, 23, 42, 0.98);
-            --bg-input: rgba(255, 255, 255, 0.05);
+            --bg-input: rgba(255, 255, 255, 0.03);
             --bg-hover: rgba(255, 255, 255, 0.08);
-            --border-color: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 255, 255, 0.08);
             --text-main: #F8FAFC;     
             --text-muted: #94A3B8; 
             --gold-base: #D97706;
@@ -38,7 +39,7 @@
             
             --sidebar-width: 260px; 
             --header-height: 65px;
-            --radius: 12px;
+            --radius: 16px;
             --font-head: 'Cinzel', serif;
             --font-body: 'Inter', sans-serif;
             --font-display: 'Space Grotesk', sans-serif;
@@ -82,7 +83,7 @@
             min-width: 16px; height: 16px; 
             border-radius: 50%; 
             display: none; align-items: center; justify-content: center;
-            border: 2px solid var(--bg-card);
+            border: 2px solid var(--bg-body);
             z-index: 10;
         }
 
@@ -106,8 +107,10 @@
             background: var(--danger); color: #fff; font-size: 0.7rem; padding: 1px 6px; 
             border-radius: 10px; margin-left: auto; font-weight: 600; display: none;
         }
-        .nav-lock-icon { margin-left: auto; font-size: 0.8rem; opacity: 0.5; }
-        .nav-item.locked { opacity: 0.5; cursor: not-allowed; pointer-events: none; filter: grayscale(1); }
+        
+        /* Unlocked Navs */
+        .nav-lock-icon { display: none !important; }
+        .nav-item.locked { opacity: 1 !important; cursor: pointer !important; pointer-events: auto !important; filter: none !important; }
 
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index:998; display:none; backdrop-filter:blur(3px); }
 
@@ -123,14 +126,14 @@
             background: var(--bg-glass); border: 1px solid var(--border-color);
             border-radius: var(--radius); overflow: hidden; margin-bottom: 30px;
             backdrop-filter: blur(10px); display: flex; flex-direction: column;
-            position: relative;
+            position: relative; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
         }
         .cover-container { position: relative; width: 100%; height: 220px; }
         .cover-photo { width: 100%; height: 100%; object-fit: cover; background: linear-gradient(135deg, #1e293b, #0f172a); }
         
         .cover-edit-btn {
             position: absolute; top: 20px; right: 20px; 
-            background: var(--bg-glass-heavy); color: var(--text-main);
+            background: rgba(0,0,0,0.6); color: var(--text-main);
             padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; cursor: pointer;
             backdrop-filter: blur(5px); transition: 0.2s; border: 1px solid var(--border-color);
             z-index: 10; font-weight: 600;
@@ -142,8 +145,8 @@
             position: relative; z-index: 5;
         }
         .avatar-container {
-            width: 140px; height: 140px; border-radius: 20px; background: var(--bg-card);
-            border: 4px solid var(--bg-card); box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            width: 140px; height: 140px; border-radius: 20px; background: var(--bg-body);
+            border: 4px solid var(--bg-body); box-shadow: 0 15px 35px rgba(0,0,0,0.4);
             position: relative; overflow: hidden; cursor: pointer; flex-shrink: 0;
         }
         .avatar-img { width: 100%; height: 100%; object-fit: cover; background: #1e1e1e; }
@@ -162,7 +165,7 @@
         
         /* Buttons */
         .btn-glass { 
-            padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; 
+            padding: 10px 20px; border-radius: 30px; font-weight: 600; font-size: 0.85rem; 
             border: 1px solid var(--border-color); background: var(--bg-input); 
             color: var(--text-main); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px;
             font-family: var(--font-body);
@@ -178,6 +181,7 @@
             background: var(--bg-glass); backdrop-filter: blur(16px);
             border: 1px solid var(--border-color); border-radius: var(--radius);
             margin-bottom: 25px; overflow: hidden; display: flex; flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
         
         .panel-header { 
@@ -199,14 +203,15 @@
         }
         .form-inp:focus { border-color: var(--gold-base); background: var(--bg-hover); }
         .form-inp[readonly] { opacity: 0.6; cursor: not-allowed; }
+        select.form-inp option { background: #0F172A; color: var(--text-main); }
         textarea.form-inp { resize: vertical; min-height: 120px; line-height: 1.6; }
 
         /* Tags */
         .tags-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
         .tag-item { 
-            background: var(--bg-input); border: 1px solid var(--border-color); padding: 6px 14px; 
+            background: var(--bg-input); border: 1px solid var(--border-color); padding: 8px 16px; 
             border-radius: 30px; font-size: 0.8rem; cursor: pointer; transition: 0.2s; color: var(--text-muted); 
-            display: flex; align-items: center; gap: 6px; user-select: none;
+            display: flex; align-items: center; gap: 8px; user-select: none;
         }
         .tag-item.active { background: rgba(16, 185, 129, 0.15); border-color: var(--success); color: var(--success); font-weight: 600; }
         .tag-item:hover:not(.active) { border-color: var(--text-muted); background: var(--bg-hover); }
@@ -233,7 +238,7 @@
             display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px);
         }
         .asset-card {
-            background: var(--bg-card); width: 90%; max-width: 800px; height: 80vh;
+            background: #0f172a; width: 90%; max-width: 800px; height: 80vh;
             border-radius: 16px; border: 1px solid var(--border-color); display: flex; flex-direction: column;
             overflow: hidden; animation: zoomIn 0.3s ease; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
         }
@@ -247,7 +252,7 @@
         .am-grid { 
             flex: 1; overflow-y: auto; padding: 25px; display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px; 
-            background: var(--bg-body);
+            background: #020617;
         }
         .am-item { 
             aspect-ratio: 1; border-radius: 8px; overflow: hidden; cursor: pointer; 
@@ -323,13 +328,13 @@
         </div>
         <div style="display:flex; align-items:center; gap:12px;">
             <!-- Notifications with Badge -->
-            <div class="icon-btn" onclick="location.href='employer-notifications.html'">
+            <div class="icon-btn" onclick="location.href='employer-notifications.html'" title="Notifications">
                 <i class="fa-regular fa-bell"></i>
                 <div class="badge" id="header-notif-badge"></div>
             </div>
 
             <!-- Messages with Badge -->
-            <div class="icon-btn" onclick="location.href='employer-messages.html'">
+            <div class="icon-btn" onclick="location.href='employer-messages.html'" title="Messages">
                 <i class="fa-regular fa-comment-dots"></i>
                 <div class="badge" id="header-msg-badge"></div>
             </div>
@@ -364,24 +369,14 @@
         <a href="employer-premium.html" class="nav-item"><i class="fas fa-crown"></i> My plan</a>
 
         <div class="nav-group-label">Growth</div>
-        <a href="employer-referrals.html" class="nav-item" id="nav-invite">
-            <i class="fas fa-share-nodes"></i> Invite and earn
-            <i class="fas fa-lock nav-lock-icon" id="lock-invite" style="display:none;"></i>
-        </a>
-        <a href="employer-investment.html" class="nav-item" id="nav-invest">
-            <i class="fas fa-chart-line"></i> Invest
-            <i class="fas fa-lock nav-lock-icon" id="lock-invest" style="display:none;"></i>
-        </a>
+        <a href="employer-referrals.html" class="nav-item"><i class="fas fa-share-nodes"></i> Invite and earn</a>
+        <a href="employer-investment.html" class="nav-item"><i class="fas fa-chart-line"></i> Invest</a>
 
         <div class="nav-group-label">Resources</div>
         <a href="employer-blogs.html" class="nav-item"><i class="fas fa-newspaper"></i> News and insights</a>
-        <a href="employer-resources.html" class="nav-item" id="nav-resources">
-            <i class="fas fa-book"></i> Resources
-            <i class="fas fa-lock nav-lock-icon" id="lock-resources" style="display:none;"></i>
-        </a>
+        <a href="employer-resources.html" class="nav-item"><i class="fas fa-book"></i> Resources</a>
 
         <div class="nav-group-label">Account</div>
-        <a href="employer-profile.html" class="nav-item active"><i class="fas fa-user"></i> My profile</a>
         <a href="employer-settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
         
         <div style="margin-top:auto; padding:20px 24px;">
@@ -402,7 +397,7 @@
                 
                 <div class="profile-bar">
                     <div class="avatar-container" onclick="openAssetModal('avatar')">
-                        <img id="profile-avatar" src="" class="avatar-img" alt="Logo">
+                        <img id="profile-avatar" src="assets/images/default-avatar.png" class="avatar-img" alt="Logo">
                         <div class="avatar-overlay"><i class="fas fa-pen"></i></div>
                     </div>
                     <div class="profile-info">
@@ -450,6 +445,7 @@
                                         <option value="Construction">Construction</option>
                                         <option value="Education">Education</option>
                                         <option value="Logistics">Logistics & Transport</option>
+                                        <option value="Hospitality">Hospitality & Tourism</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -547,7 +543,7 @@
                             <div style="display:flex; flex-direction:column; gap:10px;">
                                 <button class="btn-glass" style="width:100%; justify-content:center; color:var(--gold-base); border-color:var(--gold-base);" onclick="location.href='employer-wallet.html'">Upgrade Plan</button>
                                 
-                                <!-- Cancel Option (Hidden by default, shown via JS if plan != free) -->
+                                <!-- Cancel Option -->
                                 <button id="btn-cancel-plan" class="btn-glass" style="width:100%; justify-content:center; color:var(--danger); border-color:transparent; display:none; opacity:0.8;" onclick="cancelPlan()">Cancel Subscription</button>
                             </div>
                         </div>
@@ -558,7 +554,7 @@
                         <div class="panel-header"><div class="panel-title" style="color:var(--danger);"><i class="fas fa-exclamation-triangle"></i> Danger Zone</div></div>
                         <div class="panel-body">
                             <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px;">Irreversible action. All data will be wiped.</p>
-                            <button class="btn-glass" style="width:100%; justify-content:center; color:var(--danger); border-color:var(--danger); background:rgba(239,68,68,0.05);" onclick="alert('Please contact support to delete your account.')">Delete Account</button>
+                            <button class="btn-glass" style="width:100%; justify-content:center; color:var(--danger); border-color:var(--danger); background:rgba(239,68,68,0.05);" onclick="deleteAccount()">Delete Account</button>
                         </div>
                     </div>
 
@@ -591,14 +587,9 @@
     <!-- SCRIPTS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        import { auth, db } from './config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { doc, getDoc, updateDoc, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         let currentUser = null;
         let currentSelectionMode = null; // 'avatar' or 'cover'
@@ -657,26 +648,16 @@
         };
         window.logout = () => signOut(auth).then(() => location.href = 'signin.html');
 
-        // --- NAVIGATION LOCK LOGIC ---
-        function lockNav(id, lockId) {
-            const el = document.getElementById(id);
-            const lock = document.getElementById(lockId);
-            if(el) el.classList.add('locked');
-            if(lock) lock.style.display = 'block';
-        }
+        window.deleteAccount = () => {
+            if(confirm("Are you sure? This will delete your company profile and all posted jobs. This action cannot be undone.")) {
+                Toastify({ text: "Please contact support to complete account deletion for security reasons.", style: { background: "#EF4444" }, duration: 4000 }).showToast();
+            }
+        };
 
-        function unlockNav(id, lockId) {
-            const el = document.getElementById(id);
-            const lock = document.getElementById(lockId);
-            if(el) el.classList.remove('locked');
-            if(lock) lock.style.display = 'none';
-        }
-
-        // --- PLAN CANCELLATION LOGIC (NEW) ---
+        // --- PLAN CANCELLATION LOGIC ---
         window.cancelPlan = async () => {
             if(!currentUser) return;
             
-            // Confirmation dialog
             if(!confirm("Are you sure you want to cancel your subscription? You will lose access to premium features immediately.")) {
                 return;
             }
@@ -687,7 +668,6 @@
             btn.style.pointerEvents = 'none';
 
             try {
-                // Update Firestore to revert plan to free
                 await updateDoc(doc(db, "users", currentUser.uid), {
                     plan: "free",
                     planStatus: "cancelled",
@@ -699,8 +679,6 @@
                     style: { background: "var(--info)" },
                     duration: 3000
                 }).showToast();
-
-                // UI will update automatically via the onSnapshot listener below
 
             } catch (error) {
                 console.error("Error cancelling plan:", error);
@@ -991,18 +969,6 @@
                     if(cancelBtn) cancelBtn.style.display = 'none';
                 }
 
-                // Lock Checks
-                if(plan === 'free') lockNav('nav-invite', 'lock-invite');
-                else unlockNav('nav-invite', 'lock-invite');
-
-                if(!plan.includes('growth') && !plan.includes('scale')) {
-                    lockNav('nav-invest', 'lock-invest');
-                    lockNav('nav-resources', 'lock-resources');
-                } else {
-                    unlockNav('nav-invest', 'lock-invest');
-                    unlockNav('nav-resources', 'lock-resources');
-                }
-
                 loadBadges(user.uid);
                 calculateAIScore(); // Initial calc
             });
@@ -1059,6 +1025,19 @@
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
         }
+
+        // Expose functions to window
+        window.openAssetModal = openAssetModal;
+        window.closeAssetModal = closeAssetModal;
+        window.switchAssetTab = switchAssetTab;
+        window.confirmAssetSelection = confirmAssetSelection;
+        window.toggleTag = toggleTag;
+        window.saveProfile = saveProfile;
+        window.copyLink = copyLink;
+        window.installPWA = installPWA;
+        window.dismissPWA = dismissPWA;
+        window.deleteAccount = deleteAccount;
+        window.cancelPlan = cancelPlan;
     </script>
 </body>
 </html>

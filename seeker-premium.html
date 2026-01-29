@@ -21,27 +21,33 @@
         :root {
             /* Master Theme Palette */
             --bg-body: #0F172A;       
-            --bg-card: rgba(30, 41, 59, 0.65);
-            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass: rgba(30, 41, 59, 0.70); 
+            --bg-glass-hover: rgba(255, 255, 255, 0.08);
             --bg-glass-heavy: rgba(15, 23, 42, 0.95);
-            --bg-input: rgba(255, 255, 255, 0.07);
-            --bg-hover: rgba(255, 255, 255, 0.12);
+            --bg-input: rgba(255, 255, 255, 0.05);
             --border-color: rgba(255, 255, 255, 0.12);
+            --border-highlight: rgba(255, 255, 255, 0.2);
+            
             --text-main: #F8FAFC;     
             --text-muted: #94A3B8; 
+            
+            /* Gradients & Accents */
             --gold-base: #D97706;
             --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
             --neon-purple: #8b5cf6;
             --purple-gradient: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
             --success: #10B981;
             --danger: #EF4444;
+            
             --sidebar-width: 260px; 
             --header-height: 70px;
-            --radius: 16px;
+            --radius: 20px;
+            
             --font-head: 'Cinzel', serif;
             --font-body: 'Inter', sans-serif;
             --font-display: 'Space Grotesk', sans-serif;
-            --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            
+            --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -49,231 +55,265 @@
         body { 
             font-family: var(--font-body); 
             background-color: var(--bg-body); 
-            background-image: url('assets/images/background.png');
+            background-image: url('./assets/images/background.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            background-repeat: no-repeat;
             color: var(--text-main); 
             min-height: 100vh; 
             overflow-x: hidden;
-            transition: background 0.3s ease;
+            display: flex; flex-direction: column;
         }
 
-        /* Utils & Glassmorphism */
+        /* Dark Overlay */
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background: rgba(15, 23, 42, 0.85); 
+            z-index: -5; pointer-events: none;
+        }
+
+        /* Utils */
         .glass-panel {
             background: var(--bg-glass);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             border: 1px solid var(--border-color);
+            border-top: 1px solid var(--border-highlight);
             border-radius: var(--radius);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
             width: 100%;
-            transition: transform 0.3s var(--ease-bounce), box-shadow 0.3s ease, border-color 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         /* Header */
         header {
             position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
-            background: var(--bg-glass-heavy); backdrop-filter: blur(30px);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-color);
             display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 1000;
         }
         .header-left { display: flex; align-items: center; gap: 15px; }
         .logo { 
-            font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.3rem; 
-            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; 
+            font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.4rem; 
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; gap: 10px;
         }
-        .logo span { color: var(--gold-base); }
+        .logo span { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .hamburger { font-size: 1.4rem; cursor: pointer; color: var(--text-muted); display: none; }
 
-        /* Search (Global) */
-        .global-search-container { flex: 1; max-width: 450px; position: relative; margin: 0 20px; }
+        /* Search */
+        .global-search-container { flex: 1; max-width: 500px; position: relative; margin: 0 30px; }
         .global-search-input {
             width: 100%; background: var(--bg-input); border: 1px solid var(--border-color);
-            padding: 10px 45px 10px 15px; border-radius: 12px; color: var(--text-main);
-            transition: all 0.3s ease; font-size: 0.9rem;
+            padding: 10px 45px 10px 20px; border-radius: 12px; color: var(--text-main);
+            transition: all 0.3s ease; font-size: 0.9rem; font-family: var(--font-body);
         }
-        .global-search-input:focus { 
-            border-color: var(--gold-base); background: var(--bg-hover); 
-            box-shadow: 0 0 15px rgba(217, 119, 6, 0.15);
-        }
+        .global-search-input:focus { border-color: var(--gold-base); background: rgba(255,255,255,0.08); box-shadow: 0 0 20px rgba(217, 119, 6, 0.15); }
         .search-results-dropdown {
             position: absolute; top: 115%; left: 0; width: 100%; background: var(--bg-glass-heavy);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border-color); border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-            max-height: 300px; overflow-y: auto; display: none; z-index: 2000;
+            backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 12px; 
+            max-height: 300px; overflow-y: auto; display: none; z-index: 2000; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
         .search-result-item { padding: 12px 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-        .search-result-item:hover { background: var(--bg-hover); padding-left: 20px; }
+        .search-result-item:hover { background: var(--bg-glass-hover); padding-left: 20px; }
 
-        /* Header Actions */
-        .header-actions { display: flex; align-items: center; gap: 10px; }
+        /* Header Icons & Realistic Styles */
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        
         .icon-btn { 
-            width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px;
-            color: var(--text-muted); cursor: pointer; transition: all 0.3s var(--ease-bounce); position: relative;
+            width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; 
+            cursor: pointer; background: rgba(255,255,255,0.03); position: relative; 
+            border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
         }
-        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); transform: translateY(-2px); }
+        .icon-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+        
+        /* Realistic Colors */
+        .icon-msg { color: #3b82f6; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.4)); }
+        .icon-bell { color: #f59e0b; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.4)); }
+
         .notification-badge { 
-            position: absolute; top: 5px; right: 5px; min-width: 16px; height: 16px; 
-            background: var(--danger); border-radius: 10px; font-size: 0.6rem; color: white; font-weight: 700;
-            display: none; place-items: center; justify-content: center; padding: 0 4px; border: 2px solid var(--bg-card);
+            position: absolute; top: -3px; right: -3px; width: 18px; height: 18px; 
+            background: #ef4444; border: 2px solid #0f172a; /* Red Badge with dark border */
+            border-radius: 50%; font-size: 0.65rem; color: white; 
+            display: none; place-items: center; justify-content: center; font-weight: 700; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
-        .profile-widget {
-            width: 42px; height: 42px; position: relative; cursor: pointer;
-            transition: transform 0.3s var(--ease-bounce); margin-left: 5px; flex-shrink: 0;
-        }
+
+        .profile-widget { width: 42px; height: 42px; position: relative; cursor: pointer; transition: transform 0.3s; margin-left: 5px; flex-shrink: 0; }
         .profile-widget:hover { transform: scale(1.05); }
         .user-avatar { 
-            width: 100%; height: 100%; border-radius: 12px; 
-            background: var(--gold-gradient); display: grid; place-items: center; 
-            font-weight: 700; color: #fff; border: 2px solid var(--border-color); 
-            object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            width: 100%; height: 100%; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; 
+            font-weight: 700; color: #000; border: 1px solid rgba(255,255,255,0.2); object-fit: cover;
         }
         .user-avatar.img-mode { background: transparent; }
 
         /* Sidebar */
         .sidebar {
             position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
-            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 20px 0; overflow-y: auto; 
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column;
-            backdrop-filter: blur(20px);
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 25px 0; overflow-y: auto; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column; backdrop-filter: blur(20px);
         }
-        .nav-group { padding: 0 24px; margin-bottom: 20px; }
-        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-group { padding: 0 24px; margin-bottom: 25px; }
+        .nav-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 12px; letter-spacing: 1.2px; padding-left: 10px; }
         .nav-item { 
-            display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; 
-            font-size: 0.9rem; transition: all 0.3s ease; border-radius: 10px; margin-bottom: 4px; cursor: pointer;
+            display: flex; align-items: center; padding: 12px 16px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.9rem; transition: all 0.2s ease; border-radius: 12px; margin-bottom: 5px; position: relative; font-weight: 500;
         }
-        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
-        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
-        .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
-        
-        .lock-icon { font-size: 0.7rem; margin-left: auto; color: var(--text-muted); opacity: 0.5; }
+        .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.05); transform: translateX(5px); }
+        .nav-item.active { background: var(--gold-gradient); color: #000; font-weight: 700; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3); }
+        .nav-item i { width: 25px; text-align: center; margin-right: 12px; font-size: 1rem; }
 
-        /* Main & Layout */
-        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
-        .container { max-width: 1200px; margin: 0 auto; }
+        /* Main Content */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 40px; width: calc(100% - var(--sidebar-width)); min-height: calc(100vh - var(--header-height)); display: flex; flex-direction: column; }
+        .container { max-width: 1200px; margin: 0 auto; width: 100%; }
 
         /* Page Specific: Upgrade Plan */
         .premium-hero { text-align: center; margin-bottom: 50px; padding: 0 10px; }
-        .premium-hero h1 { font-family: var(--font-head); font-size: 2.5rem; color: var(--text-main); margin-bottom: 15px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .premium-hero h1 { font-family: var(--font-head); font-size: 2.5rem; color: var(--text-main); margin-bottom: 15px; text-shadow: 0 2px 20px rgba(0,0,0,0.5); }
         .premium-hero p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto; line-height: 1.6; }
 
-        /* FIXED WALLET STRIP */
+        /* Wallet Strip */
         .wallet-strip {
             background: var(--bg-glass); 
             border: 1px solid var(--border-color); 
+            border-top: 1px solid var(--border-highlight);
             border-radius: 50px;
             padding: 12px 30px; 
-            margin: 0 auto 40px auto; 
+            margin: 0 auto 50px auto; 
             width: fit-content;
             max-width: 100%;
-            display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap;
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.3); 
+            display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap;
+            box-shadow: 0 15px 40px -10px rgba(0,0,0,0.4); 
             backdrop-filter: blur(20px);
+            transition: transform 0.3s;
         }
-        .wallet-val { font-family: var(--font-display); font-weight: 700; color: var(--gold-base); font-size: 1.1rem; }
+        .wallet-strip:hover { transform: translateY(-5px); border-color: var(--gold-base); }
+        .wallet-val { font-family: var(--font-display); font-weight: 700; color: var(--gold-base); font-size: 1.1rem; letter-spacing: 0.5px; }
         .btn-topup-sm { font-size: 0.85rem; text-decoration: none; color: var(--text-main); border-bottom: 1px dashed var(--text-muted); transition: 0.3s; white-space: nowrap; }
         .btn-topup-sm:hover { color: var(--gold-base); border-color: var(--gold-base); }
 
         /* Pricing Grid */
-        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 40px; }
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-bottom: 60px; }
         
         .plan-card {
-            background: var(--bg-glass); border: 1px solid var(--border-color); border-radius: var(--radius);
-            padding: 30px; display: flex; flex-direction: column; transition: 0.3s var(--ease-bounce);
+            background: var(--bg-glass); border: 1px solid var(--border-color); border-radius: 24px;
+            padding: 40px 30px; display: flex; flex-direction: column; transition: all 0.4s var(--ease-snap);
             position: relative; overflow: hidden; height: 100%; backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border-highlight);
         }
-        .plan-card:hover { transform: translateY(-10px); border-color: var(--gold-base); box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+        .plan-card:hover { transform: translateY(-15px); border-color: var(--border-highlight); box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
         
         /* Plan Variations */
         .plan-standard { border-top: 4px solid var(--gold-base); }
         .plan-pro { 
             border: 2px solid var(--neon-purple); 
-            background: linear-gradient(180deg, rgba(139, 92, 246, 0.1) 0%, var(--bg-glass) 100%);
+            background: linear-gradient(180deg, rgba(139, 92, 246, 0.1) 0%, rgba(30, 41, 59, 0.7) 100%);
             transform: scale(1.03); z-index: 2;
+            box-shadow: 0 20px 50px rgba(139, 92, 246, 0.15);
         }
-        .plan-pro:hover { transform: scale(1.05) translateY(-10px); }
+        .plan-pro:hover { transform: scale(1.05) translateY(-15px); box-shadow: 0 30px 80px rgba(139, 92, 246, 0.3); }
 
         .badge-popular {
-            position: absolute; top: 15px; right: 15px;
-            background: var(--purple-gradient); color: white; padding: 4px 12px; border-radius: 20px;
-            font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+            position: absolute; top: 20px; right: 20px;
+            background: var(--purple-gradient); color: white; padding: 5px 15px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
         }
 
-        .plan-name { font-family: var(--font-head); font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; color: var(--text-main); }
-        .plan-price { display: flex; align-items: baseline; gap: 5px; margin-bottom: 25px; }
-        .currency { font-size: 1rem; color: var(--text-muted); }
-        .amount { font-size: 2.8rem; font-weight: 700; color: var(--text-main); font-family: var(--font-display); }
-        .period { color: var(--text-muted); font-size: 0.9rem; }
+        .plan-name { font-family: var(--font-head); font-size: 1.8rem; font-weight: 700; margin-bottom: 10px; color: var(--text-main); }
+        .plan-price { display: flex; align-items: baseline; gap: 5px; margin-bottom: 30px; }
+        .currency { font-size: 1.1rem; color: var(--text-muted); }
+        .amount { font-size: 3.2rem; font-weight: 700; color: var(--text-main); font-family: var(--font-display); letter-spacing: -1px; }
+        .period { color: var(--text-muted); font-size: 0.95rem; }
 
-        .features { list-style: none; margin-bottom: 30px; flex: 1; }
-        .features li { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 15px; font-size: 0.95rem; color: var(--text-muted); }
-        .features li i { color: var(--success); margin-top: 3px; }
+        .features { list-style: none; margin-bottom: 40px; flex: 1; }
+        .features li { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px; font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; }
+        .features li i { color: var(--success); margin-top: 4px; font-size: 0.9rem; }
         .features li.locked { opacity: 0.5; text-decoration: line-through; }
         .features li.locked i { color: var(--danger); }
 
         /* Buttons */
         .btn-plan { 
-            width: 100%; padding: 14px; border-radius: 12px; border: none; font-weight: 600; cursor: pointer; transition: 0.3s; 
+            width: 100%; padding: 18px; border-radius: 16px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; 
             font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px; 
+            letter-spacing: 0.5px;
         }
         .btn-current { background: var(--bg-input); color: var(--text-muted); cursor: default; border: 1px solid var(--border-color); }
-        .btn-std { background: var(--gold-gradient); color: white; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3); }
-        .btn-std:hover { box-shadow: 0 10px 25px rgba(217, 119, 6, 0.5); transform: translateY(-2px); }
+        .btn-std { background: var(--gold-gradient); color: black; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3); }
+        .btn-std:hover { box-shadow: 0 10px 30px rgba(217, 119, 6, 0.5); transform: translateY(-3px); }
         .btn-pro { background: var(--purple-gradient); color: white; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
-        .btn-pro:hover { box-shadow: 0 10px 25px rgba(139, 92, 246, 0.5); transform: translateY(-2px); }
+        .btn-pro:hover { box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5); transform: translateY(-3px); }
 
         /* Modal */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px);
             z-index: 3000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s;
         }
         .modal-overlay.open { display: flex; opacity: 1; }
         .modal-card {
-            background: var(--bg-glass-heavy); border: 1px solid var(--border-color);
-            padding: 30px; border-radius: 20px; width: 90%; max-width: 450px; text-align: left;
-            position: relative; transform: scale(0.9); transition: transform 0.3s var(--ease-bounce);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            background: #1e293b; border: 1px solid var(--border-color);
+            padding: 35px; border-radius: 24px; width: 90%; max-width: 480px; text-align: left;
+            position: relative; transform: scale(0.9); transition: transform 0.3s var(--ease-snap);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+            overflow: hidden;
         }
+        .modal-card::before { content:''; position: absolute; top:0; left:0; width:100%; height:4px; background: var(--gold-gradient); }
         .modal-overlay.open .modal-card { transform: scale(1); }
         
-        .bill-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.95rem; color: var(--text-muted); }
-        .bill-total { border-top: 1px dashed var(--border-color); padding-top: 15px; margin-top: 15px; color: var(--gold-base); font-weight: 700; font-size: 1.1rem; }
-        .alert-fund { background: rgba(239, 68, 68, 0.15); color: var(--danger); padding: 12px; border-radius: 8px; text-align: center; margin-top: 20px; display: none; font-size: 0.9rem; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .bill-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 1rem; color: var(--text-muted); }
+        .bill-total { border-top: 1px dashed var(--border-color); padding-top: 18px; margin-top: 18px; color: var(--gold-base); font-weight: 700; font-size: 1.2rem; }
+        .alert-fund { background: rgba(239, 68, 68, 0.1); color: var(--danger); padding: 15px; border-radius: 12px; text-align: center; margin-top: 25px; display: none; font-size: 0.9rem; border: 1px solid rgba(239, 68, 68, 0.3); display: flex; gap:10px; align-items:center; justify-content:center; }
 
         /* Footer */
-        .footer { text-align: center; padding: 40px 0; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.85rem; margin-top: 50px; }
-        .social-links { display: flex; justify-content: center; gap: 15px; margin: 15px 0; }
-        .social-links a { color: var(--text-muted); font-size: 1.2rem; transition: 0.2s; width: 35px; height: 35px; border: 1px solid var(--border-color); border-radius: 50%; display: grid; place-items: center; text-decoration: none; }
-        .social-links a:hover { color: white; background: var(--gold-base); border-color: var(--gold-base); transform: translateY(-3px); }
+        .footer-copyright {
+            margin-top: auto;
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.8);
+        }
+        .social-links { display: flex; justify-content: center; gap: 15px; margin: 0 0 15px 0; }
+        .social-links a { color: var(--text-muted); font-size: 1.2rem; transition: 0.2s; width: 40px; height: 40px; border: 1px solid var(--border-color); border-radius: 50%; display: grid; place-items: center; text-decoration: none; background: rgba(255,255,255,0.03); }
+        .social-links a:hover { color: #000; background: var(--gold-gradient); border-color: transparent; transform: translateY(-3px); }
 
         /* PWA Popup */
         .pwa-install-popup {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
-            border-radius: 20px; padding: 20px; z-index: 3000;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
-            animation: slideUp 0.5s ease;
+            position: fixed; bottom: 20px; right: 20px; 
+            background: rgba(15, 23, 42, 0.95); 
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            backdrop-filter: blur(12px);
+            padding: 20px; border-radius: 16px; 
+            z-index: 10000; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            max-width: 300px; animation: slideUp 0.5s ease-out; display: none;
         }
-        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
-        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
-        .pwa-actions { display: flex; gap: 10px; }
-        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
-        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* Floating Support */
+        .floating-support {
+            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--gold-gradient);
+            border-radius: 50%; display: grid; place-items: center; color: black; font-size: 1.6rem;
+            box-shadow: 0 10px 30px rgba(217, 119, 6, 0.4); z-index: 2000; transition: transform 0.3s;
+        }
+        .floating-support:hover { transform: scale(1.1) rotate(10deg); }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite; margin-right: 5px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         @media (max-width: 992px) {
             .global-search-container { display: none; }
             .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
-            main { margin-left: 0; padding: 20px 10px; width: 100%; max-width: 100vw; overflow-x: hidden; }
+            main { margin-left: 0; padding: 25px 15px; width: 100%; max-width: 100vw; overflow-x: hidden; }
             .hamburger { display: block; }
             .header-left { gap: 10px; }
             .plan-pro { transform: scale(1); }
             .premium-hero h1 { font-size: 2rem; }
-            .wallet-strip { width: 100%; border-radius: 12px; padding: 15px; flex-direction: row; justify-content: space-between; }
+            .wallet-strip { width: 100%; border-radius: 16px; padding: 15px; flex-direction: row; justify-content: space-between; }
         }
     </style>
 </head>
@@ -293,22 +333,24 @@
         </div>
 
         <div class="header-actions">
-            <div class="icon-btn" title="Messages" onclick="location.href='seeker-messages.html'">
-                <i class="fa-regular fa-envelope"></i>
+            <!-- Messages with Blue Icon & Red Badge -->
+            <div class="icon-btn" title="Messages" onclick="handleActionWithSpinner(this, () => location.href='seeker-messages.html')">
+                <i class="fa-solid fa-envelope icon-msg"></i>
                 <div class="notification-badge" id="msg-badge">0</div>
             </div>
-            <div class="icon-btn" title="Notifications" onclick="location.href='seeker-notifications.html'">
-                <i class="fa-regular fa-bell"></i>
+            <!-- Notifications with Amber Icon & Red Badge -->
+            <div class="icon-btn" title="Notifications" onclick="handleActionWithSpinner(this, () => location.href='seeker-notifications.html')">
+                <i class="fa-solid fa-bell icon-bell"></i>
                 <div class="notification-badge" id="notif-badge">0</div>
             </div>
-            <div class="profile-widget" onclick="location.href='seeker-profile.html'" title="My Profile">
+            <div class="profile-widget" onclick="handleActionWithSpinner(this, () => location.href='seeker-profile.html')" title="My Profile">
                 <img src="" id="header-avatar-img" class="user-avatar img-mode" alt="Profile" style="display:none;">
                 <div id="header-avatar-fallback" class="user-avatar">U</div>
             </div>
         </div>
     </header>
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR (Unlocked) -->
     <nav class="sidebar" id="sidebar">
         <div class="nav-group">
             <div class="nav-label">Overview</div>
@@ -318,27 +360,27 @@
             <div class="nav-label">Job Hunt</div>
             <a href="seeker-applications.html" class="nav-item"><i class="fa-solid fa-file-signature"></i> Applied Jobs</a>
             <a href="seeker-jobs.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Browse Jobs</a>
-            <div onclick="checkAccess('standard', 'seeker-featured-jobs.html')" class="nav-item link-std"><i class="fa-solid fa-star"></i> Featured Jobs <i class="fas fa-lock lock-icon" id="lock-featured"></i></div>
-            <div onclick="checkAccess('pro', 'seeker-urgentlyhiring.html')" class="nav-item link-pro"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended <i class="fas fa-lock lock-icon" id="lock-urgent"></i></div>
-            <div onclick="checkAccess('pro', 'seeker-guaranteed-jobs.html')" class="nav-item link-pro"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs <i class="fas fa-lock lock-icon" id="lock-guaranteed"></i></div>
+            <a href="seeker-featured-jobs.html" class="nav-item"><i class="fa-solid fa-star"></i> Featured Jobs</a>
+            <a href="seeker-urgentlyhiring.html" class="nav-item"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended</a>
+            <a href="seeker-guaranteed-jobs.html" class="nav-item"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Finance</div>
             <a href="seeker-wallet.html" class="nav-item"><i class="fa-solid fa-wallet"></i> My Wallet</a>
             <a href="seeker-premium.html" class="nav-item active"><i class="fa-solid fa-crown"></i> My Plan</a>
-            <div onclick="checkAccess('standard', 'seeker-referrals.html')" class="nav-item link-std"><i class="fa-solid fa-user-plus"></i> Invite & Earn <i class="fas fa-lock lock-icon" id="lock-referral"></i></div>
-            <div onclick="checkAccess('standard', 'seeker-invest.html')" class="nav-item link-std"><i class="fa-solid fa-chart-line"></i> Invest <i class="fas fa-lock lock-icon" id="lock-invest"></i></div>
+            <a href="seeker-referrals.html" class="nav-item"><i class="fa-solid fa-user-plus"></i> Invite & Earn</a>
+            <a href="seeker-invest.html" class="nav-item"><i class="fa-solid fa-chart-line"></i> Invest</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Resources</div>
             <a href="seeker-blog.html" class="nav-item"><i class="fa-solid fa-newspaper"></i> News & Insights</a>
-            <div onclick="checkAccess('pro', 'seeker-resources.html')" class="nav-item link-pro"><i class="fa-solid fa-book"></i> Resources <i class="fas fa-lock lock-icon" id="lock-resources"></i></div>
+            <a href="seeker-resources.html" class="nav-item"><i class="fa-solid fa-book"></i> Resources</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Settings</div>
             <a href="seeker-profile.html" class="nav-item"><i class="fa-solid fa-user-gear"></i> Profile</a>
             <a href="seeker-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
-            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="#" onclick="handleActionWithSpinner(this, logout)" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="closeSidebar()" style="position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:998; display:none; backdrop-filter:blur(2px);"></div>
@@ -354,9 +396,9 @@
 
             <!-- Wallet Strip -->
             <div class="wallet-strip animate__animated animate__bounceIn animate__delay-1s">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <i class="fas fa-wallet" style="color:var(--text-muted); font-size:1.2rem;"></i>
-                    <span style="color:var(--text-main); font-size:0.95rem;">Balance: <span class="wallet-val" id="wallet-display">KES ...</span></span>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <i class="fas fa-wallet" style="color:var(--text-muted); font-size:1.3rem;"></i>
+                    <span style="color:var(--text-main); font-size:1rem;">Wallet Balance: <span class="wallet-val" id="wallet-display">KES ...</span></span>
                 </div>
                 <a href="seeker-wallet.html" class="btn-topup-sm">Top Up</a>
             </div>
@@ -417,11 +459,11 @@
             </div>
 
             <!-- FOOTER -->
-            <footer class="footer animate__animated animate__fadeIn">
+            <footer class="footer-copyright animate__animated animate__fadeIn">
                 <div class="social-links" id="social-container">
                     <!-- Injected via JS -->
                 </div>
-                <p>&copy; 2025 EastLink Recruiters. All Rights Reserved.</p>
+                <p>&copy; 2026 EastLink Recruiters. All Rights Reserved.</p>
             </footer>
         </div>
     </main>
@@ -430,86 +472,94 @@
     <div class="modal-overlay" id="paymentModal">
         <div class="modal-card animate__animated animate__zoomIn">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h3 style="font-family:var(--font-head); color:var(--text-main); font-size:1.4rem;">Confirm Upgrade</h3>
-                <i class="fas fa-times" style="cursor:pointer; color:var(--text-muted); font-size:1.2rem;" onclick="closeModal()"></i>
+                <h3 style="font-family:var(--font-head); color:var(--text-main); font-size:1.6rem;">Confirm Upgrade</h3>
+                <i class="fas fa-times" style="cursor:pointer; color:var(--text-muted); font-size:1.3rem;" onclick="closeModal()"></i>
             </div>
-            <p style="color:var(--text-muted); margin-bottom:20px; font-size:0.95rem;">You are upgrading to the <strong id="modal-plan-name" style="color:var(--text-main)">---</strong> plan.</p>
+            <p style="color:var(--text-muted); margin-bottom:25px; font-size:0.95rem;">You are upgrading to the <strong id="modal-plan-name" style="color:var(--text-main); font-size:1.1rem;">---</strong> plan.</p>
             
-            <div style="background:var(--bg-input); padding:15px; border-radius:12px; border:1px solid var(--border-color);">
-                <div class="bill-row"><span>Wallet Balance</span><span style="color:var(--text-main)" id="modal-bal">0</span></div>
-                <div class="bill-row"><span>Plan Cost</span><span style="color:var(--danger)" id="modal-cost">0</span></div>
-                <div class="bill-row bill-total"><span>Remaining</span><span id="modal-remain">0</span></div>
+            <div style="background:var(--bg-input); padding:20px; border-radius:16px; border:1px solid var(--border-color);">
+                <div class="bill-row"><span>Wallet Balance</span><span style="color:var(--text-main); font-family:var(--font-display);" id="modal-bal">0</span></div>
+                <div class="bill-row"><span>Plan Cost</span><span style="color:var(--danger); font-family:var(--font-display);" id="modal-cost">0</span></div>
+                <div class="bill-row bill-total"><span>Remaining</span><span id="modal-remain" style="font-family:var(--font-display);">0</span></div>
             </div>
             
             <div class="alert-fund" id="insufficient-alert">
-                <i class="fas fa-exclamation-circle"></i> Insufficient funds. <a href="seeker-wallet.html" style="color:var(--danger); font-weight:700;">Top Up Now</a>
+                <i class="fas fa-exclamation-circle" style="font-size:1.2rem;"></i> 
+                <div>Insufficient funds. <a href="seeker-wallet.html" style="color:var(--danger); font-weight:700; text-decoration:underline;">Top Up Now</a></div>
             </div>
             
-            <button class="btn-plan btn-std" id="btn-confirm-pay" style="margin-top:20px;" onclick="processTransaction()">Confirm Payment</button>
-            <div id="pay-loader" style="display:none; text-align:center; margin-top:20px;">
+            <button class="btn-plan btn-std" id="btn-confirm-pay" style="margin-top:25px;" onclick="processTransaction()">Confirm Payment</button>
+            <div id="pay-loader" style="display:none; text-align:center; margin-top:25px;">
                 <i class="fas fa-circle-notch fa-spin" style="font-size:2rem; color:var(--gold-base);"></i>
                 <p style="color:var(--text-muted); font-size:0.9rem; margin-top:10px;">Processing secure transaction...</p>
             </div>
         </div>
     </div>
     
-    <!-- GENERIC UPGRADE INFO MODAL (For Sidebar Locks) -->
-    <div class="modal-overlay" id="upgradeInfoModal">
-        <div class="modal-card animate__animated animate__zoomIn" style="text-align:center;">
-             <div style="text-align:right;"><i class="fas fa-times" style="cursor:pointer;" onclick="document.getElementById('upgradeInfoModal').classList.remove('open')"></i></div>
-             <i class="fa-solid fa-lock" style="font-size: 3rem; color: var(--gold-base); margin-bottom: 15px;"></i>
-             <h2 style="font-family: var(--font-head); margin-bottom: 10px;">Feature Locked</h2>
-             <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px;">
-                 Select a plan below to unlock this feature.
-             </p>
-             <button onclick="document.getElementById('upgradeInfoModal').classList.remove('open')" style="padding: 10px 20px; background: var(--bg-input); border: 1px solid var(--border-color); color: white; border-radius: 8px; cursor: pointer;">Close</button>
-        </div>
-    </div>
-
     <!-- PWA INSTALL POPUP -->
     <div id="pwa-install-popup" class="pwa-install-popup">
-        <div class="pwa-content">
-            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+            <img src="./assets/images/logo.png" style="width:45px; height:45px; border-radius:10px;">
             <div>
-                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
-                <div style="font-size:0.8rem; color:#94A3B8;">Add to home screen for quick access.</div>
+                <h4 style="color:#fff; margin:0; font-family:'Cinzel', serif; font-size:0.9rem;">Install EastLink</h4>
+                <p style="color:#94A3B8; margin:3px 0 0; font-size:0.75rem;">Add to Home Screen for fast access.</p>
             </div>
         </div>
-        <div class="pwa-actions">
-            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
-            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        <div style="display:flex; gap:10px;">
+            <button onclick="dismissPWA()" style="flex:1; padding:8px; background:transparent; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:8px; cursor:pointer; font-size:0.8rem;">Later</button>
+            <button onclick="installPWA()" style="flex:1; padding:8px; background:linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border:none; color:#000; font-weight:700; border-radius:8px; cursor:pointer; font-size:0.8rem;">Install</button>
         </div>
     </div>
 
     <!-- FLOATING SUPPORT -->
-    <a href="seeker-support.html" class="animate__animated animate__fadeInRight" style="position:fixed; bottom:30px; right:30px; width:60px; height:60px; background:var(--neon-purple); color:white; border-radius:50%; display:grid; place-items:center; font-size:1.5rem; box-shadow:0 10px 25px rgba(139, 92, 246, 0.4); z-index:1100; cursor:pointer; transition:0.3s;">
+    <a href="seeker-support.html" class="floating-support animate__animated animate__fadeInRight">
         <i class="fa-solid fa-headset"></i>
     </a>
 
     <!-- SCRIPTS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, runTransaction, collection, serverTimestamp, query, where, getDoc, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { auth, db } from './config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { doc, onSnapshot, runTransaction, collection, serverTimestamp, query, where, getDoc, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); 
-        const auth = getAuth(app); 
-        const db = getFirestore(app);
-        
         let currentUser = null;
         let userData = {};
         let currentUserPlan = 'free';
         let targetPlan = { id: '', cost: 0, name: '' };
         
-        // Default Pricing (Updated Defaults)
+        // Default Pricing (Fallback)
         let globalPricing = { standard: 550, pro: 850 };
+
+        // --- SPINNER HELPER ---
+        window.handleActionWithSpinner = (btn, action) => {
+            if(btn.dataset.processing === "true") return;
+            btn.dataset.processing = "true";
+            
+            // Save original content
+            const originalContent = btn.innerHTML;
+            
+            // Set spinner content
+            btn.innerHTML = `<span class="loading-spinner"></span>`;
+            
+            setTimeout(() => {
+                // Execute action
+                if (typeof action === 'function') action();
+                
+                // Reset button (optional, in case page doesn't reload immediately)
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.dataset.processing = "false";
+                }, 500);
+            }, 1500);
+        };
 
         // --- UI UTILS ---
         window.toggleSidebar = () => {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            sb.classList.toggle('active');
+            ov.style.display = sb.classList.contains('active') ? 'block' : 'none';
         };
         window.closeSidebar = () => {
             document.getElementById('sidebar').classList.remove('active');
@@ -518,20 +568,8 @@
         window.logout = () => signOut(auth).then(() => window.location.href = 'signin.html');
         window.closeModal = () => document.getElementById('paymentModal').classList.remove('open');
         
-        window.checkAccess = (requiredTier, url) => {
-            const tierMap = { 'free': 0, 'standard': 1, 'pro': 2 };
-            const userLevel = tierMap[currentUserPlan] || 0;
-            const reqLevel = tierMap[requiredTier] || 0;
-
-            if (userLevel >= reqLevel) {
-                location.href = url;
-            } else {
-                document.getElementById('upgradeInfoModal').classList.add('open');
-            }
-        };
-
-        const saved = localStorage.getItem('theme') || 'dark';
-        document.documentElement.setAttribute('data-theme', saved);
+        // Navigation is now unlocked, but we keep this stub in case other scripts reference it
+        window.checkAccess = (r, u) => { location.href = u; };
 
         // --- AUTH & DATA ---
         onAuthStateChanged(auth, async (user) => {
@@ -569,26 +607,22 @@
                     }
                     
                     updatePlanButtons(currentUserPlan);
-                    updateTierUI(); 
                 }
             });
 
-            // 2. Real-time Pricing Sync (Updated to 'global_settings')
+            // 2. Real-time Pricing Sync
             onSnapshot(doc(db, "site_settings", "global_settings"), (snap) => {
                 if(snap.exists()) {
                     const data = snap.data();
-                    // Fallback to updated defaults if not set in DB
                     globalPricing.standard = Number(data.priceStandard) || 550;
                     globalPricing.pro = Number(data.pricePremium) || 850;
                     
-                    // Update Text
                     const stdEl = document.getElementById('price-std-display');
                     const proEl = document.getElementById('price-pro-display');
                     
                     if(stdEl) stdEl.innerText = globalPricing.standard.toLocaleString();
                     if(proEl) proEl.innerText = globalPricing.pro.toLocaleString();
                     
-                    // Update buttons with new prices
                     updatePlanButtons(currentUserPlan);
                 }
             });
@@ -597,32 +631,6 @@
             loadSocials();
             initSearch();
         });
-        
-        function updateTierUI() {
-            const locks = [
-                document.getElementById('lock-featured'),
-                document.getElementById('lock-urgent'),
-                document.getElementById('lock-guaranteed'),
-                document.getElementById('lock-resources'),
-                document.getElementById('lock-referral'),
-                document.getElementById('lock-invest')
-            ];
-
-            // Reset (Show all locks)
-            locks.forEach(el => { if(el) el.style.display = 'inline-block'; });
-
-            if (currentUserPlan === 'standard') {
-                // Unlock Standard items
-                ['lock-featured', 'lock-referral', 'lock-invest'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if(el) el.style.display = 'none';
-                });
-            } 
-            else if (currentUserPlan === 'pro') {
-                // Unlock ALL
-                locks.forEach(el => { if(el) el.style.display = 'none'; });
-            }
-        }
 
         function updatePlanButtons(currentPlan) {
             // Reset Buttons
@@ -634,16 +642,14 @@
                 if(plan === 'free') {
                     btn.innerText = "Downgrade"; 
                     btn.className = 'btn-plan btn-current';
-                    btn.onclick = null; // Downgrades usually handled via support or settings
+                    btn.onclick = null;
                 } else if(plan === 'standard') {
                     btn.innerText = "Get Verified"; 
                     btn.className = 'btn-plan btn-std';
-                    // Use Dynamic Global Pricing
                     btn.onclick = () => initiateUpgrade('standard', globalPricing.standard);
                 } else if(plan === 'pro') {
                     btn.innerHTML = `<i class="fas fa-crown"></i> Go Pro`; 
                     btn.className = 'btn-plan btn-pro';
-                    // Use Dynamic Global Pricing
                     btn.onclick = () => initiateUpgrade('pro', globalPricing.pro);
                 }
             });
@@ -673,7 +679,7 @@
             const isInsufficient = remaining < 0;
             remainEl.style.color = isInsufficient ? 'var(--danger)' : 'var(--gold-base)';
             
-            document.getElementById('insufficient-alert').style.display = isInsufficient ? 'block' : 'none';
+            document.getElementById('insufficient-alert').style.display = isInsufficient ? 'flex' : 'none';
             document.getElementById('btn-confirm-pay').style.display = isInsufficient ? 'none' : 'block';
             document.getElementById('pay-loader').style.display = 'none';
             
@@ -740,7 +746,7 @@
                 document.getElementById('pay-loader').style.display = 'none';
                 document.getElementById('btn-confirm-pay').style.display = 'block';
                 const msg = typeof e === 'string' ? e : "Transaction Failed";
-                Toastify({ text: msg, style: { background: "#EF4444" } }).showToast();
+                Toastify({ text: msg, style: { background: "#EF4444", borderRadius:"10px" } }).showToast();
             }
         };
 
@@ -763,7 +769,13 @@
         }
 
         function listenForBadges(uid) {
-            const up = (id, c) => { const el = document.getElementById(id); if(el) { el.innerText=c>9?'9+':c; el.style.display=c?'flex':'none'; }};
+            const up = (id, c) => { 
+                const el = document.getElementById(id); 
+                if(el) { 
+                    el.innerText = c > 9 ? '9+' : c; 
+                    el.style.display = c > 0 ? 'flex' : 'none'; 
+                }
+            };
             onSnapshot(query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false)), s => up('notif-badge', s.size));
             onSnapshot(query(collection(db, "messages"), where("receiverId", "==", uid), where("read", "==", false)), s => up('msg-badge', s.size));
         }
@@ -815,7 +827,7 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            document.getElementById('pwa-install-popup').style.display = 'block';
+            setTimeout(() => { document.getElementById('pwa-install-popup').style.display = 'block'; }, 3000);
         });
 
         window.installPWA = async () => {

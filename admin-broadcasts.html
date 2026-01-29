@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
     
     <!-- Fonts & Icons -->
@@ -263,6 +264,9 @@
             <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
                 <i class="fa-solid fa-user-shield"></i>
             </div>
+            <div class="icon-btn" onclick="logout()" style="color:var(--danger);" title="Logout">
+                <i class="fa-solid fa-power-off"></i>
+            </div>
         </div>
     </header>
 
@@ -284,7 +288,7 @@
             <div class="nav-label">Jobs & Service</div>
             <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
             <a href="admin-guaranteed-jobs.html" class="nav-item link-pro"><i class="fa-solid fa-certificate" style="color:var(--gold-base);"></i> Guaranteed Jobs</a>
-            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Vacancy</a>
         </div>
 
         <div class="nav-group">
@@ -299,7 +303,7 @@
             <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
             <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
             <a href="admin-broadcasts.html" class="nav-item active"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
-            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="admin-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
@@ -426,12 +430,9 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, where, getDocs, writeBatch, serverTimestamp, onSnapshot, orderBy, limit, addDoc, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+        import { auth, db } from './config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { doc, getDoc, collection, query, where, getDocs, writeBatch, serverTimestamp, onSnapshot, orderBy, limit, addDoc, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         // --- UI UTILS ---
         window.toggleSidebar = () => { 
@@ -458,9 +459,14 @@
             try {
                 let q = collection(db, "users");
                 if(target !== 'all') q = query(collection(db, "users"), where("role", "==", target));
+                
+                // Optimized Count Query (Doesn't download docs)
                 const snap = await getCountFromServer(q);
                 el.innerText = snap.data().count.toLocaleString() + " Users";
-            } catch(e) { el.innerText = "--"; }
+            } catch(e) { 
+                console.error(e);
+                el.innerText = "Check Connection"; 
+            }
         }
 
         // --- CONTEXTUAL AI ENGINE ---
@@ -598,11 +604,11 @@
                 if(target !== 'all') q = query(collection(db, "users"), where("role", "==", target));
                 
                 const snapshot = await getDocs(q);
-                if(snapshot.empty) throw "No users found.";
+                if(snapshot.empty) throw new Error("No users found matching audience.");
 
                 const users = snapshot.docs;
                 const total = users.length;
-                const CHUNK_SIZE = 400; 
+                const CHUNK_SIZE = 400; // Safe below 500 limit
                 
                 let processed = 0;
 
@@ -681,16 +687,14 @@
         };
 
         function initBadges() {
-            const txQ = query(collection(db, "transactions"), where("status", "==", "pending"));
-            onSnapshot(txQ, (snap) => {
+            onSnapshot(query(collection(db, "transactions"), where("status", "==", "pending")), (snap) => {
                 const count = snap.size;
                 const badge = document.getElementById('notif-badge');
                 if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
                 else badge.style.display = 'none';
             });
             
-            const msgQ = query(collection(db, "support_tickets"), where("status", "==", "open"));
-             onSnapshot(msgQ, (snap) => {
+            onSnapshot(query(collection(db, "support_tickets"), where("status", "==", "open")), (snap) => {
                 const count = snap.size;
                 const badge = document.getElementById('msg-badge');
                 if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
@@ -723,6 +727,14 @@
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
         }
+
+        // Expose to window
+        window.countAudience = countAudience;
+        window.generateSmartContent = generateSmartContent;
+        window.updatePreview = updatePreview;
+        window.sendTestBroadcast = sendTestBroadcast;
+        window.sendBroadcast = sendBroadcast;
+        window.loadHistory = loadHistory;
     </script>
 </body>
 </html>

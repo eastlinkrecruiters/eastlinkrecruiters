@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
     
     <!-- Fonts & Icons -->
@@ -251,6 +252,9 @@
             <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
                 <i class="fa-solid fa-user-shield"></i>
             </div>
+            <div class="icon-btn" onclick="logout()" style="color:var(--danger);" title="Logout">
+                <i class="fa-solid fa-power-off"></i>
+            </div>
         </div>
     </header>
 
@@ -272,7 +276,7 @@
             <div class="nav-label">Jobs & Service</div>
             <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
             <a href="admin-guaranteed-jobs.html" class="nav-item"><i class="fa-solid fa-certificate"></i> Guaranteed Jobs</a>
-            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Vacancy</a>
         </div>
 
         <div class="nav-group">
@@ -284,10 +288,7 @@
 
         <div class="nav-group">
             <div class="nav-label">System</div>
-            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
-            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
-            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
-            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="admin-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
@@ -502,12 +503,9 @@
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, getDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+        import { auth, db } from './config.js'; // Imports from local config
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { collection, doc, setDoc, getDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         // --- UI UTILS ---
         window.toggleSidebar = () => { 
@@ -559,31 +557,45 @@
             for(const pid of planIds) {
                 try {
                     const snap = await getDoc(doc(db, "plans", pid));
-                    if(snap.exists()) {
-                        const d = snap.data();
-                        if(pid === 'seeker_standard') {
-                            setVal('s-std-price', d.price); setVal('s-std-limit', d.limit);
-                            setCheck('s-std-verified', d.verified); setCheck('s-std-sms', d.sms); setCheck('s-std-dm', d.dm);
-                        }
-                        if(pid === 'seeker_pro') {
-                            setVal('s-pro-price', d.price); setVal('s-pro-limit', d.limit);
-                            setCheck('s-pro-verified', d.verified); setCheck('s-pro-sms', d.sms); setCheck('s-pro-dm', d.dm);
-                        }
-                        if(pid === 'employer_growth') {
-                            setVal('e-gro-price', d.price); setVal('e-gro-limit', d.limit);
-                            setCheck('e-gro-verified', d.verified); setCheck('e-gro-cv', d.cvAccess); setCheck('e-gro-feat', d.featured);
-                        }
-                        if(pid === 'employer_scale') {
-                            setVal('e-scl-price', d.price); setVal('e-scl-limit', d.limit);
-                            setCheck('e-scl-verified', d.verified); setCheck('e-scl-cv', d.cvAccess); setCheck('e-scl-feat', d.featured);
-                        }
+                    const d = snap.exists() ? snap.data() : {};
+                    
+                    // Default values if document does not exist yet (prevents crashes)
+                    if(pid === 'seeker_standard') {
+                        setVal('s-std-price', d.price || 550); setVal('s-std-limit', d.limit || 15);
+                        setCheck('s-std-verified', d.verified !== undefined ? d.verified : true); 
+                        setCheck('s-std-sms', d.sms !== undefined ? d.sms : true); 
+                        setCheck('s-std-dm', d.dm !== undefined ? d.dm : false);
+                    }
+                    if(pid === 'seeker_pro') {
+                        setVal('s-pro-price', d.price || 1550); setVal('s-pro-limit', d.limit || 9999);
+                        setCheck('s-pro-verified', d.verified !== undefined ? d.verified : true); 
+                        setCheck('s-pro-sms', d.sms !== undefined ? d.sms : true); 
+                        setCheck('s-pro-dm', d.dm !== undefined ? d.dm : true);
+                    }
+                    if(pid === 'employer_growth') {
+                        setVal('e-gro-price', d.price || 500); setVal('e-gro-limit', d.limit || 5);
+                        setCheck('e-gro-verified', d.verified !== undefined ? d.verified : true); 
+                        setCheck('e-gro-cv', d.cvAccess !== undefined ? d.cvAccess : true); 
+                        setCheck('e-gro-feat', d.featured !== undefined ? d.featured : false);
+                    }
+                    if(pid === 'employer_scale') {
+                        setVal('e-scl-price', d.price || 1100); setVal('e-scl-limit', d.limit || 9999);
+                        setCheck('e-scl-verified', d.verified !== undefined ? d.verified : true); 
+                        setCheck('e-scl-cv', d.cvAccess !== undefined ? d.cvAccess : true); 
+                        setCheck('e-scl-feat', d.featured !== undefined ? d.featured : true);
                     }
                 } catch(e) { console.log("Init plan error", e); }
             }
         }
 
-        function setVal(id, val) { if(val !== undefined) document.getElementById(id).value = val; }
-        function setCheck(id, val) { if(val !== undefined) document.getElementById(id).checked = val; }
+        function setVal(id, val) { 
+            const el = document.getElementById(id); 
+            if(el) el.value = val; 
+        }
+        function setCheck(id, val) { 
+            const el = document.getElementById(id);
+            if(el) el.checked = val; 
+        }
         
         const getVal = (id) => Number(document.getElementById(id).value);
         const getCheck = (id) => document.getElementById(id).checked;
@@ -606,6 +618,7 @@
             }
 
             try {
+                // Using setDoc with merge: true ensures we create the doc if it doesn't exist
                 await setDoc(doc(db, "plans", planId), { ...data, updatedAt: new Date() }, { merge: true });
                 Toastify({ text: "Plan Config Updated!", style: { background: "#10B981" } }).showToast();
             } catch(err) {
@@ -641,6 +654,10 @@
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
         }
+        
+        // Make functions globally available for HTML inline handlers
+        window.savePlan = savePlan;
+        window.switchTab = switchTab;
     </script>
 </body>
 </html>

@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
     
     <!-- Fonts & Icons -->
@@ -250,6 +251,9 @@
             <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
                 <i class="fa-solid fa-user-shield"></i>
             </div>
+             <div class="icon-btn" onclick="logout()" style="color:var(--danger);" title="Logout">
+                <i class="fa-solid fa-power-off"></i>
+            </div>
         </div>
     </header>
 
@@ -271,7 +275,7 @@
             <div class="nav-label">Jobs & Service</div>
             <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
             <a href="admin-guaranteed-jobs.html" class="nav-item"><i class="fa-solid fa-certificate"></i> Guaranteed Jobs</a>
-            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Vacancy</a>
         </div>
 
         <div class="nav-group">
@@ -283,10 +287,7 @@
 
         <div class="nav-group">
             <div class="nav-label">System</div>
-            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
-            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
-            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
-            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="admin-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
@@ -340,7 +341,7 @@
                                 <option value="System Correction">System Error Correction</option>
                             </select>
                         </div>
-                        <button class="btn-action btn-success" onclick="correctAndApprove()">
+                        <button class="btn-action btn-success" id="btn-tx-approve" onclick="correctAndApprove()">
                             <i class="fas fa-check-double"></i> Correct & Approve
                         </button>
                     </div>
@@ -426,12 +427,12 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, collection, doc, getDoc, getDocs, query, where, runTransaction, serverTimestamp, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { auth, db } from './config.js'; // Secure Import
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { collection, doc, getDoc, getDocs, query, where, runTransaction, serverTimestamp, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+        let currentTx = null;
+        let currentUser = null;
 
         // --- UI UTILS ---
         window.toggleSidebar = () => { 
@@ -444,9 +445,6 @@
                 signOut(auth).then(() => window.location.href = 'signin.html');
             }
         };
-
-        let currentTx = null;
-        let currentUser = null;
 
         onAuthStateChanged(auth, async (user) => {
             if(!user) window.location.href = 'signin.html';
@@ -508,6 +506,10 @@
 
             if(!confirm(`⚠️ CORRECTION ALERT ⚠️\n\nOriginal Claim: KES ${currentTx.amount}\nCorrected To: KES ${newAmt}\n\nAre you sure you want to approve this?`)) return;
 
+            const btn = document.getElementById('btn-tx-approve');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
+
             try {
                 await runTransaction(db, async (t) => {
                     const txRef = doc(db, "transactions", currentTx.id);
@@ -552,6 +554,9 @@
             } catch(e) {
                 console.error(e);
                 alert("Error: " + e);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check-double"></i> Correct & Approve';
             }
         };
 
@@ -611,8 +616,7 @@
             }
 
             const btn = document.getElementById('btn-ledger-process');
-            const originalHtml = btn.innerHTML;
-
+            
             try {
                 btn.disabled = true;
                 btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Processing...';
@@ -620,14 +624,17 @@
                 await runTransaction(db, async (t) => {
                     const userRef = doc(db, "users", currentUser.id);
                     const userDoc = await t.get(userRef);
+                    if(!userDoc.exists()) throw "User does not exist.";
+                    
                     const currentBal = userDoc.data().walletBalance || 0;
                     let newBal = currentBal;
 
                     if(type === 'debit') {
                         if(currentBal < amt) throw "Insufficient funds for Debit operation.";
-                        newBal -= amt;
+                        newBal = currentBal - amt;
                     } else {
-                        newBal += amt;
+                        // Credit or Bonus
+                        newBal = currentBal + amt;
                     }
 
                     t.update(userRef, { walletBalance: newBal });
@@ -656,7 +663,13 @@
                 });
 
                 Toastify({text:"Ledger Updated Successfully", style:{background:"var(--success)"}}).showToast();
-                document.getElementById('u-bal').innerText = "KES " + (type==='debit' ? (currentUser.walletBalance - amt) : (currentUser.walletBalance + amt)).toLocaleString();
+                
+                // Update UI Display immediately
+                const finalBal = type==='debit' ? (currentUser.walletBalance - amt) : (currentUser.walletBalance + amt);
+                document.getElementById('u-bal').innerText = "KES " + finalBal.toLocaleString();
+                // Update local obj
+                currentUser.walletBalance = finalBal;
+
                 document.getElementById('ledger-amount').value = "";
                 document.getElementById('ledger-note').value = "";
 
@@ -665,7 +678,7 @@
                 alert("Error: " + e);
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = originalHtml;
+                btn.innerHTML = '<i class="fas fa-file-invoice-dollar"></i> Process Adjustment';
             }
         };
 
@@ -694,6 +707,14 @@
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
         }
+
+        // Expose functions globally for onclick events
+        window.findTransaction = findTransaction;
+        window.correctAndApprove = correctAndApprove;
+        window.findUser = findUser;
+        window.updateFreezeStatus = updateFreezeStatus;
+        window.processLedgerUpdate = processLedgerUpdate;
+
     </script>
 </body>
 </html>

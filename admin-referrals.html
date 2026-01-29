@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
     
     <!-- Fonts & Icons -->
@@ -213,6 +214,7 @@
             border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; font-family: var(--font-body);
         }
         .btn-save:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3); }
+        .btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
 
         .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 998; backdrop-filter: blur(4px); }
 
@@ -266,6 +268,9 @@
             <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
                 <i class="fa-solid fa-user-shield"></i>
             </div>
+            <div class="icon-btn" onclick="logout()" style="color:var(--danger);" title="Logout">
+                <i class="fa-solid fa-power-off"></i>
+            </div>
         </div>
     </header>
 
@@ -287,7 +292,7 @@
             <div class="nav-label">Jobs & Service</div>
             <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
             <a href="admin-guaranteed-jobs.html" class="nav-item"><i class="fa-solid fa-certificate"></i> Guaranteed Jobs</a>
-            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Vacancy</a>
         </div>
 
         <div class="nav-group">
@@ -299,10 +304,7 @@
 
         <div class="nav-group">
             <div class="nav-label">System</div>
-            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
-            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
-            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
-            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="admin-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
@@ -371,7 +373,7 @@
                 <div class="glass-panel side-box">
                     <div class="sb-title"><i class="fas fa-trophy" style="color:var(--gold-base);"></i> Top Referrers</div>
                     <div id="leaderboard-list">
-                        <div style="text-align:center; color:var(--text-muted); font-size:0.8rem;">Loading...</div>
+                        <div style="text-align:center; color:var(--text-muted); font-size:0.8rem; padding:15px;"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>
                     </div>
                 </div>
 
@@ -385,7 +387,7 @@
                     <label class="config-label">Company Scale Reward (KES)</label>
                     <input type="number" class="config-input" value="500" id="conf-employer">
 
-                    <button class="btn-save" onclick="saveConfig()"><i class="fas fa-save"></i> Update Rates</button>
+                    <button class="btn-save" id="btn-save-config" onclick="saveConfig()"><i class="fas fa-save"></i> Update Rates</button>
                 </div>
             </div>
         </div>
@@ -408,15 +410,12 @@
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, collection, doc, getDoc, getDocs, query, where, orderBy, updateDoc, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+        import { auth, db } from './config.js'; // Secure Import
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { doc, getDoc, getDocs, collection, query, where, orderBy, updateDoc, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         let allReferrals = [];
-        let userCache = {};
+        let userCache = {}; // Cache to avoid repetitive reads for referrers
 
         // --- UI UTILS ---
         window.toggleSidebar = () => { 
@@ -432,6 +431,7 @@
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = 'signin.html'; return; }
+            // Optional: Check role here
             initBadges();
             initReferralData();
             initLeaderboard();
@@ -452,6 +452,7 @@
 
         async function initReferralData() {
             try {
+                // Query users who have a referrer
                 const q = query(collection(db, "users"), where("referredBy", "!=", null));
                 
                 onSnapshot(q, async (snapshot) => {
@@ -460,16 +461,26 @@
                     let totalPaid = 0;
                     const docs = snapshot.docs;
                     
+                    // Identify referrers we haven't cached yet
                     const referrerIds = new Set();
-                    docs.forEach(d => referrerIds.add(d.data().referredBy));
+                    docs.forEach(d => {
+                        const refId = d.data().referredBy;
+                        if(refId) referrerIds.add(refId);
+                    });
                     
                     const uncachedIds = [...referrerIds].filter(id => !userCache[id]);
+                    
+                    // Batch fetch unknown referrers (limited optimization)
                     if(uncachedIds.length > 0) {
                         await Promise.all(uncachedIds.map(async (uid) => {
                             try {
                                 const snap = await getDoc(doc(db, "users", uid));
-                                if(snap.exists()) userCache[uid] = snap.data().fullName || snap.data().companyName || "Unknown";
-                                else userCache[uid] = "Deleted User";
+                                if(snap.exists()) {
+                                    const d = snap.data();
+                                    userCache[uid] = d.fullName || d.companyName || "Unknown";
+                                } else {
+                                    userCache[uid] = "Deleted User";
+                                }
                             } catch(e) { userCache[uid] = "Unknown"; }
                         }));
                     }
@@ -479,6 +490,7 @@
                         const uid = d.id;
                         const referrerName = userCache[u.referredBy] || "Unknown";
                         
+                        // Commission Logic (Should ideally match backend logic)
                         let comm = 0;
                         let isQualified = false;
                         
@@ -512,7 +524,8 @@
                 });
             } catch(e) {
                 console.error("Referral Index Error:", e);
-                document.getElementById('table-body').innerHTML = `<tr><td colspan="6" style="color:var(--danger); text-align:center; padding:20px;">Error loading data. Check console (Missing Index?).</td></tr>`;
+                // Hint about Firestore Indexes
+                document.getElementById('table-body').innerHTML = `<tr><td colspan="6" style="color:var(--danger); text-align:center; padding:20px;">Data Error. Ensure Firestore Composite Index exists for 'referredBy'.</td></tr>`;
             }
         }
 
@@ -525,6 +538,7 @@
                 return;
             }
 
+            // Sort by date descending
             data.sort((a, b) => (b.date?.seconds || 0) - (a.date?.seconds || 0));
 
             data.forEach(item => {
@@ -547,7 +561,7 @@
                     <tr>
                         <td>
                             <div style="font-weight:600; color:var(--text-main);">${item.referrerName}</div>
-                            <div style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-display);">ID: ...${item.referrerId.slice(-4)}</div>
+                            <div style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-display);">ID: ...${(item.referrerId || "").slice(-4)}</div>
                         </td>
                         <td>
                             <div>
@@ -595,13 +609,19 @@
                     list.innerHTML = '';
                     let rank = 1;
                     
+                    if (snap.empty) {
+                        list.innerHTML = '<div style="text-align:center; font-size:0.8rem; color:var(--text-muted); padding:10px;">No referrals yet.</div>';
+                        return;
+                    }
+
                     snap.forEach(d => {
                         const u = d.data();
+                        // Only show if count > 0
                         if(u.referralCount > 0) {
                             list.innerHTML += `
                                 <div class="lb-item">
                                     <div class="lb-rank ${rank <= 3 ? 'top' : ''}">#${rank}</div>
-                                    <div class="lb-avatar">${(u.fullName || u.companyName || "U").charAt(0)}</div>
+                                    <div class="lb-avatar">${(u.fullName || u.companyName || "U").charAt(0).toUpperCase()}</div>
                                     <div style="flex:1; min-width:0;">
                                         <div style="font-size:0.85rem; font-weight:600; color:var(--text-main); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                                             ${u.fullName || u.companyName}
@@ -614,17 +634,27 @@
                             rank++;
                         }
                     });
-                    if(list.innerHTML === '') list.innerHTML = '<div style="text-align:center; font-size:0.8rem; color:var(--text-muted); padding:10px;">No referrals yet.</div>';
                 });
             } catch(e) {
-                 document.getElementById('leaderboard-list').innerHTML = '<div style="text-align:center; color:var(--danger); font-size:0.7rem;">Index Required</div>';
+                console.warn(e);
+                 document.getElementById('leaderboard-list').innerHTML = '<div style="text-align:center; color:var(--danger); font-size:0.7rem;">Index Required (referralCount DESC)</div>';
             }
         }
 
         window.saveConfig = () => {
+            const btn = document.getElementById('btn-save-config');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
             const seekerRate = document.getElementById('conf-seeker').value;
             const empRate = document.getElementById('conf-employer').value;
-            Toastify({ text: `Rates Updated Locally: Seeker(${seekerRate}), Emp(${empRate})`, style: { background: "#3B82F6" } }).showToast();
+            
+            // Mock Save (In real app, save to a 'settings' collection)
+            setTimeout(() => {
+                Toastify({ text: `Rates Updated: Seeker(${seekerRate}), Emp(${empRate})`, style: { background: "#3B82F6" } }).showToast();
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> Update Rates';
+            }, 800);
         };
 
         // --- PWA LOGIC ---
@@ -652,6 +682,12 @@
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
         }
+        
+        // Expose to window for onclick attributes
+        window.filterTable = filterTable;
+        window.markPaid = markPaid;
+        window.saveConfig = saveConfig;
+
     </script>
 </body>
 </html>

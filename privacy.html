@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" style="background-color: #020617; color-scheme: dark;">
+<html lang="en" data-theme="dark" style="background-color: #020617;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Privacy Policy | EastLink Recruiters</title>
     
-    <!-- PWA Manifest & Favicon (Updated Paths) -->
+    <!-- PWA Manifest & Favicon -->
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#020617">
@@ -25,21 +25,25 @@
         :root {
             --primary: #f59e0b;
             --primary-dark: #d97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            
             --bg: #020617; 
-            --bg-glass-70: rgba(15, 23, 42, 0.9); /* Increased opacity for better readability */
+            --bg-glass-70: rgba(15, 23, 42, 0.65); 
+            --bg-glass-hover: rgba(30, 41, 59, 0.75);
+            
             --text: #F8FAFC;
             --text-muted: #94A3B8;
-            --border-color: rgba(255, 255, 255, 0.1);
+            
+            --border-color: rgba(255, 255, 255, 0.08);
             --header-height: 80px;
-            --transition: all 0.3s ease;
-            --radius: 16px;
+            --transition: cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 20px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         
-        /* FORCE DARK BACKGROUND */
         html {
-            background-color: #020617;
+            background-color: var(--bg);
             scroll-behavior: smooth;
             scroll-padding-top: 120px;
         }
@@ -47,7 +51,6 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg);
-            /* Fallback image handling - Relative Path */
             background-image: url('./assets/images/background.png');
             background-attachment: fixed;
             background-position: center;
@@ -59,22 +62,31 @@
             display: flex; flex-direction: column;
         }
 
+        /* Ambient Overlay */
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background: radial-gradient(circle at top right, rgba(15, 23, 42, 0.4) 0%, #020617 100%);
+            z-index: -5; pointer-events: none;
+        }
+
         /* Scrollbar Fix */
-        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 5px; border: 2px solid var(--bg); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
 
         h1, h2, h3, .brand-font { font-family: 'Cinzel', serif; }
-        a { text-decoration: none; color: inherit; transition: var(--transition); }
+        a { text-decoration: none; color: inherit; transition: var(--transition) 0.3s; }
         
         .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
 
         /* HEADER */
         header {
             position: fixed; top: 0; width: 100%; height: var(--header-height);
-            z-index: 1000; background: var(--bg-glass-70);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            z-index: 1000; transition: var(--transition) 0.3s; 
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .nav-inner { height: 100%; display: flex; justify-content: space-between; align-items: center; }
@@ -83,21 +95,24 @@
             font-family: 'Cinzel', serif; font-size: 1.4rem; font-weight: 700; 
             color: var(--text); letter-spacing: 1px; display: flex; align-items: center; gap: 12px;
         }
-        .header-logo-text span { color: var(--primary); }
+        .header-logo-text span { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         .menu-trigger {
             display: inline-flex; align-items: center; gap: 12px; cursor: pointer;
-            padding: 8px 20px; border-radius: 99px;
-            background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);
-            color: var(--text); font-size: 0.75rem; font-weight: 600;
+            padding: 10px 24px; border-radius: 99px;
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-color);
+            color: var(--text); font-size: 0.8rem; font-weight: 600; letter-spacing: 1px;
+            transition: var(--transition) 0.3s;
         }
+        .menu-trigger:hover { border-color: var(--primary); background: rgba(245, 158, 11, 0.1); }
 
         /* MOBILE MENU */
         .menu-overlay {
             position: fixed; inset: 0; 
-            background: #020617; /* Solid color for mobile menu to prevent transparency issues */
+            background: rgba(2, 6, 23, 0.98);
+            backdrop-filter: blur(15px);
             z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: 0.3s;
+            opacity: 0; pointer-events: none; transition: var(--transition) 0.4s;
         }
         .menu-overlay.active { opacity: 1; pointer-events: all; }
         
@@ -105,19 +120,28 @@
             position: absolute; top: 30px; right: 30px;
             width: 44px; height: 44px; border-radius: 50%;
             border: 1px solid var(--border-color); color: var(--text-muted);
-            display: grid; place-items: center; cursor: pointer; font-size: 1.2rem;
+            display: grid; place-items: center; cursor: pointer; transition: 0.3s; font-size: 1.2rem;
         }
-        .menu-links { text-align: center; display: flex; flex-direction: column; gap: 25px; }
-        .menu-link { font-family: 'Cinzel', serif; font-size: 2rem; font-weight: 700; color: var(--text); }
-        .menu-actions { margin-top: 50px; display: flex; gap: 15px; }
+        .close-menu:hover { border-color: var(--primary); color: var(--primary); transform: rotate(90deg); }
+        
+        .menu-links { text-align: center; display: flex; flex-direction: column; gap: 30px; }
+        .menu-link {
+            font-family: 'Cinzel', serif; font-size: 2.5rem; font-weight: 700;
+            color: var(--text); transition: 0.3s;
+        }
+        .menu-link:hover { color: var(--primary); transform: scale(1.05); }
 
         /* CONTENT */
         .page-intro {
-            padding: calc(var(--header-height) + 40px) 0 40px; 
+            padding: calc(var(--header-height) + 60px) 0 40px; 
             text-align: center; border-bottom: 1px solid var(--border-color);
             margin-bottom: 60px;
         }
-        .page-intro h2 { font-size: 2.5rem; margin-bottom: 10px; color: var(--text); }
+        .page-intro h2 { 
+            font-size: 2.8rem; margin-bottom: 15px; color: var(--text); 
+            background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .page-intro p { color: var(--text-muted); }
 
         .docs-layout {
             display: grid; grid-template-columns: 280px 1fr; gap: 60px; padding-bottom: 80px;
@@ -128,32 +152,55 @@
             position: sticky; top: 120px; height: fit-content;
             background: var(--bg-glass-70); border: 1px solid var(--border-color);
             padding: 30px; border-radius: var(--radius);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
         }
+        .toc-title { font-family: 'Cinzel', serif; font-weight: 700; margin-bottom: 20px; color: var(--text); }
         .toc-list li { list-style: none; margin-bottom: 10px; }
-        .toc-link { font-size: 0.9rem; color: var(--text-muted); display: block; padding: 8px 15px; border-left: 2px solid transparent; }
-        .toc-link.active { color: var(--text); border-left-color: var(--primary); background: rgba(255,255,255,0.03); }
+        .toc-link { font-size: 0.9rem; color: var(--text-muted); display: block; padding: 10px 15px; border-left: 2px solid transparent; transition: 0.3s; border-radius: 0 8px 8px 0; }
+        .toc-link:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+        .toc-link.active { color: var(--primary); border-left-color: var(--primary); background: rgba(245, 158, 11, 0.05); }
 
         .docs-content {
             background: var(--bg-glass-70); padding: 50px; border-radius: var(--radius);
             border: 1px solid var(--border-color);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
-        .section-block { margin-bottom: 50px; }
+        .section-block { margin-bottom: 50px; scroll-margin-top: 150px; }
         .section-block h2 { font-size: 1.8rem; color: var(--text); margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
         .section-block h3 { font-size: 1.2rem; color: var(--primary); margin: 30px 0 15px; font-weight: 600; }
         .section-block p, .section-block ul { color: var(--text-muted); margin-bottom: 15px; line-height: 1.8; }
-        .highlight-box { background: rgba(245, 158, 11, 0.1); border-left: 4px solid var(--primary); padding: 25px; border-radius: 8px; margin: 30px 0; }
-        .highlight-box p { margin: 0; color: var(--text); }
+        .section-block ul { padding-left: 20px; }
+        .section-block ul li { margin-bottom: 10px; }
+        
+        .highlight-box { 
+            background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2);
+            padding: 25px; border-radius: 12px; margin: 30px 0; 
+        }
+        .highlight-box p { margin: 0; color: var(--text); font-weight: 500; }
 
         /* FOOTER */
-        footer { background: var(--bg-glass-70); border-top: 1px solid var(--border-color); padding-top: 4rem; margin-top: auto; }
+        footer { 
+            background: rgba(2, 6, 23, 0.9); border-top: 1px solid var(--border-color); 
+            padding-top: 5rem; margin-top: auto; backdrop-filter: blur(20px);
+        }
         .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; margin-bottom: 4rem; }
-        .f-col h4 { font-size: 0.9rem; color: var(--text); margin-bottom: 1.5rem; font-weight: 700; text-transform: uppercase; font-family: 'Cinzel', serif; }
+        
+        .f-col h4 { font-size: 0.9rem; color: var(--text); margin-bottom: 1.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-family: 'Cinzel', serif; }
         .f-col ul { list-style: none; }
         .f-col ul li { margin-bottom: 12px; }
-        .f-col a { color: var(--text-muted); font-size: 0.9rem; }
-        .social-links { display: flex; gap: 10px; margin-top: 25px; }
-        .s-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-muted); display: grid; place-items: center; }
-        .copyright { border-top: 1px solid var(--border-color); padding: 2rem 0; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+        .f-col a { color: var(--text-muted); font-size: 0.9rem; transition: 0.2s; }
+        .f-col a:hover { color: var(--primary); padding-left: 5px; }
+        
+        .social-links { display: flex; gap: 12px; margin-top: 25px; }
+        .s-btn {
+            width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-color); color: var(--text-muted);
+            display: grid; place-items: center; transition: 0.3s; font-size: 1.1rem;
+        }
+        .s-btn:hover { background: var(--gold-gradient); color: #000; border-color: transparent; transform: translateY(-3px); }
+        
+        .copyright { border-top: 1px solid var(--border-color); padding: 2.5rem 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
 
         @media (max-width: 900px) {
             .docs-layout { grid-template-columns: 1fr; }
@@ -163,22 +210,21 @@
         }
         @media (max-width: 600px) {
             .footer-grid { grid-template-columns: 1fr; }
-            .page-intro h2 { font-size: 1.8rem; }
-            .header-logo-text div { display: none; } /* Show only icon on very small screens to save space */
+            .page-intro h2 { font-size: 2rem; }
         }
     </style>
 </head>
-<body style="background-color: #020617;">
+<body>
 
     <!-- Scroll Progress -->
-    <div id="scroll-progress" style="position: fixed; top: 0; left: 0; height: 3px; background: var(--primary); z-index: 2000; width: 0%;"></div>
+    <div id="scroll-progress" style="position: fixed; top: 0; left: 0; height: 3px; background: var(--gold-gradient); z-index: 2000; width: 0%; box-shadow: 0 0 10px var(--primary);"></div>
 
     <!-- HEADER -->
     <header id="header">
         <div class="container nav-inner">
             <a href="index.html" class="header-logo-text">
                 <img src="./assets/images/logo.png" style="height:35px; width:auto;" alt="Logo">
-                <div style="display:block;">EAST<span>LINK</span></div>
+                <div>EAST<span>LINK</span></div>
             </a>
             <div class="menu-trigger" onclick="toggleMenu()">
                 <span>MENU</span>
@@ -193,11 +239,12 @@
         <div class="menu-links">
             <a href="index.html" class="menu-link">Home</a>
             <a href="about.html" class="menu-link">About Us</a>
+            <a href="services.html" class="menu-link">Services</a>
             <a href="contact.html" class="menu-link">Contact</a>
         </div>
         <div class="menu-actions">
-            <a href="signin.html" class="btn" style="color:white; border:1px solid var(--border-color); border-radius:50px; padding:12px 30px; text-decoration:none;">Sign In</a>
-            <a href="signup.html" class="btn" style="background:var(--primary); color:black; border-radius:50px; padding:12px 30px; font-weight:700; text-decoration:none;">Join Now</a>
+            <a href="signin.html" class="btn" style="background:transparent; border:1px solid var(--border-color); color:white; border-radius:50px; padding:12px 30px; text-decoration:none; font-weight:600;">Sign In</a>
+            <a href="signup.html" class="btn" style="background:var(--gold-gradient); color:black; border-radius:50px; padding:12px 30px; font-weight:700; text-decoration:none;">Join Now</a>
         </div>
     </div>
 
@@ -208,7 +255,7 @@
             <!-- Page Intro -->
             <div class="page-intro">
                 <h2 class="brand-font">Privacy Policy</h2>
-                <p>Effective Date: <span id="date-display" style="color:var(--primary); font-weight:600;">January 1, 2025</span></p>
+                <p>Effective Date: <span id="date-display" style="color:var(--primary); font-weight:600;">January 1, 2026</span></p>
             </div>
 
             <div class="docs-layout">
@@ -293,7 +340,7 @@
                         <p>
                             <strong>Email:</strong> <a href="mailto:eastlinkrecruiters@gmail.com" style="color:var(--primary); font-weight:600;">eastlinkrecruiters@gmail.com</a><br>
                             <strong>Phone:</strong> <a href="tel:+254781842387" style="color:var(--primary); font-weight:600;">+254 781 842 387</a><br>
-                            <strong>Address:</strong> Nairobi, Kenya
+                            <strong>Address:</strong> Westlands, Nairobi, Kenya
                         </p>
                     </div>
 
@@ -311,7 +358,7 @@
                         <img src="./assets/images/logo.png" style="height:35px; width:auto;" alt="EastLink">
                         <div style="color:white;">EAST<span style="color:var(--primary);">LINK</span></div>
                     </div>
-                    <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.6;">The leading platform for professional recruitment. We ensure quality, trust, and speed.</p>
+                    <p style="color:var(--text-muted); font-size:0.95rem; line-height:1.7;">The leading platform for professional recruitment. We ensure quality, trust, and speed.</p>
                     <div class="social-links">
                         <a href="#" id="link-fb" class="s-btn" target="_blank"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" id="link-in" class="s-btn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
@@ -338,7 +385,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="copyright">&copy; <span id="year"></span> EastLink Recruitment Solutions. All rights reserved.</div>
+            <div class="copyright">&copy; 2026 EastLink Recruitment Solutions. All rights reserved.</div>
         </div>
     </footer>
 
@@ -348,7 +395,7 @@
         position: fixed; bottom: 20px; right: 20px; 
         background: rgba(15, 23, 42, 0.95); 
         border: 1px solid rgba(245, 158, 11, 0.3);
-        backdrop-filter: blur(12px);
+        backdrop-filter: blur(20px);
         padding: 20px; border-radius: 16px; 
         z-index: 10000; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         max-width: 320px; animation: slideUp 0.5s ease-out;
@@ -361,7 +408,7 @@
             </div>
         </div>
         <div style="display:flex; gap:10px;">
-            <button id="pwa-dismiss" style="flex:1; padding:10px; background:transparent; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:8px; cursor:pointer;">Later</button>
+            <button id="pwa-dismiss" style="flex:1; padding:10px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:8px; cursor:pointer;">Later</button>
             <button id="pwa-install-btn" style="flex:1; padding:10px; background:linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border:none; color:#000; font-weight:700; border-radius:8px; cursor:pointer;">Install</button>
         </div>
     </div>
@@ -370,7 +417,6 @@
     <!-- SCRIPTS -->
     <script>
         // --- BASIC UI ---
-        document.getElementById("year").textContent = new Date().getFullYear();
         document.getElementById('date-display').innerText = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
         window.toggleMenu = () => {
@@ -434,35 +480,25 @@
         // --- PWA LOGIC END ---
     </script>
 
-    <!-- FIREBASE (Error Handled) -->
+    <!-- FIREBASE -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { db } from './config.js';
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        
-        try {
-            const app = initializeApp(firebaseConfig);
-            const db = getFirestore(app);
-
-            async function loadSocials() {
-                try {
-                    const docRef = doc(db, "site_settings", "general"); 
-                    const docSnap = await getDoc(docRef);
-                    if (docSnap.exists()) {
-                        const data = docSnap.data();
-                        if(data.facebook) document.getElementById('link-fb').href = data.facebook;
-                        if(data.linkedin) document.getElementById('link-in').href = data.linkedin;
-                        if(data.twitter) document.getElementById('link-tw').href = data.twitter;
-                        if(data.instagram) document.getElementById('link-ig').href = data.instagram;
-                    }
-                } catch (e) { console.log("Socials failed to load"); }
-            }
-            loadSocials();
-        } catch (e) {
-            console.log("Firebase failed to load, page continuing.");
+        async function loadSocials() {
+            try {
+                const docRef = doc(db, "site_settings", "general"); 
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if(data.facebook) document.getElementById('link-fb').href = data.facebook;
+                    if(data.linkedin) document.getElementById('link-in').href = data.linkedin;
+                    if(data.twitter) document.getElementById('link-tw').href = data.twitter;
+                    if(data.instagram) document.getElementById('link-ig').href = data.instagram;
+                }
+            } catch (e) { }
         }
+        loadSocials();
     </script>
 </body>
 </html>

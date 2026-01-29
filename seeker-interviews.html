@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
     
     <!-- Fonts & Icons -->
@@ -29,13 +30,18 @@
             --border-color: rgba(255, 255, 255, 0.12);
             --text-main: #F8FAFC;     
             --text-muted: #94A3B8; 
-            --gold-base: #D97706;
+            
+            --gold-base: #fbbf24;
             --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            
+            /* Page Specific Theme: Purple/Neon */
             --neon-purple: #8b5cf6;
             --purple-gradient: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+            
             --danger-gradient: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
             --success: #10B981;
             --danger: #EF4444;
+            
             --sidebar-width: 260px; 
             --header-height: 70px;
             --radius: 16px;
@@ -51,15 +57,12 @@
         body { 
             font-family: var(--font-body); 
             background-color: var(--bg-body); 
-            background-image: url('assets/images/background.png');
+            background: url('./assets/images/background.png') no-repeat center center fixed;
             background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
             color: var(--text-main); 
             min-height: 100vh; 
             overflow-x: hidden;
-            transition: background 0.3s ease;
+            display: flex; flex-direction: column;
         }
 
         /* --- GLASS UTILS --- */
@@ -82,7 +85,7 @@
         }
         .header-left { display: flex; align-items: center; gap: 15px; }
         .logo { font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; }
-        .logo span { color: var(--gold-base); }
+        .logo span { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .hamburger { font-size: 1.4rem; cursor: pointer; color: var(--text-muted); display: none; }
 
         .global-search-container { flex: 1; max-width: 450px; position: relative; margin: 0 20px; }
@@ -91,12 +94,27 @@
             padding: 10px 45px 10px 15px; border-radius: 12px; color: var(--text-main);
             transition: all 0.3s ease; font-size: 0.9rem;
         }
-        .global-search-input:focus { border-color: var(--gold-base); background: var(--bg-hover); box-shadow: 0 0 15px rgba(217, 119, 6, 0.15); }
+        .global-search-input:focus { border-color: var(--neon-purple); background: var(--bg-hover); box-shadow: 0 0 15px rgba(139, 92, 246, 0.15); }
 
-        .header-actions { display: flex; align-items: center; gap: 10px; }
-        .icon-btn { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; color: var(--text-muted); cursor: pointer; transition: 0.3s; position: relative; }
-        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); transform: translateY(-2px); }
-        .notification-badge { position: absolute; top: 5px; right: 5px; min-width: 16px; height: 16px; background: var(--danger); border-radius: 10px; font-size: 0.6rem; color: white; font-weight: 700; display: none; place-items: center; justify-content: center; padding: 0 4px; border: 2px solid var(--bg-card); }
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+
+        /* Realistic Icons */
+        .icon-btn { 
+            width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; 
+            cursor: pointer; background: rgba(255,255,255,0.03); position: relative; 
+            border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
+        }
+        .icon-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+        .icon-msg { color: #3b82f6; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.4)); }
+        .icon-bell { color: #f59e0b; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.4)); }
+
+        .notification-badge { 
+            position: absolute; top: -3px; right: -3px; width: 18px; height: 18px; 
+            background: #ef4444; border: 2px solid #0f172a; 
+            border-radius: 50%; font-size: 0.65rem; color: white; 
+            display: none; place-items: center; justify-content: center; font-weight: 700; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
         
         .profile-widget { width: 42px; height: 42px; position: relative; cursor: pointer; margin-left: 5px; }
         .user-avatar { width: 100%; height: 100%; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-weight: 700; color: #fff; border: 2px solid var(--border-color); object-fit: cover; }
@@ -111,37 +129,33 @@
         }
         .nav-group { padding: 0 24px; margin-bottom: 20px; }
         .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
-        .nav-item { display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: 0.3s; border-radius: 10px; margin-bottom: 4px; position: relative; }
+        .nav-item { display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: 0.3s; border-radius: 10px; margin-bottom: 4px; position: relative; cursor: pointer; }
         .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
-        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
+        .nav-item.active { background: linear-gradient(90deg, rgba(139, 92, 246, 0.15) 0%, transparent 100%); color: var(--neon-purple); font-weight: 600; border-left: 3px solid var(--neon-purple); }
         .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
         
-        .lock-icon { margin-left: auto; font-size: 0.7rem; opacity: 0; transition: 0.3s; }
-        .nav-item.locked { opacity: 0.6; cursor: not-allowed; }
-        .nav-item.locked:hover { transform: none; background: transparent; color: var(--text-muted); }
-        .nav-item.locked .lock-icon { opacity: 1; color: var(--text-muted); }
-
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 998; backdrop-filter: blur(4px); display: none; }
 
         /* --- MAIN LAYOUT --- */
-        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; display: flex; flex-direction: column; }
         
         .page-header { 
             display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; 
             flex-wrap: wrap; gap: 20px;
         }
         .btn-action { 
-            background: var(--gold-gradient); color: #000; padding: 10px 24px; border-radius: 12px; 
+            background: var(--purple-gradient); color: white; padding: 10px 24px; border-radius: 12px; 
             text-decoration: none; font-weight: 700; font-size: 0.9rem; border: none; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3); transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); transition: 0.3s; display: flex; align-items: center; gap: 8px;
         }
+        .btn-action:hover { box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5); transform: translateY(-2px); }
 
         .btn-secondary-action {
-            background: transparent; color: var(--gold-base); border: 1px solid var(--gold-base);
+            background: transparent; color: var(--neon-purple); border: 1px solid var(--neon-purple);
             padding: 10px 24px; border-radius: 12px; text-decoration: none; font-weight: 700;
-            font-size: 0.9rem; cursor: pointer; transition: 0.3s;
+            font-size: 0.9rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px;
         }
-        .btn-secondary-action:hover { background: rgba(217, 119, 6, 0.1); }
+        .btn-secondary-action:hover { background: rgba(139, 92, 246, 0.1); }
 
         .grid-layout { display: grid; grid-template-columns: 2.2fr 1fr; gap: 24px; width: 100%; }
 
@@ -173,21 +187,22 @@
         .btn-join-hero:hover { box-shadow: 0 0 25px rgba(139, 92, 246, 0.5); transform: translateY(-2px); }
         .btn-join-hero.disabled { background: var(--bg-input); color: var(--text-muted); cursor: not-allowed; box-shadow: none; transform: none; }
 
-        /* --- LIST & WIDGETS --- */
+        /* --- ADVANCED INTERVIEW CARD --- */
         .tab-strip { display: flex; gap: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; }
         .tab-btn { padding: 10px 0; background: none; border: none; color: var(--text-muted); font-size: 0.95rem; cursor: pointer; position: relative; font-family: var(--font-body); transition: 0.3s; }
         .tab-btn:hover { color: var(--text-main); }
         .tab-btn.active { color: var(--text-main); font-weight: 600; }
-        .tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background: var(--gold-base); box-shadow: 0 -2px 10px var(--gold-base); }
+        .tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background: var(--neon-purple); box-shadow: 0 -2px 10px var(--neon-purple); }
 
         .int-card {
-            background: var(--bg-glass); border-radius: 12px; padding: 24px;
-            display: flex; align-items: center; gap: 20px; transition: 0.3s;
+            background: var(--bg-glass); border-radius: 12px; padding: 20px;
+            display: flex; flex-wrap: wrap; /* Key fix for overflow */
+            align-items: center; gap: 20px; transition: 0.3s;
             border: 1px solid var(--border-color); margin-bottom: 15px;
-            position: relative; overflow: hidden;
+            position: relative; overflow: visible; /* For dropdowns */
         }
-        .int-card:hover { transform: translateX(5px); border-color: rgba(255,255,255,0.2); background: var(--bg-hover); }
-        .int-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--border-color); }
+        .int-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.2); background: var(--bg-hover); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3); }
+        .int-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--border-color); border-radius: 4px 0 0 4px; }
         .int-card.upcoming::before { background: var(--neon-purple); box-shadow: 2px 0 10px rgba(139, 92, 246, 0.3); }
         .int-card.completed::before { background: var(--success); }
         .int-card.pending::before { background: var(--gold-base); }
@@ -196,34 +211,52 @@
             width: 60px; height: 60px; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border-color);
             display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0;
         }
-        .db-mon { font-size: 0.7rem; color: var(--gold-base); text-transform: uppercase; font-weight: 700; }
+        .db-mon { font-size: 0.7rem; color: var(--neon-purple); text-transform: uppercase; font-weight: 700; }
         .db-day { font-size: 1.4rem; font-weight: 700; color: var(--text-main); font-family: var(--font-display); }
         
-        .int-info { flex: 1; }
-        .int-role { font-weight: 600; font-size: 1.1rem; color: var(--text-main); margin-bottom: 4px; display:flex; align-items:center; gap:10px; }
-        .int-dets { font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-top: 5px; }
+        .int-info { 
+            flex: 1; min-width: 200px; /* Ensures it doesn't squish too much */
+        }
+        .int-role { 
+            font-weight: 600; font-size: 1.1rem; color: var(--text-main); margin-bottom: 6px; 
+            display:flex; align-items:center; gap:10px; flex-wrap: wrap;
+        }
+        .int-role-text {
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px; display: inline-block;
+        }
         
-        .btn-main-sm { padding: 8px 16px; background: var(--gold-gradient); border: none; border-radius: 8px; color: white; font-size: 0.8rem; font-weight: 600; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: 0.3s; }
+        .int-dets { font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
+        
+        /* Action Container to prevent overflow */
+        .int-actions {
+            display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+            justify-content: flex-end; flex-shrink: 0;
+        }
+
+        .btn-main-sm { 
+            padding: 8px 18px; background: var(--purple-gradient); border: none; border-radius: 8px; 
+            color: white; font-size: 0.85rem; font-weight: 600; cursor: pointer; 
+            text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; 
+            white-space: nowrap; /* Prevent button text breaking */
+        }
         .btn-book-slot { background: var(--success); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4); }
-        .btn-book-slot:hover { transform: translateY(-2px); }
+        .btn-book-slot:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(16, 185, 129, 0.6); }
+
+        /* Secondary Icon Button Style */
+        .btn-icon-sec {
+            width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border-color);
+            background: var(--bg-input); color: var(--text-muted); display: grid; place-items: center;
+            cursor: pointer; transition: 0.2s;
+        }
+        .btn-icon-sec:hover { background: var(--bg-hover); color: var(--text-main); border-color: rgba(255,255,255,0.2); }
 
         /* --- FEATURE BADGES & ELEMENTS --- */
-        .tag { font-size: 0.65rem; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; vertical-align: middle; }
-        .tag.guaranteed { background: var(--gold-gradient); color: #000; box-shadow: 0 2px 10px rgba(217, 119, 6, 0.3); }
-        .tag.urgent { background: var(--danger-gradient); color: white; animation: pulse 2s infinite; }
-        .tag.featured { background: var(--purple-gradient); color: white; }
-        .tag.standard { border: 1px solid rgba(255,255,255,0.2); color: var(--text-muted); background: rgba(255,255,255,0.05); }
+        .tag { font-size: 0.65rem; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; vertical-align: middle; white-space: nowrap; }
+        .tag.featured { background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); color: #d8b4fe; }
+        .tag.standard { border: 1px solid rgba(255,255,255,0.15); color: var(--text-muted); background: rgba(255,255,255,0.03); }
 
-        .blur-text { filter: blur(4px); opacity: 0.7; user-select: none; }
-        .match-ring { width: 34px; height: 34px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--success); border-right-color: var(--success); display: grid; place-items: center; font-size: 0.6rem; font-weight: 700; color: var(--success); flex-shrink: 0; }
-        .verified-tick { color: #38bdf8; margin-left: 4px; font-size: 0.8em; }
-        
         .company-fallback { width: 24px; height: 24px; border-radius: 6px; background: rgba(255,255,255,0.1); display: grid; place-items: center; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); display:inline-flex; vertical-align:middle; margin-right:5px; }
         .company-logo-mini { width: 24px; height: 24px; border-radius: 6px; object-fit: cover; vertical-align:middle; margin-right:5px; border:1px solid var(--border-color); }
-
-        .hot-indicator { font-size: 0.75rem; color: var(--gold-base); margin-top: 4px; display: flex; align-items: center; gap: 5px; }
-
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
         /* Calendar */
         .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -235,10 +268,10 @@
             cursor: pointer; transition: 0.2s; color: var(--text-muted); position: relative;
         }
         .cal-cell:hover { background: var(--bg-hover); color: var(--text-main); transform: scale(1.1); }
-        .cal-cell.today { background: rgba(217, 119, 6, 0.15); color: var(--gold-base); font-weight: 700; border: 1px solid rgba(217, 119, 6, 0.3); }
+        .cal-cell.today { background: rgba(139, 92, 246, 0.15); color: var(--neon-purple); font-weight: 700; border: 1px solid rgba(139, 92, 246, 0.3); }
         .cal-cell.event::after { content: ''; position: absolute; bottom: 4px; width: 5px; height: 5px; background: var(--neon-purple); border-radius: 50%; box-shadow: 0 0 5px var(--neon-purple); }
 
-        /* Modal & Upgrade Modal */
+        /* Modal */
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
         .modal-overlay.active { display: flex; }
         .modal-card { 
@@ -247,41 +280,7 @@
         }
         .form-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; display: block; font-weight: 600; }
         .form-input { width: 100%; padding: 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-main); outline: none; margin-bottom: 20px; }
-        .form-input:focus { border-color: var(--gold-base); background: var(--bg-hover); }
-
-        /* Upgrade Modal Specifics */
-        .upgrade-modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2100;
-            display: none; place-items: center; backdrop-filter: blur(5px);
-            animation: fadeIn 0.3s ease;
-        }
-        .upgrade-modal {
-            background: #0F172A; border: 1px solid var(--border-color);
-            width: 90%; max-width: 400px; border-radius: 20px; padding: 30px;
-            text-align: center; position: relative;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            animation: zoomIn 0.3s ease;
-        }
-        .modal-icon-lock {
-            font-size: 2.5rem; color: var(--gold-base); margin-bottom: 15px;
-            background: rgba(217, 119, 6, 0.1); width: 80px; height: 80px;
-            display: grid; place-items: center; border-radius: 50%; margin-left: auto; margin-right: auto;
-        }
-        .modal-title { font-family: var(--font-head); font-size: 1.5rem; margin-bottom: 10px; color: var(--text-main); }
-        .modal-desc { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 25px; }
-        .btn-upgrade {
-            display: block; width: 100%; padding: 14px; border-radius: 12px;
-            background: var(--gold-gradient); color: #000; font-weight: 700;
-            text-decoration: none; border: none; cursor: pointer; font-size: 1rem;
-            margin-bottom: 10px; transition: 0.3s;
-        }
-        .btn-upgrade:hover { transform: scale(1.02); }
-        .btn-close-modal {
-            background: transparent; color: var(--text-muted); border: none;
-            cursor: pointer; font-size: 0.9rem; text-decoration: underline;
-        }
-        @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
-        @keyframes zoomIn { from{opacity:0; transform:scale(0.9);} to{opacity:1; transform:scale(1);} }
+        .form-input:focus { border-color: var(--neon-purple); background: var(--bg-hover); }
 
         /* PWA Popup */
         .pwa-install-popup {
@@ -300,21 +299,24 @@
         .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
 
         /* Footer */
-        .app-footer {
-            margin-top: 40px; padding: 30px; border-top: 1px solid var(--border-color);
-            background: var(--bg-glass); backdrop-filter: blur(20px);
-            display: flex; flex-direction: column; align-items: center; gap: 20px;
-            border-radius: var(--radius); text-align: center;
-        }
-        .social-links { display: flex; gap: 15px; }
-        .social-btn {
-            width: 40px; height: 40px; border-radius: 50%; background: var(--bg-input);
-            display: grid; place-items: center; color: var(--text-muted); text-decoration: none;
-            transition: 0.3s; border: 1px solid var(--border-color);
-        }
-        .social-btn:hover { background: var(--gold-base); color: white; transform: translateY(-3px); }
+        .app-footer-main { margin-top: auto; padding: 30px 0; text-align: center; width: 100%; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid rgba(255,255,255,0.05); }
 
-        @media (max-width: 992px) {
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite; margin-right: 5px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- RESPONSIVE ADJUSTMENTS --- */
+        @media (max-width: 768px) {
+            .int-card { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .int-info { width: 100%; }
+            .int-actions { width: 100%; justify-content: flex-start; margin-top: 5px; border-top: 1px solid var(--border-color); padding-top: 15px; }
+            .date-box { margin-bottom: 0; }
+            .int-role-text { max-width: 200px; } /* More truncation on mobile */
+            
             .global-search-container { display: none; }
             .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
             main { margin-left: 0; padding: 20px 16px; width: 100%; }
@@ -335,57 +337,58 @@
         
         <div class="global-search-container">
             <input type="text" id="searchInput" class="global-search-input" placeholder="Search schedule...">
-            <i class="fas fa-search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
         </div>
 
         <div class="header-actions">
-            <div class="icon-btn" title="Messages" onclick="location.href='seeker-messages.html'">
-                <i class="fa-regular fa-envelope"></i>
+            <!-- Messages with Blue Icon & Red Badge -->
+            <div class="icon-btn" title="Messages" onclick="handleActionWithSpinner(this, () => location.href='seeker-messages.html')">
+                <i class="fa-solid fa-envelope icon-msg"></i>
                 <div class="notification-badge" id="msg-badge">0</div>
             </div>
-            <div class="icon-btn" title="Notifications" onclick="location.href='seeker-notifications.html'">
-                <i class="fa-regular fa-bell"></i>
+            <!-- Notifications with Gold/Amber Icon & Red Badge -->
+            <div class="icon-btn" title="Notifications" onclick="handleActionWithSpinner(this, () => location.href='seeker-notifications.html')">
+                <i class="fa-solid fa-bell icon-bell"></i>
                 <div class="notification-badge" id="notif-badge">0</div>
             </div>
-            <div class="profile-widget" onclick="location.href='seeker-profile.html'">
+            <div class="profile-widget" onclick="handleActionWithSpinner(this, () => location.href='seeker-profile.html')">
                 <img src="" id="header-avatar-img" class="user-avatar img-mode" alt="Profile" style="display:none;">
                 <div id="header-avatar-fallback" class="user-avatar">U</div>
             </div>
         </div>
     </header>
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR - FULLY UNLOCKED -->
     <nav class="sidebar" id="sidebar">
         <div class="nav-group">
             <div class="nav-label">Overview</div>
-            <a href="seeker-dashboard.html" class="nav-item"><i class="fa-solid fa-compass"></i> Dashboard</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-dashboard.html')" class="nav-item"><i class="fa-solid fa-compass"></i> Dashboard</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Job Hunt</div>
-            <a href="seeker-applications.html" class="nav-item"><i class="fa-solid fa-file-signature"></i> Applied Jobs</a>
-            <a href="seeker-interviews.html" class="nav-item active"><i class="fa-solid fa-calendar-check"></i> Interviews</a>
-            <a href="seeker-jobs.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Browse Jobs</a>
-            <a href="seeker-featured-jobs.html" class="nav-item link-std" id="nav-featured"><i class="fa-solid fa-star"></i> Featured Jobs <i class="fas fa-lock lock-icon"></i></a>
-            <a href="seeker-urgentlyhiring.html" class="nav-item link-pro" id="nav-urgent"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended <i class="fas fa-lock lock-icon"></i></a>
-            <a href="seeker-guaranteed-jobs.html" class="nav-item link-pro" id="nav-guaranteed"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs <i class="fas fa-lock lock-icon"></i></a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-applications.html')" class="nav-item"><i class="fa-solid fa-file-signature"></i> Applied Jobs</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-interviews.html')" class="nav-item active"><i class="fa-solid fa-calendar-check"></i> Interviews</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-jobs.html')" class="nav-item"><i class="fa-solid fa-briefcase"></i> Browse Jobs</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-featured-jobs.html')" class="nav-item link-std"><i class="fa-solid fa-star"></i> Featured Jobs</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-urgentlyhiring.html')" class="nav-item link-pro"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-guaranteed-jobs.html')" class="nav-item link-pro"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Finance</div>
-            <a href="seeker-wallet.html" class="nav-item"><i class="fa-solid fa-wallet"></i> My Wallet</a>
-            <a href="seeker-premium.html" class="nav-item"><i class="fa-solid fa-crown"></i> My Plan</a>
-            <a href="seeker-referrals.html" class="nav-item link-std" id="nav-referrals"><i class="fa-solid fa-user-plus"></i> Invite & Earn <i class="fas fa-lock lock-icon"></i></a>
-            <a href="seeker-invest.html" class="nav-item link-std" id="nav-invest"><i class="fa-solid fa-chart-line"></i> Invest <i class="fas fa-lock lock-icon"></i></a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-wallet.html')" class="nav-item"><i class="fa-solid fa-wallet"></i> My Wallet</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-premium.html')" class="nav-item"><i class="fa-solid fa-crown"></i> My Plan</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-referrals.html')" class="nav-item link-std"><i class="fa-solid fa-user-plus"></i> Invite & Earn</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-invest.html')" class="nav-item link-std"><i class="fa-solid fa-chart-line"></i> Invest</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Resources</div>
-            <a href="seeker-blog.html" class="nav-item"><i class="fa-solid fa-newspaper"></i> News & Insights</a>
-            <a href="seeker-resources.html" class="nav-item link-pro" id="nav-resources"><i class="fa-solid fa-book"></i> Resources <i class="fas fa-lock lock-icon"></i></a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-blog.html')" class="nav-item"><i class="fa-solid fa-newspaper"></i> News & Insights</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-resources.html')" class="nav-item link-pro"><i class="fa-solid fa-book"></i> Resources</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Settings</div>
-            <a href="seeker-profile.html" class="nav-item"><i class="fa-solid fa-user-gear"></i> Profile</a>
-            <a href="seeker-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
-            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-profile.html')" class="nav-item"><i class="fa-solid fa-user-gear"></i> Profile</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-settings.html')" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
+            <a href="#" onclick="handleActionWithSpinner(this, logout)" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
@@ -400,10 +403,10 @@
             </div>
             <!-- Added My Interviews Button -->
             <div style="display:flex; gap:10px;">
-                <button onclick="location.href='seeker-booked-interviews.html'" class="btn-secondary-action">
+                <button onclick="handleActionWithSpinner(this, () => location.href='seeker-booked-interviews.html')" class="btn-secondary-action">
                     <i class="fas fa-calendar-check"></i> My Interviews
                 </button>
-                <button onclick="location.href='seeker-jobs.html'" class="btn-action">
+                <button onclick="handleActionWithSpinner(this, () => location.href='seeker-jobs.html')" class="btn-action">
                     <i class="fas fa-plus"></i> Find More
                 </button>
             </div>
@@ -466,7 +469,7 @@
                 <!-- PREP CHECKLIST -->
                 <div class="glass-panel animate__animated animate__fadeInRight" style="padding: 24px; animation-delay: 0.7s;">
                     <h4 style="font-family:var(--font-display); margin-bottom:15px; display:flex; align-items:center; gap:8px;">
-                        <i class="fas fa-list-check" style="color:var(--gold-base);"></i> Prep Checklist
+                        <i class="fas fa-list-check" style="color:var(--neon-purple);"></i> Prep Checklist
                     </h4>
                     <div style="display:flex; flex-direction:column; gap:10px;">
                         <label style="display:flex; gap:10px; align-items:center; cursor:pointer; color:var(--text-muted); font-size:0.9rem;">
@@ -491,17 +494,8 @@
             </div>
         </div>
 
-        <!-- FOOTER -->
-        <footer class="app-footer animate__animated animate__fadeInUp">
-            <div class="social-links" id="social-container">
-                <a href="#" class="social-btn"><i class="fab fa-linkedin-in"></i></a>
-                <a href="#" class="social-btn"><i class="fab fa-twitter"></i></a>
-                <a href="#" class="social-btn"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="social-btn"><i class="fab fa-facebook-f"></i></a>
-            </div>
-            <div class="footer-copy">
-                &copy; 2025 EastLink Recruiters. All rights reserved.
-            </div>
+        <footer class="app-footer-main">
+            &copy; 2026 EastLink Recruiters. All Rights Reserved.
         </footer>
     </main>
 
@@ -513,7 +507,7 @@
                 <i class="fas fa-times" onclick="closeModal()" style="cursor:pointer; color:var(--text-muted); font-size:1.2rem;"></i>
             </div>
             <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:25px; line-height:1.5;">
-                Propose a new date and time for your interview with <span id="modal-company" style="color:var(--gold-base); font-weight:600;">Company</span>.
+                Propose a new date and time for your interview with <span id="modal-company" style="color:var(--neon-purple); font-weight:600;">Company</span>.
             </p>
             <div>
                 <label class="form-label">Proposed Date</label>
@@ -525,21 +519,8 @@
             </div>
             <div style="display:flex; gap:15px;">
                 <button class="icon-btn" style="flex:1; width:auto; border-radius:10px; border:1px solid var(--border-color); background:transparent;" onclick="closeModal()">Cancel</button>
-                <button class="btn-main-sm" style="flex:1; justify-content:center; border-radius:10px; height:42px; font-size:0.95rem;" onclick="submitReschedule()">Send Request</button>
+                <button class="btn-main-sm" style="flex:1; justify-content:center; border-radius:10px; height:42px; font-size:0.95rem;" onclick="handleActionWithSpinner(this, submitReschedule)">Send Request</button>
             </div>
-        </div>
-    </div>
-
-    <!-- Upgrade / Lock Modal -->
-    <div class="upgrade-modal-overlay" id="upgrade-modal">
-        <div class="upgrade-modal">
-            <div class="modal-icon-lock"><i class="fas fa-lock"></i></div>
-            <h3 class="modal-title" id="modal-title">Access Locked</h3>
-            <p class="modal-desc" id="modal-desc">
-                This feature requires a higher tier plan. Upgrade now to unlock exclusive access.
-            </p>
-            <button class="btn-upgrade" onclick="location.href='seeker-premium.html'">Upgrade Now</button>
-            <button class="btn-close-modal" onclick="closeUpgradeModal()">I'll stay on my current plan</button>
         </div>
     </div>
 
@@ -553,7 +534,7 @@
             </div>
         </div>
         <div class="pwa-actions">
-            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-install" onclick="handleActionWithSpinner(this, installPWA)">Install</button>
             <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
         </div>
     </div>
@@ -561,21 +542,38 @@
     <!-- SCRIPTS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, getDocs, doc, getDoc, updateDoc, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        // CONFIG
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        import { auth, db } from './config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { collection, query, where, getDocs, doc, getDoc, updateDoc, arrayUnion, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         let allInterviews = [];
         let bookedInterviewIds = new Set();
         let currentMonth = new Date();
-        let userTier = 'Free'; 
         let currentUserId = null;
+
+        // --- SPINNER HELPER ---
+        window.handleActionWithSpinner = (btn, action) => {
+            if(btn.dataset.processing === "true") return;
+            btn.dataset.processing = "true";
+            
+            // Save original content
+            const originalContent = btn.innerHTML;
+            
+            // Set spinner content
+            btn.innerHTML = `<span class="loading-spinner"></span>`;
+            
+            setTimeout(async () => {
+                if (typeof action === 'function') {
+                    await action(btn); 
+                }
+                
+                // Reset button (in case page doesn't unload)
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.dataset.processing = "false";
+                }, 500);
+            }, 500);
+        };
 
         // --- GLOBAL UI UTILS ---
         window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = 'block'; };
@@ -584,7 +582,6 @@
         window.closeModal = () => document.getElementById('rescheduleModal').classList.remove('active');
 
         window.onclick = (e) => {
-            if(e.target.id === 'upgrade-modal') closeUpgradeModal();
             if(e.target.id === 'rescheduleModal') closeModal();
         };
 
@@ -594,72 +591,21 @@
             currentUserId = user.uid;
             
             initProfile(user);
-            await checkUserTier(user.uid);
+            await loadUserData(user.uid);
             setupRealtimeListeners(user.uid);
             fetchInterviews(user.uid); 
-            loadSocials();
         });
 
-        // --- TIER LOGIC ---
-        async function checkUserTier(uid) {
+        // --- DATA LOADING ---
+        async function loadUserData(uid) {
             try {
                 const docSnap = await getDoc(doc(db, "users", uid));
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    // Load Booked IDs to check against Available slots
                     bookedInterviewIds = new Set((data.bookedInterviews || []).map(i => i.id));
-                    
-                    const raw = data.plan || data.tier || 'free';
-                    if(raw.toLowerCase().includes('pro') || raw.toLowerCase().includes('premium')) userTier = 'Pro';
-                    else if(raw.toLowerCase().includes('standard')) userTier = 'Standard';
-                    else userTier = 'Free';
                 }
-            } catch (error) { console.error("Error fetching tier:", error); }
-            updateUIForTier();
+            } catch (error) { console.error("Error fetching user data:", error); }
         }
-
-        function updateUIForTier() {
-            const links = ['nav-featured', 'nav-urgent', 'nav-guaranteed', 'nav-resources', 'nav-referrals', 'nav-invest'];
-            links.forEach(id => unlockLink(id));
-
-            if (userTier === 'Free') {
-                lockLink('nav-featured', 'Standard', 'Featured Jobs are locked.', 'Upgrade to Standard to view verified roles.');
-                lockLink('nav-urgent', 'Pro', 'Urgent Roles are locked.', 'Upgrade to Pro for immediate placement roles.');
-                lockLink('nav-guaranteed', 'Pro', 'Exclusive Access Only.', 'Guaranteed jobs are reserved for Pro members.');
-                lockLink('nav-referrals', 'Standard', 'Referral Program Locked.', 'Unlock the ability to earn by referring friends.');
-                lockLink('nav-invest', 'Standard', 'Investment Access Locked.', 'Crowdfunding opportunities are for paying members only.');
-                lockLink('nav-resources', 'Pro', 'Premium Resources.', 'Executive guides are Pro-only.');
-            } 
-            else if (userTier === 'Standard') {
-                lockLink('nav-urgent', 'Pro', 'Urgent Hiring Mode.', 'Priority application needed.');
-                lockLink('nav-guaranteed', 'Pro', 'Executive Search Only.', 'Retained searches are for Pro members.');
-                lockLink('nav-resources', 'Pro', 'Advanced Insights.', 'Deep market analysis is locked.');
-            }
-        }
-
-        function lockLink(elementId, requiredTier, title, desc) {
-            const el = document.getElementById(elementId);
-            if (!el) return;
-            el.classList.add('locked');
-            el.onclick = (e) => { e.preventDefault(); showUpgradeModal(title, desc); };
-        }
-
-        function unlockLink(elementId) {
-            const el = document.getElementById(elementId);
-            if (!el) return;
-            el.classList.remove('locked');
-            el.onclick = null;
-        }
-
-        window.showUpgradeModal = (title, desc) => {
-            document.getElementById('modal-title').innerText = title || "Access Restricted";
-            document.getElementById('modal-desc').innerText = desc || "Upgrade your plan to unlock this feature.";
-            document.getElementById('upgrade-modal').style.display = 'grid';
-        };
-
-        window.closeUpgradeModal = () => {
-            document.getElementById('upgrade-modal').style.display = 'none';
-        };
 
         // --- CORE: FETCH INTERVIEWS (APPS + PUBLIC SLOTS) ---
         async function fetchInterviews(uid) {
@@ -699,11 +645,11 @@
                         link: jobData.applyLink || "#", 
                         status: currentStatus === 'shortlisted' ? 'screening' : currentStatus,
                         salary: jobData.salary || jobData.salaryRange,
-                        type: 'application' // Source Type
+                        type: 'application'
                     };
                 });
 
-                // 2. Fetch Public "Admin" Interviews from 'interviews' collection
+                // 2. Fetch Public "Admin" Interviews
                 const slotsQuery = query(collection(db, "interviews"));
                 const slotsSnap = await getDocs(slotsQuery);
 
@@ -718,9 +664,9 @@
                         logo: "", 
                         date: intDate,
                         link: data.link || "#",
-                        status: 'open_slot', // Custom status for logic
+                        status: 'open_slot',
                         salary: null,
-                        type: 'slot' // Source Type
+                        type: 'slot'
                     };
                 });
 
@@ -751,8 +697,6 @@
         window.bookSlot = async (id, title, company, dateStr) => {
             if(!currentUserId) return;
             
-            Toastify({ text: "Booking slot...", style: { background: "var(--gold-gradient)", color: "black" } }).showToast();
-
             try {
                 const bookingData = {
                     id: id,
@@ -762,17 +706,14 @@
                     bookedAt: new Date().toISOString()
                 };
 
-                // Add to user profile so "My Interviews" page can see it
                 await updateDoc(doc(db, "users", currentUserId), {
                     bookedInterviews: arrayUnion(bookingData)
                 });
                 
                 bookedInterviewIds.add(id);
-                
-                // Refresh list to update button state
                 filterList('upcoming'); 
                 
-                Toastify({ text: "Slot Booked! Check 'My Interviews'", style: { background: "var(--success)" } }).showToast();
+                Toastify({ text: "Slot Booked!", style: { background: "var(--success)" } }).showToast();
 
             } catch(e) {
                 console.error(e);
@@ -780,7 +721,19 @@
             }
         };
 
-        // --- RENDER LIST ---
+        // --- GOOGLE CALENDAR HELPER ---
+        window.addToCalendar = (title, company, dateStr) => {
+            const date = new Date(dateStr);
+            const endTime = new Date(date.getTime() + (60 * 60 * 1000)); // Default 1 hour
+            
+            const formatDate = (d) => d.toISOString().replace(/-|:|\.\d\d\d/g, "");
+            
+            const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent("Interview: " + title + " at " + company)}&dates=${formatDate(date)}/${formatDate(endTime)}&details=Interview+scheduled+via+EastLink+Recruiters&location=Online+Video+Call`;
+            
+            window.open(url, '_blank');
+        };
+
+        // --- RENDER LIST (ADVANCED) ---
         window.filterList = (type, tabBtn) => {
             if(tabBtn) {
                 document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
@@ -792,11 +745,9 @@
             let filtered = [];
 
             if(type === 'upcoming') {
-                // Show future apps OR future open slots
                 filtered = allInterviews.filter(i => i.date > now);
             }
             else if(type === 'past') {
-                // Only show past apps (slots disappear when past)
                 filtered = allInterviews.filter(i => i.date < now && i.type === 'application');
             }
             else if(type === 'pending') {
@@ -836,57 +787,63 @@
                 if (item.logo) logoHTML = `<img src="${item.logo}" class="company-logo-mini" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';"><div class="company-fallback" style="display:none;">${item.company.charAt(0)}</div>`;
                 else logoHTML = `<div class="company-fallback">${item.company.charAt(0)}</div>`;
 
+                // Meeting ID Simulation
+                const meetingId = "ID-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+
                 // Action Buttons Logic
-                let actionBtn = '';
+                let mainActionBtn = '';
+                let secondaryActions = '';
                 
                 if (item.type === 'slot') {
                     // Admin Slot Logic
                     if (bookedInterviewIds.has(item.id)) {
-                        actionBtn = `<button class="btn-main-sm" style="background:var(--bg-input); color:var(--success); cursor:default; border:1px solid var(--success);"><i class="fas fa-check"></i> Booked</button>`;
+                        mainActionBtn = `<button class="btn-main-sm" style="background:var(--bg-input); color:var(--success); cursor:default; border:1px solid var(--success);"><i class="fas fa-check"></i> Booked</button>`;
+                        // Add context menu logic for booked slots
+                        secondaryActions = `
+                            <button class="btn-icon-sec" title="Add to Google Calendar" onclick="addToCalendar('${item.title}', '${item.company}', '${item.date.toISOString()}')"><i class="fab fa-google"></i></button>
+                        `;
                     } else {
-                        // Pass ID, Title, Company, Date ISO string safely
-                        actionBtn = `<button class="btn-main-sm btn-book-slot" onclick="bookSlot('${item.id}', '${item.title}', '${item.company}', '${item.date.toISOString()}')">Book Slot</button>`;
+                        mainActionBtn = `<button class="btn-main-sm btn-book-slot" onclick="handleActionWithSpinner(this, () => bookSlot('${item.id}', '${item.title}', '${item.company}', '${item.date.toISOString()}'))">Book Slot</button>`;
                     }
                 } else {
                     // Application Logic
+                    secondaryActions = `
+                        <button class="btn-icon-sec" title="Reschedule" onclick="openReschedule('${item.company}')"><i class="far fa-calendar-alt"></i></button>
+                        <button class="btn-icon-sec" title="Add to Calendar" onclick="addToCalendar('${item.title}', '${item.company}', '${item.date.toISOString()}')"><i class="fab fa-google"></i></button>
+                    `;
+
                     if(type !== 'past') {
                         if(isReady) { 
-                            actionBtn = `<a href="${item.link}" target="_blank" class="btn-main-sm" style="background:var(--success); box-shadow:0 4px 12px rgba(16, 185, 129, 0.4);">Join Link</a>`;
+                            mainActionBtn = `<a href="${item.link}" target="_blank" class="btn-main-sm" style="background:var(--success); box-shadow:0 4px 12px rgba(16, 185, 129, 0.4);">Join Link</a>`;
                         } else {
-                            actionBtn = `<button class="btn-main-sm" style="background:var(--bg-input); color:var(--text-muted); cursor:not-allowed; border:1px solid var(--border-color);">Wait</button>`;
+                            mainActionBtn = `<button class="btn-main-sm" style="background:var(--bg-input); color:var(--text-muted); cursor:not-allowed; border:1px solid var(--border-color);">Wait</button>`;
                         }
+                    } else {
+                        mainActionBtn = `<button class="btn-main-sm" style="background:var(--bg-input); color:var(--text-muted);">Ended</button>`;
                     }
                 }
 
-                // Status Text
-                let statusBadge = '';
-                if(item.type === 'application') {
-                    statusBadge = `<span style="font-size:0.7rem; background:rgba(255,255,255,0.1); color:var(--text-muted); padding:2px 6px; border-radius:4px; margin-left:8px;">${item.status}</span>`;
-                }
-
                 return `
-                <div class="int-card ${cardClass} animate__animated animate__fadeInLeft" style="animation-delay:${index * 0.1}s">
+                <div class="int-card ${cardClass} animate__animated animate__fadeInUp" style="animation-delay:${index * 0.1}s">
                     <div class="date-box">
                         <span class="db-mon">${mon}</span>
                         <span class="db-day">${day}</span>
                     </div>
                     <div class="int-info">
                         <div class="int-role">
-                            ${item.title}
+                            <span class="int-role-text" title="${item.title}">${item.title}</span>
                             ${badgeHTML}
-                            ${statusBadge}
                         </div>
                         <div class="int-dets">
                             <span>${logoHTML} ${item.company}</span>
                             <span>•</span>
                             <span><i class="far fa-clock"></i> ${time}</span>
+                            ${item.type === 'application' ? `<span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted); opacity:0.7;">${meetingId}</span>` : ''}
                         </div>
                     </div>
-                    <div style="display:flex; gap:15px; align-items:center;">
-                        <div style="display:flex; gap:5px;">
-                            ${item.type === 'application' ? `<button class="icon-btn" title="Reschedule" onclick="openReschedule('${item.company}')"><i class="far fa-calendar-alt"></i></button>` : ''}
-                            ${actionBtn}
-                        </div>
+                    <div class="int-actions">
+                        ${secondaryActions}
+                        ${mainActionBtn}
                     </div>
                 </div>`;
             }).join('');
@@ -974,9 +931,15 @@
             document.getElementById('modal-company').innerText = company;
             document.getElementById('rescheduleModal').classList.add('active');
         };
-        window.submitReschedule = () => {
+
+        window.submitReschedule = async () => {
             const date = document.getElementById('resch-date').value;
-            if(!date) return Toastify({ text: "Please select a date.", style: { background: "var(--danger)" } }).showToast();
+            if(!date) {
+                Toastify({ text: "Please select a date.", style: { background: "var(--danger)" } }).showToast();
+                return;
+            }
+            // Simulate API delay
+            await new Promise(r => setTimeout(r, 800));
             Toastify({ text: "Request sent to " + document.getElementById('modal-company').innerText, style: { background: "var(--success)" } }).showToast();
             closeModal();
         };
@@ -1003,7 +966,6 @@
             document.getElementById('pwa-install-popup').style.display = 'none';
         };
 
-        // Service Worker
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("./service-worker.js").catch(e => console.log(e));
         }
@@ -1025,25 +987,11 @@
         }
 
         function setupRealtimeListeners(uid) {
+            // Badges
             onSnapshot(query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false)), 
                 s => { const el = document.getElementById('notif-badge'); if(el){ el.innerText = s.size > 9 ? '9+' : s.size; el.style.display = s.empty ? 'none' : 'flex'; }});
             onSnapshot(query(collection(db, "messages"), where("receiverId", "==", uid), where("read", "==", false)), 
                 s => { const el = document.getElementById('msg-badge'); if(el){ el.innerText = s.size > 9 ? '9+' : s.size; el.style.display = s.empty ? 'none' : 'flex'; }});
-        }
-
-        async function loadSocials() {
-            try {
-                const s = await getDoc(doc(db, "site_settings", "social_links"));
-                if(s.exists()) {
-                    const d = s.data();
-                    const c = document.getElementById('social-container');
-                    c.innerHTML = '';
-                    if(d.linkedin) c.innerHTML += `<a href="${d.linkedin}" target="_blank" class="social-btn"><i class="fab fa-linkedin-in"></i></a>`;
-                    if(d.twitter) c.innerHTML += `<a href="${d.twitter}" target="_blank" class="social-btn"><i class="fab fa-twitter"></i></a>`;
-                    if(d.facebook) c.innerHTML += `<a href="${d.facebook}" target="_blank" class="social-btn"><i class="fab fa-facebook-f"></i></a>`;
-                    if(d.instagram) c.innerHTML += `<a href="${d.instagram}" target="_blank" class="social-btn"><i class="fab fa-instagram"></i></a>`;
-                }
-            } catch(e){}
         }
     </script>
 </body>

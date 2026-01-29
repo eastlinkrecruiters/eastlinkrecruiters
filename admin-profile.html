@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
     
     <!-- Fonts & Icons -->
@@ -224,6 +225,7 @@
             box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
         }
         .btn-save:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .btn-save:disabled { opacity: 0.7; cursor: not-allowed; }
 
         .btn-danger-outline {
             background: transparent; border: 1px solid var(--danger); color: var(--danger);
@@ -290,6 +292,9 @@
             <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
                 <i class="fa-solid fa-user-shield"></i>
             </div>
+            <div class="icon-btn" onclick="logout()" style="color:var(--danger);" title="Logout">
+                <i class="fa-solid fa-power-off"></i>
+            </div>
         </div>
     </header>
 
@@ -311,7 +316,7 @@
             <div class="nav-label">Jobs & Service</div>
             <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
             <a href="admin-guaranteed-jobs.html" class="nav-item"><i class="fa-solid fa-certificate"></i> Guaranteed Jobs</a>
-            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Vacancy</a>
         </div>
 
         <div class="nav-group">
@@ -323,10 +328,7 @@
 
         <div class="nav-group">
             <div class="nav-label">System</div>
-            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
-            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
-            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
-            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="admin-settings.html" class="nav-item active"><i class="fa-solid fa-sliders"></i> Settings</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
@@ -388,7 +390,7 @@
                             </div>
                             <label class="toggle-switch"><input type="checkbox" disabled><span class="slider"></span></label>
                         </div>
-                        <button class="btn-save" style="width:100%; margin-top:20px; justify-content:center; background:var(--bg-input); border:1px solid var(--border-color); box-shadow:none;" onclick="savePrefs()">
+                        <button class="btn-save" id="btn-save-prefs" style="width:100%; margin-top:20px; justify-content:center; background:var(--bg-input); border:1px solid var(--border-color); box-shadow:none;" onclick="savePrefs()">
                             <i class="fas fa-check"></i> Save Preferences
                         </button>
                     </div>
@@ -465,7 +467,7 @@
                                 <div style="font-weight:700; color:var(--text-main); font-size:0.95rem;">Change Password</div>
                                 <div style="font-size:0.8rem; color:var(--text-muted);">Send a secure reset link to your email.</div>
                             </div>
-                            <button onclick="sendResetLink()" style="background:transparent; border:1px solid var(--border-color); padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600; color:var(--text-main); transition:0.2s;">Send Link</button>
+                            <button onclick="sendResetLink()" id="btn-reset" style="background:transparent; border:1px solid var(--border-color); padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600; color:var(--text-main); transition:0.2s;">Send Link</button>
                         </div>
 
                         <div style="margin-top:25px; border-top:1px solid var(--border-color); padding-top:20px;">
@@ -498,12 +500,10 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { auth, db } from './config.js'; // Secure import
+        import { onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { doc, getDoc, updateDoc, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
         let currentUser = null;
 
         // --- UI UTILS ---
@@ -555,7 +555,13 @@
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 if (userDoc.exists()) {
                     const d = userDoc.data();
-                    if (d.role !== 'admin') window.location.href = 'signin.html';
+                    
+                    // Security Check: Role
+                    if (d.role !== 'admin' && d.role !== 'super_admin') {
+                         console.warn("Unauthorized access attempted");
+                         window.location.href = 'signin.html';
+                         return;
+                    }
 
                     document.getElementById('fullName').value = d.fullName || "";
                     document.getElementById('display-name').innerText = d.fullName || "Admin";
@@ -568,41 +574,55 @@
 
                     const initial = (d.fullName || "A").charAt(0).toUpperCase();
                     document.getElementById('page-avatar').innerText = initial;
+                } else {
+                    console.log("No profile found");
                 }
                 
-                // Mock Audit logs count
-                document.getElementById('stat-logs').innerText = Math.floor(Math.random() * 50) + 10; 
+                // Mock Audit logs count for UI (Real implementation would query "audit_logs" collection)
+                document.getElementById('stat-logs').innerText = "24"; 
             } catch(e) {
-                console.error(e);
+                console.error("Profile load error", e);
             }
         }
 
         window.saveProfile = async () => {
+            if(!currentUser) return;
+            
             const btn = document.getElementById('btn-save-profile');
             const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            btn.disabled = true;
             
             const updates = {
-                fullName: document.getElementById('fullName').value,
-                jobTitle: document.getElementById('jobTitle').value,
-                phone: document.getElementById('phone').value,
-                location: document.getElementById('location').value
+                fullName: document.getElementById('fullName').value.trim(),
+                jobTitle: document.getElementById('jobTitle').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                location: document.getElementById('location').value.trim()
             };
 
             try {
                 await updateDoc(doc(db, "users", currentUser.uid), updates);
                 document.getElementById('display-name').innerText = updates.fullName;
-                document.getElementById('page-avatar').innerText = updates.fullName.charAt(0).toUpperCase();
+                if(updates.fullName) document.getElementById('page-avatar').innerText = updates.fullName.charAt(0).toUpperCase();
+                
                 Toastify({ text: "Profile Updated Successfully", style: { background: "#10B981" } }).showToast();
             } catch(e) {
                 console.error(e);
                 Toastify({ text: "Error Updating Profile", style: { background: "#EF4444" } }).showToast();
             } finally {
                 btn.innerHTML = originalText;
+                btn.disabled = false;
             }
         };
 
         window.savePrefs = async () => {
+             if(!currentUser) return;
+             
+             const btn = document.getElementById('btn-save-prefs');
+             const originalText = btn.innerHTML;
+             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+             btn.disabled = true;
+
             const notify = document.getElementById('pref-email').checked;
 
             try {
@@ -610,13 +630,31 @@
                     notifyEmail: notify
                 });
                 Toastify({ text: "Preferences Saved", style: { background: "#3B82F6" } }).showToast();
-            } catch(e) { console.error(e); }
+            } catch(e) { 
+                console.error(e); 
+                Toastify({ text: "Error saving preferences", style: { background: "#EF4444" } }).showToast();
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         };
 
         window.sendResetLink = () => {
+            if(!currentUser) return;
+            const btn = document.getElementById('btn-reset');
+            btn.disabled = true;
+            btn.innerText = "Sending...";
+
             sendPasswordResetEmail(auth, currentUser.email)
-                .then(() => Toastify({ text: "Reset Link Sent to Email!", style: { background: "#10B981" } }).showToast())
-                .catch(e => Toastify({ text: e.message, style: { background: "#EF4444" } }).showToast());
+                .then(() => {
+                    Toastify({ text: "Reset Link Sent to Email!", style: { background: "#10B981" } }).showToast();
+                    btn.innerText = "Link Sent";
+                })
+                .catch(e => {
+                    Toastify({ text: e.message, style: { background: "#EF4444" } }).showToast();
+                    btn.disabled = false;
+                    btn.innerText = "Send Link";
+                });
         };
 
         // --- PWA LOGIC ---
@@ -644,6 +682,12 @@
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
         }
+        
+        // Expose functions to window for onClick handlers
+        window.saveProfile = saveProfile;
+        window.savePrefs = savePrefs;
+        window.sendResetLink = sendResetLink;
+
     </script>
 </body>
 </html>

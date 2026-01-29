@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en" style="background-color: #0F172A;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Testimonials Control | EastLink Admin</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
+    <meta name="theme-color" content="#0F172A">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Executive Theme */
+            --primary: #f59e0b;
+            --primary-dark: #d97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            
+            --bg-body: #0F172A;       
+            --bg-glass: rgba(30, 41, 59, 0.7);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.85);
+            --bg-input: rgba(255, 255, 255, 0.05);
+            --bg-hover: rgba(255, 255, 255, 0.08);
+            
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8; 
+            
+            --border-color: rgba(255, 255, 255, 0.08);
+            
+            --neon-purple: #8b5cf6;
+            --success: #10B981;
+            --danger: #EF4444;
+            --blue: #3B82F6;
+            
+            /* Dimensions */
+            --sidebar-width: 260px; 
+            --header-height: 70px;
+            --radius: 16px;
+            
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            
+            --transition: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background-image: url('assets/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+        }
+
+        /* Ambient Overlay */
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background: radial-gradient(circle at top right, rgba(15, 23, 42, 0.4) 0%, #020617 100%);
+            z-index: -1; pointer-events: none;
+        }
+
+        /* Utils & Glassmorphism */
+        .glass-panel {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+            width: 100%;
+        }
+        
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; 
+            padding: 0 25px; z-index: 1000;
+        }
+        
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        
+        .logo { 
+            font-family: var(--font-head); 
+            font-weight: 700; color: var(--text-main); font-size: 1.2rem;
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; 
+            display: flex; align-items: center; gap: 10px;
+        }
+        .logo img { height: 32px; width: auto; }
+        .logo span { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .admin-badge { 
+            font-family: var(--font-body); font-size: 0.6rem; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 6px; 
+            margin-left: 10px; color: var(--text-muted); letter-spacing: 0.5px; font-weight: 600;
+        }
+        
+        .hamburger { font-size: 1.4rem; cursor: pointer; color: var(--text-muted); display: none; transition: 0.3s; }
+        .hamburger:hover { color: var(--primary); }
+
+        /* Header Actions */
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .icon-btn { 
+            width: 40px; height: 40px;
+            display: grid; place-items: center; border-radius: 12px; font-size: 1rem;
+            color: var(--text-muted); cursor: pointer; transition: 0.3s; position: relative;
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-color);
+        }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--primary); border-color: var(--primary); }
+        
+        .notification-badge { 
+            position: absolute; top: -5px; right: -5px; 
+            min-width: 18px; height: 18px; 
+            background: var(--danger); border-radius: 50%; 
+            font-size: 0.65rem; color: white; font-weight: 700;
+            display: none; place-items: center; justify-content: center;
+            border: 2px solid #0F172A;
+            animation: bounceIn 0.5s;
+        }
+        
+        .profile-widget {
+            width: 40px; height: 40px; margin-left: 10px;
+            background: var(--gold-gradient); border-radius: 12px; display: grid; place-items: center;
+            color: #000; font-size: 1rem; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+        .profile-widget:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.5); }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 25px 0; overflow-y: auto; 
+            transition: transform 0.3s var(--transition); z-index: 999; display: flex; flex-direction: column;
+            backdrop-filter: blur(25px);
+        }
+        .nav-group { padding: 0 20px; margin-bottom: 25px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--primary); font-weight: 700; margin-bottom: 12px; letter-spacing: 1px; padding-left: 12px; opacity: 0.8; }
+        .nav-item { 
+            display: flex; align-items: center; padding: 12px 15px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.9rem; transition: all 0.3s; border-radius: 10px; margin-bottom: 5px; font-weight: 500;
+        }
+        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
+        .nav-item.active { background: rgba(245, 158, 11, 0.1); color: var(--primary); font-weight: 600; border: 1px solid rgba(245, 158, 11, 0.2); }
+        .nav-item i { width: 24px; text-align: center; margin-right: 10px; font-size: 1rem; transition: 0.3s; }
+        .nav-item:hover i { color: var(--primary); }
+
+        /* --- MAIN --- */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; display: flex; flex-direction: column; }
+        
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .page-title { font-family: var(--font-head); font-size: 1.6rem; color: var(--text-main); }
+        
+        .split-layout {
+            display: grid; grid-template-columns: 380px 1fr; gap: 30px;
+        }
+
+        /* Create Panel */
+        .form-label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; }
+        .form-input, .form-textarea { 
+            width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); 
+            padding: 12px 15px; border-radius: 10px; color: var(--text-main); font-family: var(--font-body); 
+            outline: none; transition: 0.3s; margin-bottom: 20px; font-size: 0.95rem;
+        }
+        .form-input:focus, .form-textarea:focus { border-color: var(--primary); background: rgba(245, 158, 11, 0.05); }
+        
+        /* AI Button */
+        .ai-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .btn-ai {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            color: white; border: none; padding: 6px 14px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;
+            box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3); transition: 0.3s;
+        }
+        .btn-ai:hover { transform: translateY(-1px); box-shadow: 0 8px 15px rgba(139, 92, 246, 0.5); }
+        .btn-ai i { animation: pulse 2s infinite; }
+
+        .btn-submit {
+            width: 100%; background: var(--gold-gradient); color: #000; padding: 14px; 
+            border: none; border-radius: 12px; font-weight: 700; cursor: pointer; 
+            font-size: 0.95rem; box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3); transition: 0.3s;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.5); }
+
+        /* Preview */
+        .preview-box { 
+            margin-bottom: 20px; padding: 15px; background: rgba(0,0,0,0.3); 
+            border-radius: 10px; border-left: 3px solid var(--primary); 
+        }
+        .preview-text { font-style: italic; font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+
+        /* Testimonials List */
+        .section-title { 
+            font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; 
+            margin-bottom: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; font-family: var(--font-head);
+        }
+        
+        .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; margin-bottom: 40px; }
+
+        .t-card {
+            background: var(--bg-glass); border: 1px solid var(--border-color); border-radius: var(--radius);
+            padding: 24px; display: flex; flex-direction: column; position: relative; overflow: hidden;
+            transition: 0.3s; height: 100%; backdrop-filter: blur(20px);
+        }
+        .t-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5); }
+        
+        .t-status { 
+            position: absolute; top: 20px; right: 20px; padding: 4px 12px; 
+            border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; 
+        }
+        .status-approved { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .status-pending { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+
+        .t-header { display: flex; gap: 15px; align-items: center; margin-bottom: 15px; }
+        .t-avatar { 
+            width: 42px; height: 42px; background: rgba(255,255,255,0.05); color: var(--primary);
+            border-radius: 50%; border: 1px solid var(--border-color);
+            display: grid; place-items: center; font-weight: 700; font-family: var(--font-display); font-size: 1.1rem;
+        }
+        .t-info h4 { font-size: 1rem; color: var(--text-main); margin: 0; font-weight: 600; }
+        .t-info span { font-size: 0.8rem; color: var(--text-muted); display: block; margin-top: 2px; }
+
+        .t-body { font-size: 0.9rem; color: #cbd5e1; line-height: 1.6; flex-grow: 1; margin-bottom: 20px; font-style: italic; background: rgba(255,255,255,0.02); padding: 12px; border-radius: 8px; }
+
+        .t-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border-top: 1px solid var(--border-color); padding-top: 15px; margin-top: auto; }
+        .btn-mini { 
+            padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer; 
+            font-weight: 600; font-size: 0.8rem; transition: 0.2s; background: transparent; color: var(--text-muted);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-mini:hover { background: var(--bg-hover); color: var(--text-main); border-color: var(--text-main); }
+        .btn-mini.approve:hover { color: var(--success); border-color: var(--success); background: rgba(16,185,129,0.05); }
+        .btn-mini.danger:hover { background: rgba(239, 68, 68, 0.1); color: var(--danger); border-color: var(--danger); }
+
+        /* Footer */
+        .admin-footer {
+            margin-top: auto; padding-top: 40px; border-top: 1px solid var(--border-color);
+            text-align: center; color: var(--text-muted); font-size: 0.85rem; width: 100%;
+        }
+
+        /* PWA Popup */
+        .pwa-install-popup {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px); border: 1px solid var(--primary);
+            border-radius: 20px; padding: 20px; z-index: 3000;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-actions { display: flex; gap: 10px; }
+        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 998; backdrop-filter: blur(4px); }
+
+        @keyframes pulse { 0% { opacity: 0.7; } 50% { opacity: 1; } 100% { opacity: 0.7; } }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 20px; width: 100%; }
+            .split-layout { grid-template-columns: 1fr; }
+            .hamburger { display: block; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="admin-dashboard.html" class="logo">
+                <img src="assets/images/logo.png" alt="Logo">
+                <div>East<span>Link</span> <span class="admin-badge">ADMIN</span></div>
+            </a>
+        </div>
+        
+        <div class="header-actions">
+            <!-- Messages -->
+            <div class="icon-btn" onclick="location.href='admin-support.html'" title="Support Tickets">
+                <i class="fa-solid fa-envelope"></i>
+                <div class="notification-badge" id="msg-badge">0</div>
+            </div>
+            
+            <!-- Notifications -->
+            <div class="icon-btn" onclick="location.href='admin-notifications.html'" title="System Alerts">
+                <i class="fa-solid fa-bell"></i>
+                <div class="notification-badge" id="notif-badge">0</div>
+            </div>
+            
+            <!-- Profile -->
+            <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Analytics</div>
+            <a href="admin-dashboard.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        </div>
+        
+        <div class="nav-group">
+            <div class="nav-label">User Management</div>
+            <a href="admin-users.html" class="nav-item"><i class="fa-solid fa-users"></i> Manage Users</a>
+            <a href="admin-plans.html" class="nav-item"><i class="fa-solid fa-tags"></i> Manage Plans</a>
+            <a href="admin-referrals.html" class="nav-item"><i class="fa-solid fa-share-nodes"></i> Referrals</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Jobs & Service</div>
+            <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
+            <a href="admin-guaranteed-jobs.html" class="nav-item" style="color:var(--primary); font-weight:600;"><i class="fa-solid fa-certificate"></i> Guaranteed Jobs</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+            <a href="admin-post-job.html" class="nav-item"><i class="fa-solid fa-pen-to-square"></i> Post Job</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="admin-deposits.html" class="nav-item"><i class="fa-solid fa-arrow-down" style="color:var(--success);"></i> Deposits</a>
+            <a href="admin-withdrawals.html" class="nav-item"><i class="fa-solid fa-arrow-up" style="color:var(--danger);"></i> Withdrawals</a>
+            <a href="admin-deposit-issues.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> Errors</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">System</div>
+            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
+            <a href="#" class="nav-item active"><i class="fa-solid fa-quote-right"></i> Testimonials</a>
+            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
+            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:20px; border:1px solid rgba(239, 68, 68, 0.2);"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- MAIN -->
+    <main>
+        <div class="page-header animate__animated animate__fadeInDown">
+            <div>
+                <h1 class="page-title">Testimonials Control</h1>
+                <div style="font-size:0.9rem; color:var(--text-muted); margin-top:5px;">Manage user reviews and feedback.</div>
+            </div>
+        </div>
+
+        <div class="split-layout">
+            
+            <!-- LEFT: CREATE PANEL -->
+            <div class="animate__animated animate__fadeInLeft">
+                <div class="glass-panel" style="padding:30px; position:sticky; top:90px;">
+                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:25px; color:var(--primary);">
+                        <i class="fas fa-plus-circle" style="font-size:1.2rem;"></i>
+                        <h3 style="font-size:1.2rem; color:var(--text-main); font-family:var(--font-head);">Add New</h3>
+                    </div>
+                    
+                    <form id="addForm">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" id="inName" class="form-input" placeholder="e.g. John Kamau">
+                        
+                        <label class="form-label">Location</label>
+                        <input type="text" id="inLoc" class="form-input" placeholder="e.g. Nairobi, Kenya">
+
+                        <label class="form-label">Phone (Admin View Only)</label>
+                        <input type="text" id="inPhone" class="form-input" placeholder="07XX XXX XXX">
+
+                        <div class="ai-header">
+                            <label class="form-label" style="margin:0;">Message Body</label>
+                            <button type="button" class="btn-ai" onclick="generateAI()"><i class="fas fa-magic"></i> AI Write</button>
+                        </div>
+                        <textarea id="inMsg" class="form-textarea" rows="5" placeholder="Click AI Write or type manually..."></textarea>
+
+                        <!-- Live Preview -->
+                        <div class="preview-box">
+                            <div style="font-size:0.7rem; text-transform:uppercase; color:var(--primary); margin-bottom:8px; font-weight:700; letter-spacing:1px;">Live Preview</div>
+                            <div id="livePreviewText" class="preview-text">...</div>
+                        </div>
+
+                        <button type="submit" class="btn-submit">Publish to Site</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- RIGHT: LIST PANEL -->
+            <div class="animate__animated animate__fadeInRight">
+                
+                <!-- Pending -->
+                <div class="section-title" style="color:var(--primary);">
+                    <i class="fas fa-clock"></i> Pending Review
+                </div>
+                <div id="pendingGrid" class="testimonials-grid">
+                    <div style="color:var(--text-muted); font-size:0.9rem; padding:10px;">Loading pending items...</div>
+                </div>
+
+                <!-- Active -->
+                <div class="section-title" style="color:var(--success); margin-top:40px;">
+                    <i class="fas fa-check-circle"></i> Live on Website
+                </div>
+                <div id="activeGrid" class="testimonials-grid">
+                    <div style="color:var(--text-muted); font-size:0.9rem; padding:10px;">Loading live data...</div>
+                </div>
+
+            </div>
+        </div>
+
+        <footer class="admin-footer">
+            &copy; 2026 EastLink Recruitment Solutions. Internal System.
+        </footer>
+    </main>
+
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><i class="fas fa-download"></i></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install Admin App</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Add to home screen for quick access.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script type="module">
+        import { auth, db } from './config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, getDoc, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        // --- UI UTILS ---
+        window.toggleSidebar = () => { 
+            document.getElementById('sidebar').classList.toggle('active'); 
+            document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
+        };
+        
+        window.logout = () => {
+            if(confirm("Confirm Log Out?")) {
+                signOut(auth).then(() => window.location.href = 'signin.html');
+            }
+        };
+
+        // 1. AUTH CHECK
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) window.location.href = 'signin.html';
+            else {
+                // Optional: Check role here if needed
+                initApp();
+                initBadges();
+            }
+        });
+
+        // 2. AI ENGINE
+        const aiEngine = {
+            openers: [
+                "I was skeptical at first, but EastLink proved me wrong.",
+                "Ideally the best recruitment experience I've had in years.",
+                "EastLink is a game changer for professionals in East Africa.",
+                "The verification process was rigorous but totally worth it.",
+                "I had been looking for a job for 8 months with no luck."
+            ],
+            middles: [
+                " Within 3 days of completing my profile, I got 2 interview calls.",
+                " The 'Urgently Hiring' tier actually delivers on its promise.",
+                " I secured a contract with a top construction firm in Mombasa.",
+                " Connecting directly with the employer cut out all the middlemen.",
+                " Their transparency regarding salary and contract terms is unmatched."
+            ],
+            closers: [
+                " Highly recommend to anyone serious about their career.",
+                " Thank you EastLink for the transparency and speed!",
+                " Finally, a platform that respects professional talent.",
+                " Worth every shilling of the registration fee.",
+                " Secure, fast, and professional. 5 stars."
+            ],
+            names: ["James O.", "Sarah K.", "David M.", "Grace W.", "Peter N.", "Faith C."],
+            locs: ["Nairobi", "Mombasa", "Kisumu", "Eldoret", "Nakuru", "Kampala", "Dar es Salaam"]
+        };
+
+        window.generateAI = () => {
+            const open = aiEngine.openers[Math.floor(Math.random() * aiEngine.openers.length)];
+            const mid = aiEngine.middles[Math.floor(Math.random() * aiEngine.middles.length)];
+            const close = aiEngine.closers[Math.floor(Math.random() * aiEngine.closers.length)];
+            const fullMsg = `${open}${mid}${close}`;
+            
+            const nameInput = document.getElementById('inName');
+            const locInput = document.getElementById('inLoc');
+            
+            if(!nameInput.value) nameInput.value = aiEngine.names[Math.floor(Math.random() * aiEngine.names.length)];
+            if(!locInput.value) locInput.value = aiEngine.locs[Math.floor(Math.random() * aiEngine.locs.length)];
+            
+            const msgInput = document.getElementById('inMsg');
+            msgInput.value = "";
+            let i = 0;
+            const typeWriter = () => {
+                if (i < fullMsg.length) {
+                    msgInput.value += fullMsg.charAt(i);
+                    i++;
+                    document.getElementById('livePreviewText').textContent = msgInput.value;
+                    setTimeout(typeWriter, 15);
+                }
+            };
+            typeWriter();
+        };
+
+        document.getElementById('inMsg').addEventListener('input', (e) => {
+            document.getElementById('livePreviewText').textContent = e.target.value || "...";
+        });
+
+        // 3. MAIN APP LOGIC
+        function initApp() {
+            const q = query(collection(db, "testimonials"), orderBy("timestamp", "desc"));
+            
+            onSnapshot(q, (snapshot) => {
+                const pendingDiv = document.getElementById("pendingGrid");
+                const activeDiv = document.getElementById("activeGrid");
+                
+                let pHTML = ""; 
+                let aHTML = "";
+
+                if (snapshot.empty) {
+                     pendingDiv.innerHTML = `<div style="color:var(--text-muted); padding:10px;">No items found.</div>`;
+                     activeDiv.innerHTML = `<div style="color:var(--text-muted); padding:10px;">No items found.</div>`;
+                     return;
+                }
+
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const id = docSnap.id;
+                    const initial = data.name ? data.name.charAt(0).toUpperCase() : "U";
+                    const isApproved = data.status === 'approved';
+
+                    const card = `
+                        <div class="t-card animate__animated animate__fadeInUp">
+                            <span class="t-status ${isApproved ? 'status-approved' : 'status-pending'}">
+                                ${isApproved ? 'Live' : 'Pending'}
+                            </span>
+                            <div class="t-header">
+                                <div class="t-avatar">${initial}</div>
+                                <div class="t-info">
+                                    <h4>${data.name}</h4>
+                                    <span>${data.location}</span>
+                                </div>
+                            </div>
+                            <div class="t-body">"${data.message}"</div>
+                            <div class="t-actions">
+                                <button class="btn-mini approve" onclick="toggleStatus('${id}', '${data.status}')">
+                                    ${isApproved ? '<i class="fas fa-eye-slash"></i> Hide' : '<i class="fas fa-check"></i> Approve'}
+                                </button>
+                                <button class="btn-mini danger" onclick="deleteTestimonial('${id}')">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    `;
+
+                    if (isApproved) aHTML += card;
+                    else pHTML += card;
+                });
+
+                pendingDiv.innerHTML = pHTML || `<div style="color:var(--text-muted); font-style:italic;">No pending testimonials.</div>`;
+                activeDiv.innerHTML = aHTML || `<div style="color:var(--text-muted); font-style:italic;">No live testimonials.</div>`;
+            });
+
+            // Handle Form
+            document.getElementById('addForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.querySelector('.btn-submit');
+                const name = document.getElementById('inName').value;
+                const loc = document.getElementById('inLoc').value;
+                const msg = document.getElementById('inMsg').value;
+                const phone = document.getElementById('inPhone').value;
+
+                if(!name || !loc || !msg) { 
+                    Toastify({ text: "Please fill all required fields", style: { background: "#EF4444" } }).showToast();
+                    return; 
+                }
+
+                btn.innerText = "Publishing...";
+                btn.disabled = true;
+
+                try {
+                    await addDoc(collection(db, "testimonials"), {
+                        name: name,
+                        location: loc,
+                        message: msg,
+                        phone: phone || "Hidden",
+                        status: 'approved', // Admin added = auto approved
+                        timestamp: serverTimestamp(),
+                        source: 'admin_manual'
+                    });
+                    
+                    document.getElementById('addForm').reset();
+                    document.getElementById('livePreviewText').textContent = "...";
+                    btn.innerText = "Publish to Site";
+                    btn.disabled = false;
+                    
+                    Toastify({ text: "Testimonial Published!", style: { background: "#10B981" } }).showToast();
+
+                } catch(e) {
+                    console.error(e);
+                    Toastify({ text: "Error publishing", style: { background: "#EF4444" } }).showToast();
+                    btn.innerText = "Publish to Site";
+                    btn.disabled = false;
+                }
+            });
+        }
+
+        // Global functions for HTML onclick
+        window.toggleStatus = async (id, currentStatus) => {
+            const newStatus = currentStatus === 'approved' ? 'pending' : 'approved';
+            try {
+                await updateDoc(doc(db, "testimonials", id), { status: newStatus });
+            } catch(e) { console.error(e); }
+        };
+
+        window.deleteTestimonial = async (id) => {
+            if(confirm("Permanently delete this testimonial?")) {
+                try {
+                    await deleteDoc(doc(db, "testimonials", id));
+                } catch(e) { console.error(e); }
+            }
+        };
+
+        function initBadges() {
+            const txQ = query(collection(db, "transactions"), where("status", "==", "pending"));
+            onSnapshot(txQ, (snap) => {
+                const count = snap.size;
+                const badge = document.getElementById('notif-badge');
+                if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
+                else badge.style.display = 'none';
+            });
+            
+            const msgQ = query(collection(db, "support_tickets"), where("status", "==", "open"));
+             onSnapshot(msgQ, (snap) => {
+                const count = snap.size;
+                const badge = document.getElementById('msg-badge');
+                if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
+                else badge.style.display = 'none';
+            });
+        }
+
+        // --- PWA LOGIC ---
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if(!localStorage.getItem('pwaDismissed')) {
+                document.getElementById('pwa-install-popup').style.display = 'flex';
+            }
+        });
+
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('pwa-install-popup').style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
+            document.getElementById('pwa-install-popup').style.display = 'none';
+            localStorage.setItem('pwaDismissed', 'true');
+        };
+
+    </script>
+</body>
+</html>

@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
     
     <!-- Fonts & Icons -->
@@ -285,6 +286,9 @@
             <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
                 <i class="fa-solid fa-user-shield"></i>
             </div>
+            <div class="icon-btn" onclick="logout()" style="color:var(--danger);" title="Logout">
+                <i class="fa-solid fa-power-off"></i>
+            </div>
         </div>
     </header>
 
@@ -306,7 +310,7 @@
             <div class="nav-label">Jobs & Service</div>
             <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
             <a href="admin-guaranteed-jobs.html" class="nav-item"><i class="fa-solid fa-certificate"></i> Guaranteed Jobs</a>
-            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Vacancy</a>
         </div>
 
         <div class="nav-group">
@@ -318,10 +322,7 @@
 
         <div class="nav-group">
             <div class="nav-label">System</div>
-            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
-            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
-            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
-            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="admin-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
@@ -396,12 +397,9 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, where, orderBy, onSnapshot, updateDoc, writeBatch, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+        import { auth, db } from './config.js'; // Secure import
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { doc, getDoc, collection, query, where, orderBy, onSnapshot, updateDoc, writeBatch, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         let allNotifications = [];
         let currentFilter = 'all';
@@ -540,9 +538,10 @@
 
             let icon = 'fa-bell', cls = 'type-default';
             const type = (n.type||'').toLowerCase();
-            if(type === 'success') { icon = 'fa-check'; cls = 'type-success'; }
-            else if(type === 'danger') { icon = 'fa-times'; cls = 'type-danger'; }
-            else if(type === 'warning') { icon = 'fa-exclamation'; cls = 'type-wallet'; }
+            if(type === 'success' || type === 'approved') { icon = 'fa-check'; cls = 'type-success'; }
+            else if(type === 'danger' || type === 'error') { icon = 'fa-times'; cls = 'type-danger'; }
+            else if(type === 'warning' || type === 'pending') { icon = 'fa-exclamation'; cls = 'type-wallet'; }
+            else if(type === 'info' || type === 'system') { icon = 'fa-info'; cls = 'type-info'; }
 
             const jsDate = n.timestamp ? new Date(n.timestamp.seconds * 1000) : new Date();
 
@@ -573,27 +572,49 @@
             const unreadIds = allNotifications.filter(n => !n.read).map(n => n.id);
             if (unreadIds.length === 0) return Toastify({ text: "No unread items", style: { background: "#3B82F6" } }).showToast();
             
+            // Limit batch size to 500
             const batch = writeBatch(db);
-            unreadIds.forEach(id => batch.update(doc(db, "notifications", id), { read: true }));
-            await batch.commit();
-            Toastify({ text: "All marked as read", style: { background: "#10B981" } }).showToast();
+            let count = 0;
+            unreadIds.forEach(id => {
+                if(count < 500) {
+                    batch.update(doc(db, "notifications", id), { read: true });
+                    count++;
+                }
+            });
+            
+            try {
+                await batch.commit();
+                Toastify({ text: "Marked as read", style: { background: "#10B981" } }).showToast();
+            } catch(e) { console.error(e); }
         };
 
         window.deleteAllNotifications = async () => {
             if (allNotifications.length === 0) return;
             if (!confirm("Clear all logs? This cannot be undone.")) return;
             
+            // Limit batch size to 500
             const batch = writeBatch(db);
-            allNotifications.forEach(n => batch.delete(doc(db, "notifications", n.id)));
-            await batch.commit();
-            Toastify({ text: "Logs cleared", style: { background: "#EF4444" } }).showToast();
+            let count = 0;
+            allNotifications.forEach(n => {
+                 if(count < 500) {
+                    batch.delete(doc(db, "notifications", n.id));
+                    count++;
+                 }
+            });
+            
+            try {
+                await batch.commit();
+                Toastify({ text: "Logs cleared", style: { background: "#EF4444" } }).showToast();
+            } catch(e) { console.error(e); }
         };
 
         window.deleteCurrentNotification = async () => {
             if (!activeNotifId) return;
             const tempId = activeNotifId;
             closeModal();
-            await deleteDoc(doc(db, "notifications", tempId));
+            try {
+                await deleteDoc(doc(db, "notifications", tempId));
+            } catch(e) { console.error(e); }
         };
 
         // --- PWA LOGIC ---
@@ -621,6 +642,15 @@
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
         }
+
+        // Expose functions globally for HTML handlers
+        window.filterNotifications = filterNotifications;
+        window.openModal = openModal;
+        window.handleAction = handleAction;
+        window.markAllRead = markAllRead;
+        window.deleteAllNotifications = deleteAllNotifications;
+        window.deleteCurrentNotification = deleteCurrentNotification;
+
     </script>
 </body>
 </html>

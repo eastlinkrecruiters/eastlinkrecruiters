@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
     
     <!-- Fonts & Icons -->
@@ -261,6 +262,9 @@
             <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
                 <i class="fa-solid fa-user-shield"></i>
             </div>
+            <div class="icon-btn" onclick="logout()" style="color:var(--danger);" title="Logout">
+                <i class="fa-solid fa-power-off"></i>
+            </div>
         </div>
     </header>
 
@@ -282,7 +286,7 @@
             <div class="nav-label">Jobs & Service</div>
             <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
             <a href="admin-guaranteed-jobs.html" class="nav-item link-pro"><i class="fa-solid fa-certificate" style="color:var(--gold-base);"></i> Guaranteed Jobs</a>
-            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Vacancy</a>
         </div>
 
         <div class="nav-group">
@@ -297,7 +301,7 @@
             <a href="admin-blogs.html" class="nav-item active"><i class="fa-solid fa-blog"></i> Blogs & News</a>
             <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
             <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
-            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="admin-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
@@ -441,12 +445,9 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, collection, doc, getDoc, addDoc, updateDoc, deleteDoc, query, where, onSnapshot, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+        import { auth, db } from './config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { collection, doc, getDoc, addDoc, updateDoc, deleteDoc, query, where, onSnapshot, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         // --- UI UTILS ---
         window.toggleSidebar = () => { 
@@ -459,7 +460,7 @@
         };
 
         onAuthStateChanged(auth, (user) => {
-            if(!user) window.location.href = 'signin.html';
+            if(!user) { window.location.href = 'signin.html'; return; }
             initBadges();
             loadPosts(true); // Attempt to load with sort first
         });
@@ -484,19 +485,19 @@
                 if (keywords.includes("work") || keywords.includes("remote") || keywords.includes("home")) {
                     struct.title = `The Future of Work: Adapting to the ${topic} Revolution`;
                     struct.cat = "Industry Trends";
-                    struct.imgPrompt = "futuristic office remote work digital nomad";
+                    struct.imgPrompt = "futuristic office remote work digital nomad high tech";
                     struct.body = `The traditional 9-to-5 office model is undergoing a seismic shift. As organizations globally embrace ${topic}, we are witnessing a fundamental redefinition of productivity and collaboration.\n\n### The Paradigm Shift\nRemote work is no longer a perk; it is a necessity for competitive businesses. Companies that offer flexibility are seeing a 40% increase in employee retention. However, this transition is not without its challenges. Maintaining culture and communication in a distributed environment requires intentional leadership.\n\n### Technology as an Enabler\nCloud computing and collaborative tools like Slack and Zoom have made this transition possible. But technology is just the vehicle; the driver is trust. Managers must pivot from surveillance to outcome-based performance management.\n\n### Conclusion\nThe future belongs to the adaptable. As we navigate this new era of ${topic}, the focus must remain on human-centric design. Balancing efficiency with well-being will be the hallmark of successful organizations in the coming decade.`;
                 } 
                 else if (keywords.includes("interview") || keywords.includes("hiring") || keywords.includes("job")) {
                     struct.title = `Mastering the ${topic}: A Guide for Modern Candidates`;
                     struct.cat = "Career Advice";
-                    struct.imgPrompt = "professional job interview handshake success";
+                    struct.imgPrompt = "professional job interview handshake success corporate meeting";
                     struct.body = `In today's hyper-competitive job market, mastering ${topic} is essential. It is not just about having the right skills; it is about how you present them.\n\n### Preparation is Key\nResearch shows that candidates who spend at least 3 hours researching a company are 3x more likely to land the job. Understand their pain points and articulate how you are the solution.\n\n### The Soft Skills Advantage\nWhile technical skills get you the interview, soft skills get you the job. Emotional intelligence, adaptability, and communication are now top priorities for recruiters globally.\n\n### Final Thoughts\nApproach every ${topic} as a two-way conversation. You are evaluating them just as much as they are evaluating you. Confidence comes from preparation.`;
                 }
                 else if (keywords.includes("tech") || keywords.includes("ai") || keywords.includes("future")) {
                     struct.title = `Innovation Frontier: How ${topic} is Reshaping Industries`;
                     struct.cat = "Industry Trends";
-                    struct.imgPrompt = "artificial intelligence future technology glowing abstract";
+                    struct.imgPrompt = "artificial intelligence future technology glowing abstract network";
                     struct.body = `We stand on the brink of a technological revolution. ${topic} is not just a buzzword; it is a catalyst for unprecedented change across sectors from finance to healthcare.\n\n### The Data Revolution\nData is the new oil, and ${topic} is the engine. Organizations that leverage data-driven insights are outperforming their peers by substantial margins. The integration of AI and machine learning is automating routine tasks, freeing up humans for creative problem-solving.\n\n### Ethical Considerations\nAs we embrace ${topic}, we must also address the ethical implications. Privacy, security, and the digital divide are challenges that require global cooperation and regulation.\n\n### Looking Ahead\nThe pace of change will only accelerate. Staying informed and continuously upskilling is the only way to remain relevant in a world driven by ${topic}.`;
                 }
                 else {
@@ -504,16 +505,15 @@
                     const capTopic = topic.charAt(0).toUpperCase() + topic.slice(1);
                     struct.title = `Key Insights: The Impact of ${capTopic} on Today's Market`;
                     struct.cat = "News";
-                    struct.imgPrompt = topic + " professional business concept";
+                    struct.imgPrompt = topic + " professional business concept corporate sleek";
                     struct.body = `As the landscape evolves, ${topic} has emerged as a critical area of focus for professionals and businesses alike. Understanding its nuances is key to strategic growth.\n\n### Why It Matters\nThe implications of ${topic} are far-reaching. From operational efficiency to strategic planning, it influences decision-making at every level. Ignoring this trend is a risk no modern organization can afford.\n\n### Strategic Implementation\nIntegrating ${topic} requires a holistic approach. It is not enough to adopt new tools; mindsets must change. Leadership buy-in is essential for driving this transformation forward.\n\n### Conclusion\nStay ahead of the curve. By prioritizing ${topic}, you position yourself and your organization for long-term success in an unpredictable market.`;
                 }
 
-                // 2. GENERATE REAL AI IMAGE using Pollinations.ai (Robust & Free)
-                // We encode the prompt to be URL safe
+                // 2. GENERATE REAL AI IMAGE
                 const safePrompt = encodeURIComponent(struct.imgPrompt);
-                const imgUrl = `https://image.pollinations.ai/prompt/${safePrompt}?width=800&height=500&nologo=true`;
+                const imgUrl = `https://image.pollinations.ai/prompt/${safePrompt}?width=800&height=500&nologo=true&seed=${Math.random()}`;
                 
-                // 3. FILL UI WITH TYPING EFFECT
+                // 3. FILL UI
                 document.getElementById('inp-title').value = struct.title;
                 document.getElementById('inp-category').value = struct.cat;
                 document.getElementById('inp-img').value = imgUrl;
@@ -538,7 +538,7 @@
                         if(i < 150) excerptArea.value += fullText.charAt(i);
                         if(i === 150) excerptArea.value += "...";
                         
-                        setTimeout(typeWriter, 4); // Speed of typing
+                        setTimeout(typeWriter, 3); // Speed of typing
                     } else {
                         // Restore Button
                         btn.innerHTML = originalHtml;
@@ -553,9 +553,6 @@
         };
 
         // --- CRUD LOGIC ---
-
-        // Flag to prevent infinite recursion if fallback also fails
-        let fallbackAttempted = false;
 
         window.loadPosts = function(trySort = true) {
             const tbody = document.getElementById('table-body');
@@ -578,11 +575,13 @@
                         return; 
                     }
 
-                    snap.forEach(doc => {
-                        const d = doc.data();
+                    snap.forEach(docSnap => {
+                        const d = docSnap.data();
                         const date = d.timestamp ? new Date(d.timestamp.seconds*1000).toLocaleDateString() : 'Draft';
                         const badgeClass = d.status === 'published' ? 'bg-published' : 'bg-draft';
-                        const safeData = encodeURIComponent(JSON.stringify({id: doc.id, ...d}));
+                        
+                        // Sanitize for function params
+                        const safeData = encodeURIComponent(JSON.stringify({id: docSnap.id, ...d}));
 
                         tbody.innerHTML += `
                             <tr class="animate__animated animate__fadeIn">
@@ -594,7 +593,7 @@
                                 <td><span class="badge ${badgeClass}">${d.status || "draft"}</span></td>
                                 <td style="text-align:right;">
                                     <button class="btn-action" onclick="editPost('${safeData}')" title="Edit"><i class="fas fa-edit"></i></button>
-                                    <button class="btn-action btn-del" onclick="deletePost('${doc.id}')" title="Delete"><i class="fas fa-trash"></i></button>
+                                    <button class="btn-action btn-del" onclick="deletePost('${docSnap.id}')" title="Delete"><i class="fas fa-trash"></i></button>
                                 </td>
                             </tr>
                         `;
@@ -603,7 +602,7 @@
                     // ERROR HANDLER
                     console.error("Firestore Error:", error);
                     
-                    if(error.code === 'failed-precondition' && trySort) {
+                    if((error.code === 'failed-precondition' || error.message.includes("index")) && trySort) {
                          // Missing Index Error -> Auto Fallback
                          console.warn("Missing Index detected. Switching to Unsorted mode...");
                          loadPosts(false); // Retry without sort
@@ -625,6 +624,8 @@
         window.openEditor = () => {
             document.getElementById('list-view').style.display = 'none';
             document.getElementById('editor-view').style.display = 'block';
+            
+            // Reset fields
             document.getElementById('post-id').value = '';
             document.getElementById('inp-title').value = '';
             document.getElementById('inp-img').value = '';
@@ -655,10 +656,10 @@
         window.previewImage = () => {
             const url = document.getElementById('inp-img').value;
             const img = document.getElementById('img-prev');
-            if(url) { 
+            if(url && url.length > 5) { 
                 img.src = url; 
                 img.style.display = 'block'; 
-                img.onerror = () => { img.style.display = 'none'; Toastify({text:"Invalid Image URL", style:{background:"var(--danger)"}}).showToast(); };
+                img.onerror = () => { img.style.display = 'none'; }; // Silent fail for bad URLs
             } else { 
                 img.style.display = 'none'; 
             }
@@ -717,16 +718,14 @@
         };
 
         function initBadges() {
-            const txQ = query(collection(db, "transactions"), where("status", "==", "pending"));
-            onSnapshot(txQ, (snap) => {
+            onSnapshot(query(collection(db, "transactions"), where("status", "==", "pending")), (snap) => {
                 const count = snap.size;
                 const badge = document.getElementById('notif-badge');
                 if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
                 else badge.style.display = 'none';
             });
             
-            const msgQ = query(collection(db, "support_tickets"), where("status", "==", "open"));
-             onSnapshot(msgQ, (snap) => {
+            onSnapshot(query(collection(db, "support_tickets"), where("status", "==", "open")), (snap) => {
                 const count = snap.size;
                 const badge = document.getElementById('msg-badge');
                 if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
@@ -759,6 +758,17 @@
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
         }
+        
+        // Expose to window
+        window.generateSmartArticle = generateSmartArticle;
+        window.loadPosts = loadPosts;
+        window.openEditor = openEditor;
+        window.closeEditor = closeEditor;
+        window.editPost = editPost;
+        window.previewImage = previewImage;
+        window.savePost = savePost;
+        window.deletePost = deletePost;
+
     </script>
 </body>
 </html>

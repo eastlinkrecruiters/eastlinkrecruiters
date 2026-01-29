@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>System Maintenance | EastLink Recruiters</title>
+    
+    <meta name="theme-color" content="#0F172A">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Toastify CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <style>
+        :root {
+            --bg-body: #0F172A;      
+            --bg-card: rgba(30, 41, 59, 0.75);
+            --bg-input: rgba(255, 255, 255, 0.05);      
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;   
+            --gold-base: #fbbf24;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --glass: blur(15px);
+            --danger: #EF4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Background Texture */
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background-image: url('./assets/images/background.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -2;
+            opacity: 0.4;
+        }
+        
+        /* Initial Full Screen Loader (Prevents Blinking) */
+        #page-loader {
+            position: fixed; inset: 0;
+            background: var(--bg-body);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .maint-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            text-align: center;
+            z-index: 10;
+            display: none; /* Hidden until confirmed by JS */
+        }
+
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: var(--glass);
+            -webkit-backdrop-filter: var(--glass);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 50px 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .logo {
+            font-family: 'Cinzel', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: inline-block;
+            text-decoration: none;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .logo span {
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid var(--gold-base);
+            color: var(--gold-base);
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            animation: pulse-gold 2s infinite;
+        }
+
+        @keyframes pulse-gold {
+            0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); }
+        }
+
+        p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            max-width: 90%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Countdown Timer */
+        .timer-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            display: none; /* Controlled by JS */
+        }
+        .timer-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--gold-base);
+            margin-bottom: 5px;
+            font-weight: 700;
+            opacity: 0.8;
+        }
+        .timer-val {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* WhatsApp Button */
+        .wa-btn {
+            background: #25D366;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.1);
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .wa-btn:hover {
+            background: #22c35e;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(37, 211, 102, 0.3), 0 4px 6px -2px rgba(37, 211, 102, 0.1);
+        }
+
+        .admin-link {
+            margin-top: 25px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-decoration: none;
+            transition: 0.3s;
+            opacity: 0.5;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px 15px;
+            border-radius: 20px;
+        }
+        .admin-link:hover { color: var(--gold-base); opacity: 1; background: rgba(255,255,255,0.03); }
+
+        .spinner {
+            width: 40px; height: 40px; 
+            border: 3px solid rgba(251, 191, 36, 0.2); 
+            border-top: 3px solid var(--gold-base);
+            border-radius: 50%; 
+            animation: spin 1s linear infinite; 
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- ADMIN MODAL STYLES --- */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none; /* Hidden by default */
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        
+        .login-card {
+            background: #1e293b;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            padding: 40px 30px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.7);
+            transform: scale(0.95); transition: transform 0.3s;
+        }
+        .modal-overlay.active .login-card { transform: scale(1); }
+
+        .close-btn {
+            position: absolute; top: 15px; right: 20px;
+            color: var(--text-muted); cursor: pointer; font-size: 1.2rem;
+            transition: 0.2s;
+        }
+        .close-btn:hover { color: #fff; transform: rotate(90deg); }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-label { display: block; color: var(--text-muted); font-size: 0.8rem; margin-bottom: 8px; font-weight: 600; letter-spacing: 0.5px; }
+        .form-input {
+            width: 100%; padding: 14px 15px;
+            background: var(--bg-input); border: 1px solid var(--border-color);
+            border-radius: 12px; color: #fff; font-size: 0.95rem;
+            transition: 0.3s;
+        }
+        .form-input:focus { border-color: var(--gold-base); background: rgba(255,255,255,0.08); box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.1); }
+
+        .btn-login {
+            width: 100%; padding: 14px;
+            background: var(--gold-gradient);
+            border: none; border-radius: 12px;
+            color: #000; font-weight: 700; font-size: 1rem;
+            cursor: pointer; margin-top: 10px;
+            transition: 0.3s;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(217, 119, 6, 0.3); }
+        .btn-login:disabled { opacity: 0.7; cursor: wait; }
+
+    </style>
+</head>
+<body>
+
+    <!-- LOADING OVERLAY (PREVENTS BLINKING) -->
+    <div id="page-loader">
+        <div class="logo">EAST<span>LINK</span></div>
+        <div class="spinner"></div>
+        <p style="margin-top:20px; font-size:0.8rem;">Checking system status...</p>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="maint-container" id="main-content">
+        <div class="glass-card animate__animated animate__fadeInUp">
+            
+            <div class="logo">EAST<span>LINK</span></div>
+            <div class="status-badge">System Maintenance</div>
+            
+            <h1>We'll be back shortly</h1>
+            <p>We are currently performing scheduled upgrades to enhance your recruitment experience. Our direct line remains open.</p>
+
+            <div class="timer-box" id="timerContainer">
+                <div class="timer-label">Estimated Completion</div>
+                <div class="timer-val" id="countdown">-- : -- : --</div>
+            </div>
+
+            <a href="https://wa.me/254119524616?text=Hello%20EastLink%2C%20I%20would%20like%20to%20apply%20for%20opportunities%20while%20the%20portal%20is%20down." class="wa-btn">
+                <i class="fab fa-whatsapp" style="font-size: 1.3rem;"></i> Apply via WhatsApp
+            </a>
+
+            <!-- Triggers Modal -->
+            <button onclick="openAdminModal()" class="admin-link">
+                <i class="fas fa-lock"></i> Admin Access
+            </button>
+        </div>
+    </div>
+
+    <!-- ADMIN LOGIN MODAL -->
+    <div class="modal-overlay" id="admin-login-modal">
+        <div class="login-card">
+            <i class="fas fa-times close-btn" onclick="closeAdminModal()"></i>
+            <div style="width:50px; height:50px; background:rgba(251,191,36,0.1); border-radius:50%; display:grid; place-items:center; margin:0 auto 15px auto; color:var(--gold-base); font-size:1.2rem;">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <h2 style="color:#fff; font-family:'Cinzel',serif; margin-bottom:10px; font-size:1.4rem;">Admin Portal</h2>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:25px;">Enter your credentials to bypass maintenance.</p>
+            
+            <form id="adminForm" onsubmit="handleAdminLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="adm-email" class="form-input" placeholder="admin@eastlink.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="adm-pass" class="form-input" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-login" id="adm-btn">
+                    <span id="btn-text">Secure Login</span>
+                    <span id="btn-spin" style="display:none;"><i class="fas fa-circle-notch fa-spin"></i></span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { auth, db } from './config.js';
+        import { doc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+        // --- DOM ELEMENTS ---
+        const pageLoader = document.getElementById('page-loader');
+        const mainContent = document.getElementById('main-content');
+        const timerContainer = document.getElementById('timerContainer');
+        const countdownEl = document.getElementById('countdown');
+        let timerInterval;
+
+        // --- MAINTENANCE LOGIC ---
+        // 1. Listen specifically to 'site_settings/general'
+        //    This matches where your Admin Settings switch writes to.
+        const settingsRef = doc(db, "site_settings", "general");
+
+        onSnapshot(settingsRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+
+                // 2. CHECK THE SWITCH: maintenanceMode
+                if (data.maintenanceMode === true) {
+                    // Maintenance is ON: Show this page
+                    revealContent();
+
+                    // Optional: Handle timer if an end time exists
+                    if (data.maintenanceEndTime) {
+                        timerContainer.style.display = 'block';
+                        // Convert Firestore Timestamp or Date String
+                        const endTime = data.maintenanceEndTime.seconds 
+                            ? data.maintenanceEndTime.seconds * 1000 
+                            : new Date(data.maintenanceEndTime).getTime();
+                        startTimer(endTime);
+                    } else {
+                        timerContainer.style.display = 'none';
+                    }
+
+                } else {
+                    // Maintenance is OFF: Redirect immediately
+                    window.location.replace('seeker-dashboard.html'); 
+                }
+            } else {
+                // If the settings doc doesn't exist, assume safe and redirect
+                window.location.replace('seeker-dashboard.html');
+            }
+        }, (error) => {
+            console.error("Error listening to maintenance status:", error);
+            // Fallback: If we can't read settings (e.g., offline), don't trap the user here
+            // window.location.replace('seeker-dashboard.html');
+        });
+
+        function revealContent() {
+            // Fade out loader, show content
+            pageLoader.style.opacity = '0';
+            setTimeout(() => {
+                pageLoader.style.display = 'none';
+                mainContent.style.display = 'block';
+            }, 500);
+        }
+
+        function startTimer(endTime) {
+            clearInterval(timerInterval);
+            
+            function update() {
+                const now = new Date().getTime();
+                const distance = endTime - now;
+
+                if (distance < 0) {
+                    clearInterval(timerInterval);
+                    countdownEl.textContent = "Finishing Up...";
+                    setTimeout(() => window.location.reload(), 3000); // Check status again
+                    return;
+                }
+
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                countdownEl.textContent = 
+                    (hours < 10 ? "0" + hours : hours) + " : " + 
+                    (minutes < 10 ? "0" + minutes : minutes) + " : " + 
+                    (seconds < 10 ? "0" + seconds : seconds);
+            }
+
+            update(); 
+            timerInterval = setInterval(update, 1000);
+        }
+
+        // --- ADMIN LOGIN LOGIC ---
+        
+        window.openAdminModal = () => {
+            document.getElementById('admin-login-modal').classList.add('active');
+            setTimeout(() => document.getElementById('adm-email').focus(), 100);
+        };
+
+        window.closeAdminModal = () => {
+            document.getElementById('admin-login-modal').classList.remove('active');
+        };
+
+        // Close modal when clicking outside card
+        document.getElementById('admin-login-modal').addEventListener('click', (e) => {
+            if(e.target === document.getElementById('admin-login-modal')) window.closeAdminModal();
+        });
+
+        window.handleAdminLogin = async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('adm-email').value;
+            const password = document.getElementById('adm-pass').value;
+            const btn = document.getElementById('adm-btn');
+            const btnText = document.getElementById('btn-text');
+            const btnSpin = document.getElementById('btn-spin');
+
+            if(!email || !password) {
+                Toastify({ text: "Please enter email and password", style: { background: "var(--danger)", borderRadius: "8px" } }).showToast();
+                return;
+            }
+
+            // Set Loading State
+            btn.disabled = true;
+            btnText.style.display = 'none';
+            btnSpin.style.display = 'inline-block';
+
+            try {
+                // 1. Authenticate
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // 2. Check Role in Firestore
+                const userDocRef = doc(db, "users", user.uid);
+                const userDocSnap = await getDoc(userDocRef);
+
+                if (userDocSnap.exists()) {
+                    const userData = userDocSnap.data();
+                    
+                    if (userData.role === 'admin') {
+                        Toastify({ text: "Access Granted. Redirecting...", style: { background: "var(--gold-gradient)", color:"#000", borderRadius: "8px" } }).showToast();
+                        // Redirect to Admin Dashboard
+                        setTimeout(() => {
+                            window.location.href = 'admin-dashboard.html';
+                        }, 1000);
+                    } else {
+                        throw new Error("Unauthorized: Admin access only.");
+                    }
+                } else {
+                    throw new Error("User record not found.");
+                }
+
+            } catch (error) {
+                console.error("Login Error:", error);
+                
+                let msg = "Login failed. Please check credentials.";
+                if(error.message.includes("Unauthorized")) msg = "Access Denied: You do not have admin privileges.";
+                
+                Toastify({ text: msg, style: { background: "var(--danger)", borderRadius: "8px" } }).showToast();
+                
+                // If auth worked but role failed, sign them out immediately
+                if(auth.currentUser) await signOut(auth);
+
+                // Reset Button
+                btn.disabled = false;
+                btnText.style.display = 'inline-block';
+                btnSpin.style.display = 'none';
+            }
+        };
+    </script>
+</body>
+</html>

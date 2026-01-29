@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#1e293b">
     
     <!-- Fonts & Icons -->
@@ -24,6 +25,7 @@
             --bg-glass: rgba(255, 255, 255, 0.02);
             --bg-glass-hover: rgba(255, 255, 255, 0.08);
             --bg-glass-heavy: rgba(15, 23, 42, 0.75);
+            --bg-card-dark: #111827;
             --bg-input: rgba(0, 0, 0, 0.2);
             --border-color: rgba(255, 255, 255, 0.1);
             --border-highlight: rgba(255, 255, 255, 0.15);
@@ -54,6 +56,10 @@
             --font-mono: 'Space Mono', monospace;
             
             --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1); 
+
+            /* 3D Effects */
+            --shadow-3d: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            --shadow-3d-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.6), 0 10px 10px -5px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -66,6 +72,7 @@
             color: var(--text-main); 
             min-height: 100vh; 
             overflow-x: hidden;
+            display: flex; flex-direction: column;
         }
 
         /* --- UI COMPONENTS --- */
@@ -109,18 +116,26 @@
         }
         .global-search-input:focus { border-color: var(--urgent-orange); background: rgba(0,0,0,0.3); }
 
-        /* Header Icons */
-        .header-actions { display: flex; align-items: center; gap: 10px; }
+        /* Header Icons & Realistic Styles */
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        
         .icon-btn { 
-            width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px;
-            color: var(--text-muted); cursor: pointer; transition: all 0.3s var(--ease-snap); position: relative;
-            background: rgba(255,255,255,0.03); 
+            width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; 
+            cursor: pointer; background: rgba(255,255,255,0.03); position: relative; 
+            border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
         }
-        .icon-btn:hover { background: var(--bg-glass-hover); color: var(--text-main); }
+        .icon-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+        
+        /* Realistic Colors */
+        .icon-msg { color: #3b82f6; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.4)); }
+        .icon-bell { color: #f59e0b; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.4)); }
+
         .notification-badge { 
-            position: absolute; top: -2px; right: -2px; width: 18px; height: 18px; 
-            background: var(--danger-gradient); border-radius: 50%; font-size: 0.6rem; color: white; font-weight: 700;
-            display: none; place-items: center; justify-content: center;
+            position: absolute; top: -3px; right: -3px; width: 18px; height: 18px; 
+            background: #ef4444; border: 2px solid #0f172a; /* Red Badge with dark border */
+            border-radius: 50%; font-size: 0.65rem; color: white; 
+            display: none; place-items: center; justify-content: center; font-weight: 700; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 10;
         }
         
         .profile-widget { width: 42px; height: 42px; position: relative; cursor: pointer; margin-left: 5px; }
@@ -128,6 +143,7 @@
             width: 100%; height: 100%; border-radius: 12px; 
             background: var(--gold-gradient); display: grid; place-items: center; 
             font-weight: 700; color: #fff; object-fit: cover; 
+            border: 2px solid var(--border-color);
         }
 
         /* Sidebar */
@@ -145,10 +161,9 @@
         .nav-item:hover { color: var(--text-main); background: var(--bg-glass-hover); transform: translateX(5px); }
         .nav-item.active { background: linear-gradient(90deg, rgba(251, 191, 36, 0.15) 0%, transparent 100%); color: var(--gold-base); font-weight: 600; border-left: 3px solid var(--gold-base); }
         .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
-        .lock-icon { margin-left: auto; font-size: 0.7rem; opacity: 0.7; }
         
         /* Layout */
-        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; display: flex; flex-direction: column; }
         .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 998; }
         
         /* --- PAGE SPECIFIC --- */
@@ -157,6 +172,7 @@
         .urgent-hero {
             background: linear-gradient(135deg, rgba(234, 88, 12, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%);
             border: 1px solid rgba(234, 88, 12, 0.4);
+            border-radius: var(--radius);
             position: relative; overflow: hidden;
             display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px;
             padding: 35px;
@@ -182,81 +198,75 @@
         .filter-select { padding: 12px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-muted); cursor: pointer; outline: none; }
         .filter-select option { background: #0F172A; color: var(--text-main); }
 
-        /* Job Grid & Card Enhancements */
+        /* --- 3D JOB CARDS & HORIZONTAL BUTTONS --- */
         .job-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
         
-        .job-card { 
-            display: flex; flex-direction: column; padding: 25px; height: 100%;
-            position: relative; transition: all 0.3s var(--ease-snap);
-            overflow: hidden;
-            border-top: 3px solid var(--urgent-orange);
+        .job-card-3d {
+            background: var(--bg-card-dark);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-top: 3px solid var(--urgent-orange); /* Urgent accent */
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow-3d);
+            transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            display: flex; flex-direction: column;
+            min-height: 250px;
         }
-        .job-card:hover { transform: translateY(-8px); border-color: var(--urgent-orange); box-shadow: 0 15px 40px rgba(234, 88, 12, 0.15); }
+        .job-card-3d:hover { transform: translateY(-5px); border-color: var(--urgent-orange); box-shadow: 0 15px 40px rgba(234, 88, 12, 0.15); }
 
-        /* Tier Badges */
         .tier-badge {
             position: absolute; top: 0; right: 0; 
-            padding: 6px 14px; border-bottom-left-radius: 16px; 
-            font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-            display: flex; align-items: center; gap: 6px; z-index: 10;
+            padding: 4px 10px; border-bottom-left-radius: 12px; 
+            font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+            display: flex; align-items: center; gap: 4px; z-index: 10;
         }
-        .badge-urgent { background: var(--urgent-gradient); color: white; animation: pulse-red 2s infinite; box-shadow: 0 5px 15px rgba(234, 88, 12, 0.4); }
+        .badge-urgent { background: var(--urgent-gradient); color: white; animation: pulse-red 2s infinite; }
+        .badge-guaranteed { background: var(--pink-gradient); color: white; }
         
         @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(234, 88, 12, 0); } 100% { box-shadow: 0 0 0 0 rgba(234, 88, 12, 0); } }
 
-        /* Card Content */
-        .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; margin-top: 15px; }
-        .c-logo { 
-            width: 52px; height: 52px; background: var(--bg-glass-hover); border-radius: 14px; border: 1px solid var(--border-color);
-            display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;
-        }
-        .c-logo img { width: 100%; height: 100%; object-fit: cover; }
-        .c-logo-fallback { font-family: var(--font-head); font-weight: 700; font-size: 1.5rem; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-        .card-body { flex: 1; }
-        .c-info h3 { font-size: 1.1rem; font-weight: 700; color: var(--text-main); font-family: var(--font-display); margin-bottom: 6px; line-height: 1.3; }
-        .c-info p { font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; margin-bottom: 15px; }
-
-        /* Match Ring */
-        .match-ring-container { position: absolute; top: 25px; right: 20px; width: 40px; height: 40px; }
-        .match-ring { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(var(--success) var(--pct), var(--bg-input) 0); display: grid; place-items: center; position: relative; }
-        .match-inner { width: 32px; height: 32px; background: var(--bg-body); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 700; color: var(--success); }
-        .blur-match { filter: blur(4px); opacity: 0.5; }
-
-        .c-tags { display: flex; gap: 8px; margin-bottom: 25px; flex-wrap: wrap; }
-        .tag { font-size: 0.75rem; padding: 6px 12px; background: var(--bg-input); color: var(--text-muted); border-radius: 20px; display: flex; align-items: center; gap: 5px; border: 1px solid var(--border-color); font-weight: 500; }
-        .tag-new { color: var(--success); border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.1); font-weight: 700; }
-
-        /* Salary Logic */
-        .salary-row { 
-            margin-top: auto; padding-top: 15px; border-top: 1px solid var(--border-color); 
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; 
-        }
-        .salary-val { font-family: var(--font-mono); font-weight: 600; color: var(--success); font-size: 0.95rem; }
-        .blur-salary { filter: blur(6px); opacity: 0.5; user-select: none; transition: 0.3s; }
-        .job-card:hover .blur-salary { opacity: 0.7; }
-        .unlock-link { font-size: 0.7rem; color: var(--gold-base); text-transform: uppercase; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; }
-
-        /* BUTTONS */
-        .btn-group { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-top: auto; }
-        .btn-apply { width: 100%; padding: 12px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.9rem; }
+        .job-head { display: flex; gap: 15px; align-items: flex-start; margin-bottom: 12px; }
+        .j-logo { width: 45px; height: 45px; background: rgba(255,255,255,0.05); border-radius: 10px; display: grid; place-items: center; overflow: hidden; flex-shrink: 0; }
+        .j-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .j-logo-text { font-weight: 700; font-size: 1.2rem; color: var(--urgent-orange); }
         
-        /* Apply Directly Button */
-        .btn-pay { background: var(--pink-gradient); color: white; box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3); }
-        .btn-pay:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(236, 72, 153, 0.5); }
+        .j-details h3 { font-size: 1rem; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
+        .j-details p { font-size: 0.8rem; color: var(--text-muted); }
 
-        /* Internal View Button (Unlocked) */
-        .btn-view { background: var(--green-gradient); color: white; }
-        .btn-view:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3); }
+        .j-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+        .j-tag { font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); color: var(--text-muted); }
+        
+        .j-salary { font-family: var(--font-mono); font-size: 0.85rem; color: var(--success); font-weight: 600; padding: 8px 0; border-top: 1px solid rgba(255,255,255,0.05); margin-bottom: 12px; }
+        
+        /* Blur classes for Free users (salary only) */
+        .blur-salary { filter: blur(6px); opacity: 0.5; user-select: none; }
+        .unlock-link { font-size: 0.7rem; color: var(--urgent-orange); text-transform: uppercase; font-weight: 700; cursor: pointer; margin-left: 8px; }
 
-        /* Locked Button */
-        .btn-locked { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-weight: 600; }
-        .btn-locked:hover { border-color: var(--urgent-orange); color: var(--urgent-orange); }
-
-        /* Save Job Button */
-        .btn-save { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); color: var(--text-muted); }
-        .btn-save:hover { background: var(--bg-glass-hover); color: var(--text-main); }
-        .btn-save.saved { background: var(--gold-base); border-color: var(--gold-base); color: #000; }
+        /* HORIZONTAL BUTTONS */
+        .job-actions { display: flex; gap: 8px; margin-top: auto; }
+        .btn-j-action {
+            flex: 1;
+            padding: 8px 4px;
+            border-radius: 8px;
+            border: none;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 4px;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .btn-j-view { background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid rgba(255,255,255,0.1); }
+        .btn-j-view:hover { background: rgba(255,255,255,0.1); }
+        
+        /* Apply button gets Urgent Gradient */
+        .btn-j-apply { background: var(--urgent-gradient); color: white; box-shadow: 0 3px 10px rgba(234, 88, 12, 0.3); }
+        .btn-j-apply:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(234, 88, 12, 0.5); }
+        
+        .btn-j-save { background: transparent; border: 1px solid var(--gold-base); color: var(--gold-base); max-width: 40px; }
+        .btn-j-save:hover { background: var(--gold-base); color: black; }
+        .btn-j-saved { background: var(--gold-base); color: black; border: 1px solid var(--gold-base); max-width: 40px; }
 
         /* Upgrade Modal */
         .modal-overlay {
@@ -273,16 +283,6 @@
         .modal-overlay.open .popup-content { transform: scale(1); }
         .close-popup { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 1.2rem; color: var(--text-muted); cursor: pointer; }
 
-        /* Floating Support Button */
-        .floating-support {
-            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
-            background: var(--gold-gradient); border-radius: 50%;
-            display: grid; place-items: center; color: #1e293b; font-size: 1.6rem;
-            box-shadow: 0 10px 25px rgba(245, 158, 11, 0.5); z-index: 9999;
-            text-decoration: none; transition: transform 0.3s;
-        }
-        .floating-support:hover { transform: scale(1.1); box-shadow: 0 15px 35px rgba(245, 158, 11, 0.7); }
-
         /* PWA Popup */
         .pwa-install-popup {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
@@ -295,6 +295,17 @@
         .pwa-actions { display: flex; gap: 10px; }
         .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
         .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+        /* Main Footer */
+        .app-footer-main { margin-top: auto; padding: 30px 0; text-align: center; width: 100%; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid rgba(255,255,255,0.05); }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite; margin-right: 5px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         @media (max-width: 992px) {
             .global-search-container { display: none; }
@@ -320,20 +331,24 @@
         </div>
 
         <div class="header-actions">
-            <div class="icon-btn" onclick="location.href='seeker-messages.html'">
-                <i class="fa-regular fa-envelope"></i><div class="notification-badge" id="msg-badge">0</div>
+            <!-- Messages with Blue Icon & Red Badge -->
+            <div class="icon-btn" onclick="handleActionWithSpinner(this, () => location.href='seeker-messages.html')">
+                <i class="fa-solid fa-envelope icon-msg"></i>
+                <div class="notification-badge" id="msg-badge">0</div>
             </div>
-            <div class="icon-btn" onclick="location.href='seeker-notifications.html'">
-                <i class="fa-regular fa-bell"></i><div class="notification-badge" id="notif-badge">0</div>
+            <!-- Notifications with Gold/Amber Icon & Red Badge -->
+            <div class="icon-btn" onclick="handleActionWithSpinner(this, () => location.href='seeker-notifications.html')">
+                <i class="fa-solid fa-bell icon-bell"></i>
+                <div class="notification-badge" id="notif-badge">0</div>
             </div>
-            <div class="profile-widget" onclick="location.href='seeker-profile.html'">
+            <div class="profile-widget" onclick="handleActionWithSpinner(this, () => location.href='seeker-profile.html')">
                 <img src="" id="header-avatar-img" class="user-avatar" style="display:none;">
                 <div id="header-avatar-fallback" class="user-avatar">U</div>
             </div>
         </div>
     </header>
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR - FULLY UNLOCKED -->
     <nav class="sidebar" id="sidebar">
         <div class="nav-group">
             <div class="nav-label">Overview</div>
@@ -343,27 +358,27 @@
             <div class="nav-label">Job Hunt</div>
             <a href="seeker-applications.html" class="nav-item"><i class="fa-solid fa-file-signature"></i> Applied Jobs</a>
             <a href="seeker-jobs.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Browse Jobs</a>
-            <div onclick="checkAccess('standard', 'seeker-featured-jobs.html')" class="nav-item link-std" style="cursor:pointer;"><i class="fa-solid fa-star"></i> Featured Jobs <i class="fas fa-lock lock-icon" id="lock-featured"></i></div>
-            <a href="seeker-urgentlyhiring.html" class="nav-item active link-pro"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended <i class="fas fa-lock lock-icon" id="lock-urgent"></i></a>
-            <div onclick="checkAccess('pro', 'seeker-guaranteed-jobs.html')" class="nav-item link-pro" style="cursor:pointer;"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs <i class="fas fa-lock lock-icon" id="lock-guaranteed"></i></div>
+            <a href="seeker-featured-jobs.html" class="nav-item link-std"><i class="fa-solid fa-star"></i> Featured Jobs</a>
+            <a href="seeker-urgentlyhiring.html" class="nav-item active link-pro"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended</a>
+            <a href="seeker-guaranteed-jobs.html" class="nav-item link-pro"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Finance</div>
             <a href="seeker-wallet.html" class="nav-item"><i class="fa-solid fa-wallet"></i> My Wallet</a>
             <a href="seeker-premium.html" class="nav-item"><i class="fa-solid fa-crown"></i> My Plan</a>
-            <div onclick="checkAccess('standard', 'seeker-referrals.html')" class="nav-item link-std" style="cursor:pointer;"><i class="fa-solid fa-user-plus"></i> Invite & Earn <i class="fas fa-lock lock-icon" id="lock-referral"></i></div>
-            <div onclick="checkAccess('standard', 'seeker-invest.html')" class="nav-item link-std" style="cursor:pointer;"><i class="fa-solid fa-chart-line"></i> Invest <i class="fas fa-lock lock-icon" id="lock-invest"></i></div>
+            <a href="seeker-referrals.html" class="nav-item link-std"><i class="fa-solid fa-user-plus"></i> Invite & Earn</a>
+            <a href="seeker-invest.html" class="nav-item link-std"><i class="fa-solid fa-chart-line"></i> Invest</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Resources</div>
             <a href="seeker-blog.html" class="nav-item"><i class="fa-solid fa-newspaper"></i> News & Insights</a>
-            <div onclick="checkAccess('pro', 'seeker-resources.html')" class="nav-item link-pro" style="cursor:pointer;"><i class="fa-solid fa-book"></i> Resources <i class="fas fa-lock lock-icon" id="lock-resources"></i></div>
+            <a href="seeker-resources.html" class="nav-item link-pro"><i class="fa-solid fa-book"></i> Resources</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Settings</div>
             <a href="seeker-profile.html" class="nav-item"><i class="fa-solid fa-user-gear"></i> Profile</a>
             <a href="seeker-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
-            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="#" onclick="handleActionWithSpinner(this, logout)" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
@@ -393,14 +408,15 @@
 
         <!-- Grid -->
         <div class="job-grid" id="urgent-container">
-            <div class="glass-panel job-card" style="height:260px; display:flex; align-items:center; justify-content:center; color:var(--text-muted);">
+            <div class="glass-panel" style="height:260px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); grid-column:1/-1;">
                 <i class="fas fa-circle-notch fa-spin fa-2x"></i>
             </div>
         </div>
         
-        <div style="text-align:center; padding:30px 0; color:var(--text-muted); font-size:0.85rem; border-top:1px solid var(--border-color); margin-top:40px;">
-            &copy; 2025 EastLink Recruiters. All rights reserved.
-        </div>
+        <!-- COPYRIGHT FOOTER -->
+        <footer class="app-footer-main">
+            &copy; 2026 EastLink Recruiters. All Rights Reserved.
+        </footer>
 
     </main>
 
@@ -409,9 +425,9 @@
         <div class="popup-content animate__animated animate__zoomIn">
             <button class="close-popup" onclick="closeUpgradeModal()"><i class="fas fa-times"></i></button>
             <i class="fa-solid fa-crown" style="font-size: 3rem; color: var(--urgent-orange); margin-bottom: 15px;"></i>
-            <h2 style="font-family: var(--font-head); margin-bottom: 10px;">Pro Access Required</h2>
+            <h2 style="font-family: var(--font-head); margin-bottom: 10px;">Upgrade for Salary Info</h2>
             <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px; line-height: 1.5;">
-                This role requires immediate placement. <br>Applications are exclusively open to <span style="color: var(--gold-base); font-weight: 700;">Pro</span> members.
+                Get full salary transparency for urgent roles by upgrading to <span style="color: var(--gold-base); font-weight: 700;">Pro</span>.
             </p>
             <div style="display:flex; gap:10px; justify-content:center;">
                 <button onclick="closeUpgradeModal()" style="padding: 12px 20px; background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 12px; cursor: pointer;">Close</button>
@@ -419,11 +435,6 @@
             </div>
         </div>
     </div>
-
-    <!-- FLOATING SUPPORT BUTTON -->
-    <a href="seeker-support.html" class="floating-support" title="Contact Support">
-        <i class="fa-solid fa-headset"></i>
-    </a>
 
     <!-- PWA INSTALL POPUP -->
     <div id="pwa-install-popup" class="pwa-install-popup">
@@ -443,19 +454,37 @@
     <!-- SCRIPTS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot, getDocs, limit, orderBy, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); 
-        const auth = getAuth(app); 
-        const db = getFirestore(app);
+        import { auth, db } from './config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { doc, getDoc, collection, query, where, onSnapshot, getDocs, limit, orderBy, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         let currentUserPlan = 'free';
         let allJobs = []; 
         let bookmarks = new Set();
         let currentUserId = null;
+
+        // --- SPINNER HELPER ---
+        window.handleActionWithSpinner = (btn, action) => {
+            if(btn.dataset.processing === "true") return;
+            btn.dataset.processing = "true";
+            
+            // Save original content
+            const originalContent = btn.innerHTML;
+            
+            // Set spinner content
+            btn.innerHTML = `<span class="loading-spinner"></span>`;
+            
+            setTimeout(() => {
+                // Execute action
+                if (typeof action === 'function') action();
+                
+                // Reset button (optional, in case page doesn't reload immediately)
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.dataset.processing = "false";
+                }, 500);
+            }, 1500);
+        };
 
         // --- UI UTILS ---
         window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = 'block'; };
@@ -464,14 +493,16 @@
         window.showUpgradeModal = () => document.getElementById('upgradeModal').classList.add('open');
         window.closeUpgradeModal = () => document.getElementById('upgradeModal').classList.remove('open');
 
+        // Access check logic (retained but links unlocked)
         window.checkAccess = (requiredTier, url) => {
             const tierMap = { 'free': 0, 'standard': 1, 'pro': 2 };
             let currentTier = 'free';
             if(['standard'].some(p => currentUserPlan.includes(p))) currentTier = 'standard';
             if(['pro', 'gold', 'premium'].some(p => currentUserPlan.includes(p))) currentTier = 'pro';
 
-            if (tierMap[currentTier] >= tierMap[requiredTier]) location.href = url;
-            else window.showUpgradeModal();
+            // Redirect regardless of tier if needed, or enforce check
+            // Since links are unlocked, we just redirect:
+            location.href = url;
         };
 
         // --- AUTH & DATA ---
@@ -585,12 +616,13 @@
 
             container.innerHTML = '';
             
-            // Logic Check: Only Pro gets access to Internal Apply
+            // Logic Check: Tier Levels for Salary Display Only
             const isPro = ['pro', 'gold', 'premium', 'guaranteed'].some(p => currentUserPlan.includes(p));
             const isStandard = currentUserPlan.includes('standard');
             const isFree = !isPro && !isStandard;
 
             jobs.forEach((job, index) => {
+                const delay = index * 0.05;
                 
                 // 1. Badges (Urgent is default here)
                 let badgeHTML = `<div class="tier-badge badge-urgent"><i class="fas fa-bolt"></i> Urgent</div>`;
@@ -604,7 +636,7 @@
                     logoHtml = `<img src="${job.employerLogo}" alt="Logo">`;
                 } else {
                     const initial = (job.company || 'C').charAt(0).toUpperCase();
-                    logoHtml = `<div class="c-logo-fallback">${initial}</div>`;
+                    logoHtml = `<div class="j-logo-text">${initial}</div>`;
                 }
                 
                 // 3. Smart Salary Locking
@@ -631,93 +663,47 @@
                     salaryDisplay = job.salary ? `KES ${job.salary}` : 'Competitive';
                 }
 
-                // 4. Match Ring (AI Feature)
-                const matchScore = Math.floor(Math.random() * (99 - 80 + 1) + 80); 
-                const matchColor = matchScore > 90 ? 'var(--urgent-orange)' : 'var(--gold-base)';
-                const matchRingHTML = `
-                    <div class="match-ring-container ${isFree ? 'blur-match' : ''}" title="AI Match Score">
-                        <div class="match-ring" style="background: conic-gradient(${matchColor} ${matchScore * 3.6}deg, var(--bg-input) 0);">
-                            <div class="match-inner">${matchScore}%</div>
-                        </div>
-                    </div>`;
-
-                // 5. Bookmark State
+                // 4. Bookmark State
                 const isSaved = bookmarks.has(job.id);
+                const saveClass = isSaved ? 'btn-j-saved' : 'btn-j-save';
+                const saveIcon = isSaved ? 'fas fa-check' : 'far fa-bookmark';
 
-                // --- BUTTON LOGIC ---
-                
-                // 1. Apply Directly (Never Locked)
-                const btnDirectHTML = `
-                    <button class="btn-apply btn-pay" onclick="window.location.href='seeker-apply-directly.html?id=${job.id}'">
-                        <i class="fas fa-bolt"></i> Apply Directly
-                    </button>
-                `;
+                const location = job.location || 'Remote';
+                const type = job.type || 'Full Time';
+                const postedDate = job.postedAt?.seconds ? new Date(job.postedAt.seconds * 1000).toLocaleDateString() : 'Recently';
 
-                // 2. View & Apply (Internal)
-                // Free/Standard -> Locked for Urgent Jobs
-                // Pro -> Unlocked
-                let btnInternalHTML = "";
-                
-                if (isPro) {
-                    // Unlocked
-                    btnInternalHTML = `
-                        <button class="btn-apply btn-view" onclick="window.location.href='seeker-job-details.html?id=${job.id}'">
-                            <i class="fas fa-eye"></i> View & Apply
-                        </button>
-                    `;
-                } else {
-                    // Locked
-                    btnInternalHTML = `
-                        <button class="btn-locked" onclick="window.showUpgradeModal()">
-                            <i class="fas fa-lock"></i> Locked (Pro Only)
-                        </button>
-                    `;
-                }
-
-                // 3. Save Job Button
-                const saveBtnText = isSaved ? 'Saved' : 'Save Job';
-                const saveBtnClass = isSaved ? 'btn-save saved' : 'btn-save';
-                const saveBtnIcon = isSaved ? 'fas fa-check' : 'far fa-bookmark';
-                
-                const btnSaveHTML = `
-                    <button class="btn-apply ${saveBtnClass}" onclick="toggleSave('${job.id}', this)">
-                        <i class="${saveBtnIcon}"></i> <span>${saveBtnText}</span>
-                    </button>
-                `;
-
-                const delay = index * 0.05;
-                const isNew = (Date.now() - (job.postedAt?.seconds*1000 || 0)) < (3 * 24 * 60 * 60 * 1000);
-
+                // --- 3D CARD RENDER ---
                 container.innerHTML += `
-                    <div class="glass-panel job-card animate__animated animate__fadeInUp" style="animation-delay: ${delay}s;">
+                    <div class="job-card-3d animate__animated animate__fadeInUp" style="animation-delay: ${delay}s;">
                         ${badgeHTML}
-                        ${matchRingHTML}
                         
-                        <div class="card-head">
-                            <div class="c-logo">${logoHtml}</div>
-                            <div class="card-body" style="margin-left:15px;">
-                                <div class="c-info" style="margin-bottom:0;">
-                                    <h3>${job.title}</h3>
-                                    <p>${job.company}</p>
-                                </div>
+                        <div class="job-head">
+                            <div class="j-logo">${logoHtml}</div>
+                            <div class="j-details">
+                                <h3>${job.title}</h3>
+                                <p>${job.company}</p>
                             </div>
                         </div>
 
-                        <div class="c-tags">
-                            <span class="tag"><i class="fas fa-map-marker-alt"></i> ${job.location || 'Remote'}</span>
-                            <span class="tag"><i class="fas fa-clock"></i> ${job.type || 'Full Time'}</span>
-                            ${isNew ? '<span class="tag tag-new">New</span>' : ''}
+                        <div class="j-tags">
+                            <span class="j-tag"><i class="fas fa-map-marker-alt" style="font-size:0.7rem; margin-right:4px;"></i> ${location}</span>
+                            <span class="j-tag"><i class="fas fa-clock" style="font-size:0.7rem; margin-right:4px;"></i> ${type}</span>
+                            <span class="j-tag" style="color:var(--urgent-orange); border-color:var(--urgent-orange);">${postedDate}</span>
                         </div>
                         
-                        <div class="salary-row">
-                            <div class="salary-val">${salaryDisplay}</div>
-                            <div style="font-size:0.7rem; color:var(--text-muted);">${new Date(job.postedAt?.seconds*1000 || Date.now()).toLocaleDateString()}</div>
-                        </div>
+                        <div class="j-salary">${salaryDisplay}</div>
 
-                        <div class="btn-group">
-                            ${btnInternalHTML}
-                            ${btnDirectHTML}
-                            ${btnSaveHTML}
+                        <!-- Horizontal Actions (Always Unlocked) -->
+                        <div class="job-actions">
+                            <button class="btn-j-action btn-j-view" onclick="handleActionWithSpinner(this, () => location.href='seeker-job-details.html?id=${job.id}')">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="btn-j-action btn-j-apply" onclick="handleActionWithSpinner(this, () => location.href='seeker-apply-directly.html?id=${job.id}')">
+                                <i class="fas fa-bolt"></i> Apply
+                            </button>
+                            <button class="btn-j-action ${saveClass}" onclick="toggleSave('${job.id}', this)">
+                                <i class="${saveIcon}"></i>
+                            </button>
                         </div>
                     </div>
                 `;
@@ -732,26 +718,21 @@
             }
 
             // Determine current state based on button class
-            const isCurrentlySaved = btn.classList.contains('saved');
+            const isCurrentlySaved = btn.classList.contains('btn-j-saved');
             const isSaving = !isCurrentlySaved;
             
             // Get elements inside button
             const icon = btn.querySelector('i');
-            const span = btn.querySelector('span');
 
             // Optimistic Toggle UI
             if(isSaving) {
                 bookmarks.add(jobId);
-                btn.classList.add('saved');
+                btn.className = "btn-j-action btn-j-saved animate__animated animate__pulse";
                 if(icon) icon.className = 'fas fa-check';
-                if(span) span.innerText = 'Saved';
-                btn.classList.add('animate__animated', 'animate__pulse');
             } else {
                 bookmarks.delete(jobId);
-                btn.classList.remove('saved');
+                btn.className = "btn-j-action btn-j-save";
                 if(icon) icon.className = 'far fa-bookmark';
-                if(span) span.innerText = 'Save Job';
-                btn.classList.remove('animate__animated', 'animate__pulse');
             }
 
             // Firestore Update
@@ -767,48 +748,36 @@
                 }
             } catch(e) {
                 console.error("Error updating bookmark:", e);
-                // Revert
+                // Revert UI on error (optional)
                 if(isSaving) {
                     bookmarks.delete(jobId);
-                    btn.classList.remove('saved');
+                    btn.className = "btn-j-action btn-j-save";
                     if(icon) icon.className = 'far fa-bookmark';
-                    if(span) span.innerText = 'Save Job';
                 } else {
                     bookmarks.add(jobId);
-                    btn.classList.add('saved');
+                    btn.className = "btn-j-action btn-j-saved";
                     if(icon) icon.className = 'fas fa-check';
-                    if(span) span.innerText = 'Saved';
                 }
             }
         };
 
         // --- REALTIME NOTIFICATION LISTENERS ---
         function setupRealtimeListeners(uid) {
-            // Notifications
-            const notifQ = query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false));
-            onSnapshot(notifQ, (snap) => {
+            // Notifications Badge
+            onSnapshot(query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false)), (snapshot) => {
                 const badge = document.getElementById('notif-badge');
                 if(badge) {
-                    if (snap.size > 0) {
-                        badge.style.display = 'flex';
-                        badge.innerText = snap.size > 9 ? '9+' : snap.size;
-                    } else {
-                        badge.style.display = 'none';
-                    }
+                    badge.innerText = snapshot.size > 9 ? '9+' : snapshot.size;
+                    badge.style.display = snapshot.size > 0 ? 'flex' : 'none';
                 }
             });
 
-            // Messages
-            const msgQ = query(collection(db, "messages"), where("receiverId", "==", uid), where("read", "==", false));
-            onSnapshot(msgQ, (snap) => {
+            // Messages Badge
+            onSnapshot(query(collection(db, "messages"), where("receiverId", "==", uid), where("read", "==", false)), (snapshot) => {
                 const badge = document.getElementById('msg-badge');
                 if(badge) {
-                     if (snap.size > 0) {
-                        badge.style.display = 'flex';
-                        badge.innerText = snap.size > 9 ? '9+' : snap.size;
-                    } else {
-                        badge.style.display = 'none';
-                    }
+                    badge.innerText = snapshot.size > 9 ? '9+' : snapshot.size;
+                    badge.style.display = snapshot.size > 0 ? 'flex' : 'none';
                 }
             });
         }
@@ -818,7 +787,10 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            document.getElementById('pwa-install-popup').style.display = 'block';
+            const isDismissed = localStorage.getItem('pwa_dismissed');
+            if(!isDismissed) {
+                document.getElementById('pwa-install-popup').style.display = 'block';
+            }
         });
 
         window.installPWA = async () => {
@@ -833,6 +805,7 @@
 
         window.dismissPWA = () => {
             document.getElementById('pwa-install-popup').style.display = 'none';
+            localStorage.setItem('pwa_dismissed', 'true');
         };
 
         if ("serviceWorker" in navigator) {

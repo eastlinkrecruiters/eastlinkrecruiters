@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Contact Us | EastLink Recruiters</title>
     
-    <!-- PWA Manifest & Favicon (Updated Paths) -->
+    <!-- PWA Manifest & Favicon -->
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#020617">
@@ -30,24 +30,26 @@
             --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
             
             --bg: #020617; 
-            --bg-glass-70: rgba(15, 23, 42, 0.7); 
+            --bg-glass-70: rgba(15, 23, 42, 0.65); 
+            --bg-glass-hover: rgba(30, 41, 59, 0.75);
             --bg-input: rgba(255, 255, 255, 0.03);
             
             --text: #F8FAFC;
             --text-muted: #94A3B8;
             
-            --border-color: rgba(255, 255, 255, 0.1);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(255, 255, 255, 0.15);
+            
             --header-height: 80px;
-            --transition: all 0.3s ease;
-            --radius: 16px;
+            --transition: cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 20px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg);
-            /* Relative path */
             background-image: url('./assets/images/background.png');
             background-attachment: fixed;
             background-position: center;
@@ -59,44 +61,49 @@
             display: flex; flex-direction: column;
         }
 
-        /* Dark overlay */
+        /* Ambient Overlay */
         body::before {
             content: ''; position: fixed; inset: 0;
-            background: rgba(2, 6, 23, 0.2); 
+            background: radial-gradient(circle at top right, rgba(15, 23, 42, 0.4) 0%, #020617 100%);
             z-index: -5; pointer-events: none;
         }
 
         h1, h2, h3, .brand-font { font-family: 'Cinzel', serif; }
-        a { text-decoration: none; color: inherit; transition: var(--transition); }
+        a { text-decoration: none; color: inherit; transition: var(--transition) 0.3s; }
         .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
 
         /* --- HEADER --- */
         header {
             position: fixed; top: 0; width: 100%; height: var(--header-height);
-            z-index: 1000; transition: var(--transition); 
-            background: var(--bg-glass-70); backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            z-index: 1000; transition: var(--transition) 0.3s; 
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
         }
         .nav-inner { height: 100%; display: flex; justify-content: space-between; align-items: center; }
+        
         .header-logo-text {
             font-family: 'Cinzel', serif; font-size: 1.4rem; font-weight: 700; color: var(--text);
             letter-spacing: 1px; display: flex; align-items: center; gap: 12px;
         }
-        .header-logo-text span { color: var(--primary); }
+        .header-logo-text span { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
         .menu-trigger {
             display: inline-flex; align-items: center; gap: 12px; cursor: pointer;
-            padding: 8px 20px; border-radius: 99px;
-            background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);
-            color: var(--text); font-size: 0.75rem; font-weight: 600; letter-spacing: 1px;
-            transition: var(--transition);
+            padding: 10px 24px; border-radius: 99px;
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-color);
+            color: var(--text); font-size: 0.8rem; font-weight: 600; letter-spacing: 1px;
+            transition: var(--transition) 0.3s;
         }
         .menu-trigger:hover { border-color: var(--primary); background: rgba(245, 158, 11, 0.1); }
 
         /* --- OVERLAY MENU --- */
         .menu-overlay {
-            position: fixed; inset: 0; background: rgba(2, 6, 23, 0.98);
+            position: fixed; inset: 0; 
+            background: rgba(2, 6, 23, 0.98);
+            backdrop-filter: blur(15px);
             z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none; transition: var(--transition);
+            opacity: 0; pointer-events: none; transition: var(--transition) 0.4s;
         }
         .menu-overlay.active { opacity: 1; pointer-events: all; }
         .close-menu {
@@ -106,16 +113,19 @@
             display: grid; place-items: center; cursor: pointer; transition: 0.3s; font-size: 1.2rem;
         }
         .close-menu:hover { border-color: var(--primary); color: var(--primary); transform: rotate(90deg); }
-        .menu-links { text-align: center; display: flex; flex-direction: column; gap: 25px; }
+        .menu-links { text-align: center; display: flex; flex-direction: column; gap: 30px; }
         .menu-link { font-family: 'Cinzel', serif; font-size: 2.5rem; font-weight: 700; color: var(--text); transition: 0.3s; }
-        .menu-link:hover { color: var(--primary); }
+        .menu-link:hover { color: var(--primary); transform: scale(1.05); }
 
         /* --- CONTACT PAGE CONTENT --- */
         .page-intro {
             padding: calc(var(--header-height) + 60px) 0 40px; 
             text-align: center; margin-bottom: 40px;
         }
-        .page-intro h1 { font-size: 3rem; margin-bottom: 10px; color: var(--text); }
+        .page-intro h1 { 
+            font-size: 3rem; margin-bottom: 15px; color: var(--text); 
+            background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
         .page-intro p { color: var(--text-muted); font-size: 1.1rem; }
 
         .contact-grid {
@@ -125,32 +135,38 @@
         /* Info Card */
         .info-card {
             background: var(--bg-glass-70); border: 1px solid var(--border-color);
-            border-radius: var(--radius); padding: 40px; backdrop-filter: blur(12px);
+            border-radius: var(--radius); padding: 40px; 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             display: flex; flex-direction: column; gap: 30px; height: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
         .info-item { display: flex; gap: 20px; align-items: flex-start; }
         .info-icon {
-            width: 50px; height: 50px; background: rgba(245, 158, 11, 0.1); color: var(--primary);
-            border-radius: 12px; display: grid; place-items: center; font-size: 1.2rem; flex-shrink: 0;
-            border: 1px solid rgba(245, 158, 11, 0.2);
+            width: 50px; height: 50px; background: rgba(255, 255, 255, 0.05); color: var(--primary);
+            border-radius: 14px; display: grid; place-items: center; font-size: 1.2rem; flex-shrink: 0;
+            border: 1px solid var(--border-color); transition: 0.3s;
         }
+        .info-item:hover .info-icon { background: var(--gold-gradient); color: #000; border-color: transparent; }
+        
         .info-text h4 { font-family: 'Cinzel', serif; font-size: 1.1rem; margin-bottom: 5px; color: var(--text); }
         .info-text p, .info-text a { color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; }
         .info-text a:hover { color: var(--primary); }
 
         /* Map */
         .map-frame {
-            width: 100%; height: 250px; border-radius: 12px; overflow: hidden; margin-top: auto;
+            width: 100%; height: 250px; border-radius: 16px; overflow: hidden; margin-top: auto;
             border: 1px solid var(--border-color); filter: grayscale(100%) invert(92%) contrast(83%);
-            transition: var(--transition);
+            transition: var(--transition) 0.5s; position: relative;
         }
-        .map-frame:hover { filter: none; border-color: var(--primary); }
+        .map-frame:hover { filter: none; border-color: var(--primary); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
 
         /* Form Card */
         .form-card {
             background: var(--bg-glass-70); border: 1px solid var(--border-color);
-            border-radius: var(--radius); padding: 50px; backdrop-filter: blur(12px);
+            border-radius: var(--radius); padding: 50px; 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             position: relative; overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
         .form-group { margin-bottom: 25px; position: relative; }
         .form-label {
@@ -160,49 +176,51 @@
         .form-input {
             width: 100%; padding: 16px; background: var(--bg-input); border: 1px solid var(--border-color);
             border-radius: 12px; color: var(--text); font-size: 1rem; font-family: 'Inter', sans-serif;
-            transition: var(--transition); resize: none;
+            transition: var(--transition) 0.3s; resize: none;
         }
-        .form-input:focus { border-color: var(--primary); background: rgba(0,0,0,0.3); }
+        .form-input:focus { border-color: var(--primary); background: rgba(0,0,0,0.2); box-shadow: 0 0 15px rgba(245, 158, 11, 0.1); }
         .form-input:focus + .form-label,
         .form-input:not(:placeholder-shown) + .form-label {
-            top: -10px; left: 10px; font-size: 0.8rem; background: var(--bg); padding: 0 5px; color: var(--primary);
+            top: -10px; left: 10px; font-size: 0.8rem; background: var(--bg-input); 
+            padding: 0 8px; color: var(--primary); border-radius: 4px; backdrop-filter: blur(5px);
         }
 
         .btn-submit {
             width: 100%; padding: 16px; border-radius: 50px; border: none;
             background: var(--gold-gradient); color: #000; font-weight: 700; font-size: 1rem;
-            cursor: pointer; transition: var(--transition); display: flex; justify-content: center; align-items: center; gap: 10px;
+            cursor: pointer; transition: var(--transition) 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px;
+            box-shadow: 0 4px 15px rgba(217, 119, 6, 0.2);
         }
-        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3); }
-        .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4); filter: brightness(1.1); }
+        .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
 
         /* FAQ Section */
         .faq-section { margin-bottom: 80px; max-width: 800px; margin-left: auto; margin-right: auto; }
         .faq-header { text-align: center; margin-bottom: 40px; }
         .faq-item {
             background: var(--bg-glass-70); border: 1px solid var(--border-color);
-            border-radius: 12px; margin-bottom: 15px; overflow: hidden; transition: var(--transition);
+            border-radius: 14px; margin-bottom: 15px; overflow: hidden; transition: var(--transition) 0.3s;
+            backdrop-filter: blur(10px);
         }
         .faq-question {
             padding: 20px 25px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-            font-weight: 600; color: var(--text);
+            font-weight: 600; color: var(--text); transition: 0.3s;
         }
-        .faq-question:hover { color: var(--primary); }
+        .faq-question:hover { color: var(--primary); background: rgba(255,255,255,0.02); }
         .faq-icon { transition: 0.3s; }
         .faq-answer {
-            max-height: 0; overflow: hidden; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 0 25px; color: var(--text-muted); font-size: 0.95rem;
+            max-height: 0; overflow: hidden; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0 25px; color: var(--text-muted); font-size: 0.95rem; line-height: 1.6;
         }
-        .faq-item.active .faq-answer { max-height: 200px; padding-bottom: 25px; }
+        .faq-item.active .faq-answer { max-height: 200px; padding-bottom: 25px; opacity: 1; }
         .faq-item.active .faq-icon { transform: rotate(180deg); color: var(--primary); }
-        .faq-item.active { border-color: var(--primary); }
+        .faq-item.active { border-color: var(--primary); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 
         /* Footer */
         footer { 
-            background: var(--bg-glass-70); border-top: 1px solid var(--border-color); 
-            padding-top: 4rem; margin-top: auto; backdrop-filter: blur(12px);
+            background: rgba(2, 6, 23, 0.9); border-top: 1px solid var(--border-color); 
+            padding-top: 5rem; margin-top: auto; backdrop-filter: blur(20px);
         }
-        /* UPDATED: Changed to 3 columns */
         .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 40px; margin-bottom: 4rem; }
         
         .f-col h4 { font-size: 0.9rem; color: var(--text); margin-bottom: 1.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-family: 'Cinzel', serif; }
@@ -210,14 +228,16 @@
         .f-col ul li { margin-bottom: 12px; }
         .f-col a { color: var(--text-muted); font-size: 0.9rem; transition: 0.2s; }
         .f-col a:hover { color: var(--primary); padding-left: 5px; }
-        .social-links { display: flex; gap: 10px; margin-top: 25px; }
+        
+        .social-links { display: flex; gap: 12px; margin-top: 25px; }
         .s-btn {
-            width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05);
+            width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.03);
             border: 1px solid var(--border-color); color: var(--text-muted);
-            display: grid; place-items: center; transition: 0.3s; font-size: 1rem;
+            display: grid; place-items: center; transition: 0.3s; font-size: 1.1rem;
         }
-        .s-btn:hover { background: var(--primary); color: #000; border-color: var(--primary); }
-        .copyright { border-top: 1px solid var(--border-color); padding: 2rem 0; text-align: center; color: var(--text-muted); font-size: 0.85rem; }
+        .s-btn:hover { background: var(--gold-gradient); color: #000; border-color: transparent; transform: translateY(-3px); }
+        
+        .copyright { border-top: 1px solid var(--border-color); padding: 2.5rem 0; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
 
         @media (max-width: 900px) {
             .contact-grid { grid-template-columns: 1fr; }
@@ -228,6 +248,7 @@
         @media (max-width: 600px) {
             .footer-grid { grid-template-columns: 1fr; }
             .page-intro h1 { font-size: 2.2rem; }
+            .info-card, .form-card { padding: 30px; }
         }
     </style>
 </head>
@@ -397,7 +418,7 @@
                         <img src="./assets/images/logo.png" style="height:35px; width:auto;" alt="EastLink">
                         <div style="color:white;">EAST<span style="color:var(--primary);">LINK</span></div>
                     </div>
-                    <p style="color:var(--text-muted); font-size:0.9rem; line-height:1.6;">The leading platform for professional recruitment. We ensure quality, trust, and speed.</p>
+                    <p style="color:var(--text-muted); font-size:0.95rem; line-height:1.7;">The leading platform for professional recruitment. We ensure quality, trust, and speed.</p>
                     <div class="social-links">
                         <a href="#" id="link-fb" class="s-btn" target="_blank"><i class="fab fa-facebook-f"></i></a>
                         <a href="#" id="link-in" class="s-btn" target="_blank"><i class="fab fa-linkedin-in"></i></a>
@@ -423,9 +444,8 @@
                         <li><a href="terms.html">Terms & Conditions</a></li>
                     </ul>
                 </div>
-                <!-- REMOVED "GET THE APP" COLUMN -->
             </div>
-            <div class="copyright">&copy; <span id="year"></span> EastLink Recruitment Solutions. All rights reserved.</div>
+            <div class="copyright">&copy; 2026 EastLink Recruitment Solutions. All rights reserved.</div>
         </div>
     </footer>
 
@@ -435,7 +455,7 @@
         position: fixed; bottom: 20px; right: 20px; 
         background: rgba(15, 23, 42, 0.95); 
         border: 1px solid rgba(245, 158, 11, 0.3);
-        backdrop-filter: blur(12px);
+        backdrop-filter: blur(20px);
         padding: 20px; border-radius: 16px; 
         z-index: 10000; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
         max-width: 320px; animation: slideUp 0.5s ease-out;
@@ -448,7 +468,7 @@
             </div>
         </div>
         <div style="display:flex; gap:10px;">
-            <button id="pwa-dismiss" style="flex:1; padding:10px; background:transparent; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:8px; cursor:pointer;">Later</button>
+            <button id="pwa-dismiss" style="flex:1; padding:10px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:8px; cursor:pointer;">Later</button>
             <button id="pwa-install-btn" style="flex:1; padding:10px; background:linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border:none; color:#000; font-weight:700; border-radius:8px; cursor:pointer;">Install</button>
         </div>
     </div>
@@ -459,17 +479,15 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        import { db } from './config.js';
+        import { collection, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         // --- INIT UI ---
         AOS.init({ duration: 800, offset: 50, once: true });
-        document.getElementById("year").textContent = new Date().getFullYear();
+        
+        // Ensure 2026 is strictly enforced
+        const yearEl = document.getElementById("year");
+        if(yearEl) yearEl.textContent = "2026";
 
         window.toggleMenu = () => {
             const menu = document.getElementById('menuOverlay');

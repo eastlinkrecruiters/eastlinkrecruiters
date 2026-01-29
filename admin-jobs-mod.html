@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" style="background-color: #0F172A;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Manage Jobs (Admin) | EastLink</title>
+    <title>Manage Jobs | EastLink Admin</title>
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
@@ -20,34 +20,40 @@
 
     <style>
         :root {
-            /* Core Theme */
+            /* Executive Theme */
+            --primary: #f59e0b;
+            --primary-dark: #d97706;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            
             --bg-body: #0F172A;       
-            --bg-card: rgba(30, 41, 59, 0.65);
-            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass: rgba(30, 41, 59, 0.7);
             --bg-glass-heavy: rgba(15, 23, 42, 0.95);
-            --bg-input: rgba(255, 255, 255, 0.07);
-            --bg-hover: rgba(255, 255, 255, 0.12);
-            --border-color: rgba(255, 255, 255, 0.12);
+            --bg-hover: rgba(255, 255, 255, 0.08);
+            --bg-input: rgba(15, 23, 42, 0.6);
+            
             --text-main: #F8FAFC;     
             --text-muted: #94A3B8; 
             
-            /* Admin Tiers Colors */
-            --theme-standard: #10B981;   /* Green */
-            --theme-featured: #F59E0B;   /* Golden */
-            --theme-urgent: #EC4899;     /* Pink */
-            --theme-guaranteed: #8B5CF6; /* Purple */
+            --border-color: rgba(255, 255, 255, 0.08);
             
-            --success: #10B981;
-            --danger: #EF4444;
-            --blue: #3B82F6;
-            --gold-base: #D97706;
+            /* Status Colors */
+            --neon-purple: #8b5cf6; /* Guaranteed */
+            --success: #10B981;     /* Standard */
+            --danger: #EF4444;      /* Closed/Delete */
+            --blue: #3B82F6;        /* Action */
+            --pink: #EC4899;        /* Urgent */
             
+            /* Dimensions */
             --sidebar-width: 260px; 
-            --header-height: 60px;
+            --header-height: 70px;
             --radius: 16px;
+            
             --font-head: 'Cinzel', serif;
             --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
+            
+            --transition: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -61,180 +67,231 @@
             background-attachment: fixed;
             color: var(--text-main); 
             min-height: 100vh; 
+            overflow-x: hidden;
         }
 
-        /* --- LAYOUT UTILS --- */
+        /* Ambient Overlay */
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background: radial-gradient(circle at top right, rgba(15, 23, 42, 0.4) 0%, #020617 100%);
+            z-index: -1; pointer-events: none;
+        }
+
+        /* Utils & Glassmorphism */
         .glass-panel {
             background: var(--bg-glass);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-color);
             border-radius: var(--radius);
-            padding: 25px;
-            margin-bottom: 25px;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+            width: 100%;
         }
 
-        /* --- HEADER & SIDEBAR --- */
+        /* --- HEADER --- */
         header {
             position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
             background: var(--bg-glass-heavy); backdrop-filter: blur(30px);
             border-bottom: 1px solid var(--border-color);
             display: flex; align-items: center; justify-content: space-between; 
-            padding: 0 20px; z-index: 1000;
+            padding: 0 25px; z-index: 1000;
         }
-        .header-left { display: flex; align-items: center; gap: 12px; }
-        .logo { font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.15rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; }
-        .logo span { color: var(--gold-base); }
-        .admin-badge { font-family: var(--font-body); font-size: 0.55rem; background: var(--bg-input); border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; margin-left: 8px; color: var(--text-muted); letter-spacing: 0.5px; }
-        .hamburger { font-size: 1.2rem; cursor: pointer; color: var(--text-muted); display: none; }
         
-        .header-actions { display: flex; align-items: center; gap: 8px; }
-        .icon-btn { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 8px; font-size: 0.9rem; color: var(--text-muted); cursor: pointer; transition: 0.3s; position: relative; }
-        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); }
-        .notification-badge { position: absolute; top: 2px; right: 2px; min-width: 14px; height: 14px; background: var(--danger); border-radius: 10px; font-size: 0.55rem; color: white; font-weight: 700; display: none; place-items: center; justify-content: center; padding: 0 3px; border: 2px solid var(--bg-card); }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        
+        .logo { 
+            font-family: var(--font-head); 
+            font-weight: 700; color: var(--text-main); font-size: 1.2rem;
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; 
+            display: flex; align-items: center; gap: 10px;
+        }
+        .logo img { height: 32px; width: auto; }
+        .logo span { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .admin-badge { 
+            font-family: var(--font-body); font-size: 0.6rem; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 6px; 
+            margin-left: 10px; color: var(--text-muted); letter-spacing: 0.5px; font-weight: 600;
+        }
+        
+        .hamburger { font-size: 1.4rem; cursor: pointer; color: var(--text-muted); display: none; transition: 0.3s; }
+        .hamburger:hover { color: var(--primary); }
 
+        /* Header Actions */
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .icon-btn { 
+            width: 40px; height: 40px;
+            display: grid; place-items: center; border-radius: 12px; font-size: 1rem;
+            color: var(--text-muted); cursor: pointer; transition: 0.3s; position: relative;
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-color);
+        }
+        .icon-btn:hover { background: var(--bg-hover); color: var(--primary); border-color: var(--primary); }
+        
+        .notification-badge { 
+            position: absolute; top: -5px; right: -5px; 
+            min-width: 18px; height: 18px; 
+            background: var(--danger); border-radius: 50%; 
+            font-size: 0.65rem; color: white; font-weight: 700;
+            display: none; place-items: center; justify-content: center;
+            border: 2px solid #0F172A;
+            animation: bounceIn 0.5s;
+        }
+        
+        .profile-widget {
+            width: 40px; height: 40px; margin-left: 10px;
+            background: var(--gold-gradient); border-radius: 12px; display: grid; place-items: center;
+            color: #000; font-size: 1rem; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+        .profile-widget:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.5); }
+
+        /* --- SIDEBAR --- */
         .sidebar {
             position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
-            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 15px 0; overflow-y: auto; 
-            transition: transform 0.3s ease; z-index: 999; display: flex; flex-direction: column;
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 25px 0; overflow-y: auto; 
+            transition: transform 0.3s var(--transition); z-index: 999; display: flex; flex-direction: column;
+            backdrop-filter: blur(25px);
         }
-        .nav-group { padding: 0 20px; margin-bottom: 15px; }
-        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
-        .nav-item { display: flex; align-items: center; padding: 10px 12px; color: var(--text-muted); text-decoration: none; font-size: 0.85rem; border-radius: 8px; transition: 0.3s; margin-bottom: 2px; }
+        .nav-group { padding: 0 20px; margin-bottom: 25px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--primary); font-weight: 700; margin-bottom: 12px; letter-spacing: 1px; padding-left: 12px; opacity: 0.8; }
+        .nav-item { 
+            display: flex; align-items: center; padding: 12px 15px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.9rem; transition: all 0.3s; border-radius: 10px; margin-bottom: 5px; font-weight: 500;
+        }
         .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
-        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
-        .nav-item i { width: 22px; text-align: center; margin-right: 8px; }
+        .nav-item.active { background: rgba(245, 158, 11, 0.1); color: var(--primary); font-weight: 600; border: 1px solid rgba(245, 158, 11, 0.2); }
+        .nav-item i { width: 24px; text-align: center; margin-right: 10px; font-size: 1rem; transition: 0.3s; }
+        .nav-item:hover i { color: var(--primary); }
         
-        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 25px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
-        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 998; backdrop-filter: blur(4px); }
+        /* --- MAIN --- */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; display: flex; flex-direction: column; }
 
-        /* --- FILTERS --- */
-        .filter-container { margin-bottom: 25px; display: flex; flex-direction: column; gap: 15px; }
-        .filter-row-top { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 15px; }
-        
-        /* Tier Filter Buttons */
-        .tier-filters { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
-        .tier-btn {
-            background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-muted);
-            padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; white-space: nowrap;
-            transition: 0.3s; font-weight: 600; display: flex; align-items: center; gap: 6px;
+        .page-header { margin-bottom: 30px; }
+        .page-title h1 { font-family: var(--font-head); font-size: 1.8rem; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .page-title p { color: var(--text-muted); font-size: 0.95rem; margin-top: 5px; }
+
+        /* FILTERS */
+        .filters-container {
+            display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 15px;
+            padding: 20px; margin-bottom: 25px;
         }
-        .tier-btn:hover { background: var(--bg-hover); color: var(--text-main); }
-        .tier-btn.active { border: 1px solid currentColor; background: rgba(255,255,255,0.05); }
-        
-        /* Specific Tier Button Colors */
-        .t-btn-standard.active { color: var(--theme-standard); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
-        .t-btn-featured.active { color: var(--theme-featured); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2); }
-        .t-btn-urgent.active { color: var(--theme-urgent); box-shadow: 0 4px 12px rgba(236, 72, 153, 0.2); }
-        .t-btn-guaranteed.active { color: var(--theme-guaranteed); box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2); }
-
         .search-box { position: relative; }
         .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-        .search-box input { padding-left: 40px; }
+        .search-box input { padding-left: 45px; }
+        
         input, select, textarea {
             width: 100%; padding: 12px 15px; background: var(--bg-input); 
-            border: 1px solid var(--border-color); border-radius: 8px; 
+            border: 1px solid var(--border-color); border-radius: 12px; 
             color: var(--text-main); outline: none; font-size: 0.9rem; transition: 0.3s; font-family: var(--font-body);
         }
-        input:focus, select:focus, textarea:focus { border-color: var(--theme-featured); background: var(--bg-hover); }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); background: var(--bg-hover); box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.1); }
 
-        /* --- JOB CARD --- */
-        .jobs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
+        .tier-tabs { display: flex; gap: 10px; margin-top: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .tier-tab {
+            padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; 
+            border: 1px solid var(--border-color); background: rgba(255,255,255,0.02); color: var(--text-muted);
+            transition: 0.3s; white-space: nowrap; display: flex; align-items: center; gap: 6px;
+        }
+        .tier-tab:hover { background: var(--bg-hover); color: var(--text-main); }
+        .tier-tab.active { border-color: currentColor; background: rgba(255,255,255,0.05); font-weight: 600; }
+        
+        .tab-standard.active { color: var(--success); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); }
+        .tab-featured.active { color: var(--primary); box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2); }
+        .tab-urgent.active { color: var(--pink); box-shadow: 0 4px 12px rgba(236, 72, 153, 0.2); }
+        .tab-guaranteed.active { color: var(--neon-purple); box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2); }
+        .tab-all.active { color: var(--text-main); box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1); }
 
+        /* JOBS GRID */
+        .jobs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        
         .job-card {
-            background: var(--bg-glass); border: 1px solid var(--border-color);
-            border-radius: var(--radius); padding: 20px; position: relative;
-            transition: all 0.3s ease; overflow: hidden; display: flex; flex-direction: column;
+            background: var(--bg-glass); border: 1px solid var(--border-color); border-radius: var(--radius);
+            padding: 0; display: flex; flex-direction: column; transition: 0.3s; position: relative;
+            backdrop-filter: blur(20px); overflow: hidden; height: 100%;
         }
-        .job-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .job-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
 
-        /* Left Color Stripe Logic */
-        .card-stripe { position: absolute; top: 0; left: 0; width: 4px; height: 100%; transition: 0.3s; }
-        .tier-standard .card-stripe { background: var(--theme-standard); box-shadow: 0 0 10px var(--theme-standard); }
-        .tier-featured .card-stripe { background: var(--theme-featured); box-shadow: 0 0 10px var(--theme-featured); }
-        .tier-urgent .card-stripe { background: var(--theme-urgent); box-shadow: 0 0 10px var(--theme-urgent); }
-        .tier-guaranteed .card-stripe { background: var(--theme-guaranteed); box-shadow: 0 0 10px var(--theme-guaranteed); }
+        /* Tier Stripe */
+        .card-stripe { height: 4px; width: 100%; }
+        .stripe-standard { background: var(--success); box-shadow: 0 0 10px var(--success); }
+        .stripe-featured { background: var(--gold-gradient); box-shadow: 0 0 10px var(--primary); }
+        .stripe-urgent { background: var(--pink); box-shadow: 0 0 10px var(--pink); }
+        .stripe-guaranteed { background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); }
 
-        .job-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; padding-left: 10px; }
-        .job-role { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; font-family: var(--font-head); }
-        .job-company { font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; }
         
-        .badges-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; padding-left: 10px; }
-        .status-badge { font-size: 0.65rem; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; font-weight: 700; border: 1px solid transparent; letter-spacing: 0.5px; }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .role-title { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; line-height: 1.3; }
+        .company-name { font-size: 0.85rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        
+        .badges-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; margin-top: auto; }
+        .status-badge { font-size: 0.65rem; padding: 4px 10px; border-radius: 6px; text-transform: uppercase; font-weight: 700; border: 1px solid transparent; letter-spacing: 0.5px; }
+        .badge-standard { background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
+        .badge-featured { background: rgba(245, 158, 11, 0.1); color: var(--primary); border-color: rgba(245, 158, 11, 0.3); }
+        .badge-urgent { background: rgba(236, 72, 153, 0.1); color: var(--pink); border-color: rgba(236, 72, 153, 0.3); }
+        .badge-guaranteed { background: rgba(139, 92, 246, 0.1); color: var(--neon-purple); border-color: rgba(139, 92, 246, 0.3); }
 
-        .badge-standard { background: rgba(16, 185, 129, 0.1); color: var(--theme-standard); border-color: rgba(16, 185, 129, 0.3); }
-        .badge-featured { background: rgba(245, 158, 11, 0.1); color: var(--theme-featured); border-color: rgba(245, 158, 11, 0.3); }
-        .badge-urgent { background: rgba(236, 72, 153, 0.1); color: var(--theme-urgent); border-color: rgba(236, 72, 153, 0.3); }
-        .badge-guaranteed { background: rgba(139, 92, 246, 0.1); color: var(--theme-guaranteed); border-color: rgba(139, 92, 246, 0.3); }
-
-        /* CLICKABLE APPLICANT BUTTON */
-        .applicant-stats-btn {
+        /* Applicants Button */
+        .applicant-btn {
             background: rgba(255,255,255,0.03); border: 1px solid var(--border-color);
-            border-radius: 8px; padding: 12px; margin-bottom: 15px; cursor: pointer;
+            border-radius: 12px; padding: 12px 15px; margin-bottom: 20px; cursor: pointer;
             display: flex; align-items: center; justify-content: space-between;
-            transition: 0.3s; margin-left: 10px; width: calc(100% - 10px);
+            transition: 0.3s;
         }
-        .applicant-stats-btn:hover { background: rgba(255,255,255,0.08); border-color: var(--text-muted); }
-        .app-count-large { font-size: 1.5rem; font-weight: 700; font-family: var(--font-mono); }
+        .applicant-btn:hover { background: var(--bg-hover); border-color: var(--text-muted); transform: translateX(2px); }
+        .app-count { font-size: 1.4rem; font-weight: 700; font-family: var(--font-mono); }
         
-        /* Tier specific stats coloring */
-        .tier-standard .app-count-large { color: var(--theme-standard); }
-        .tier-featured .app-count-large { color: var(--theme-featured); }
-        .tier-urgent .app-count-large { color: var(--theme-urgent); }
-        .tier-guaranteed .app-count-large { color: var(--theme-guaranteed); }
+        .tier-standard .app-count { color: var(--success); }
+        .tier-featured .app-count { color: var(--primary); }
+        .tier-urgent .app-count { color: var(--pink); }
+        .tier-guaranteed .app-count { color: var(--neon-purple); }
 
-        .job-footer { display: flex; gap: 8px; margin-top: auto; padding-left: 10px; }
-        .btn-card {
-            flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color);
-            background: var(--bg-input); color: var(--text-muted); font-size: 0.85rem; cursor: pointer;
-            transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 6px;
+        .card-actions { display: flex; border-top: 1px solid var(--border-color); }
+        .action-btn { 
+            flex: 1; padding: 12px; background: transparent; border: none; border-right: 1px solid var(--border-color);
+            color: var(--text-muted); font-size: 0.9rem; cursor: pointer; transition: 0.2s;
         }
-        .btn-card:hover { background: var(--bg-hover); color: var(--text-main); }
-        .btn-edit:hover { color: var(--blue); border-color: var(--blue); }
-        .btn-delete:hover { color: var(--danger); border-color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+        .action-btn:last-child { border-right: none; }
+        .action-btn:hover { background: var(--bg-hover); color: var(--text-main); }
+        .btn-del:hover { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
 
-        /* --- MODALS --- */
+        /* MODALS */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
             z-index: 2000; display: none; place-items: center; padding: 20px;
+            animation: fadeIn 0.3s ease;
         }
         .modal-content {
             background: #1E293B; border: 1px solid var(--border-color); border-radius: 20px;
-            width: 100%; max-width: 800px; max-height: 90vh; display: flex; flex-direction: column;
+            width: 100%; max-width: 800px; max-height: 85vh; display: flex; flex-direction: column;
             box-shadow: 0 25px 60px rgba(0,0,0,0.6); animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .modal-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.5); border-radius: 20px 20px 0 0; }
+        .modal-header { padding: 20px 25px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: rgba(15, 23, 42, 0.5); }
         .modal-body { padding: 25px; overflow-y: auto; flex: 1; }
-        .modal-footer { padding: 20px; border-top: 1px solid var(--border-color); background: rgba(15, 23, 42, 0.5); border-radius: 0 0 20px 20px; display: flex; justify-content: flex-end; gap: 10px; }
-        @keyframes zoomIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        /* Edit Form Grid */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; }
+        .modal-footer { padding: 20px 25px; border-top: 1px solid var(--border-color); background: rgba(15, 23, 42, 0.5); display: flex; justify-content: flex-end; gap: 10px; }
+        
+        /* Edit Form */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .full-width { grid-column: 1 / -1; }
         label { display: block; font-size: 0.75rem; font-weight: 600; margin-bottom: 6px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        .section-divider { 
-            grid-column: 1 / -1; margin: 15px 0 5px 0; padding-bottom: 10px; 
-            border-bottom: 1px solid var(--border-color); color: var(--theme-featured); 
-            font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; gap: 10px;
-        }
 
-        /* Applicant List Items */
+        /* Applicants List */
         .applicant-item {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 15px; background: var(--bg-input); border-radius: 12px;
-            margin-bottom: 10px; border: 1px solid transparent; transition: 0.2s;
+            padding: 15px; background: rgba(15, 23, 42, 0.4); border-radius: 12px;
+            margin-bottom: 10px; border: 1px solid var(--border-color); transition: 0.2s;
         }
-        .applicant-item:hover { border-color: var(--theme-featured); background: var(--bg-hover); }
-        .avatar-circle { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-hover); border: 1px solid var(--border-color); display: grid; place-items: center; font-weight: 700; color: var(--text-main); overflow: hidden; }
-        .avatar-img { width: 100%; height: 100%; object-fit: cover; }
-        .cv-btn { padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; background: rgba(59, 130, 246, 0.15); color: var(--blue); text-decoration: none; border: 1px solid rgba(59, 130, 246, 0.3); font-weight: 600; }
-        .cv-btn:hover { background: var(--blue); color: white; }
+        .applicant-item:hover { border-color: var(--primary); background: rgba(255,255,255,0.03); }
+        .avatar { width: 40px; height: 40px; border-radius: 10px; object-fit: cover; background: var(--bg-hover); }
+        .cv-link { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; background: rgba(59, 130, 246, 0.15); color: var(--blue); text-decoration: none; border: 1px solid rgba(59, 130, 246, 0.3); font-weight: 600; transition: 0.3s; }
+        .cv-link:hover { background: var(--blue); color: white; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes zoomIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         @media (max-width: 992px) {
             .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
-            main { margin-left: 0; padding: 15px; width: 100%; }
-            .filter-row-top { grid-template-columns: 1fr; }
+            main { margin-left: 0; padding: 20px; width: 100%; }
+            .filters-container { grid-template-columns: 1fr; }
             .form-grid { grid-template-columns: 1fr; }
             .hamburger { display: block; }
         }
@@ -249,13 +306,17 @@
     <header>
         <div class="header-left">
             <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
-            <a href="admin-dashboard.html" class="logo">East<span>Link</span> <span class="admin-badge">ADMIN</span></a>
+            <a href="admin-dashboard.html" class="logo">
+                <img src="assets/images/logo.png" alt="Logo">
+                <div>East<span>Link</span> <span class="admin-badge">ADMIN</span></div>
+            </a>
         </div>
+        
         <div class="header-actions">
             <div class="icon-btn" onclick="location.href='admin-support.html'"><i class="fa-solid fa-envelope"></i><div class="notification-badge" id="header-msg-badge">0</div></div>
             <div class="icon-btn" onclick="location.href='admin-notifications.html'"><i class="fa-solid fa-bell"></i><div class="notification-badge" id="header-notif-badge">0</div></div>
-            <div class="icon-btn" onclick="location.href='admin-settings.html'"><i class="fa-solid fa-user-shield"></i></div>
-            <div class="icon-btn" onclick="logout()" style="color:var(--danger);"><i class="fa-solid fa-power-off"></i></div>
+            <div class="profile-widget" onclick="location.href='admin-settings.html'"><i class="fa-solid fa-user-shield"></i></div>
+            <div class="icon-btn" onclick="logout()" style="color:var(--danger); border-color:rgba(239,68,68,0.3);"><i class="fa-solid fa-power-off"></i></div>
         </div>
     </header>
 
@@ -269,8 +330,14 @@
             <div class="nav-label">Jobs & Service</div>
             <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
             <a href="admin-manage-jobs.html" class="nav-item active"><i class="fa-solid fa-list-check"></i> Manage Jobs</a>
+            <a href="admin-international.html" class="nav-item"><i class="fa-solid fa-globe"></i> International</a>
             <a href="admin-candidates.apps.html" class="nav-item"><i class="fas fa-file-signature"></i> Applications</a>
             <a href="admin-post-job.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Job</a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="admin-deposits.html" class="nav-item"><i class="fa-solid fa-arrow-down" style="color:var(--success);"></i> Deposits</a>
+            <a href="admin-withdrawals.html" class="nav-item"><i class="fa-solid fa-arrow-up" style="color:var(--danger);"></i> Withdrawals</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">System</div>
@@ -281,46 +348,50 @@
 
     <!-- MAIN -->
     <main>
-        <div style="margin-bottom:25px;">
-            <h2 style="font-family:var(--font-head); color:var(--text-main); font-size:1.5rem;">Job Management</h2>
-            <p style="color:var(--text-muted); font-size:0.9rem;">Categorize listings, manage applicants, and configure job tiers.</p>
+        <div class="page-header animate__animated animate__fadeInDown">
+            <div class="page-title">
+                <h1>Job Management</h1>
+                <p>Configure listings, monitor status, and review applicants.</p>
+            </div>
         </div>
 
         <!-- FILTERS -->
-        <div class="glass-panel filter-container">
-            <div class="filter-row-top">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Search by title, company, ID..." oninput="filterJobs()">
-                </div>
-                <select id="statusFilter" onchange="filterJobs()">
-                    <option value="all">All Statuses</option>
-                    <option value="active">Active Only</option>
-                    <option value="closed">Closed</option>
-                </select>
-                <select id="sortFilter" onchange="sortJobs()">
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                </select>
+        <div class="glass-panel filters-container animate__animated animate__fadeInUp">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search by title, company, ID..." oninput="debouncedFilter()">
             </div>
-
-            <!-- Horizontal Tier Filter Buttons -->
-            <div class="tier-filters">
-                <button class="tier-btn active" onclick="setTierFilter('all', this)"><i class="fas fa-layer-group"></i> All Tiers</button>
-                <button class="tier-btn t-btn-standard" onclick="setTierFilter('standard', this)"><i class="fas fa-briefcase"></i> Standard</button>
-                <button class="tier-btn t-btn-featured" onclick="setTierFilter('featured', this)"><i class="fas fa-star"></i> Featured</button>
-                <button class="tier-btn t-btn-urgent" onclick="setTierFilter('urgent', this)"><i class="fas fa-exclamation-circle"></i> Urgent</button>
-                <button class="tier-btn t-btn-guaranteed" onclick="setTierFilter('guaranteed', this)"><i class="fas fa-crown"></i> Guaranteed</button>
+            <select id="statusFilter" onchange="filterJobs()">
+                <option value="all">All Statuses</option>
+                <option value="active">Active Only</option>
+                <option value="closed">Closed</option>
+                <option value="pending">Pending Approval</option>
+            </select>
+            <select id="sortFilter" onchange="sortJobs()">
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+            </select>
+            
+            <div class="tier-tabs" style="grid-column: 1 / -1;">
+                <div class="tier-tab tab-all active" onclick="setTierFilter('all', this)"><i class="fas fa-layer-group"></i> All Tiers</div>
+                <div class="tier-tab tab-standard" onclick="setTierFilter('standard', this)"><i class="fas fa-briefcase"></i> Standard</div>
+                <div class="tier-tab tab-featured" onclick="setTierFilter('featured', this)"><i class="fas fa-star"></i> Featured</div>
+                <div class="tier-tab tab-urgent" onclick="setTierFilter('urgent', this)"><i class="fas fa-exclamation-circle"></i> Urgent</div>
+                <div class="tier-tab tab-guaranteed" onclick="setTierFilter('guaranteed', this)"><i class="fas fa-crown"></i> Guaranteed</div>
             </div>
         </div>
 
         <!-- JOBS GRID -->
         <div id="jobs-grid" class="jobs-grid">
-            <div style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--text-muted);">
+            <div style="grid-column: 1/-1; text-align: center; padding: 60px; color: var(--text-muted);">
                 <i class="fas fa-circle-notch fa-spin fa-2x"></i>
-                <p style="margin-top:15px;">Syncing Firestore Data...</p>
+                <p style="margin-top:20px; font-family:var(--font-mono);">Syncing Database...</p>
             </div>
         </div>
+
+        <footer style="margin-top:auto; padding-top:40px; border-top:1px solid var(--border-color); text-align:center; color:var(--text-muted); font-size:0.85rem;">
+            &copy; 2026 EastLink Recruitment Solutions. Internal System.
+        </footer>
     </main>
 
     <!-- ================= MODALS ================= -->
@@ -334,7 +405,7 @@
             </div>
             <div class="modal-body" id="viewBody"></div>
             <div class="modal-footer">
-                <button onclick="closeModal('viewModal')" class="btn-card">Close</button>
+                <button onclick="closeModal('viewModal')" class="action-btn" style="border-radius:8px; border:1px solid var(--border-color);">Close</button>
             </div>
         </div>
     </div>
@@ -343,7 +414,7 @@
     <div class="modal-overlay" id="editModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 style="font-family:var(--font-head); color:var(--text-main);">Edit Listing Configuration</h3>
+                <h3 style="font-family:var(--font-head); color:var(--text-main);">Configuration</h3>
                 <button onclick="closeModal('editModal')" style="background:none; border:none; color:var(--text-muted); font-size:1.2rem; cursor:pointer;"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
@@ -351,39 +422,39 @@
                     <input type="hidden" id="editJobId">
                     
                     <div class="form-grid">
-                        <div class="section-divider"><i class="fas fa-cube"></i> Listing Identity</div>
+                        <div style="grid-column: 1/-1; border-bottom:1px solid var(--border-color); padding-bottom:5px; margin-bottom:10px; color:var(--primary); font-size:0.8rem; font-weight:700; text-transform:uppercase;">Core Identity</div>
                         <div><label>Job Title</label><input type="text" id="editTitle" required></div>
                         <div><label>Company</label><input type="text" id="editCompany" required></div>
                         <div><label>Location</label><input type="text" id="editLocation" required></div>
                         <div><label>Salary</label><input type="text" id="editSalary"></div>
                         
-                        <div class="section-divider"><i class="fas fa-sliders-h"></i> Configuration</div>
+                        <div style="grid-column: 1/-1; border-bottom:1px solid var(--border-color); padding-bottom:5px; margin:15px 0 10px 0; color:var(--primary); font-size:0.8rem; font-weight:700; text-transform:uppercase;">Settings</div>
                         <div>
                             <label>Status</label>
                             <select id="editStatus">
                                 <option value="active">Active</option>
                                 <option value="closed">Closed</option>
+                                <option value="pending">Pending</option>
                             </select>
                         </div>
                         <div>
-                            <label>Listing Tier (Color Coded)</label>
+                            <label>Listing Tier</label>
                             <select id="editTier" style="font-weight:700;">
-                                <option value="standard" style="color:var(--theme-standard);">Standard (Green)</option>
-                                <option value="featured" style="color:var(--theme-featured);">Featured (Golden)</option>
-                                <option value="urgent" style="color:var(--theme-urgent);">Urgently Hiring (Pink)</option>
-                                <option value="guaranteed" style="color:var(--theme-guaranteed);">Guaranteed (Purple)</option>
+                                <option value="standard" style="color:var(--success);">Standard (Green)</option>
+                                <option value="featured" style="color:var(--primary);">Featured (Golden)</option>
+                                <option value="urgent" style="color:var(--pink);">Urgently Hiring (Pink)</option>
+                                <option value="guaranteed" style="color:var(--neon-purple);">Guaranteed (Purple)</option>
                             </select>
                         </div>
 
-                        <div class="section-divider"><i class="fas fa-align-left"></i> Details</div>
                         <div class="full-width"><label>Description</label><textarea id="editDesc" rows="5"></textarea></div>
-                        <div class="full-width"><label>Requirements</label><textarea id="editReqs" rows="5"></textarea></div>
+                        <div class="full-width"><label>Requirements (One per line)</label><textarea id="editReqs" rows="5"></textarea></div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button onclick="closeModal('editModal')" class="btn-card">Cancel</button>
-                <button onclick="saveJobChanges()" class="btn-card" style="background:var(--theme-featured); color:#000; font-weight:700; border:none;" id="saveBtn">Save Updates</button>
+                <button onclick="closeModal('editModal')" class="action-btn" style="border-radius:8px; border:1px solid var(--border-color); width:100px;">Cancel</button>
+                <button onclick="saveJobChanges()" id="saveBtn" class="action-btn" style="background:var(--gold-gradient); color:black; font-weight:700; border-radius:8px; width:140px; border:none;">Save Changes</button>
             </div>
         </div>
     </div>
@@ -394,53 +465,43 @@
             <div class="modal-header">
                 <div>
                     <h3 style="font-family:var(--font-head); color:var(--text-main);" id="appJobTitle">Applicants</h3>
-                    <span style="font-size:0.8rem; color:var(--text-muted);" id="appCountDisplay">Loading...</span>
+                    <span style="font-size:0.8rem; color:var(--text-muted); font-family:var(--font-mono);" id="appCountDisplay">Loading...</span>
                 </div>
                 <button onclick="closeModal('applicantModal')" style="background:none; border:none; color:var(--text-muted); font-size:1.2rem; cursor:pointer;"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body" id="applicantList"></div>
             <div class="modal-footer">
-                <button onclick="closeModal('applicantModal')" class="btn-card">Close</button>
+                <button onclick="closeModal('applicantModal')" class="action-btn" style="border-radius:8px; border:1px solid var(--border-color);">Close Viewer</button>
             </div>
         </div>
     </div>
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, onSnapshot, doc, deleteDoc, updateDoc, orderBy, getDocs, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        import { auth, db } from './config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { collection, query, where, onSnapshot, doc, deleteDoc, updateDoc, orderBy, getDocs, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         let allJobs = [];
         let currentTierFilter = 'all';
-        let currentUser = null;
+        let debounceTimer;
 
         // --- GLOBAL HELPERS ---
         window.toggleSidebar = () => { 
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
         };
-        window.logout = () => signOut(auth).then(() => window.location.href = 'signin.html');
+        window.logout = () => { if(confirm("Log out?")) signOut(auth).then(() => window.location.href = 'signin.html'); };
         window.closeModal = (id) => document.getElementById(id).style.display = 'none';
 
         // --- AUTH ---
         onAuthStateChanged(auth, async (user) => {
             if (!user) return window.location.href = 'signin.html';
-            
-            // Basic Admin Check
-            const uDoc = await getDoc(doc(db, "users", user.uid));
-            if (!uDoc.exists() || (uDoc.data().role !== 'admin' && uDoc.data().role !== 'owner')) return window.location.href = 'index.html';
-            
-            currentUser = user;
             loadJobs();
+            initBadges(); 
         });
 
-        // --- 1. LOAD JOBS (Real-time) ---
+        // --- 1. LOAD JOBS ---
         function loadJobs() {
             const q = query(collection(db, "jobs"), orderBy("postedAt", "desc"));
             onSnapshot(q, (snapshot) => {
@@ -448,39 +509,41 @@
                 snapshot.forEach(doc => {
                     allJobs.push({ id: doc.id, ...doc.data() });
                 });
-                sortJobs(); // Calls filterJobs -> renderJobs
+                filterJobs(); 
             }, (error) => {
                 console.error(error);
-                Toastify({ text: "Error syncing jobs", style: { background: "var(--danger)" } }).showToast();
+                Toastify({ text: "Sync Error", style: { background: "var(--danger)" } }).showToast();
             });
         }
 
-        // --- 2. FETCH REAL APPLICANT COUNT ---
-        // We do this per job to ensure the number on the card is always accurate
+        // --- 2. FETCH APPLICANT COUNT ---
         async function fetchRealCount(jobId) {
             try {
                 const q = query(collection(db, "applications"), where("jobId", "==", jobId));
                 const snapshot = await getDocs(q);
                 const count = snapshot.size;
                 
-                // Update DOM Element if it exists
                 const el = document.getElementById(`count-${jobId}`);
-                if(el) el.innerText = count;
+                if(el) {
+                    el.innerText = count < 10 ? `0${count}` : count;
+                    el.parentElement.style.opacity = '1';
+                }
 
-                // Update Local Data (for modal accuracy)
                 const jobIndex = allJobs.findIndex(j => j.id === jobId);
                 if(jobIndex > -1) allJobs[jobIndex].realCount = count;
-                
-            } catch (e) {
-                console.log("Count fetch error", e);
-            }
+            } catch (e) { console.log(e); }
         }
 
-        // --- 3. FILTER & SORT LOGIC ---
-        window.setTierFilter = (tier, btnElement) => {
+        // --- 3. FILTER & SORT ---
+        window.debouncedFilter = () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => filterJobs(), 300);
+        };
+
+        window.setTierFilter = (tier, btn) => {
             currentTierFilter = tier;
-            document.querySelectorAll('.tier-btn').forEach(btn => btn.classList.remove('active'));
-            btnElement.classList.add('active');
+            document.querySelectorAll('.tier-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
             filterJobs();
         };
 
@@ -518,102 +581,95 @@
             grid.innerHTML = '';
 
             if (jobs.length === 0) {
-                grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:40px;">No jobs match your criteria.</div>`;
+                grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:40px; border:1px dashed var(--border-color); border-radius:12px;">No matching jobs found.</div>`;
                 return;
             }
 
-            jobs.forEach(job => {
-                const posted = job.postedAt ? new Date(job.postedAt.seconds*1000).toLocaleDateString() : 'Pending';
+            jobs.forEach((job, index) => {
+                const posted = job.postedAt ? new Date(job.postedAt.seconds*1000).toLocaleDateString() : 'N/A';
 
-                // Tier Determination
                 let tierClass = 'tier-standard';
+                let stripeClass = 'stripe-standard';
                 let badge = '<span class="status-badge badge-standard">Standard</span>';
                 
                 if (job.isGuaranteed) {
-                    tierClass = 'tier-guaranteed';
+                    tierClass = 'tier-guaranteed'; stripeClass = 'stripe-guaranteed';
                     badge = '<span class="status-badge badge-guaranteed"><i class="fas fa-crown"></i> Guaranteed</span>';
                 } else if (job.isUrgent) {
-                    tierClass = 'tier-urgent';
+                    tierClass = 'tier-urgent'; stripeClass = 'stripe-urgent';
                     badge = '<span class="status-badge badge-urgent"><i class="fas fa-exclamation-circle"></i> Urgent</span>';
                 } else if (job.isFeatured) {
-                    tierClass = 'tier-featured';
+                    tierClass = 'tier-featured'; stripeClass = 'stripe-featured';
                     badge = '<span class="status-badge badge-featured"><i class="fas fa-star"></i> Featured</span>';
                 }
 
-                const card = document.createElement('div');
-                card.className = `job-card ${tierClass} animate__animated animate__fadeInUp`;
-                card.innerHTML = `
-                    <div class="card-stripe"></div>
-                    
-                    <div class="job-header">
-                        <div>
-                            <div class="job-role">${job.title}</div>
-                            <div class="job-company"><i class="fas fa-building"></i> ${job.company}</div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div style="font-size:0.7rem; color:${job.status === 'active' ? 'var(--theme-standard)' : 'var(--danger)'}; font-weight:700; text-transform:uppercase;">${job.status}</div>
-                            <div style="font-size:0.65rem; color:var(--text-muted);">${posted}</div>
-                        </div>
-                    </div>
-
-                    <div class="badges-row">
-                        ${badge}
-                        <span class="status-badge" style="border:1px solid var(--border-color); color:var(--text-muted);">${job.type || 'Full Time'}</span>
-                    </div>
-
-                    <!-- APPLICANT BUTTON -->
-                    <div class="applicant-stats-btn" onclick="openApplicantModal('${job.id}', '${job.title}')">
-                        <div>
-                            <div class="app-count-large" id="count-${job.id}">
-                                <i class="fas fa-spinner fa-spin" style="font-size:1rem; opacity:0.5;"></i>
+                grid.innerHTML += `
+                <div class="job-card ${tierClass} animate__animated animate__fadeInUp" style="animation-delay:${index * 0.05}s">
+                    <div class="card-stripe ${stripeClass}"></div>
+                    <div class="card-body">
+                        <div class="card-header">
+                            <div>
+                                <div class="role-title">${job.title}</div>
+                                <div class="company-name"><i class="fas fa-building"></i> ${job.company}</div>
                             </div>
-                            <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;">Applicants</div>
+                            <div style="text-align:right;">
+                                <div style="font-size:0.7rem; color:${job.status === 'active' ? 'var(--success)' : 'var(--danger)'}; font-weight:700; text-transform:uppercase;">${job.status}</div>
+                                <div style="font-size:0.65rem; color:var(--text-muted);">${posted}</div>
+                            </div>
                         </div>
-                        <i class="fas fa-chevron-right" style="color:var(--text-muted);"></i>
+
+                        <div class="badges-row">
+                            ${badge}
+                            <span class="status-badge" style="border:1px solid var(--border-color); color:var(--text-muted);">${job.type || 'Full Time'}</span>
+                        </div>
+
+                        <div class="applicant-btn" onclick="openApplicantModal('${job.id}', '${job.title}')">
+                            <div style="opacity:0.6;">
+                                <div class="app-count" id="count-${job.id}"><i class="fas fa-circle-notch fa-spin"></i></div>
+                                <div style="font-size:0.65rem; color:var(--text-muted); text-transform:uppercase; font-weight:600;">Applicants</div>
+                            </div>
+                            <div style="width:30px; height:30px; background:var(--bg-hover); border-radius:50%; display:grid; place-items:center; color:var(--text-muted);">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="job-footer">
-                        <button class="btn-card" onclick="openViewModal('${job.id}')" title="Details"><i class="fas fa-eye"></i></button>
-                        <button class="btn-card btn-edit" onclick="openEditModal('${job.id}')" title="Edit Configuration"><i class="fas fa-pen"></i></button>
-                        <button class="btn-card btn-delete" onclick="deleteJob('${job.id}')" title="Delete"><i class="fas fa-trash"></i></button>
+                    <div class="card-actions">
+                        <button class="action-btn" onclick="openViewModal('${job.id}')"><i class="fas fa-eye"></i></button>
+                        <button class="action-btn" onclick="openEditModal('${job.id}')"><i class="fas fa-pen"></i></button>
+                        <button class="action-btn btn-del" onclick="deleteJob('${job.id}')"><i class="fas fa-trash"></i></button>
                     </div>
-                `;
-                grid.appendChild(card);
-                
-                // Fetch Count immediately
-                fetchRealCount(job.id);
+                </div>`;
             });
+            
+            jobs.forEach(job => fetchRealCount(job.id));
         }
 
-        // --- 5. MODAL LOGIC (View/Edit) ---
+        // --- 5. MODALS (View/Edit) ---
         window.openViewModal = (id) => {
             const job = allJobs.find(j => j.id === id);
             if(!job) return;
 
-            let color = 'var(--theme-standard)';
-            let typeName = 'Standard Listing';
-            if(job.isGuaranteed) { color='var(--theme-guaranteed)'; typeName='Guaranteed Job'; }
-            else if(job.isUrgent) { color='var(--theme-urgent)'; typeName='Urgently Hiring'; }
-            else if(job.isFeatured) { color='var(--theme-featured)'; typeName='Featured Listing'; }
-
-            const reqs = Array.isArray(job.requirements) ? job.requirements.map(r=>`<li>${r}</li>`).join('') : '<li>None listed</li>';
+            const reqs = Array.isArray(job.requirements) ? job.requirements.map(r=>`<li>${r}</li>`).join('') : '<li>None</li>';
 
             document.getElementById('viewBody').innerHTML = `
-                <div style="border-left:4px solid ${color}; padding-left:15px; margin-bottom:20px;">
-                    <h2 style="font-family:var(--font-head); color:var(--text-main); margin:0;">${job.title}</h2>
-                    <span style="color:${color}; font-weight:700; font-size:0.9rem;">${typeName}</span>
+                <h2 style="font-family:var(--font-head); color:var(--text-main); margin-bottom:5px;">${job.title}</h2>
+                <div style="font-size:0.9rem; color:var(--text-muted); margin-bottom:20px;">${job.company} • ${job.location}</div>
+                
+                <div style="background:var(--bg-input); padding:15px; border-radius:12px; margin-bottom:20px;">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                        <div><div style="font-size:0.7rem; color:var(--text-muted);">SALARY</div><div>${job.salary || 'N/A'}</div></div>
+                        <div><div style="font-size:0.7rem; color:var(--text-muted);">TYPE</div><div>${job.type || 'Full Time'}</div></div>
+                    </div>
                 </div>
-                <div style="background:var(--bg-input); padding:15px; border-radius:10px; margin-bottom:15px;">
-                    <p><strong>Company:</strong> ${job.company}</p>
-                    <p><strong>Location:</strong> ${job.location}</p>
-                    <p><strong>Salary:</strong> ${job.salary || 'N/A'}</p>
-                </div>
-                <h4 style="color:var(--text-muted);">Description</h4>
-                <p style="white-space:pre-wrap; font-size:0.9rem; margin-bottom:15px;">${job.description}</p>
-                <h4 style="color:var(--text-muted);">Requirements</h4>
-                <ul style="font-size:0.9rem; padding-left:20px;">${reqs}</ul>
+
+                <h4 style="color:var(--primary); font-size:0.8rem; text-transform:uppercase; margin-bottom:10px;">Description</h4>
+                <p style="white-space:pre-wrap; font-size:0.9rem; margin-bottom:20px; line-height:1.6; color:var(--text-muted);">${job.description}</p>
+                
+                <h4 style="color:var(--primary); font-size:0.8rem; text-transform:uppercase; margin-bottom:10px;">Requirements</h4>
+                <ul style="font-size:0.9rem; padding-left:20px; color:var(--text-muted);">${reqs}</ul>
             `;
-            document.getElementById('viewModal').style.display = 'grid';
+            document.getElementById('viewModal').style.display = 'flex';
         };
 
         window.openEditModal = (id) => {
@@ -634,7 +690,7 @@
             else if(job.isFeatured) tierVal = 'featured';
             document.getElementById('editTier').value = tierVal;
 
-            document.getElementById('editModal').style.display = 'grid';
+            document.getElementById('editModal').style.display = 'flex';
         };
 
         window.saveJobChanges = async () => {
@@ -663,110 +719,75 @@
             try {
                 btn.innerText = "Saving...";
                 await updateDoc(doc(db, "jobs", id), updateData);
-                Toastify({ text: "Updated Successfully!", style: { background: "var(--success)" } }).showToast();
+                Toastify({ text: "Updated Successfully", style: { background: "var(--success)" } }).showToast();
                 document.getElementById('editModal').style.display = 'none';
             } catch (e) {
                 Toastify({ text: "Error updating", style: { background: "var(--danger)" } }).showToast();
             } finally {
-                btn.innerText = "Save Updates";
+                btn.innerText = "Save Changes";
             }
         };
 
-        // --- 6. APPLICANTS LIST (Advanced) ---
+        // --- 6. APPLICANTS VIEWER ---
         window.openApplicantModal = async (jobId, jobTitle) => {
             const list = document.getElementById('applicantList');
             document.getElementById('appJobTitle').innerText = jobTitle;
-            
-            // Get cached count if available
-            const job = allJobs.find(j => j.id === jobId);
-            const countDisplay = job && job.realCount !== undefined ? job.realCount : '...';
-            document.getElementById('appCountDisplay').innerText = `${countDisplay} Total`;
-            
-            document.getElementById('applicantModal').style.display = 'grid';
-            list.innerHTML = `<div style="text-align:center; padding:40px;"><i class="fas fa-spinner fa-spin fa-2x"></i></div>`;
+            document.getElementById('applicantModal').style.display = 'flex';
+            list.innerHTML = `<div style="text-align:center; padding:50px;"><i class="fas fa-circle-notch fa-spin fa-2x"></i></div>`;
 
             try {
-                // 1. Query Applications for this Job
                 const q = query(collection(db, "applications"), where("jobId", "==", jobId));
                 const snap = await getDocs(q);
 
-                // Update count strictly based on fetch result
-                document.getElementById('appCountDisplay').innerText = `${snap.size} Total`;
+                document.getElementById('appCountDisplay').innerText = `${snap.size} Candidates`;
 
                 if(snap.empty) {
-                    list.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:30px;">
-                        <i class="fas fa-folder-open fa-2x" style="opacity:0.5;"></i><br><br>No applicants yet.
-                    </div>`;
+                    list.innerHTML = `<div style="text-align:center; color:var(--text-muted); padding:40px;">No applicants yet.</div>`;
                     return;
                 }
 
-                // 2. Fetch User Profiles for up-to-date Avatar/Name
-                // We map over the applications and fetch the corresponding User doc to ensure data is fresh.
-                const appPromises = snap.docs.map(async (docSnap) => {
+                let html = '';
+                for(const docSnap of snap.docs) {
                     const app = docSnap.data();
-                    const userId = app.seekerId || app.applicantId || app.userId;
+                    const userId = app.seekerId || app.applicantId;
                     
-                    // Defaults from Application snapshot
+                    // Defaults
                     let photo = 'assets/images/default-avatar.png';
-                    let name = app.seekerName || app.applicantName || app.userName || 'Unknown';
-                    let email = app.seekerEmail || app.applicantEmail || app.userEmail || 'No Email';
+                    let name = app.seekerName || 'Unknown User';
+                    let email = app.seekerEmail || 'No Email';
 
-                    // Fetch latest user profile if ID exists
+                    // Try fetch fresh user data
                     if(userId) {
                         try {
                             const uSnap = await getDoc(doc(db, "users", userId));
                             if(uSnap.exists()) {
                                 const u = uSnap.data();
-                                if(u.photoUrl) photo = u.photoUrl;
-                                if(u.displayName) name = u.displayName; // Sync latest name
-                                if(u.email) email = u.email; // Sync latest email
+                                photo = u.photoUrl || photo;
+                                name = u.displayName || u.fullName || name;
+                                email = u.email || email;
                             }
-                        } catch(err) { console.log("User fetch err", err); }
+                        } catch(e){}
                     }
 
-                    // Fallback: If user doc didn't have photo, check application doc
-                    if(photo.includes('default') && (app.applicantPhoto || app.userPhoto)) {
-                        photo = app.applicantPhoto || app.userPhoto;
-                    }
-
-                    return { 
-                        ...app, 
-                        finalName: name, 
-                        finalEmail: email, 
-                        finalPhoto: photo 
-                    };
-                });
-
-                // Wait for all user profiles to load
-                const finalApps = await Promise.all(appPromises);
-
-                // 3. Render List
-                let html = '';
-                finalApps.forEach(app => {
-                    const initials = (app.finalName || 'U').substring(0,2).toUpperCase();
                     const date = app.appliedAt ? new Date(app.appliedAt.seconds*1000).toLocaleDateString() : 'N/A';
                     
                     html += `
                         <div class="applicant-item animate__animated animate__fadeIn">
-                            <div style="display:flex; align-items:center; gap:12px;">
-                                <div class="avatar-circle">
-                                    <img src="${app.finalPhoto}" class="avatar-img" onerror="this.parentElement.innerHTML='${initials}'">
-                                </div>
+                            <div style="display:flex; align-items:center; gap:15px;">
+                                <img src="${photo}" class="avatar">
                                 <div>
-                                    <div style="font-weight:600; color:var(--text-main); font-size:0.9rem;">${app.finalName}</div>
-                                    <div style="font-size:0.75rem; color:var(--text-muted);"><i class="fas fa-envelope"></i> ${app.finalEmail}</div>
-                                    <div style="color:var(--theme-featured); font-size:0.7rem; margin-top:2px;">Applied: ${date}</div>
+                                    <div style="font-weight:600; color:var(--text-main); font-size:0.9rem;">${name}</div>
+                                    <div style="font-size:0.75rem; color:var(--text-muted);">${email}</div>
+                                    <div style="font-size:0.7rem; color:var(--primary); margin-top:2px;">Applied: ${date}</div>
                                 </div>
                             </div>
-                            <div>
-                                ${app.resumeUrl 
-                                    ? `<a href="${app.resumeUrl}" target="_blank" class="cv-btn"><i class="fas fa-download"></i> View CV</a>`
-                                    : `<span style="font-size:0.75rem; color:var(--text-muted); font-style:italic;">No CV</span>`
-                                }
-                            </div>
+                            ${app.resumeUrl 
+                                ? `<a href="${app.resumeUrl}" target="_blank" class="cv-link"><i class="fas fa-download"></i> CV</a>`
+                                : `<span style="font-size:0.75rem; opacity:0.5;">No CV</span>`
+                            }
                         </div>
                     `;
-                });
+                }
                 list.innerHTML = html;
 
             } catch (e) {
@@ -775,18 +796,28 @@
             }
         };
 
-        // --- 7. DELETE ---
         window.deleteJob = async (id) => {
-            if(!confirm("Permanently delete this job? This cannot be undone.")) return;
+            if(!confirm("Permanently delete this job?")) return;
             try {
                 await deleteDoc(doc(db, "jobs", id));
-                Toastify({ text: "Job Deleted", style: { background: "var(--success)" } }).showToast();
+                Toastify({ text: "Deleted", style: { background: "var(--success)" } }).showToast();
             } catch (e) {
-                Toastify({ text: "Error deleting", style: { background: "var(--danger)" } }).showToast();
+                Toastify({ text: "Error", style: { background: "var(--danger)" } }).showToast();
             }
         };
 
-        // Export functions to Window so HTML can access them
+        function initBadges() {
+            onSnapshot(query(collection(db, "transactions"), where("status", "==", "pending")), (snap) => {
+                const b = document.getElementById('header-notif-badge');
+                if(snap.size > 0) { b.innerText = snap.size; b.style.display = 'flex'; } else b.style.display = 'none';
+            });
+            onSnapshot(query(collection(db, "support_tickets"), where("status", "==", "open")), (snap) => {
+                const b = document.getElementById('header-msg-badge');
+                if(snap.size > 0) { b.innerText = snap.size; b.style.display = 'flex'; } else b.style.display = 'none';
+            });
+        }
+
+        // Export functions
         window.openViewModal = openViewModal;
         window.openEditModal = openEditModal;
         window.saveJobChanges = saveJobChanges;
@@ -795,6 +826,7 @@
         window.setTierFilter = setTierFilter;
         window.sortJobs = sortJobs;
         window.filterJobs = filterJobs;
+        window.debouncedFilter = debouncedFilter;
 
     </script>
 </body>

@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Refer & Earn | EastLink Recruiters</title>
+    <title>Refer & Earn | EastLink Partner</title>
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#020617">
     
     <!-- Fonts & Icons -->
@@ -21,12 +22,12 @@
         :root {
             /* Theme Variables */
             --bg-body: #020617;       
-            --bg-card: #0f172a; 
-            --bg-glass: rgba(15, 23, 42, 0.95); 
+            --bg-card: rgba(15, 23, 42, 0.6); 
+            --bg-glass: rgba(15, 23, 42, 0.85); 
             --bg-glass-heavy: rgba(15, 23, 42, 0.98);
             --bg-input: rgba(255, 255, 255, 0.05);
             --bg-hover: rgba(255, 255, 255, 0.08);
-            --border-color: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 255, 255, 0.08);
             --text-main: #F8FAFC;     
             --text-muted: #94A3B8; 
             --gold-base: #D97706;
@@ -82,7 +83,7 @@
             min-width: 16px; height: 16px; 
             border-radius: 50%; 
             display: none; align-items: center; justify-content: center;
-            border: 2px solid var(--bg-card);
+            border: 2px solid var(--bg-body);
             z-index: 10;
         }
 
@@ -155,8 +156,8 @@
             color: var(--text-muted); font-family: var(--font-mono); font-size: 0.9rem; 
         }
         .btn-copy { 
-            background: var(--gold-gradient); color: white; border: none; 
-            padding: 8px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; 
+            background: var(--gold-gradient); color: #020617; border: none; 
+            padding: 8px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s; 
         }
         .btn-copy:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3); }
 
@@ -188,7 +189,7 @@
         .lb-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .lb-rank { font-family: var(--font-mono); font-weight: 700; font-size: 1.1rem; width: 25px; }
         .rank-1 { color: #fbbf24; } .rank-2 { color: #94a3b8; } .rank-3 { color: #b45309; }
-        .lb-avatar { width: 32px; height: 32px; background: var(--bg-input); border-radius: 50%; display: grid; place-items: center; font-size: 0.8rem; font-weight: 700; border: 1px solid var(--border-color); }
+        .lb-avatar { width: 32px; height: 32px; background: var(--bg-input); border-radius: 50%; display: grid; place-items: center; font-size: 0.8rem; font-weight: 700; border: 1px solid var(--border-color); color: var(--gold-base); }
         .lb-name { flex: 1; font-size: 0.9rem; font-weight: 500; }
         .lb-score { font-family: var(--font-mono); color: var(--gold-base); font-weight: 700; }
 
@@ -440,16 +441,20 @@
     <!-- SCRIPTS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, where, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+        import { auth, db } from './config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { doc, getDoc, collection, query, where, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         // UI Helpers
-        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = 'block'; };
-        window.closeSidebar = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').style.display = 'none'; };
+        window.toggleSidebar = () => { 
+            const sb = document.getElementById('sidebar');
+            sb.classList.toggle('active');
+            document.getElementById('overlay').style.display = sb.classList.contains('active') ? 'block' : 'none';
+        };
+        window.closeSidebar = () => { 
+            document.getElementById('sidebar').classList.remove('active'); 
+            document.getElementById('overlay').style.display = 'none'; 
+        };
         window.logout = () => signOut(auth).then(() => window.location.href = 'signin.html');
         window.copyLink = () => {
             const copyText = document.getElementById("ref-link");
@@ -601,6 +606,7 @@
 
         function loadLeaderboard() {
             try {
+                // Note: Requires a composite index on role and referralCount in Firestore
                 const q = query(collection(db, "users"), where("role", "==", "employer"), orderBy("referralCount", "desc"), limit(5));
                 onSnapshot(q, (snapshot) => {
                     const list = document.getElementById('leaderboard-list');

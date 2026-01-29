@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
     
     <!-- Fonts & Icons -->
@@ -21,21 +22,25 @@
         :root {
             /* Theme Variables */
             --bg-body: #0F172A;       
-            --bg-card: rgba(30, 41, 59, 0.65);
-            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-card: rgba(30, 41, 59, 0.4);
+            --bg-glass: rgba(15, 23, 42, 0.7);
             --bg-glass-heavy: rgba(15, 23, 42, 0.95);
-            --bg-input: rgba(255, 255, 255, 0.07);
-            --bg-hover: rgba(255, 255, 255, 0.12);
-            --border-color: rgba(255, 255, 255, 0.12);
+            --bg-input: rgba(255, 255, 255, 0.03);
+            --bg-hover: rgba(255, 255, 255, 0.08);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(255, 255, 255, 0.15);
             --text-main: #F8FAFC;     
             --text-muted: #94A3B8; 
-            --gold-base: #D97706;
-            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
-            --neon-purple: #8b5cf6;
+            
+            /* Gold Theme for Money/Rewards */
+            --gold-base: #F59E0B;
+            --gold-glow: rgba(245, 158, 11, 0.3);
+            --gold-gradient: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            --gold-text-gradient: linear-gradient(to right, #FCD34D, #F59E0B, #D97706);
+            
             --success: #10B981;
             --danger: #EF4444;
-            --silver: #94a3b8;
-            --bronze: #b45309;
+            
             --sidebar-width: 260px; 
             --header-height: 70px;
             --radius: 16px;
@@ -51,25 +56,15 @@
         body { 
             font-family: var(--font-body); 
             background-color: var(--bg-body); 
-            background-image: url('assets/images/background.png');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
+            /* Subtle Tech Grid Background */
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
             color: var(--text-main); 
             min-height: 100vh; 
             overflow-x: hidden;
-            transition: background 0.3s ease;
-        }
-
-        /* Utils & Glassmorphism */
-        .glass-panel {
-            background: var(--bg-glass);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            display: flex; flex-direction: column;
         }
 
         /* Header */
@@ -87,25 +82,29 @@
             text-transform: uppercase; letter-spacing: 1px; text-decoration: none; 
             display: flex; align-items: center; 
         }
-        .logo span { color: var(--gold-base); }
+        .logo span { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
         .hamburger { font-size: 1.4rem; cursor: pointer; color: var(--text-muted); display: none; }
         .global-search-container { flex: 1; max-width: 450px; position: relative; margin: 0 20px; opacity: 0; pointer-events: none; }
         
-        .header-actions { display: flex; align-items: center; gap: 10px; }
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+
         .icon-btn { 
-            width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px;
-            color: var(--text-muted); cursor: pointer; transition: all 0.3s var(--ease-bounce); position: relative;
+            width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; 
+            cursor: pointer; background: rgba(255,255,255,0.03); position: relative; 
+            border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
         }
-        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); transform: translateY(-2px); }
-        
+        .icon-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+        .icon-msg { color: #3b82f6; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.4)); }
+        .icon-bell { color: #f59e0b; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.4)); }
+
         .notification-badge { 
-            position: absolute; top: 5px; right: 5px; 
-            min-width: 16px; height: 16px; 
-            background: var(--danger); border-radius: 10px; 
-            font-size: 0.6rem; color: white; font-weight: 700;
+            position: absolute; top: -3px; right: -3px; 
+            width: 18px; height: 18px; 
+            background: #ef4444; border: 2px solid #0f172a; 
+            border-radius: 50%; font-size: 0.65rem; color: white; font-weight: 700;
             display: none; place-items: center; justify-content: center;
-            padding: 0 4px; border: 2px solid var(--bg-card);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
         
         .profile-widget {
@@ -132,136 +131,116 @@
         .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
         .nav-item { 
             display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; 
-            font-size: 0.9rem; transition: all 0.3s ease; border-radius: 10px; margin-bottom: 4px;
+            font-size: 0.9rem; transition: all 0.3s ease; border-radius: 10px; margin-bottom: 4px; cursor: pointer;
         }
         .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
-        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
+        .nav-item.active { background: linear-gradient(90deg, rgba(217, 119, 6, 0.15) 0%, transparent 100%); color: var(--gold-base); font-weight: 600; border-left: 3px solid var(--gold-base); }
         .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
-        .lock-icon { margin-left: auto; font-size: 0.7rem; opacity: 0.7; }
-
+        
         /* Main Content */
-        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; position: relative; }
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; position: relative; display: flex; flex-direction: column; }
         
-        .content-wrapper { max-width: 1200px; margin: 0 auto; position: relative; }
+        .content-wrapper { max-width: 900px; margin: 0 auto; position: relative; width: 100%; }
 
-        /* Premium Lock Overlay */
-        .lock-overlay {
-            position: absolute; inset: 0; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(15px);
-            z-index: 500; display: none; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; padding: 30px; border-radius: var(--radius);
-            height: 100%; min-height: 600px;
-        }
-        .lock-icon-circle { 
-            width: 80px; height: 80px; background: var(--bg-card); border: 2px solid var(--gold-base); 
-            border-radius: 50%; display: grid; place-items: center; font-size: 2rem; color: var(--gold-base); 
-            margin-bottom: 25px; box-shadow: 0 0 30px rgba(217, 119, 6, 0.3); animation: pulse 2s infinite;
-        }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(217,119,6,0.4); } 70% { box-shadow: 0 0 0 20px rgba(217,119,6,0); } 100% { box-shadow: 0 0 0 0 rgba(217,119,6,0); } }
-        
-        .btn-upgrade-lock { 
-            background: var(--gold-gradient); color: black; padding: 14px 36px; border-radius: 30px; 
-            font-weight: 700; text-decoration: none; transition: 0.3s; margin-top: 20px;
-            box-shadow: 0 10px 20px rgba(217,119,6,0.2);
-        }
-        .btn-upgrade-lock:hover { transform: scale(1.05); box-shadow: 0 15px 30px rgba(217, 119, 6, 0.4); }
-
-        /* Hero */
+        /* PRO Hero */
         .referral-hero {
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 27, 75, 0.9) 100%); 
+            background: radial-gradient(circle at top right, rgba(217, 119, 6, 0.1), transparent 50%),
+                        linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%); 
             border: 1px solid var(--border-color); border-radius: var(--radius); padding: 40px; 
             margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between;
-            position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative; overflow: hidden; box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5);
+            backdrop-filter: blur(20px);
         }
-        .hero-content { z-index: 2; position: relative; max-width: 600px; }
+        .hero-content { z-index: 2; position: relative; max-width: 550px; }
         .hero-badge { 
             background: rgba(217, 119, 6, 0.15); border: 1px solid var(--gold-base); color: var(--gold-base);
             padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; 
             text-transform: uppercase; letter-spacing: 1px; display: inline-block; margin-bottom: 15px; 
+            box-shadow: 0 0 15px rgba(217, 119, 6, 0.2);
         }
-        .hero-title { font-family: var(--font-head); font-size: 2.2rem; font-weight: 700; line-height: 1.2; margin-bottom: 12px; color: var(--text-main); }
+        .hero-title { font-family: var(--font-head); font-size: 2.2rem; font-weight: 700; line-height: 1.2; margin-bottom: 12px; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .hero-desc { font-size: 1rem; color: var(--text-muted); line-height: 1.6; }
-        .hero-decor { position: absolute; right: -20px; bottom: -40px; font-size: 12rem; opacity: 0.05; color: var(--gold-base); transform: rotate(10deg); }
+        
+        /* Hero Stats Box */
+        .hero-stats-box {
+            background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 20px; text-align: right; min-width: 200px;
+            z-index: 2;
+        }
+        .h-stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .h-stat-val { font-family: var(--font-mono); font-size: 1.8rem; font-weight: 700; color: var(--success); text-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
 
-        /* Grid */
-        .dashboard-grid { display: grid; grid-template-columns: 2.2fr 1fr; gap: 30px; }
+        .hero-decor { position: absolute; right: -20px; bottom: -40px; font-size: 12rem; opacity: 0.03; color: var(--gold-base); transform: rotate(10deg); pointer-events: none; }
+
+        /* Main Container */
+        .dashboard-container { display: flex; flex-direction: column; gap: 30px; }
         
         .card { 
             background: var(--bg-glass); border: 1px solid var(--border-color); border-radius: var(--radius); 
-            padding: 25px; display: flex; flex-direction: column; backdrop-filter: blur(20px);
+            padding: 30px; display: flex; flex-direction: column; backdrop-filter: blur(20px);
+            transition: transform 0.3s ease, border-color 0.3s ease;
         }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
+        .card:hover { border-color: var(--border-highlight); }
+        
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; }
         .card-title { font-family: var(--font-display); font-weight: 700; color: var(--text-main); font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
 
-        /* Code Ticket */
+        /* Professional Code Ticket */
         .code-ticket { 
-            background: radial-gradient(circle at center, rgba(217, 119, 6, 0.1) 0%, transparent 70%);
-            border: 2px dashed var(--gold-base); padding: 30px; border-radius: 12px;
-            text-align: center; margin-bottom: 25px; position: relative; transition: transform 0.3s ease;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, transparent 100%);
+            border: 1px solid var(--gold-base); 
+            box-shadow: 0 0 30px var(--gold-glow) inset;
+            padding: 30px; border-radius: 16px;
+            text-align: center; margin-bottom: 30px; position: relative; 
             overflow: hidden;
         }
-        .code-ticket::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--gold-base), transparent);
-            animation: shine 3s infinite;
-        }
-        @keyframes shine { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-
+        
         .referral-code-display {
-            font-family: var(--font-mono); font-size: 2rem; font-weight: 700; color: var(--text-main);
-            letter-spacing: 4px; margin: 10px 0 20px 0; text-shadow: 0 0 20px rgba(217, 119, 6, 0.4);
+            font-family: var(--font-mono); font-size: 2.2rem; font-weight: 700; 
+            background: var(--gold-text-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            letter-spacing: 3px; margin: 10px 0 20px 0; 
+            filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5));
         }
-        .referral-label { color: var(--gold-base); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; }
+        .referral-label { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; }
 
         .action-row { display: flex; gap: 15px; justify-content: center; }
         .btn-action { 
             padding: 12px 24px; border-radius: 10px; border: none; font-weight: 600; font-size: 0.9rem; 
             cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; 
         }
-        .btn-copy { background: var(--gold-gradient); color: black; } .btn-copy:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(217, 119, 6, 0.3); }
-        .btn-share { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); } .btn-share:hover { border-color: var(--gold-base); color: var(--gold-base); }
+        .btn-copy { background: var(--gold-gradient); color: black; box-shadow: 0 5px 15px rgba(217, 119, 6, 0.2); } 
+        .btn-copy:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(217, 119, 6, 0.4); }
+        .btn-share { background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); color: var(--text-main); } 
+        .btn-share:hover { border-color: var(--gold-base); color: var(--gold-base); background: rgba(245, 158, 11, 0.1); }
 
         /* Steps */
-        .steps-container { display: flex; gap: 15px; margin-top: 10px; margin-bottom: 25px; }
-        .step { flex: 1; background: var(--bg-input); padding: 15px; border-radius: 10px; text-align: center; border: 1px solid var(--border-color); transition: 0.3s; }
-        .step:hover { background: var(--bg-hover); border-color: var(--gold-base); }
-        .step-icon { width: 35px; height: 35px; background: var(--bg-card); border: 1px solid var(--gold-base); color: var(--gold-base); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 10px auto; }
-        .step p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.4; }
+        .steps-container { display: flex; gap: 15px; margin-top: 10px; margin-bottom: 30px; }
+        .step { flex: 1; background: var(--bg-input); padding: 20px; border-radius: 12px; text-align: center; border: 1px solid var(--border-color); transition: 0.3s; }
+        .step:hover { background: var(--bg-hover); border-color: var(--gold-base); transform: translateY(-3px); }
+        .step-icon { width: 45px; height: 45px; background: rgba(245, 158, 11, 0.1); border: 1px solid var(--gold-base); color: var(--gold-base); border-radius: 50%; display: grid; place-items: center; margin: 0 auto 15px auto; font-size: 1.2rem; }
+        .step p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
 
         /* Stats & Table */
-        .stats-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: var(--bg-input); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; text-align: center; }
-        .stat-value { font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: var(--text-main); display: block; }
-        .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
+        .stats-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: var(--bg-input); border: 1px solid var(--border-color); padding: 20px; border-radius: 12px; text-align: center; }
+        .stat-value { font-family: var(--font-mono); font-size: 1.8rem; font-weight: 700; color: var(--text-main); display: block; }
+        .stat-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-top: 8px; }
 
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th { text-align: left; padding: 12px; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
-        td { padding: 14px 12px; border-bottom: 1px solid var(--border-color); color: var(--text-main); }
+        .table-wrapper { overflow-x: auto; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 5px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        th { text-align: left; padding: 15px; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid var(--border-color); letter-spacing: 0.5px; }
+        td { padding: 15px; border-bottom: 1px solid var(--border-color); color: var(--text-main); }
+        tr:last-child td { border-bottom: none; }
         .profit-text { color: var(--success); font-family: var(--font-mono); font-weight: 700; }
-        .badge-plan { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+        .badge-plan { padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        .plan-free { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
-        .plan-standard { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
-        .plan-gold { background: rgba(251, 191, 36, 0.15); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
-        .plan-premium { background: rgba(236, 72, 153, 0.15); color: #ec4899; border: 1px solid rgba(236, 72, 153, 0.3); }
-
-        /* Leaderboard */
-        .lb-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-color); }
-        .lb-rank { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; font-weight: 700; font-size: 0.85rem; color: #000; background: var(--bg-input); }
-        .rank-1 { background: var(--gold-base); box-shadow: 0 0 10px rgba(217, 119, 6, 0.4); }
-        .rank-2 { background: var(--silver); }
-        .rank-3 { background: var(--bronze); color: white; }
-        .lb-name { font-weight: 600; font-size: 0.9rem; color: var(--text-main); flex: 1; }
-        .lb-count { font-size: 0.8rem; color: var(--gold-base); font-weight: 700; font-family: var(--font-mono); }
+        .plan-free { background: rgba(148, 163, 184, 0.1); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.2); }
+        .plan-standard { background: rgba(56, 189, 248, 0.1); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.2); }
+        .plan-gold { background: rgba(251, 191, 36, 0.1); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2); }
+        .plan-premium { background: rgba(236, 72, 153, 0.1); color: #ec4899; border: 1px solid rgba(236, 72, 153, 0.2); }
 
         /* Footer */
-        .footer { 
-            margin-top: 50px; padding-top: 30px; border-top: 1px solid var(--border-color); 
-            color: var(--text-muted); font-size: 0.85rem; text-align: center; width: 100%;
-        }
-        .social-links { display: flex; justify-content: center; gap: 15px; margin: 15px 0; }
-        .social-links a { color: var(--text-muted); font-size: 1.2rem; width: 35px; height: 35px; border: 1px solid var(--border-color); border-radius: 50%; display: grid; place-items: center; transition: 0.2s; text-decoration: none; }
-        .social-links a:hover { color: black; background: var(--gold-base); border-color: var(--gold-base); }
+        .app-footer-main { margin-top: auto; padding: 30px 0; text-align: center; width: 100%; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid rgba(255,255,255,0.05); }
 
         .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 998; backdrop-filter: blur(4px); }
 
@@ -281,14 +260,24 @@
         .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
         .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
 
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite; margin-right: 5px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
         @media (max-width: 992px) {
             .global-search-container { display: none; }
             .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
             main { margin-left: 0; padding: 20px; width: 100%; } 
-            .dashboard-grid { grid-template-columns: 1fr; }
             .hero-title { font-size: 1.8rem; }
             .steps-container { flex-direction: column; }
             .hamburger { display: block; }
+            .referral-hero { flex-direction: column; text-align: center; gap: 20px; }
+            .hero-stats-box { width: 100%; text-align: center; }
+            .content-wrapper { max-width: 100%; }
         }
     </style>
 </head>
@@ -301,55 +290,57 @@
             <a href="seeker-dashboard.html" class="logo">EAST<span>LINK</span></a>
         </div>
         
-        <div class="global-search-container">
-            <!-- Hidden but keeps spacing correct -->
-        </div>
+        <div class="global-search-container"></div>
 
         <div class="header-actions">
-            <div class="icon-btn" title="Messages" onclick="location.href='seeker-messages.html'">
-                <i class="fa-regular fa-envelope"></i><div class="notification-badge" id="msg-badge">0</div>
+            <!-- Messages with Blue Icon & Red Badge -->
+            <div class="icon-btn" title="Messages" onclick="handleActionWithSpinner(this, () => location.href='seeker-messages.html')">
+                <i class="fa-solid fa-envelope icon-msg"></i>
+                <div class="notification-badge" id="msg-badge">0</div>
             </div>
-            <div class="icon-btn" title="Notifications" onclick="location.href='seeker-notifications.html'">
-                <i class="fa-regular fa-bell"></i><div class="notification-badge" id="notif-badge">0</div>
+            <!-- Notifications with Gold/Amber Icon & Red Badge -->
+            <div class="icon-btn" title="Notifications" onclick="handleActionWithSpinner(this, () => location.href='seeker-notifications.html')">
+                <i class="fa-solid fa-bell icon-bell"></i>
+                <div class="notification-badge" id="notif-badge">0</div>
             </div>
-            <div class="profile-widget" onclick="location.href='seeker-profile.html'">
+            <div class="profile-widget" onclick="handleActionWithSpinner(this, () => location.href='seeker-profile.html')">
                 <img src="" id="header-avatar-img" class="user-avatar img-mode" alt="Profile" style="display:none;">
                 <div id="header-avatar-fallback" class="user-avatar">U</div>
             </div>
         </div>
     </header>
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR - FULLY UNLOCKED -->
     <nav class="sidebar" id="sidebar">
         <div class="nav-group">
             <div class="nav-label">Overview</div>
-            <a href="seeker-dashboard.html" class="nav-item"><i class="fa-solid fa-compass"></i> Dashboard</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-dashboard.html')" class="nav-item"><i class="fa-solid fa-compass"></i> Dashboard</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Job Hunt</div>
-            <a href="seeker-applications.html" class="nav-item"><i class="fa-solid fa-file-signature"></i> Applied Jobs</a>
-            <a href="seeker-jobs.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Browse Jobs</a>
-            <a href="seeker-featured-jobs.html" class="nav-item link-std"><i class="fa-solid fa-star"></i> Featured Jobs <i class="fas fa-lock lock-icon"></i></a>
-            <a href="seeker-urgentlyhiring.html" class="nav-item link-pro"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended <i class="fas fa-lock lock-icon"></i></a>
-            <a href="seeker-guaranteed-jobs.html" class="nav-item link-pro"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs <i class="fas fa-lock lock-icon"></i></a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-applications.html')" class="nav-item"><i class="fa-solid fa-file-signature"></i> Applied Jobs</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-jobs.html')" class="nav-item"><i class="fa-solid fa-briefcase"></i> Browse Jobs</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-featured-jobs.html')" class="nav-item link-std"><i class="fa-solid fa-star"></i> Featured Jobs</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-urgentlyhiring.html')" class="nav-item link-pro"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-guaranteed-jobs.html')" class="nav-item link-pro"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Finance</div>
-            <a href="seeker-wallet.html" class="nav-item"><i class="fa-solid fa-wallet"></i> My Wallet</a>
-            <a href="seeker-premium.html" class="nav-item"><i class="fa-solid fa-crown"></i> My Plan</a>
-            <a href="seeker-referrals.html" class="nav-item active link-std"><i class="fa-solid fa-user-plus"></i> Invite & Earn <i class="fas fa-lock lock-icon"></i></a>
-            <a href="seeker-invest.html" class="nav-item link-std"><i class="fa-solid fa-chart-line"></i> Invest <i class="fas fa-lock lock-icon"></i></a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-wallet.html')" class="nav-item"><i class="fa-solid fa-wallet"></i> My Wallet</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-premium.html')" class="nav-item"><i class="fa-solid fa-crown"></i> My Plan</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-referrals.html')" class="nav-item active"><i class="fa-solid fa-user-plus"></i> Invite & Earn</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-invest.html')" class="nav-item link-std"><i class="fa-solid fa-chart-line"></i> Invest</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Resources</div>
-            <a href="seeker-blog.html" class="nav-item"><i class="fa-solid fa-newspaper"></i> News & Insights</a>
-            <a href="seeker-resources.html" class="nav-item link-pro"><i class="fa-solid fa-book"></i> Resources <i class="fas fa-lock lock-icon"></i></a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-blog.html')" class="nav-item"><i class="fa-solid fa-newspaper"></i> News & Insights</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-resources.html')" class="nav-item link-pro"><i class="fa-solid fa-book"></i> Resources</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Settings</div>
-            <a href="seeker-profile.html" class="nav-item"><i class="fa-solid fa-user-gear"></i> Profile</a>
-            <a href="seeker-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
-            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-profile.html')" class="nav-item"><i class="fa-solid fa-user-gear"></i> Profile</a>
+            <a href="#" onclick="handleActionWithSpinner(this, () => location.href='seeker-settings.html')" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
+            <a href="#" onclick="handleActionWithSpinner(this, logout)" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
@@ -358,110 +349,81 @@
     <main>
         <div class="content-wrapper">
             
-            <!-- Premium Lock Overlay -->
-            <div class="lock-overlay animate__animated animate__fadeIn" id="premium-lock">
-                <div class="lock-icon-circle"><i class="fas fa-gem"></i></div>
-                <h2 style="color:var(--text-main); margin-bottom:10px; font-family:var(--font-head);">Premium Access Only</h2>
-                <p style="color:var(--text-muted); max-width:400px; margin-bottom:25px; line-height:1.6;">
-                    The Referral Program is exclusively available to our Standard, Pro, Gold, and Premium members. Upgrade your plan to start earning commissions.
-                </p>
-                <a href="seeker-premium.html" class="btn-upgrade-lock">Upgrade Now</a>
-            </div>
-
             <!-- Hero Section -->
             <div class="referral-hero animate__animated animate__zoomIn">
                 <div class="hero-content">
-                    <div class="hero-badge"><i class="fas fa-ticket"></i> Premium Program</div>
-                    <h1 class="hero-title">Invite Friends,<br>Earn Real Cash</h1>
-                    <p class="hero-desc">Share your unique referral code. When friends sign up and upgrade their account, you earn instant wallet credits.</p>
+                    <div class="hero-badge"><i class="fas fa-ticket"></i> Unlock Earnings</div>
+                    <h1 class="hero-title">Invite Friends,<br>Get Paid Cash</h1>
+                    <p class="hero-desc">Share your exclusive code. Earn instant commissions when your referrals upgrade their plans. No limits.</p>
                 </div>
+                
+                <div class="hero-stats-box">
+                    <div class="h-stat-label">Total Earnings</div>
+                    <div class="h-stat-val" id="hero-earnings">KES 0</div>
+                </div>
+
                 <i class="fas fa-trophy hero-decor"></i>
             </div>
 
-            <div class="dashboard-grid animate__animated animate__fadeInUp">
+            <div class="dashboard-container animate__animated animate__fadeInUp">
                 
-                <!-- Left Col -->
-                <div class="col-left">
-                    <div class="card animate__animated animate__fadeInLeft">
-                        <div class="card-header"><div class="card-title"><i class="fas fa-ticket-alt"></i> Your Referral Code</div></div>
-                        
-                        <!-- Code Ticket -->
-                        <div class="code-ticket animate__animated animate__flipInX animate__delay-1s">
-                            <div class="referral-label">Share This Code</div>
-                            <div class="referral-code-display" id="code-display"><i class="fas fa-circle-notch fa-spin" style="font-size:1rem;color:var(--gold-base);"></i></div>
-                            <div class="action-row">
-                                <button class="btn-action btn-copy" onclick="copyCode()"><i class="far fa-copy"></i> Copy Code</button>
-                                <button class="btn-action btn-share" onclick="shareCode()"><i class="fas fa-share-alt"></i> Share</button>
-                            </div>
-                        </div>
-
-                        <!-- Instructions -->
-                        <div class="card-header" style="border:none; padding-bottom:0; margin-bottom:10px;"><div class="card-title" style="font-size:0.9rem;"><i class="fas fa-info-circle"></i> How It Works</div></div>
-                        <div class="steps-container">
-                            <div class="step">
-                                <div class="step-icon"><i class="fas fa-share-nodes"></i></div>
-                                <p>1. Share your unique code with friends.</p>
-                            </div>
-                            <div class="step">
-                                <div class="step-icon"><i class="fas fa-user-plus"></i></div>
-                                <p>2. They enter it during Sign Up.</p>
-                            </div>
-                            <div class="step">
-                                <div class="step-icon"><i class="fas fa-wallet"></i></div>
-                                <p>3. You earn cash when they upgrade!</p>
-                            </div>
-                        </div>
-
-                        <div class="stats-container">
-                            <div class="stat-card">
-                                <span class="stat-value" id="stat-referrals">0</span>
-                                <span class="stat-label">Friends</span>
-                            </div>
-                            <div class="stat-card">
-                                <span class="stat-value" id="stat-upgrades">0</span>
-                                <span class="stat-label">Upgrades</span>
-                            </div>
-                            <div class="stat-card" style="border-color:var(--success);">
-                                <span class="stat-value" style="color:var(--success);" id="stat-earnings">KES 0</span>
-                                <span class="stat-label">Earnings</span>
-                            </div>
-                        </div>
-
-                        <div class="card-header" style="margin-top:10px;"><div class="card-title"><i class="fas fa-history"></i> Referral History</div></div>
-                        <div class="table-wrapper">
-                            <table id="history-table">
-                                <thead><tr><th>User</th><th>Date</th><th>Plan</th><th>Commission</th></tr></thead>
-                                <tbody id="table-body">
-                                    <tr><td colspan="4" style="text-align:center; padding:25px; color:var(--text-muted);">Loading data...</td></tr>
-                                </tbody>
-                            </table>
+                <div class="card">
+                    <div class="card-header"><div class="card-title"><i class="fas fa-ticket-alt"></i> Your Unique Referral Code</div></div>
+                    
+                    <!-- Code Ticket -->
+                    <div class="code-ticket animate__animated animate__flipInX animate__delay-1s">
+                        <div class="referral-label">Your Personal Invite Code</div>
+                        <div class="referral-code-display" id="code-display"><i class="fas fa-circle-notch fa-spin" style="font-size:1rem;color:var(--gold-base);"></i></div>
+                        <div class="action-row">
+                            <button class="btn-action btn-copy" onclick="handleActionWithSpinner(this, copyCode)"><i class="far fa-copy"></i> Copy Code</button>
+                            <button class="btn-action btn-share" onclick="handleActionWithSpinner(this, shareCode)"><i class="fas fa-share-alt"></i> Share</button>
                         </div>
                     </div>
-                </div>
 
-                <!-- Right Col -->
-                <div class="col-right">
-                    <div class="card animate__animated animate__fadeInRight">
-                        <div class="card-header">
-                            <div class="card-title"><i class="fas fa-crown" style="color:var(--gold-base);"></i> Top Referrers</div>
-                            <span style="font-size:0.7rem; background:var(--bg-input); padding:4px 10px; border-radius:8px; font-weight:600; color:var(--text-muted);">Monthly</span>
+                    <!-- Instructions -->
+                    <div class="card-header" style="border:none; padding-bottom:0; margin-bottom:10px;"><div class="card-title" style="font-size:0.9rem;"><i class="fas fa-info-circle"></i> How It Works</div></div>
+                    <div class="steps-container">
+                        <div class="step">
+                            <div class="step-icon"><i class="fas fa-share-nodes"></i></div>
+                            <p>1. Share your unique code with friends.</p>
                         </div>
-                        <ul class="lb-list" id="leaderboard-list">
-                            <li style="text-align:center; padding:15px; color:var(--text-muted);"><i class="fas fa-circle-notch fa-spin"></i> Loading...</li>
-                        </ul>
-                        <div style="margin-top:20px; padding-top:15px; border-top:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
-                            <span style="font-weight:600; font-size:0.9rem;">Your Rank</span>
-                            <span style="font-weight:700; font-size:1.1rem; color:var(--gold-base);" id="my-rank-display">#--</span>
+                        <div class="step">
+                            <div class="step-icon"><i class="fas fa-user-plus"></i></div>
+                            <p>2. They enter it during Sign Up.</p>
                         </div>
+                        <div class="step">
+                            <div class="step-icon"><i class="fas fa-wallet"></i></div>
+                            <p>3. You earn cash when they upgrade!</p>
+                        </div>
+                    </div>
+
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <span class="stat-value" id="stat-referrals">0</span>
+                            <span class="stat-label">Friends Invited</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="stat-upgrades">0</span>
+                            <span class="stat-label">Pro Upgrades</span>
+                        </div>
+                    </div>
+
+                    <div class="card-header" style="margin-top:20px;"><div class="card-title"><i class="fas fa-history"></i> Earnings History</div></div>
+                    <div class="table-wrapper">
+                        <table id="history-table">
+                            <thead><tr><th>User</th><th>Date</th><th>Plan</th><th>Commission</th></tr></thead>
+                            <tbody id="table-body">
+                                <tr><td colspan="4" style="text-align:center; padding:25px; color:var(--text-muted);">Loading data...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
             </div>
 
             <!-- FOOTER -->
-            <footer class="footer">
-                <div class="social-links" id="social-container"></div>
-                <p>&copy; 2025 EastLink Recruiters. All Rights Reserved.</p>
+            <footer class="app-footer-main">
+                &copy; 2026 EastLink Recruiters. All Rights Reserved.
             </footer>
         </div>
     </main>
@@ -476,7 +438,7 @@
             </div>
         </div>
         <div class="pwa-actions">
-            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-install" onclick="handleActionWithSpinner(this, installPWA)">Install</button>
             <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
         </div>
     </div>
@@ -484,16 +446,35 @@
     <!-- SCRIPTS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, collection, query, where, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); 
-        const auth = getAuth(app); 
-        const db = getFirestore(app);
+        import { auth, db } from './config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { doc, getDoc, updateDoc, collection, query, where, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         let myReferralCode = "";
+
+        // --- SPINNER HELPER ---
+        window.handleActionWithSpinner = (btn, action) => {
+            if(btn.dataset.processing === "true") return;
+            btn.dataset.processing = "true";
+            
+            // Save original content
+            const originalContent = btn.innerHTML;
+            
+            // Set spinner content
+            btn.innerHTML = `<span class="loading-spinner"></span>`;
+            
+            setTimeout(async () => {
+                if (typeof action === 'function') {
+                    await action(btn); 
+                }
+                
+                // Reset button if page didn't redirect
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.dataset.processing = "false";
+                }, 500);
+            }, 500);
+        };
 
         // --- UI UTILS ---
         window.toggleSidebar = () => {
@@ -516,7 +497,7 @@
             'guaranteed': 1000
         };
 
-        function isPremiumUser(plan) { return premiumPlans.some(p => (plan || '').toLowerCase().includes(p)); }
+        function isPayingPlan(plan) { return premiumPlans.some(p => (plan || '').toLowerCase().includes(p)); }
 
         // --- AUTH & DATA ---
         onAuthStateChanged(auth, async (user) => {
@@ -530,8 +511,7 @@
                 
                 if (snap.exists()) {
                     const data = snap.data();
-                    const plan = (data.plan || 'free').toLowerCase();
-
+                    
                     // Avatar Sync
                     const img = document.getElementById('header-avatar-img');
                     const fallback = document.getElementById('header-avatar-fallback');
@@ -542,39 +522,26 @@
                         fallback.innerText = (data.fullName || "U").charAt(0).toUpperCase();
                     }
 
-                    // Unlock logic for Navigation
-                    if(premiumPlans.some(p => plan.includes(p))) {
-                        document.querySelectorAll('.lock-icon').forEach(el => el.style.display='none');
-                    }
-
-                    // Content Logic
-                    if(isPremiumUser(plan)) {
-                        // Generate or Fetch Code
-                        if(data.referralCode) {
-                            myReferralCode = data.referralCode;
-                        } else {
-                            // Generate Unique Code: Prefix + Random Alphanumeric
-                            const uniquePart = Math.random().toString(36).substring(2, 8).toUpperCase();
-                            myReferralCode = `EL-${uniquePart}`;
-                            // Update Firestore with new Code
-                            await updateDoc(userRef, { referralCode: myReferralCode });
-                        }
-                        document.getElementById('code-display').innerText = myReferralCode;
-
-                        loadReferralData(user.uid);
-                        loadLeaderboard(user.uid);
+                    // --- UNLOCKED LOGIC FOR ALL USERS ---
+                    // 1. Check if user has code, if not generate it
+                    if(data.referralCode) {
+                        myReferralCode = data.referralCode;
                     } else {
-                        document.getElementById('premium-lock').style.display = 'flex';
+                        // Generate Unique Code: Prefix + Random Alphanumeric
+                        const uniquePart = Math.random().toString(36).substring(2, 8).toUpperCase();
+                        myReferralCode = `EL-${uniquePart}`;
+                        // Update Firestore with new Code immediately
+                        await updateDoc(userRef, { referralCode: myReferralCode });
                     }
+                    document.getElementById('code-display').innerText = myReferralCode;
 
-                    loadSocials();
+                    // 2. Load Data
+                    loadReferralData(user.uid);
                 }
             } catch(e) { console.error(e); }
         });
 
         function loadReferralData(uid) {
-            // NOTE: Requires 'referredBy' index in Firestore. 
-            // If index is missing, see console for creation link.
             const q = query(collection(db, "users"), where("referredBy", "==", uid), orderBy("createdAt", "desc"));
             
             onSnapshot(q, (snapshot) => {
@@ -594,7 +561,7 @@
                         let profitDisplay = `<span style="color:var(--text-muted)">--</span>`;
                         
                         // Calculate Commission based on referred user's plan
-                        if (isPremiumUser(rPlan)) {
+                        if (isPayingPlan(rPlan)) {
                             // Find rate based on plan inclusion string
                             for (const [key, val] of Object.entries(commissionRates)) {
                                 if(rPlan.includes(key)) commission = val;
@@ -628,52 +595,10 @@
                 // Update Stats UI
                 document.getElementById('stat-referrals').innerText = snapshot.size;
                 document.getElementById('stat-upgrades').innerText = upgrades;
-                document.getElementById('stat-earnings').innerText = "KES " + earnings.toLocaleString();
-            });
-        }
-
-        function loadLeaderboard(myUid) {
-            // Query: Users with referrals > 0, ordered by count
-            const q = query(collection(db, "users"), where("referralCount", ">", 0), orderBy("referralCount", "desc"), limit(10));
-            
-            onSnapshot(q, (snap) => {
-                const list = document.getElementById('leaderboard-list');
-                list.innerHTML = '';
-                let rank = 1, myRankFound = false;
                 
-                if(snap.empty) {
-                    list.innerHTML = `<li style="text-align:center; padding:15px; color:var(--text-muted);">Leaderboard is empty. Be the first!</li>`;
-                    return;
-                }
-
-                snap.forEach(doc => {
-                    const u = doc.data();
-                    const isMe = doc.id === myUid;
-                    
-                    if (isMe) { 
-                        myRankFound = true; 
-                        document.getElementById('my-rank-display').innerText = `#${rank}`; 
-                    }
-                    
-                    // Show top 5 in the widget
-                    if (rank <= 5) {
-                        let rankClass = (rank === 1) ? 'rank-1' : (rank === 2) ? 'rank-2' : (rank === 3) ? 'rank-3' : '';
-                        // Privacy: Mask other users' names slightly
-                        const displayName = u.fullName || 'Anonymous';
-                        const safeName = isMe ? `${displayName} (You)` : displayName.split(' ')[0] + ' ***';
-
-                        list.innerHTML += `
-                            <li class="lb-item" style="${isMe ? 'background:rgba(217,119,6,0.1); border-radius:8px; padding-left:10px; padding-right:10px;' : ''}">
-                                <div class="lb-rank ${rankClass}">${rank}</div>
-                                <div class="lb-name">${safeName}</div>
-                                <div class="lb-count">${u.referralCount || 0}</div>
-                            </li>
-                        `;
-                    }
-                    rank++;
-                });
-                
-                if (!myRankFound) document.getElementById('my-rank-display').innerText = "Unranked";
+                // Update Earnings in Hero
+                const formattedEarnings = "KES " + earnings.toLocaleString();
+                document.getElementById('hero-earnings').innerText = formattedEarnings;
             });
         }
 
@@ -697,7 +622,7 @@
             }
         };
 
-        // --- BADGES & SOCIALS ---
+        // --- BADGES ---
         function listenForBadges(uid) {
             const up = (id, c) => { 
                 const el = document.getElementById(id); 
@@ -710,24 +635,6 @@
             onSnapshot(query(collection(db, "messages"), where("receiverId", "==", uid), where("read", "==", false)), s => up('msg-badge', s.size));
         }
 
-        async function loadSocials() {
-            try {
-                const d = await getDoc(doc(db, "site_settings", "social_links"));
-                if(d.exists()) {
-                    const s = d.data();
-                    const container = document.getElementById('social-container');
-                    if (container) {
-                        container.innerHTML = `
-                            <a href="${s.facebook||'#'}"><i class="fab fa-facebook-f"></i></a>
-                            <a href="${s.whatsapp||'#'}"><i class="fab fa-whatsapp"></i></a>
-                            <a href="${s.instagram||'#'}"><i class="fab fa-instagram"></i></a>
-                            <a href="${s.tiktok||'#'}"><i class="fab fa-tiktok"></i></a>
-                        `;
-                    }
-                }
-            } catch(e) { console.log("Socials load error", e); }
-        }
-
         // --- PWA LOGIC ---
         let deferredPrompt;
         const pwaPopup = document.getElementById('pwa-install-popup');
@@ -735,6 +642,7 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
+            // Only show if not dismissed previously
             if(!localStorage.getItem('pwaDismissed')) {
                 pwaPopup.style.display = 'flex';
             }
@@ -756,7 +664,9 @@
         };
 
         // Service Worker Registration
-        if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js").catch(e => console.log(e));
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Error:", e));
+        }
     </script>
 </body>
 </html>

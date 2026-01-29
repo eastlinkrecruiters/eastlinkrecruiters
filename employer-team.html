@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Team & Access | EastLink Recruiters</title>
+    <title>Team & Access | EastLink Partner</title>
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#020617">
     
     <!-- Fonts & Icons -->
@@ -21,12 +22,12 @@
         :root {
             /* Theme Variables */
             --bg-body: #020617;       
-            --bg-card: #0f172a; 
-            --bg-glass: rgba(15, 23, 42, 0.95); 
+            --bg-card: rgba(15, 23, 42, 0.6); 
+            --bg-glass: rgba(15, 23, 42, 0.85); 
             --bg-glass-heavy: rgba(15, 23, 42, 0.98);
             --bg-input: rgba(255, 255, 255, 0.05);
             --bg-hover: rgba(255, 255, 255, 0.08);
-            --border-color: rgba(255, 255, 255, 0.12);
+            --border-color: rgba(255, 255, 255, 0.08);
             --text-main: #F8FAFC;     
             --text-muted: #94A3B8; 
             --gold-base: #D97706;
@@ -82,7 +83,7 @@
             min-width: 16px; height: 16px; 
             border-radius: 50%; 
             display: none; align-items: center; justify-content: center;
-            border: 2px solid var(--bg-card);
+            border: 2px solid var(--bg-body);
             z-index: 10;
         }
 
@@ -124,8 +125,8 @@
         .page-title p { color: var(--text-muted); font-size: 0.95rem; }
 
         .btn-invite { 
-            background: var(--gold-gradient); color: white; padding: 10px 24px; border-radius: 8px; 
-            font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; 
+            background: var(--gold-gradient); color: #020617; padding: 10px 24px; border-radius: 8px; 
+            font-weight: 700; border: none; cursor: pointer; display: flex; align-items: center; 
             gap: 10px; transition: 0.3s; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3); font-size: 0.9rem;
         }
         .btn-invite:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 6px 20px rgba(217, 119, 6, 0.4); }
@@ -136,6 +137,7 @@
             background: var(--bg-glass); border: 1px solid var(--border-color); border-radius: var(--radius);
             padding: 20px; display: flex; flex-direction: column; justify-content: space-between; 
             transition: transform 0.2s; cursor: pointer; min-height: 120px;
+            backdrop-filter: blur(10px);
         }
         .kpi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: var(--text-muted); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.5px; }
         .kpi-value { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--text-main); }
@@ -164,7 +166,7 @@
             padding: 20px; margin-bottom: 25px;
         }
         .table-toolbar { 
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; 
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; 
         }
         .search-box { position: relative; max-width: 300px; width: 100%; }
         .search-box input { 
@@ -174,9 +176,10 @@
         .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
         .search-box input:focus { border-color: var(--gold-base); background: var(--bg-card); }
 
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th { text-align: left; padding: 12px; color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
-        td { padding: 12px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-size: 0.9rem; vertical-align: middle; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
+        th { text-align: left; padding: 15px; color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; border-bottom: 1px solid var(--border-color); letter-spacing: 0.5px; }
+        td { padding: 15px; border-bottom: 1px solid var(--border-color); color: var(--text-main); font-size: 0.9rem; vertical-align: middle; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        tr:last-child td { border-bottom: none; }
         
         .member-cell { display: flex; align-items: center; gap: 12px; }
         .avatar-cell { 
@@ -184,7 +187,7 @@
             display: flex; align-items: center; justify-content: center; font-weight: 700; border: 1px solid var(--border-color);
             font-size: 0.85rem;
         }
-        .role-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; border: 1px solid transparent; text-transform: uppercase; }
+        .role-badge { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; border: 1px solid transparent; text-transform: uppercase; letter-spacing: 0.5px; }
         .role-owner { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); border-color: rgba(217, 119, 6, 0.3); }
         .role-admin { background: rgba(59, 130, 246, 0.1); color: var(--info); border-color: rgba(59, 130, 246, 0.3); }
         .role-recruiter { background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.3); }
@@ -199,24 +202,24 @@
 
         /* --- MODAL --- */
         .modal-overlay { 
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); 
             z-index: 2000; align-items: center; justify-content: center; padding: 20px; 
             transition: opacity 0.2s ease-out; opacity: 0;
         }
         .modal-overlay.active { display: flex; opacity: 1; }
         
         .modal-box { 
-            background: var(--bg-glass-heavy); width: 100%; max-width: 450px; border-radius: 16px; 
+            background: #0f172a; width: 100%; max-width: 450px; border-radius: 16px; 
             border: 1px solid var(--border-color); overflow: hidden; 
             transform: scale(0.95); transition: transform 0.2s; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
         }
         .modal-overlay.active .modal-box { transform: scale(1); }
 
-        .modal-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .modal-body { padding: 25px; }
+        .modal-header { padding: 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-glass); }
+        .modal-body { padding: 30px 25px; }
 
         .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; font-size: 0.85rem; margin-bottom: 8px; color: var(--text-muted); }
+        .input-group label { display: block; font-size: 0.85rem; margin-bottom: 8px; color: var(--text-muted); font-weight: 500; }
         .input-wrapper { position: relative; }
         .input-wrapper i { position: absolute; left: 15px; top: 13px; color: var(--gold-base); opacity: 0.8; }
         .input-wrapper input, .input-wrapper select { 
@@ -224,17 +227,24 @@
             border-radius: 10px; color: var(--text-main); font-family: var(--font-body); outline: none; transition: 0.3s; font-size: 0.95rem;
         }
         .input-wrapper input:focus, .input-wrapper select:focus { border-color: var(--gold-base); background: var(--bg-glass); }
+        .input-wrapper select { appearance: none; cursor: pointer; }
+        .input-wrapper::after {
+            content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute;
+            right: 15px; top: 14px; color: var(--text-muted); pointer-events: none; font-size: 0.8rem;
+        }
+        .input-wrapper input[type="email"]::after { display: none; } /* remove chevron for input */
 
-        .btn-submit { width: 100%; padding: 12px; background: var(--gold-gradient); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+        .btn-submit { width: 100%; padding: 14px; background: var(--gold-gradient); color: #020617; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; margin-top: 10px; transition: 0.3s; font-size: 0.95rem; }
         .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3); }
 
         .copy-link-box { 
             display: flex; gap: 10px; align-items: center; background: var(--bg-input); 
-            padding: 10px 15px; border-radius: 8px; border: 1px dashed var(--border-color); 
+            padding: 12px 15px; border-radius: 8px; border: 1px dashed var(--border-color); 
             margin-top: 20px; font-size: 0.85rem; color: var(--text-muted); 
         }
         .copy-link-box span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); }
         .copy-btn { color: var(--gold-base); font-weight: 600; cursor: pointer; white-space: nowrap; background: none; border: none; }
+        .copy-btn:hover { text-decoration: underline; }
 
         /* PWA Popup */
         .pwa-install-popup {
@@ -261,19 +271,20 @@
             thead { display: none; }
             tbody { display: block; width: 100%; }
             tr { 
-                display: flex; flex-direction: column; background: var(--bg-input); 
+                display: flex; flex-direction: column; background: rgba(255,255,255,0.02); 
                 border: 1px solid var(--border-color); border-radius: 12px; 
                 margin-bottom: 15px; padding: 15px; 
             }
             td { 
                 display: flex; justify-content: space-between; align-items: center; 
-                padding: 8px 0; border: none; width: 100%; font-size: 0.9rem; 
+                padding: 10px 0; border: none; width: 100%; font-size: 0.9rem; 
             }
-            td:not(:last-child) { border-bottom: 1px solid rgba(255,255,255,0.03); }
+            td:not(:last-child) { border-bottom: 1px solid rgba(255,255,255,0.05); }
             td::before { 
                 content: attr(data-label); font-weight: 600; color: var(--text-muted); 
                 font-size: 0.75rem; text-transform: uppercase; 
             }
+            .member-cell { flex-direction: row-reverse; gap: 10px; }
         }
     </style>
 </head>
@@ -326,7 +337,6 @@
         <div class="nav-group-label">Organization</div>
         <a href="employer-profile.html" class="nav-item"><i class="fas fa-building"></i> Company profile</a>
         <a href="employer-wallet.html" class="nav-item"><i class="fas fa-wallet"></i> My wallet</a>
-        <a href="employer-team.html" class="nav-item active"><i class="fas fa-users-cog"></i> Team & Access</a>
         <a href="employer-premium.html" class="nav-item"><i class="fas fa-crown"></i> My plan</a>
 
         <div class="nav-group-label">Growth</div>
@@ -347,8 +357,7 @@
         </a>
 
         <div class="nav-group-label">Account</div>
-        <a href="employer-profile.html" class="nav-item"><i class="fas fa-user"></i> My profile</a>
-        <a href="employer-settings.html" class="nav-item"><i class="fas fa-cog"></i> Settings</a>
+        <a href="employer-settings.html" class="nav-item active"><i class="fas fa-cog"></i> Settings</a>
         
         <div style="margin-top:auto; padding:20px 24px;">
             <a href="#" onclick="logout()" style="color:var(--danger); text-decoration:none; font-size:0.9rem; display:flex; align-items:center;"><i class="fa-solid fa-right-from-bracket" style="margin-right:10px;"></i> Signout</a>
@@ -376,7 +385,7 @@
                 <div class="kpi-card">
                     <div class="kpi-header">AVAILABLE SEATS <i class="fas fa-chair"></i></div>
                     <div class="kpi-value" id="val-seats">4</div>
-                    <div class="kpi-trend">Scale Plan Limit: 5</div>
+                    <div class="kpi-trend">Plan Limit: 5</div>
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-header">PENDING INVITES <i class="fas fa-envelope-open"></i></div>
@@ -428,9 +437,9 @@
             <div id="tab-activity" class="tab-content">
                 <div class="glass-panel">
                     <h3 style="font-family:var(--font-head); font-size:1.1rem; color:var(--text-main); margin-bottom:15px;">Recent Activity</h3>
-                    <div class="audit-item">
+                    <div style="display:flex; justify-content:space-between; padding:15px 0; border-bottom:1px solid var(--border-color);">
                         <div><strong style="color:var(--text-main)">You</strong> viewed the team settings page.</div>
-                        <div class="audit-time">Just now</div>
+                        <div style="color:var(--text-muted); font-size:0.8rem;">Just now</div>
                     </div>
                     <div style="text-align:center; padding-top:20px; opacity:0.5; font-size:0.85rem;">No older activities found.</div>
                 </div>
@@ -439,18 +448,21 @@
             <!-- Roles Tab -->
             <div id="tab-roles" class="tab-content">
                 <div class="glass-panel">
-                    <h3 style="font-family:var(--font-head); font-size:1.1rem; color:var(--text-main); margin-bottom:15px;">Role Definitions</h3>
-                    <div style="margin-bottom:15px;">
+                    <h3 style="font-family:var(--font-head); font-size:1.1rem; color:var(--text-main); margin-bottom:20px;">Role Definitions</h3>
+                    <div style="margin-bottom:20px; padding:15px; border:1px solid var(--border-color); border-radius:8px; background:rgba(255,255,255,0.02);">
                         <span class="role-badge role-owner">Owner</span>
-                        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:5px;">Full access to billing, settings, and team management. Cannot be removed.</p>
+                        <h4 style="color:var(--text-main); margin:10px 0 5px 0; font-size:0.95rem;">Full Permissions</h4>
+                        <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.5;">Full access to billing, settings, and team management. Cannot be removed by others.</p>
                     </div>
-                    <div style="margin-bottom:15px;">
+                    <div style="margin-bottom:20px; padding:15px; border:1px solid var(--border-color); border-radius:8px; background:rgba(255,255,255,0.02);">
                         <span class="role-badge role-admin">Admin</span>
-                        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:5px;">Can post jobs, manage candidates, and invite recruiters. No billing access.</p>
+                        <h4 style="color:var(--text-main); margin:10px 0 5px 0; font-size:0.95rem;">Operational Access</h4>
+                        <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.5;">Can post jobs, manage candidates, and invite recruiters. Restricted billing access.</p>
                     </div>
-                    <div>
+                    <div style="padding:15px; border:1px solid var(--border-color); border-radius:8px; background:rgba(255,255,255,0.02);">
                         <span class="role-badge role-recruiter">Recruiter</span>
-                        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:5px;">Can view candidates and move them through pipelines. Cannot edit company profile.</p>
+                        <h4 style="color:var(--text-main); margin:10px 0 5px 0; font-size:0.95rem;">Hiring Access</h4>
+                        <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.5;">Can view candidates and move them through pipelines. Cannot edit company profile or settings.</p>
                     </div>
                 </div>
             </div>
@@ -464,7 +476,7 @@
 
     <!-- INVITE MODAL -->
     <div class="modal-overlay" id="inviteModal">
-        <div class="modal-box">
+        <div class="modal-box animate__animated animate__zoomIn">
             <div class="modal-header">
                 <h3 style="font-family:var(--font-head); color:var(--text-main); margin:0;">Invite Member</h3>
                 <button onclick="closeInviteModal()" style="background:none; border:none; color:var(--text-muted); font-size:1.2rem; cursor:pointer;">&times;</button>
@@ -518,19 +530,23 @@
     <!-- SCRIPTS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+        import { auth, db } from './config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { doc, getDoc, collection, query, where, getDocs, addDoc, serverTimestamp, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         let currentUser = null;
         let teamMembers = [];
 
         // UI Helpers
-        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = 'block'; };
-        window.closeSidebar = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').style.display = 'none'; };
+        window.toggleSidebar = () => { 
+            const sb = document.getElementById('sidebar');
+            sb.classList.toggle('active');
+            document.getElementById('overlay').style.display = sb.classList.contains('active') ? 'block' : 'none';
+        };
+        window.closeSidebar = () => { 
+            document.getElementById('sidebar').classList.remove('active'); 
+            document.getElementById('overlay').style.display = 'none'; 
+        };
         window.logout = () => signOut(auth).then(() => window.location.href = 'signin.html');
         window.switchTab = (id, event) => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -570,7 +586,7 @@
             onSnapshot(doc(db, "users", user.uid), (docSnap) => {
                 if(docSnap.exists()) {
                     const data = docSnap.data();
-                    if(data.role !== 'employer') return location.href = 'index.html';
+                    if(data.role !== 'employer') return location.href = 'seeker-dashboard.html';
 
                     if(data.logoUrl) document.getElementById('header-avatar').innerHTML = `<img src="${data.logoUrl}" style="width:100%;height:100%;object-fit:cover;">`;
                     
@@ -633,21 +649,33 @@
 
             try {
                 const q = query(collection(db, "invites"), where("companyId", "==", ownerId));
-                const snapshot = await getDocs(q);
-                snapshot.forEach(doc => {
-                    const d = doc.data();
-                    teamMembers.push({
-                        id: doc.id,
-                        name: d.email.split('@')[0], 
-                        email: d.email,
-                        role: d.role,
-                        status: 'pending',
-                        lastActive: '-'
+                onSnapshot(q, (snapshot) => {
+                    // Reset to owner only then add
+                    const tempMembers = [{
+                        id: ownerId,
+                        name: ownerData.companyName || "Owner",
+                        email: currentUser.email,
+                        role: 'owner',
+                        status: 'active',
+                        lastActive: 'Now'
+                    }];
+                    
+                    snapshot.forEach(doc => {
+                        const d = doc.data();
+                        tempMembers.push({
+                            id: doc.id,
+                            name: d.email.split('@')[0], 
+                            email: d.email,
+                            role: d.role,
+                            status: d.status || 'pending',
+                            lastActive: '-'
+                        });
                     });
+                    
+                    teamMembers = tempMembers;
+                    renderTeam(teamMembers);
                 });
             } catch (e) { console.log("Error fetching invites", e); }
-
-            renderTeam(teamMembers);
         }
 
         function renderTeam(list) {
@@ -673,12 +701,12 @@
 
                 const statusDot = m.status === 'active' ? 'st-active' : 'st-pending';
                 const actions = m.role === 'owner' 
-                    ? `<span style="color:var(--border-color)">-</span>` 
+                    ? `<span style="color:var(--border-color); font-size:0.8rem;">Owner</span>` 
                     : `<button class="action-btn" title="Edit"><i class="fas fa-edit"></i></button>
                        <button class="action-btn danger" title="Remove" onclick="removeMember('${m.id}')"><i class="fas fa-trash"></i></button>`;
 
                 const html = `
-                    <tr>
+                    <tr class="animate__animated animate__fadeIn">
                         <td data-label="User">
                             <div class="member-cell">
                                 <div class="avatar-cell">${m.name.charAt(0).toUpperCase()}</div>
@@ -689,8 +717,8 @@
                             </div>
                         </td>
                         <td data-label="Role"><span class="role-badge ${roleClass}">${m.role}</span></td>
-                        <td data-label="Status"><span class="status-dot ${statusDot}"></span> <span style="text-transform:capitalize;">${m.status}</span></td>
-                        <td data-label="Last Active" style="font-family:var(--font-mono);">${m.lastActive}</td>
+                        <td data-label="Status"><span class="status-dot ${statusDot}"></span> <span style="text-transform:capitalize; font-size:0.85rem;">${m.status}</span></td>
+                        <td data-label="Last Active" style="font-family:var(--font-mono); color:var(--text-muted); font-size:0.85rem;">${m.lastActive}</td>
                         <td data-label="Actions" style="text-align:right;">${actions}</td>
                     </tr>
                 `;
@@ -699,7 +727,6 @@
 
             // Update Stats
             document.getElementById('val-total').innerText = teamMembers.length;
-            // Assuming 'Scale' plan has 5 seats. Logic can be adjusted based on 'userPlan' variable if needed.
             document.getElementById('val-seats').innerText = Math.max(0, 5 - teamMembers.length); 
             document.getElementById('val-pending').innerText = pendingCount;
         }
@@ -737,9 +764,13 @@
                 
                 closeInviteModal();
                 Toastify({ text: "Invitation sent successfully!", style: { background: "var(--success)" } }).showToast();
+                document.getElementById('inviteEmail').value = ''; // Reset input
                 
-                // Reload to reflect changes (or manually push to array)
-                setTimeout(() => window.location.reload(), 1500);
+                // Button reset happens automatically because the modal closes, 
+                // but good practice to reset state if they open it again immediately
+                btn.innerText = originalText;
+                btn.disabled = false;
+
             } catch(e) {
                 console.error(e);
                 Toastify({ text: "Error sending invite.", style: { background: "var(--danger)" } }).showToast();
@@ -750,14 +781,14 @@
 
         window.removeMember = async (id) => {
             if(confirm("Are you sure you want to remove this member? This will revoke their access immediately.")) {
-                // In a real scenario, you would deleteDoc from Firestore here.
-                // await deleteDoc(doc(db, "invites", id));
-                
-                Toastify({ text: "Member access revoked.", style: { background: "var(--info)" } }).showToast();
-                
-                // Optimistic UI update
-                teamMembers = teamMembers.filter(m => m.id !== id);
-                renderTeam(teamMembers);
+                try {
+                    await deleteDoc(doc(db, "invites", id));
+                    Toastify({ text: "Member access revoked.", style: { background: "var(--info)" } }).showToast();
+                    // The onSnapshot listener in loadTeam will automatically update the UI
+                } catch (e) {
+                    console.error("Error removing member:", e);
+                    Toastify({ text: "Error removing member.", style: { background: "var(--danger)" } }).showToast();
+                }
             }
         };
 

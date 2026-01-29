@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sign In | EastLink Recruiters</title>
     
-    <!-- PWA Manifest & Favicon (Updated Paths) -->
+    <!-- PWA Manifest & Favicon -->
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
@@ -16,7 +16,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <!-- Icons & Animation & Toast -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
@@ -53,7 +53,6 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-body);
-            /* Relative path for GitHub Pages */
             background-image: url('./assets/images/background.png');
             background-size: cover;
             background-position: center;
@@ -69,6 +68,19 @@
         h1, h2, h3, .brand-font { font-family: 'Cinzel', serif; }
         a { text-decoration: none; color: inherit; transition: var(--transition); }
         .container { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+
+        /* --- PRELOADER --- */
+        #preloader {
+            position: fixed; inset: 0; background: var(--bg-body); z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.5s ease;
+        }
+        .spinner-ring {
+            width: 50px; height: 50px; border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid var(--primary); border-radius: 50%;
+            animation: spin 1s linear infinite; margin: 0 auto 15px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* --- HEADER --- */
         header {
@@ -197,9 +209,16 @@
         .btn-pri { 
             width: 100%; padding: 14px; border-radius: 50px; font-weight: 700; cursor: pointer;
             transition: var(--transition); border: none; display: flex; align-items: center; justify-content: center; gap: 10px;
-            background: var(--gold-gradient); color: #000; 
+            background: var(--gold-gradient); color: #000; min-height: 50px;
         }
         .btn-pri:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(217, 119, 6, 0.3); }
+        .btn-pri:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        .btn-spinner {
+            width: 20px; height: 20px; border: 2px solid rgba(0,0,0,0.1); 
+            border-top: 2px solid #000; border-radius: 50%; 
+            animation: spin 1s linear infinite; display: none;
+        }
         
         /* FOOTER */
         footer { 
@@ -233,13 +252,10 @@
 <body>
 
     <!-- PRELOADER -->
-    <div id="preloader" style="position:fixed; inset:0; background:var(--bg-body); z-index:9999; display:flex; justify-content:center; align-items:center; transition: opacity 0.5s ease;">
+    <div id="preloader">
         <div style="text-align:center;">
-            <img src="./assets/images/logo.png" style="width:70px; height:auto; margin-bottom:20px;">
-            <div style="width:150px; height:2px; background:rgba(255,255,255,0.1); overflow:hidden; border-radius:2px;">
-                <div style="width:100%; height:100%; background:var(--gold-gradient); animation:loading 1.5s infinite ease-in-out; transform-origin:left;"></div>
-            </div>
-            <style>@keyframes loading { 0% { transform: scaleX(0); } 50% { transform: scaleX(1); } 100% { transform: scaleX(0); transform-origin:right; } }</style>
+            <div class="spinner-ring"></div>
+            <div style="font-family:'Cinzel', serif; font-size:1.1rem; letter-spacing:2px; color:var(--text);">AUTHENTICATING</div>
         </div>
     </div>
 
@@ -271,7 +287,7 @@
     <main class="container">
         <div class="signup-grid">
             
-            <!-- Left Visual (Updated style) -->
+            <!-- Left Visual -->
             <div class="visual-content" data-aos="fade-right">
                 <h1 class="brand-font">Unlock Your <br><span>Potential.</span></h1>
                 <p>Join thousands of professionals and employers connecting daily through East Africa's most trusted recruitment platform.</p>
@@ -282,7 +298,7 @@
                 </div>
             </div>
 
-            <!-- Right Form (Updated style) -->
+            <!-- Right Form -->
             <div class="form-card" data-aos="fade-left">
                 <div class="form-header">
                     <img src="./assets/images/logo.png" alt="EastLink">
@@ -306,14 +322,15 @@
 
                     <div class="form-options">
                         <label style="cursor:pointer; display:flex; align-items:center; gap:8px;">
-                            <input type="checkbox" style="accent-color:var(--primary); width:16px; height:16px;"> Remember me
+                            <input type="checkbox" id="rememberMe" style="accent-color:var(--primary); width:16px; height:16px;" checked> Remember me
                         </label>
-                        <span class="forgot-link" onclick="showToast('Password reset functionality coming soon.', 'yellow')">Forgot Password?</span>
+                        <span class="forgot-link" onclick="handleForgotPass()">Forgot Password?</span>
                     </div>
 
-                    <button class="btn-pri" onclick="handleLogin()">
+                    <button class="btn-pri" id="loginBtn" onclick="handleLogin()">
+                        <div class="btn-spinner" id="btnSpinner"></div>
                         <span id="btnText">Log In</span>
-                        <i class="fas fa-arrow-right"></i>
+                        <i class="fas fa-arrow-right" id="btnIcon"></i>
                     </button>
                 </form>
 
@@ -377,29 +394,35 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        import { auth, db } from './config.js';
+        import { 
+            signInWithEmailAndPassword, 
+            onAuthStateChanged, 
+            setPersistence, 
+            browserLocalPersistence,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         // --- INIT UI ---
         AOS.init({ duration: 800, offset: 50, once: true });
         document.getElementById("year").textContent = new Date().getFullYear();
 
-        // Updated Preloader Logic
-        const removePreloader = () => {
-            const preloader = document.getElementById('preloader');
-            if(preloader && preloader.style.display !== 'none') {
-                preloader.style.opacity = '0';
-                setTimeout(() => preloader.style.display = 'none', 500);
+        // --- AUTO-LOGIN CHECK ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User detected, route them
+                await routeUser(user, true); // true = automated check
+            } else {
+                // No user, hide preloader
+                const preloader = document.getElementById('preloader');
+                if(preloader) {
+                    preloader.style.opacity = '0';
+                    setTimeout(() => preloader.style.display = 'none', 500);
+                }
             }
-        };
-        window.addEventListener('load', removePreloader);
-        setTimeout(removePreloader, 2000); // Fail-safe
+        });
 
         window.toggleMenu = () => {
             const menu = document.getElementById('menuOverlay');
@@ -417,33 +440,10 @@
             Toastify({ text: msg, duration: 3000, gravity: "top", position: "center", style: { background: bg, borderRadius: "12px", boxShadow: "0 10px 30px rgba(0,0,0,0.3)" } }).showToast();
         };
 
-        // --- PWA LOGIC START ---
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
-                    .then(reg => console.log('SW Registered'))
-                    .catch(err => console.log('SW Failed', err));
-            });
-        }
-        let deferredPrompt;
-        const pwaPopup = document.getElementById('pwa-install-popup');
-        const installBtn = document.getElementById('pwa-install-btn');
-        const dismissBtn = document.getElementById('pwa-dismiss');
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            setTimeout(() => { pwaPopup.style.display = 'block'; }, 3000);
-        });
-        installBtn.addEventListener('click', (e) => {
-            pwaPopup.style.display = 'none';
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => { deferredPrompt = null; });
-            }
-        });
-        dismissBtn.addEventListener('click', () => { pwaPopup.style.display = 'none'; });
-        window.addEventListener('appinstalled', () => { pwaPopup.style.display = 'none'; });
-        // --- PWA LOGIC END ---
+        window.handleForgotPass = () => {
+             // Basic placeholder logic as per original prompt hint
+             showToast('Password reset link sent (simulated).', 'yellow');
+        };
 
         // --- SOCIALS ---
         async function loadSocials() {
@@ -479,49 +479,133 @@
         });
 
         window.fillEmail = (val) => { emailInput.value = val; emailBox.style.display = 'none'; };
+        document.addEventListener('click', (e) => { if (e.target !== emailInput && emailBox) emailBox.style.display = 'none'; });
 
-        document.addEventListener('click', (e) => {
-            if (e.target !== emailInput && emailBox) emailBox.style.display = 'none';
+        // --- PWA LOGIC ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js').catch(() => {}));
+        }
+        let deferredPrompt;
+        const pwaPopup = document.getElementById('pwa-install-popup');
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            setTimeout(() => { pwaPopup.style.display = 'block'; }, 3000);
         });
+        document.getElementById('pwa-install-btn').addEventListener('click', () => {
+            pwaPopup.style.display = 'none';
+            if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt = null; }
+        });
+        document.getElementById('pwa-dismiss').addEventListener('click', () => { pwaPopup.style.display = 'none'; });
 
-        // --- LOGIN LOGIC ---
+        // --- ROUTING LOGIC (With Ban Check & Maintenance Mode) ---
+        async function routeUser(user, isAuto = false) {
+            const preloader = document.getElementById('preloader');
+            
+            try {
+                // Get User Profile
+                const snap = await getDoc(doc(db, "users", user.uid));
+                
+                if (snap.exists()) {
+                    const data = snap.data();
+                    const role = data.role; // e.g. 'seeker', 'employer', 'admin'
+                    
+                    // 1. BAN CHECK
+                    if (data.banned === true) {
+                        await signOut(auth);
+                        showToast("Account suspended. Contact support.", "error");
+                        toggleButtonLoading(false); 
+                        if(preloader) preloader.style.display = 'none';
+                        return;
+                    }
+
+                    // 2. MAINTENANCE MODE CHECK (New)
+                    try {
+                        const settingsSnap = await getDoc(doc(db, "site_settings", "general"));
+                        if (settingsSnap.exists()) {
+                            const settings = settingsSnap.data();
+                            // If maintenanceMode is ON and user is NOT admin -> Redirect
+                            if (settings.maintenanceMode === true && role !== 'admin') {
+                                window.location.replace('maintenance.html');
+                                return;
+                            }
+                        }
+                    } catch (err) {
+                        console.log("Setting check failed", err);
+                    }
+
+                    // 3. EMAIL VERIFICATION CHECK
+                    if (!user.emailVerified) {
+                         showToast("Please verify your email first.", "yellow");
+                         setTimeout(() => window.location.href = 'verify.html', 1000);
+                         return;
+                    }
+
+                    // 4. SUCCESS ROUTING
+                    if(!isAuto) showToast("Signin successful", "success");
+                    
+                    const dest = role === 'employer' ? 'employer-dashboard.html' : (role === 'admin' ? 'admin-dashboard.html' : 'seeker-dashboard.html');
+                    
+                    setTimeout(() => window.location.replace(dest), 500);
+
+                } else {
+                    // No profile found
+                    showToast("User profile missing.", "error");
+                    if(preloader) preloader.style.display = 'none';
+                    toggleButtonLoading(false);
+                }
+            } catch(e) {
+                console.error(e);
+                if(preloader) preloader.style.display = 'none';
+                toggleButtonLoading(false);
+            }
+        }
+
+        function toggleButtonLoading(isLoading) {
+            const btn = document.getElementById('loginBtn');
+            const spinner = document.getElementById('btnSpinner');
+            const text = document.getElementById('btnText');
+            const icon = document.getElementById('btnIcon');
+            
+            if(isLoading) {
+                btn.disabled = true;
+                spinner.style.display = 'block';
+                text.innerText = "Authenticating...";
+                icon.style.display = 'none';
+            } else {
+                btn.disabled = false;
+                spinner.style.display = 'none';
+                text.innerText = "Log In";
+                icon.style.display = 'inline-block';
+            }
+        }
+
+        // --- LOGIN ACTION ---
         window.handleLogin = async () => {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const btnText = document.getElementById('btnText');
-
-            if(!email || !password) { showToast("Please fill in all fields", "yellow"); return; }
-            const originalText = btnText.innerHTML;
-            btnText.innerHTML = "Authenticating...";
             
+            if(!email || !password) { showToast("Please fill in all fields", "yellow"); return; }
+            
+            toggleButtonLoading(true);
+
             try {
+                // Set Persistence (Local = Remember Me)
+                await setPersistence(auth, browserLocalPersistence);
+                
                 const cred = await signInWithEmailAndPassword(auth, email, password);
-                const user = cred.user;
+                
+                // Route user (Pass false because this is manual login)
+                await routeUser(cred.user, false);
 
-                // Check Email Verification
-                if (!user.emailVerified) {
-                    showToast("Email not verified. Redirecting...", "yellow");
-                    setTimeout(() => window.location.href = 'verify.html', 1500);
-                    return;
-                }
-
-                // Check Firestore Role
-                const snap = await getDoc(doc(db, "users", user.uid));
-                if (snap.exists()) {
-                    const role = snap.data().role;
-                    const dest = role === 'employer' ? 'employer-dashboard.html' : (role === 'admin' ? 'admin-dashboard.html' : 'seeker-dashboard.html');
-                    showToast("Login successful!", "success");
-                    setTimeout(() => window.location.href = dest, 800);
-                } else {
-                    showToast("User profile not found.", "error");
-                    btnText.innerHTML = originalText;
-                }
             } catch (error) {
                 console.error(error);
                 let msg = "Login failed.";
-                if (error.code === 'auth/invalid-credential') msg = "Invalid email or password.";
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') msg = "Invalid email or password.";
+                else if (error.code === 'auth/too-many-requests') msg = "Too many attempts. Try later.";
+                
                 showToast(msg, "error");
-                btnText.innerHTML = originalText;
+                toggleButtonLoading(false);
             }
         };
     </script>

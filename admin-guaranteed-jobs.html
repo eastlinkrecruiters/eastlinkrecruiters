@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
     
     <!-- Fonts & Icons -->
@@ -286,22 +287,6 @@
 
         .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 998; backdrop-filter: blur(4px); }
 
-        /* PWA Popup */
-        .pwa-install-popup {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
-            border-radius: 20px; padding: 20px; z-index: 3000;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
-            animation: slideUp 0.5s ease;
-        }
-        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
-        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
-        .pwa-actions { display: flex; gap: 10px; }
-        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
-        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
-
         @media (max-width: 992px) {
             .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
             main { margin-left: 0; padding: 20px 10px; width: 100%; }
@@ -336,6 +321,9 @@
             <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
                 <i class="fa-solid fa-user-shield"></i>
             </div>
+            <div class="icon-btn" onclick="logout()" style="color:var(--danger);" title="Logout">
+                <i class="fa-solid fa-power-off"></i>
+            </div>
         </div>
     </header>
 
@@ -369,10 +357,7 @@
 
         <div class="nav-group">
             <div class="nav-label">System</div>
-            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
-            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
-            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
-            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="admin-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
@@ -470,30 +455,12 @@
         </div>
     </div>
 
-    <!-- PWA INSTALL POPUP -->
-    <div id="pwa-install-popup" class="pwa-install-popup">
-        <div class="pwa-content">
-            <div class="pwa-icon"><i class="fas fa-download"></i></div>
-            <div>
-                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
-                <div style="font-size:0.8rem; color:#94A3B8;">Add to home screen for quick access.</div>
-            </div>
-        </div>
-        <div class="pwa-actions">
-            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
-            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
-        </div>
-    </div>
-
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, getDocs, collection, query, where, onSnapshot, updateDoc, addDoc, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+        import { auth, db } from './config.js'; // Imports from local config
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { doc, getDoc, getDocs, collection, query, where, onSnapshot, updateDoc, addDoc, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         let currentAppId = null;
         let currentSeekerId = null;
@@ -537,6 +504,7 @@
         function initApplications() {
             const grid = document.getElementById('app-grid');
             // Using basic collection fetch then client filtering to prevent index errors
+            // Real-time listener
             const q = collection(db, "applications");
             
             onSnapshot(q, (snap) => {
@@ -564,8 +532,10 @@
                 // Sort Descending by Time (Client Side)
                 guaranteedApps.sort((a, b) => (b.appliedAt?.seconds || 0) - (a.appliedAt?.seconds || 0));
 
-                grid.innerHTML = '';
                 let counts = { pending: 0, placed: 0 };
+                
+                // Use Fragment for performance
+                const fragment = document.createDocumentFragment();
 
                 guaranteedApps.forEach(d => {
                     const status = (d.status || 'pending').toLowerCase();
@@ -582,23 +552,30 @@
                     const badgeHtml = unreadCount > 0 ? `<div class="card-badge">${unreadCount}</div>` : '';
                     const jobRole = d.jobTitle || d.jobPreference || 'Guaranteed Role';
                     const userLoc = d.city || d.location || 'N/A';
-
-                    grid.innerHTML += `
-                        <div class="glass-panel app-card animate__animated animate__fadeInUp" onclick="openAppModal('${d.id}', '${d.seekerId}', '${safeName}', '${d.seekerEmail || ''}', '${d.phone || ''}', '${userLoc}', '${jobRole}', '${status}')">
-                            <div class="app-status ${badge}">${status === 'placed' ? 'Placed' : status}</div>
-                            <div class="seeker-name">${d.seekerName || 'Unknown'}</div>
-                            <div class="seeker-detail"><i class="fas fa-briefcase"></i> ${jobRole}</div>
-                            <div class="seeker-detail"><i class="fas fa-map-marker-alt"></i> ${userLoc}</div>
-                            <div class="app-footer">
-                                <span class="time-ago">${dateStr}</span>
-                                <span class="btn-msg-card">
-                                    <i class="far fa-comment-dots"></i> Review
-                                    ${badgeHtml}
-                                </span>
-                            </div>
+                    
+                    // Passing arguments carefully to avoid syntax errors in HTML
+                    const card = document.createElement('div');
+                    card.className = "glass-panel app-card animate__animated animate__fadeInUp";
+                    card.onclick = () => openAppModal(d.id, d.seekerId, d.seekerName, d.seekerEmail, d.phone, userLoc, jobRole, status);
+                    
+                    card.innerHTML = `
+                        <div class="app-status ${badge}">${status === 'placed' ? 'Placed' : status}</div>
+                        <div class="seeker-name">${d.seekerName || 'Unknown'}</div>
+                        <div class="seeker-detail"><i class="fas fa-briefcase"></i> ${jobRole}</div>
+                        <div class="seeker-detail"><i class="fas fa-map-marker-alt"></i> ${userLoc}</div>
+                        <div class="app-footer">
+                            <span class="time-ago">${dateStr}</span>
+                            <span class="btn-msg-card">
+                                <i class="far fa-comment-dots"></i> Review
+                                ${badgeHtml}
+                            </span>
                         </div>
                     `;
+                    fragment.appendChild(card);
                 });
+
+                grid.innerHTML = '';
+                grid.appendChild(fragment);
 
                 document.getElementById('stat-pending').innerText = counts.pending;
                 document.getElementById('stat-approved').innerText = counts.placed;
@@ -621,7 +598,7 @@
             currentSeekerDetails = { name, email, pref, status }; 
             currentChatId = null;
 
-            document.getElementById('header-name').innerText = name;
+            document.getElementById('header-name').innerText = name || "Unknown Applicant";
             document.getElementById('header-status').innerText = (status === 'placed' ? 'SUCCESSFUL PLACEMENT' : status.toUpperCase());
             document.getElementById('header-status').style.color = status === 'placed' ? 'var(--success)' : 'var(--gold-base)';
             
@@ -698,6 +675,8 @@
                     return;
                 }
 
+                const frag = document.createDocumentFragment();
+
                 msgs.forEach(m => {
                     const isMe = m.senderId === currentAdminId || m.senderId === 'admin';
                     const bubble = document.createElement('div');
@@ -711,8 +690,9 @@
                         ${formattedText}
                         <span class="msg-time">${m.timestamp ? new Date(m.timestamp.seconds*1000).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'Just now'}</span>
                     `;
-                    container.appendChild(bubble);
+                    frag.appendChild(bubble);
                 });
+                container.appendChild(frag);
                 container.scrollTop = container.scrollHeight;
             });
         }
@@ -800,14 +780,15 @@
             const firstName = name ? name.split(' ')[0] : "Applicant";
             let replyText = "";
 
+            // Enhanced logic for guaranteed placement context
             if (status === 'pending') {
-                replyText = `Hello ${firstName}, thank you for your application regarding the ${pref} placement. We have reviewed your profile and would like to schedule a verification call. Are you available tomorrow?`;
+                replyText = `Hello ${firstName}, thank you for your application regarding the ${pref} placement. We have reviewed your profile and would like to schedule a verification call to proceed. Are you available tomorrow?`;
             } else if (status === 'placed') {
                 replyText = `Congratulations ${firstName}! We are pleased to inform you that your placement for ${pref} has been confirmed. We will be sending over the onboarding documents shortly. Welcome aboard!`;
             } else if (status === 'rejected') {
                 replyText = `Dear ${firstName}, thank you for your interest in the ${pref} opportunity. After careful consideration, we have decided to proceed with other candidates who more closely match our current requirements. We wish you the best in your search.`;
             } else {
-                replyText = `Hello ${firstName}, following up on your application. Do you have any pending documents you need to submit?`;
+                replyText = `Hello ${firstName}, following up on your application. Do you have any pending documents you need to submit for the ${pref} role?`;
             }
 
             setTimeout(() => {
@@ -821,8 +802,6 @@
         window.updateStatus = async (status) => {
             if(!currentAppId) return;
             
-            // Map 'placed' to 'approved' if necessary, or keep 'placed' as the specific status for guaranteed jobs.
-            // Using 'placed' for display and logic consistency.
             const actionText = status === 'placed' ? 'Mark as Placed' : 'Reject Application';
             
             if(!confirm(`Are you sure you want to ${actionText}? This will notify the user immediately.`)) return;
@@ -873,31 +852,13 @@
             }
         };
 
-        // --- PWA LOGIC ---
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('pwa-install-popup').style.display = 'block';
-        });
+        // Expose functions globally for HTML onClick
+        window.openAppModal = openAppModal;
+        window.closeModal = closeModal;
+        window.sendMessage = sendMessage;
+        window.generateAIReply = generateAIReply;
+        window.updateStatus = updateStatus;
 
-        window.installPWA = async () => {
-            if (!deferredPrompt) return;
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                document.getElementById('pwa-install-popup').style.display = 'none';
-            }
-            deferredPrompt = null;
-        };
-
-        window.dismissPWA = () => {
-            document.getElementById('pwa-install-popup').style.display = 'none';
-        };
-
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
-        }
     </script>
 </body>
 </html>

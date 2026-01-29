@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
     
     <!-- Fonts & Icons -->
@@ -79,7 +80,7 @@
         }
         .header-left { display: flex; align-items: center; gap: 15px; }
         .logo { font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; }
-        .logo span { color: var(--gold-base); }
+        .logo span { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .hamburger { font-size: 1.4rem; cursor: pointer; color: var(--text-muted); display: none; }
 
         .global-search-container { flex: 1; max-width: 450px; position: relative; margin: 0 20px; }
@@ -90,10 +91,26 @@
         }
         .global-search-input:focus { border-color: var(--gold-base); background: var(--bg-hover); box-shadow: 0 0 15px rgba(217, 119, 6, 0.15); }
 
-        .header-actions { display: flex; align-items: center; gap: 10px; }
-        .icon-btn { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px; color: var(--text-muted); cursor: pointer; transition: 0.3s; position: relative; }
-        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); transform: translateY(-2px); }
-        .notification-badge { position: absolute; top: 5px; right: 5px; min-width: 16px; height: 16px; background: var(--danger); border-radius: 10px; font-size: 0.6rem; color: white; font-weight: 700; display: none; place-items: center; justify-content: center; padding: 0 4px; border: 2px solid var(--bg-card); }
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        
+        /* Realistic Icons (Matched to Dashboard) */
+        .icon-btn { 
+            width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; 
+            cursor: pointer; background: rgba(255,255,255,0.03); position: relative; 
+            border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
+        }
+        .icon-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+        
+        .icon-msg { color: #3b82f6; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.4)); }
+        .icon-bell { color: #f59e0b; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.4)); }
+
+        .notification-badge { 
+            position: absolute; top: -3px; right: -3px; width: 18px; height: 18px; 
+            background: #ef4444; border: 2px solid #0f172a; 
+            border-radius: 50%; font-size: 0.65rem; color: white; 
+            display: none; place-items: center; justify-content: center; font-weight: 700; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
         
         .profile-widget { width: 42px; height: 42px; position: relative; cursor: pointer; margin-left: 5px; }
         .user-avatar { width: 100%; height: 100%; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-weight: 700; color: #fff; border: 2px solid var(--border-color); object-fit: cover; }
@@ -108,11 +125,10 @@
         }
         .nav-group { padding: 0 24px; margin-bottom: 20px; }
         .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
-        .nav-item { display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: 0.3s; border-radius: 10px; margin-bottom: 4px; }
+        .nav-item { display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: 0.3s; border-radius: 10px; margin-bottom: 4px; cursor: pointer; }
         .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
-        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
+        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; border-left: 3px solid var(--gold-base); }
         .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
-        .lock-icon { margin-left: auto; font-size: 0.7rem; opacity: 0.7; }
 
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 998; backdrop-filter: blur(4px); display: none; }
 
@@ -247,6 +263,14 @@
             .toolbar { max-width: 100%; }
         }
         .empty-state { grid-column: 1/-1; text-align: center; padding: 50px; color: var(--text-muted); border: 1px dashed var(--border-color); border-radius: 20px; background: var(--bg-input); }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite; margin-right: 5px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -264,22 +288,24 @@
         </div>
 
         <div class="header-actions">
-            <div class="icon-btn" title="Messages" onclick="location.href='seeker-messages.html'">
-                <i class="fa-regular fa-envelope"></i>
+            <!-- Messages -->
+            <div class="icon-btn" onclick="handleActionWithSpinner(this, () => location.href='seeker-messages.html')">
+                <i class="fa-solid fa-envelope icon-msg"></i>
                 <div class="notification-badge" id="msg-badge">0</div>
             </div>
-            <div class="icon-btn" title="Notifications" onclick="location.href='seeker-notifications.html'">
-                <i class="fa-regular fa-bell"></i>
+            <!-- Notifications -->
+            <div class="icon-btn" onclick="handleActionWithSpinner(this, () => location.href='seeker-notifications.html')">
+                <i class="fa-solid fa-bell icon-bell"></i>
                 <div class="notification-badge" id="notif-badge">0</div>
             </div>
-            <div class="profile-widget" onclick="location.href='seeker-profile.html'">
+            <div class="profile-widget" onclick="handleActionWithSpinner(this, () => location.href='seeker-profile.html')">
                 <img src="" id="header-avatar-img" class="user-avatar img-mode" alt="Profile" style="display:none;">
                 <div id="header-avatar-fallback" class="user-avatar">U</div>
             </div>
         </div>
     </header>
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR (UNLOCKED) -->
     <nav class="sidebar" id="sidebar">
         <div class="nav-group">
             <div class="nav-label">Overview</div>
@@ -289,27 +315,27 @@
             <div class="nav-label">Job Hunt</div>
             <a href="seeker-applications.html" class="nav-item"><i class="fa-solid fa-file-signature"></i> Applied Jobs</a>
             <a href="seeker-jobs.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Browse Jobs</a>
-            <a href="seeker-featured-jobs.html" class="nav-item link-std"><i class="fa-solid fa-star"></i> Featured Jobs <i class="fas fa-lock lock-icon"></i></a>
-            <a href="seeker-urgentlyhiring.html" class="nav-item link-pro"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended <i class="fas fa-lock lock-icon"></i></a>
-            <a href="seeker-guaranteed-jobs.html" class="nav-item link-pro"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-featured-jobs.html" class="nav-item"><i class="fa-solid fa-star"></i> Featured Jobs</a>
+            <a href="seeker-urgentlyhiring.html" class="nav-item"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended</a>
+            <a href="seeker-guaranteed-jobs.html" class="nav-item"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Finance</div>
             <a href="seeker-wallet.html" class="nav-item"><i class="fa-solid fa-wallet"></i> My Wallet</a>
             <a href="seeker-premium.html" class="nav-item"><i class="fa-solid fa-crown"></i> My Plan</a>
-            <a href="seeker-referrals.html" class="nav-item link-std"><i class="fa-solid fa-user-plus"></i> Invite & Earn <i class="fas fa-lock lock-icon"></i></a>
-            <a href="seeker-invest.html" class="nav-item link-std"><i class="fa-solid fa-chart-line"></i> Invest <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-referrals.html" class="nav-item"><i class="fa-solid fa-user-plus"></i> Invite & Earn</a>
+            <a href="seeker-invest.html" class="nav-item"><i class="fa-solid fa-chart-line"></i> Invest</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Resources</div>
             <a href="seeker-blog.html" class="nav-item active"><i class="fa-solid fa-newspaper"></i> News & Insights</a>
-            <a href="seeker-resources.html" class="nav-item link-pro"><i class="fa-solid fa-book"></i> Resources <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-resources.html" class="nav-item"><i class="fa-solid fa-book"></i> Resources</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Settings</div>
             <a href="seeker-profile.html" class="nav-item"><i class="fa-solid fa-user-gear"></i> Profile</a>
             <a href="seeker-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
-            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="#" onclick="handleActionWithSpinner(this, logout)" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
@@ -340,7 +366,7 @@
             <!-- ARTICLE VIEW -->
             <div id="article-view" class="animate__animated animate__zoomIn">
                 <div class="article-container">
-                    <div class="btn-back" onclick="showList()">
+                    <div class="btn-back" onclick="handleActionWithSpinner(this, showList)">
                         <i class="fas fa-arrow-left-long"></i> Back to Articles
                     </div>
                     <div id="article-content">
@@ -360,7 +386,9 @@
     </main>
 
     <!-- FLOATING SUPPORT -->
-    <a href="seeker-support.html" class="support-fab"><i class="fa-solid fa-headset"></i></a>
+    <div onclick="handleActionWithSpinner(this, () => location.href='seeker-support.html')" class="support-fab">
+        <i class="fa-solid fa-headset"></i>
+    </div>
     
     <!-- PWA INSTALL POPUP -->
     <div id="pwa-install-popup" class="pwa-install-popup">
@@ -372,7 +400,7 @@
             </div>
         </div>
         <div class="pwa-actions">
-            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-install" onclick="handleActionWithSpinner(this, installPWA)">Install</button>
             <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
         </div>
     </div>
@@ -380,17 +408,34 @@
     <!-- SCRIPTS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, where, orderBy, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); 
-        const auth = getAuth(app); 
-        const db = getFirestore(app);
+        import { auth, db } from './config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { doc, getDoc, collection, query, where, orderBy, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         let allPosts = [];
-        let currentUserTier = 0; // 0=Free, 1=Standard, 2=Pro
+
+        // --- SPINNER HELPER ---
+        window.handleActionWithSpinner = (btn, action) => {
+            if(btn.dataset.processing === "true") return;
+            btn.dataset.processing = "true";
+            
+            // Save original content
+            const originalContent = btn.innerHTML;
+            
+            // Set spinner content
+            btn.innerHTML = `<span class="loading-spinner"></span>`;
+            
+            setTimeout(() => {
+                // Execute action
+                if (typeof action === 'function') action();
+                
+                // Reset button (optional, in case page doesn't reload immediately)
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.dataset.processing = "false";
+                }, 500);
+            }, 1500);
+        };
 
         // --- UI UTILS ---
         window.toggleSidebar = () => { document.getElementById('sidebar').classList.add('active'); document.getElementById('overlay').style.display = 'block'; };
@@ -406,16 +451,6 @@
                     if(snap.exists()) {
                         const d = snap.data();
                         
-                        // PLAN/TIER LOGIC
-                        const rawPlan = (d.plan || d.subscription || 'free').toLowerCase();
-                        if(rawPlan.includes('pro') || rawPlan.includes('premium') || rawPlan.includes('gold') || rawPlan.includes('guaranteed')) {
-                            currentUserTier = 2; // Pro
-                        } else if(rawPlan.includes('standard')) {
-                            currentUserTier = 1; // Standard
-                        } else {
-                            currentUserTier = 0; // Free
-                        }
-
                         // HEADER AVATAR LOGIC
                         const avatarImg = document.getElementById('header-avatar-img');
                         const avatarFallback = document.getElementById('header-avatar-fallback');
@@ -427,14 +462,6 @@
                             avatarImg.style.display = 'none';
                             avatarFallback.style.display = 'grid';
                             avatarFallback.innerText = (d.fullName || "U").charAt(0).toUpperCase();
-                        }
-
-                        // SIDEBAR UNLOCK LOGIC
-                        if(currentUserTier >= 1) {
-                            document.querySelectorAll('.link-std .lock-icon').forEach(el => el.style.display = 'none');
-                        }
-                        if(currentUserTier >= 2) {
-                            document.querySelectorAll('.link-pro .lock-icon').forEach(el => el.style.display = 'none');
                         }
                     }
                 } catch(e) { console.error("User Load Error", e); }
@@ -458,9 +485,7 @@
             document.getElementById('article-view').style.display = 'none';
 
             try {
-                // CORRECTED COLLECTION: blog_posts
                 const q = query(collection(db, "blog_posts"), orderBy("createdAt", "desc"));
-                
                 const snap = await getDocs(q);
                 
                 grid.innerHTML = '';

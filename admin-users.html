@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
     
     <!-- Fonts & Icons -->
@@ -264,22 +265,6 @@
         .btn-outline-blue { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid var(--blue); background: rgba(59, 130, 246, 0.05); color: var(--blue); border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; }
         .btn-outline-blue:hover { background: var(--blue); color: white; }
 
-        /* PWA Popup */
-        .pwa-install-popup {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
-            border-radius: 20px; padding: 20px; z-index: 3000;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
-            animation: slideUp 0.5s ease;
-        }
-        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
-        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
-        .pwa-actions { display: flex; gap: 10px; }
-        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
-        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
-
         @media (max-width: 992px) {
             .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
             main { margin-left: 0; padding: 20px 10px; width: 100%; max-width: 100vw; overflow-x: hidden; }
@@ -303,21 +288,19 @@
         </div>
         
         <div class="header-actions">
-            <!-- Messages -->
             <div class="icon-btn" onclick="location.href='admin-support.html'" title="Support Tickets">
                 <i class="fa-solid fa-envelope"></i>
                 <div class="notification-badge" id="msg-badge">0</div>
             </div>
-            
-            <!-- Notifications -->
             <div class="icon-btn" onclick="location.href='admin-notifications.html'" title="System Alerts">
                 <i class="fa-solid fa-bell"></i>
                 <div class="notification-badge" id="notif-badge">0</div>
             </div>
-            
-            <!-- Profile -->
             <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
                 <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <div class="icon-btn" onclick="logout()" style="color:var(--danger);" title="Logout">
+                <i class="fa-solid fa-power-off"></i>
             </div>
         </div>
     </header>
@@ -352,10 +335,7 @@
 
         <div class="nav-group">
             <div class="nav-label">System</div>
-            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
-            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
-            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
-            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="admin-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
@@ -399,10 +379,10 @@
             
             <div class="search-wrapper">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" class="form-input" placeholder="Search by Name, Email, or ID..." onkeyup="filterLocal()">
+                <input type="text" id="searchInput" class="form-input" placeholder="Search by Name, Email, or ID..." onkeyup="debouncedFilter()">
             </div>
 
-            <select id="statusFilter" class="filter-select" onchange="filterLocal()">
+            <select id="statusFilter" class="filter-select" onchange="debouncedFilter()">
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
                 <option value="banned">Banned</option>
@@ -416,7 +396,7 @@
             <button class="btn-action" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Export PDF</button>
         </div>
 
-        <!-- Bulk Action Bar (Hidden by default) -->
+        <!-- Bulk Action Bar -->
         <div id="bulk-bar" class="bulk-bar">
             <div>
                 <span class="bulk-count" id="selected-count">0 Selected</span>
@@ -439,12 +419,12 @@
                             <th>User Profile</th>
                             <th>Role & Plan</th>
                             <th>Status</th>
-                            <th>Joined Date & Time</th>
+                            <th>Joined Date</th>
                             <th style="text-align:right;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="users-table">
-                        <tr><td colspan="6" style="text-align:center; padding:50px; color:var(--text-muted); font-style:italic;">Loading users...</td></tr>
+                        <tr><td colspan="6" style="text-align:center; padding:50px; color:var(--text-muted); font-style:italic;">Loading...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -464,7 +444,7 @@
     <div class="modal-overlay" id="editModal">
         <div class="modal-card">
             <div class="modal-header">
-                <h3 style="margin:0; color:var(--text-main); font-family:var(--font-head);">Edit User Account</h3>
+                <h3 style="margin:0; color:var(--text-main); font-family:var(--font-head);">Edit User</h3>
                 <i class="fas fa-times" onclick="closeModal()" style="cursor:pointer; color:var(--text-muted);"></i>
             </div>
             <div class="modal-body">
@@ -526,31 +506,13 @@
         </div>
     </div>
 
-    <!-- PWA INSTALL POPUP -->
-    <div id="pwa-install-popup" class="pwa-install-popup">
-        <div class="pwa-content">
-            <div class="pwa-icon"><i class="fas fa-download"></i></div>
-            <div>
-                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install Admin App</div>
-                <div style="font-size:0.8rem; color:#94A3B8;">Add to home screen for quick access.</div>
-            </div>
-        </div>
-        <div class="pwa-actions">
-            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
-            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
-        </div>
-    </div>
-
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, getDocs, updateDoc, deleteDoc, writeBatch, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+        import { auth, db } from './config.js'; // Imports from local config
+        import { onAuthStateChanged, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { doc, getDoc, collection, getDocs, updateDoc, deleteDoc, writeBatch, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         // --- UI UTILS ---
         window.toggleSidebar = () => { 
@@ -579,6 +541,16 @@
         // Bulk Action vars
         let selectedIds = new Set();
 
+        // --- DEBOUNCE FUNCTION FOR SEARCH ---
+        // Prevents UI freeze on high data
+        function debounce(func, timeout = 300){
+            let timer;
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => { func.apply(this, args); }, timeout);
+            };
+        }
+
         onAuthStateChanged(auth, async (u) => {
             if(!u) { window.location.href='signin.html'; return; }
             await checkAdminStatus(u);
@@ -590,17 +562,17 @@
             try {
                 const userRef = doc(db, "users", user.uid);
                 const snap = await getDoc(userRef);
-                if(!snap.exists() || snap.data().role !== 'admin') {
-                    // Log but don't crash, rules handle security
+                if(!snap.exists() || (snap.data().role !== 'admin' && snap.data().role !== 'owner')) {
+                   // Logic to handle unauthorized access would go here
                 }
             } catch(e) { console.error(e); }
         }
 
         async function loadData() {
             try {
-                // Fetching all users initially. 
-                // Note: For 10,000+ users, this should switch to server-side pagination (startAfter).
-                // But for <5000 users, fetching once and paginating client-side is faster for UX (search/sort).
+                // For high volume data, ideally you'd use server-side pagination.
+                // However, to keep search/export functionality client-side without external services (Algolia),
+                // fetching once is the trade-off.
                 const querySnapshot = await getDocs(collection(db, "users"));
                 allUsers = [];
                 
@@ -616,8 +588,8 @@
                 });
 
                 calculateStats();
-                filterLocal(); // This triggers renderTable
-                Toastify({ text: "User Database Synced", duration: 2000, style: { background: "#0F172A", border: "1px solid #3B82F6" } }).showToast();
+                filterLocal(); 
+                Toastify({ text: "Database Synced", duration: 2000, style: { background: "#10B981" } }).showToast();
             } catch(e) {
                 console.error("Error loading users:", e);
                 document.getElementById('users-table').innerHTML = `<tr><td colspan="6" style="color:var(--danger); text-align:center; padding:30px;">Error loading data. Check permissions or connection.</td></tr>`;
@@ -638,13 +610,15 @@
             curRole = role;
             document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            currentPage = 1; // Reset to page 1
-            selectedIds.clear(); // Clear selections on tab switch
+            currentPage = 1; 
+            selectedIds.clear(); 
             updateBulkBar();
             filterLocal();
         };
 
-        // Advanced Filter with Search & Status
+        // Attach debounced filter to window
+        window.debouncedFilter = debounce(() => filterLocal(), 300);
+
         window.filterLocal = () => {
             const term = document.getElementById('searchInput').value.toLowerCase();
             const statusFilter = document.getElementById('statusFilter').value;
@@ -706,7 +680,6 @@
 
             // Handle Check-All State
             const checkAll = document.getElementById('check-all');
-            // If every item on this page is selected, check the master box
             const allOnPageSelected = pageData.length > 0 && pageData.every(u => selectedIds.has(u.id));
             checkAll.checked = allOnPageSelected;
 
@@ -715,57 +688,65 @@
                 return;
             }
 
-            // 2. Render Rows
+            // 2. Render Rows using DocumentFragment (Performance Optimization)
+            const fragment = document.createDocumentFragment();
+
             pageData.forEach(u => {
+                const tr = document.createElement('tr');
+                tr.className = 'animate__animated animate__fadeIn';
+                
                 const name = u.fullName || u.companyName || 'Unknown';
                 const init = name.charAt(0).toUpperCase();
                 const isSelected = selectedIds.has(u.id);
                 
-                // Date Formatting
+                // Robust Date Formatting
                 let dateStr = 'N/A';
                 const ts = u.joinedAt || u.createdAt;
                 if(ts) {
-                    const d = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
-                    dateStr = d.toLocaleString('en-US', { month:'numeric', day:'numeric', year:'2-digit', hour:'numeric', minute:'2-digit' });
+                    try {
+                        const d = ts.seconds ? new Date(ts.seconds * 1000) : new Date(ts);
+                        dateStr = d.toLocaleString('en-US', { month:'short', day:'numeric', year:'2-digit', hour:'2-digit', minute:'2-digit' });
+                    } catch(e) { dateStr = 'Invalid Date'; }
                 }
                 
-                // Plan Badge
+                // Plan Badge Logic
                 let planHtml = '<span class="badge badge-free">Free</span>';
                 if(u.plan && u.plan !== 'basic' && u.plan !== 'starter' && u.plan !== 'free') {
                     planHtml = `<span class="badge badge-premium"><i class="fas fa-crown" style="font-size:0.6rem;"></i> ${u.plan.toUpperCase()}</span>`;
                 }
 
-                // Status Badge
+                // Status Badge Logic
                 let statusHtml = '<span class="status-active"><span class="status-dot"></span>Active</span>';
                 if(u.isBanned) statusHtml = '<span class="status-banned"><span class="status-dot"></span>Banned</span>';
                 
-                // Verified Badge
+                // Verified Icon
                 const verifiedIcon = u.isVerified ? `<i class="fas fa-check-circle verified-badge" title="Verified User"></i>` : '';
 
-                tbody.innerHTML += `
-                    <tr class="animate__animated animate__fadeIn">
-                        <td>
-                            <input type="checkbox" class="custom-check user-check" value="${u.id}" 
-                                ${isSelected ? 'checked' : ''} onclick="toggleSelect('${u.id}')">
-                        </td>
-                        <td>
-                            <div class="user-info">
-                                <div class="avatar-circle">${init}</div>
-                                <div>
-                                    <div style="font-weight:600; color:var(--text-main); font-size:0.95rem;">${name} ${verifiedIcon}</div>
-                                    <div style="font-size:0.75rem; color:var(--text-muted);">${u.email || ''}</div>
-                                </div>
+                tr.innerHTML = `
+                    <td>
+                        <input type="checkbox" class="custom-check user-check" value="${u.id}" 
+                            ${isSelected ? 'checked' : ''} onchange="toggleSelect('${u.id}')">
+                    </td>
+                    <td>
+                        <div class="user-info">
+                            <div class="avatar-circle">${init}</div>
+                            <div>
+                                <div style="font-weight:600; color:var(--text-main); font-size:0.95rem;">${name} ${verifiedIcon}</div>
+                                <div style="font-size:0.75rem; color:var(--text-muted);">${u.email || 'No Email'}</div>
                             </div>
-                        </td>
-                        <td>${planHtml}</td>
-                        <td>${statusHtml}</td>
-                        <td style="font-family:var(--font-display); font-size:0.85rem; color:var(--text-muted);">${dateStr}</td>
-                        <td style="text-align:right;">
-                            <button class="btn-icon" onclick="editUser('${u.id}')" title="Edit User"><i class="fas fa-cog"></i></button>
-                        </td>
-                    </tr>
+                        </div>
+                    </td>
+                    <td>${planHtml}</td>
+                    <td>${statusHtml}</td>
+                    <td style="font-family:var(--font-display); font-size:0.85rem; color:var(--text-muted);">${dateStr}</td>
+                    <td style="text-align:right;">
+                        <button class="btn-icon" onclick="editUser('${u.id}')" title="Edit User"><i class="fas fa-cog"></i></button>
+                    </td>
                 `;
+                fragment.appendChild(tr);
             });
+
+            tbody.appendChild(fragment);
         }
 
         // --- BULK ACTIONS LOGIC ---
@@ -773,8 +754,12 @@
             if(selectedIds.has(id)) selectedIds.delete(id);
             else selectedIds.add(id);
             updateBulkBar();
-            // Optional: update check-all box visual state if needed
-            renderTable(); // Re-render to update check-all state logic
+            // Don't re-render whole table for one click, just check status
+            const checkAll = document.getElementById('check-all');
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIndex = startIndex + ITEMS_PER_PAGE;
+            const pageData = filteredList.slice(startIndex, endIndex);
+            checkAll.checked = pageData.every(u => selectedIds.has(u.id));
         };
 
         window.toggleSelectAll = () => {
@@ -791,7 +776,7 @@
                 pageData.forEach(u => selectedIds.delete(u.id));
             }
             updateBulkBar();
-            renderTable(); // Re-render checks
+            renderTable(); // Re-render checks visually
         };
 
         function updateBulkBar() {
@@ -820,8 +805,8 @@
             const batch = writeBatch(db);
             const idArray = Array.from(selectedIds);
             
-            // Firestore batches limited to 500. For production, split into chunks.
-            // For this snippet, we assume <500 selected.
+            // Note: Firestore batches limited to 500 ops.
+            // For production with >500 selections, this loop needs chunking.
             
             try {
                 idArray.forEach(id => {
@@ -837,7 +822,7 @@
 
                 await batch.commit();
 
-                // Update Local Data
+                // Update Local Data (Client-side optimization)
                 if(action === 'delete') {
                     allUsers = allUsers.filter(u => !selectedIds.has(u.id));
                 } else {
@@ -866,12 +851,15 @@
         // --- SINGLE USER EDIT LOGIC ---
         window.editUser = (id) => {
             editU = allUsers.find(u => u.id === id);
+            if(!editU) return;
+
             document.getElementById('edit-uid').value = id;
             document.getElementById('edit-name').value = editU.fullName || editU.companyName || '';
             document.getElementById('edit-email').value = editU.email || '';
             document.getElementById('edit-role').value = editU.role || 'seeker';
             document.getElementById('edit-verified').value = editU.isVerified ? 'true' : 'false';
 
+            // Dynamic Plan Options
             const sel = document.getElementById('edit-plan');
             if(editU.role === 'employer') {
                 sel.innerHTML = `<option value="starter">Starter (Free)</option><option value="growth">Growth</option><option value="scale">Scale</option>`;
@@ -976,7 +964,7 @@
 
         // --- EXPORT TOOLS ---
         window.exportData = () => {
-            const filtered = filteredList; // Export current view
+            const filtered = filteredList; 
             let csv = "ID,Name,Email,Role,Plan,Verified,Status,Joined Date\n";
             
             filtered.forEach(u => {
@@ -987,7 +975,8 @@
                     datePart = d.toISOString();
                 }
 
-                csv += `${u.id},"${u.fullName||u.companyName||''}",${u.email},${u.role},${u.plan},${u.isVerified},${u.isBanned?'Banned':'Active'},${datePart}\n`;
+                const safeName = (u.fullName || u.companyName || '').replace(/,/g, ''); // Remove commas
+                csv += `${u.id},"${safeName}",${u.email},${u.role},${u.plan},${u.isVerified},${u.isBanned?'Banned':'Active'},${datePart}\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -1001,7 +990,7 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
-            // Limit PDF export to 500 rows to prevent crash
+            // Limit PDF export to 500 rows to prevent browser crash on huge datasets
             const dataToPrint = filteredList.slice(0, 500);
 
             doc.setFontSize(18);
@@ -1049,6 +1038,8 @@
                 doc.text(email, 65, y);
                 doc.text(plan, 125, y);
                 if(u.isBanned) doc.setTextColor(220, 38, 38);
+                else doc.setTextColor(50);
+                
                 doc.text(status, 145, y);
                 doc.setTextColor(50);
                 doc.text(dateStr, 170, y);
@@ -1076,32 +1067,21 @@
                 else badge.style.display = 'none';
             });
         }
+        
+        // Expose functions for buttons
+        window.saveDraft = () => {}; 
+        window.editUser = editUser;
+        window.saveChanges = saveChanges;
+        window.deleteUser = deleteUser;
+        window.toggleBan = toggleBan;
+        window.toggleSelect = toggleSelect;
+        window.toggleSelectAll = toggleSelectAll;
+        window.executeBulk = executeBulk;
+        window.exportData = exportData;
+        window.exportPDF = exportPDF;
+        window.copyUserId = copyUserId;
+        window.triggerResetPassword = triggerResetPassword;
 
-        // --- PWA LOGIC ---
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('pwa-install-popup').style.display = 'block';
-        });
-
-        window.installPWA = async () => {
-            if (!deferredPrompt) return;
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                document.getElementById('pwa-install-popup').style.display = 'none';
-            }
-            deferredPrompt = null;
-        };
-
-        window.dismissPWA = () => {
-            document.getElementById('pwa-install-popup').style.display = 'none';
-        };
-
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
-        }
     </script>
 </body>
 </html>

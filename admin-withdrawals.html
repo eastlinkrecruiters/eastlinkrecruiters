@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
     
     <!-- Fonts & Icons -->
@@ -274,6 +275,9 @@
             <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
                 <i class="fa-solid fa-user-shield"></i>
             </div>
+            <div class="icon-btn" onclick="logout()" style="color:var(--danger);" title="Logout">
+                <i class="fa-solid fa-power-off"></i>
+            </div>
         </div>
     </header>
 
@@ -295,7 +299,7 @@
             <div class="nav-label">Jobs & Service</div>
             <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
             <a href="admin-guaranteed-jobs.html" class="nav-item link-pro"><i class="fa-solid fa-certificate" style="color:var(--gold-base);"></i> Guaranteed Jobs</a>
-            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Vacancy</a>
         </div>
 
         <div class="nav-group">
@@ -310,7 +314,7 @@
             <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
             <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
             <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
-            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="admin-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
@@ -434,12 +438,9 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, collection, doc, getDoc, updateDoc, addDoc, query, where, onSnapshot, orderBy, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+        import { auth, db } from './config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { collection, doc, getDoc, updateDoc, addDoc, query, where, onSnapshot, orderBy, runTransaction, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         // --- UI UTILS ---
         window.toggleSidebar = () => { 
@@ -461,12 +462,17 @@
         onAuthStateChanged(auth, async (user) => {
             if(!user) { window.location.href = 'signin.html'; return; }
             initBadges();
-            loadWithdrawals();
+            loadWithdrawals(true);
         });
 
-        function loadWithdrawals() {
-            // Note: Use simple query to avoid needing composite indexes immediately, or create index if console prompts
-            const q = query(collection(db, "transactions"), where("type", "==", "withdrawal"), orderBy("timestamp", "desc"));
+        function loadWithdrawals(trySort = true) {
+            let q;
+            // Attempt sorted query first (requires index)
+            if(trySort) {
+                q = query(collection(db, "transactions"), where("type", "==", "withdrawal"), orderBy("timestamp", "desc"));
+            } else {
+                q = query(collection(db, "transactions"), where("type", "==", "withdrawal"));
+            }
             
             onSnapshot(q, async (snap) => {
                 allTx = [];
@@ -487,18 +493,30 @@
                     
                     allTx.push({ id: doc.id, ...d, userName: userCache[d.userId] || "Loading..." });
                 });
+                
+                // Manual sort if query fallback was used
+                if(!trySort) {
+                    allTx.sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+                }
 
                 document.getElementById('val-pending-amount').innerText = `Ksh ${pendingLiability.toLocaleString()}`;
                 document.getElementById('val-pending-count').innerText = pendingCount;
                 document.getElementById('val-total-out').innerText = `Ksh ${totalOut.toLocaleString()}`;
                 
                 filterTable();
+            }, (error) => {
+                console.error("Query Error:", error);
+                if(trySort && error.message.includes("index")) {
+                     console.warn("Missing index, using unsorted fallback.");
+                     loadWithdrawals(false);
+                }
             });
         }
 
         async function fetchUserNames(uids) {
             const toFetch = uids.filter(id => !userCache[id]);
             if(toFetch.length === 0) return;
+            // Fetch one by one for robustness
             for(const uid of toFetch) {
                 try {
                     const uSnap = await getDoc(doc(db, "users", uid));
@@ -531,11 +549,17 @@
                 
                 let actions = '-';
                 if(tx.status === 'pending') {
+                    // Safe passing of arguments
+                    const safeId = tx.id;
+                    const safeUid = tx.userId;
+                    const safeAmt = tx.amount;
+                    const safePhone = phone;
+
                     actions = `
-                        <button class="row-action-btn btn-pay" onclick="markPaid('${tx.id}', '${tx.userId}', ${tx.amount}, '${phone}')" title="Confirm Payment">
+                        <button class="row-action-btn btn-pay" onclick="markPaid('${safeId}', '${safeUid}', ${safeAmt}, '${safePhone}')" title="Confirm Payment">
                             <i class="fas fa-check"></i> Pay
                         </button>
-                        <button class="row-action-btn btn-reject" onclick="openRefund('${tx.id}', '${tx.userId}')" title="Refund/Reject">
+                        <button class="row-action-btn btn-reject" onclick="openRefund('${safeId}', '${safeUid}')" title="Refund/Reject">
                             <i class="fas fa-undo"></i> Refund
                         </button>
                     `;
@@ -584,6 +608,7 @@
                     title: "Withdrawal Sent", 
                     message: `Funds (Ksh ${amount}) have been sent to your mobile number (${phone}).`, 
                     type: "transaction", 
+                    priority: "success",
                     read: false, 
                     timestamp: serverTimestamp()
                 });
@@ -622,7 +647,8 @@
                     const txData = txDoc.data();
                     if(txData.status !== 'pending') throw "Transaction already processed";
 
-                    const refundAmount = txData.totalDeducted || (txData.amount + (txData.fee || 0));
+                    // Ensure we refund the total amount deducted (including fee)
+                    const refundAmount = txData.totalDeducted || (Number(txData.amount) + Number(txData.fee || 0));
                     const currentBal = userDoc.data().walletBalance || 0;
                     const newBal = currentBal + refundAmount;
 
@@ -643,6 +669,7 @@
                         title: "Withdrawal Refunded", 
                         message: `Ksh ${refundAmount.toLocaleString()} has been returned to your wallet. Reason: ${fullReason}`, 
                         type: "alert", 
+                        priority: "high",
                         read: false, 
                         timestamp: serverTimestamp()
                     });
@@ -652,7 +679,8 @@
                 Toastify({ text: "Refund Processed Successfully", duration: 3000, style: { background: "#3B82F6" } }).showToast();
             } catch(e) {
                 console.error("Refund Error:", e);
-                Toastify({ text: "Refund Failed: " + e, duration: 4000, style: { background: "#EF4444" } }).showToast();
+                const errMsg = typeof e === 'string' ? e : e.message;
+                Toastify({ text: "Refund Failed: " + errMsg, duration: 4000, style: { background: "#EF4444" } }).showToast();
             }
         };
 
@@ -660,10 +688,14 @@
             const pending = allTx.filter(t => t.status === 'pending');
             if(pending.length === 0) return Toastify({text: "No pending payouts to export", style:{background:"#EF4444"}}).showToast();
 
-            let csvContent = "data:text/csv;charset=utf-8,MobileNumber,Amount,Name,Provider\n";
+            // Formatted for Payment Processing (e.g. M-Pesa Bulk)
+            let csvContent = "data:text/csv;charset=utf-8,MobileNumber,Amount,UserReference,Provider,TotalDeducted\n";
             pending.forEach(tx => {
                 const phone = tx.details?.phone || "";
-                csvContent += `${phone},${tx.amount},"${tx.userName}",${tx.details?.provider || 'M-PESA'}\n`;
+                const total = tx.totalDeducted || (Number(tx.amount) + Number(tx.fee||0));
+                // Clean input for CSV
+                const safeName = (tx.userName || "").replace(/,/g, " ");
+                csvContent += `${phone},${tx.amount},"${safeName}",${tx.details?.provider || 'M-PESA'},${total}\n`;
             });
 
             const link = document.createElement("a");
@@ -671,19 +703,18 @@
             link.setAttribute("download", "payouts_" + new Date().toISOString().slice(0,10) + ".csv");
             document.body.appendChild(link);
             link.click();
+            document.body.removeChild(link);
         };
 
         function initBadges() {
-            const txQ = query(collection(db, "transactions"), where("status", "==", "pending"));
-            onSnapshot(txQ, (snap) => {
+            onSnapshot(query(collection(db, "transactions"), where("status", "==", "pending")), (snap) => {
                 const count = snap.size;
                 const badge = document.getElementById('notif-badge');
                 if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
                 else badge.style.display = 'none';
             });
             
-            const msgQ = query(collection(db, "support_tickets"), where("status", "==", "open"));
-             onSnapshot(msgQ, (snap) => {
+            onSnapshot(query(collection(db, "support_tickets"), where("status", "==", "open")), (snap) => {
                 const count = snap.size;
                 const badge = document.getElementById('msg-badge');
                 if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
@@ -716,6 +747,13 @@
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
         }
+
+        // Expose functions for buttons
+        window.markPaid = markPaid;
+        window.openRefund = openRefund;
+        window.confirmRefund = confirmRefund;
+        window.exportCSV = exportCSV;
+        window.filterTable = filterTable;
     </script>
 </body>
 </html>

@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" style="background-color: #020617;">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Offline - EastLink Recruiters</title>
-    <link rel="manifest" href="manifest.json">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Offline | EastLink Recruiters</title>
+    
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#020617">
 
     <!-- Fonts -->
@@ -20,87 +22,111 @@
            THEME VARIABLES
            ========================================= */
         :root {
-            --gold-base: #D97706;
+            --primary: #f59e0b;
+            --primary-dark: #d97706;
             --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
-            --bg-body: #020617;
-            --bg-card: #0F172A;
-            --text-main: #F8FAFC;
+            
+            --bg: #020617; 
+            --bg-glass-70: rgba(15, 23, 42, 0.65); 
+            
+            --text: #F8FAFC;
             --text-muted: #94A3B8;
+            
             --border-color: rgba(255, 255, 255, 0.08);
-            --shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+            --radius: 20px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--bg-body); 
-            color: var(--text-main); 
-            min-height: 100vh; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            background-image: url('./assets/images/background.png'); /* Ensure this image exists or body will be dark */
+            background-position: center;
+            background-size: cover;
+            color: var(--text);
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            overflow: hidden;
             padding: 20px;
         }
 
-        /* Centered Card */
+        /* Ambient Overlay */
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background: radial-gradient(circle at top right, rgba(15, 23, 42, 0.4) 0%, #020617 100%);
+            z-index: -1; pointer-events: none;
+        }
+
+        /* LOGO AREA */
+        .brand-header {
+            margin-bottom: 40px;
+            text-align: center;
+            animation: fadeInDown 0.8s ease;
+        }
+        .brand-header img { height: 50px; width: auto; margin-bottom: 10px; }
+        .brand-text { font-family: 'Cinzel', serif; font-size: 1.5rem; font-weight: 700; letter-spacing: 2px; }
+        .brand-text span { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* OFFLINE CARD */
         .offline-container { 
-            background: var(--bg-card); 
+            background: var(--bg-glass-70); 
             border: 1px solid var(--border-color);
-            border-radius: 20px; 
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius); 
             padding: 50px 30px; 
             text-align: center; 
-            max-width: 480px; 
+            max-width: 450px; 
             width: 100%;
-            box-shadow: var(--shadow); 
-            animation: fadeIn 0.6s ease-out;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
+            animation: zoomIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             overflow: hidden;
         }
 
-        /* Background Glow Effect */
+        /* Card Glow */
         .offline-container::before {
             content: ''; position: absolute; top: -50px; right: -50px;
-            width: 150px; height: 150px; background: var(--gold-base);
-            filter: blur(80px); opacity: 0.15; pointer-events: none;
+            width: 150px; height: 150px; background: var(--primary);
+            filter: blur(90px); opacity: 0.15; pointer-events: none;
         }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Icon Animation */
         .icon-wrapper {
-            width: 80px; height: 80px; margin: 0 auto 25px;
-            background: rgba(255, 255, 255, 0.05); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            border: 1px solid var(--border-color);
-            color: var(--gold-base); font-size: 2rem;
+            width: 90px; height: 90px; margin: 0 auto 30px;
+            background: rgba(245, 158, 11, 0.05); border-radius: 50%;
+            display: grid; place-items: center;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            color: var(--primary); font-size: 2.2rem;
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.1);
             animation: pulse 3s infinite;
-        }
-        @keyframes pulse { 
-            0% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.2); }
-            70% { box-shadow: 0 0 0 15px rgba(217, 119, 6, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0); }
         }
 
         h1 { 
-            font-family: 'Cinzel', serif; color: var(--text-main); 
+            font-family: 'Cinzel', serif; color: var(--text); 
             margin-bottom: 15px; font-size: 1.8rem; font-weight: 700; 
         }
 
         p { 
-            color: var(--text-muted); margin-bottom: 25px; 
-            line-height: 1.6; font-size: 0.95rem; 
+            color: var(--text-muted); margin-bottom: 30px; 
+            line-height: 1.7; font-size: 0.95rem; 
         }
 
         /* Status Box */
         .status-box { 
-            background: rgba(217, 119, 6, 0.1); 
-            border: 1px solid rgba(217, 119, 6, 0.3);
-            color: var(--gold-base);
-            padding: 12px; border-radius: 12px; 
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid var(--border-color);
+            color: var(--text);
+            padding: 15px; border-radius: 12px; 
             margin-bottom: 30px; 
             font-size: 0.9rem; font-weight: 500;
-            display: inline-block; width: 100%;
+            display: inline-flex; align-items: center; gap: 10px; justify-content: center;
+            width: 100%;
+        }
+        .count-badge {
+            background: var(--gold-gradient); color: #000;
+            padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 0.85rem;
         }
 
         /* Button */
@@ -108,145 +134,149 @@
             background: var(--gold-gradient); 
             color: #000; 
             border: none; 
-            padding: 14px 30px; 
+            padding: 16px 35px; 
             border-radius: 50px; 
             cursor: pointer; 
             font-size: 1rem; 
             font-weight: 700;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: 0.3s;
             display: inline-flex; align-items: center; gap: 10px;
+            box-shadow: 0 5px 20px rgba(245, 158, 11, 0.2);
         }
         .btn-retry:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 10px 20px rgba(217, 119, 6, 0.3); 
+            transform: translateY(-3px); 
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4); 
         }
-        .btn-retry:active { transform: translateY(0); }
 
-        #queue-count { font-weight: 800; color: var(--text-main); }
+        /* Animations */
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.2); } 70% { box-shadow: 0 0 0 20px rgba(245, 158, 11, 0); } 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
         /* PWA Popup */
         .pwa-install-popup {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
-            border-radius: 20px; padding: 20px; z-index: 3000;
+            position: fixed; bottom: 20px; right: 20px;
+            width: auto; max-width: 350px; background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px); border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 16px; padding: 20px; z-index: 3000;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
             animation: slideUp 0.5s ease;
         }
-        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
+        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; overflow:hidden; }
         .pwa-actions { display: flex; gap: 10px; }
-        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
-        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+        .btn-pwa-install { flex: 1; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 8px; font-weight: 700; cursor: pointer; color: #000; }
+        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; cursor: pointer; }
 
     </style>
-    
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
-        const firebaseConfig = {
-          apiKey: "AIzaSyCNZpgX7yDvlDsJVcyvCqWXBXuABbgItkQ",
-          authDomain: "eastlink-recruiters.firebaseapp.com",
-          projectId: "eastlink-recruiters",
-          storageBucket: "eastlink-recruiters.firebasestorage.app",
-          messagingSenderId: "176058975790",
-          appId: "1:176058975790:web:fe404a908334a6482241bf",
-          measurementId: "G-EXBL55FKRK"
-        };
-        const app = initializeApp(firebaseConfig);
-        try { const analytics = getAnalytics(app); } catch(e) {}
-    </script>
 </head>
 <body>
 
-  <div class="offline-container">
-    <div class="icon-wrapper">
-        <i class="fas fa-wifi"></i>
+    <div class="brand-header">
+        <img src="./assets/images/logo.png" alt="Logo">
+        <div class="brand-text">EAST<span>LINK</span></div>
     </div>
-    
-    <h1>Connection Lost</h1>
-    
-    <p>EastLink works offline. Your recent actions (like job applications) have been saved and will automatically sync when you reconnect.</p>
-    
-    <div class="status-box">
-        <i class="fas fa-sync fa-spin" style="margin-right: 8px;"></i>
-        Pending Actions: <span id="queue-count">0</span>
+
+    <div class="offline-container">
+        <div class="icon-wrapper">
+            <i class="fas fa-wifi"></i>
+        </div>
+        
+        <h1>Connection Lost</h1>
+        
+        <p>You are currently offline. Don't worry, EastLink stores your recent actions locally. They will automatically sync once your internet is restored.</p>
+        
+        <div class="status-box">
+            <i class="fas fa-database" style="color:var(--text-muted);"></i>
+            <span>Pending Sync:</span>
+            <span class="count-badge" id="queue-count">0</span>
+        </div>
+        
+        <button class="btn-retry" onclick="window.location.reload()">
+            <i class="fas fa-redo-alt"></i> Try Reconnecting
+        </button>
     </div>
-    
-    <button class="btn-retry" onclick="window.location.reload()">
-        <i class="fas fa-redo-alt"></i> Retry Connection
-    </button>
-  </div>
 
-  <!-- PWA INSTALL POPUP -->
-  <div id="pwa-install-popup" class="pwa-install-popup">
-      <div class="pwa-content">
-          <div class="pwa-icon"><i class="fas fa-download"></i></div>
-          <div>
-              <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
-              <div style="font-size:0.8rem; color:#94A3B8;">Add EastLink to home screen.</div>
-          </div>
-      </div>
-      <div class="pwa-actions">
-          <button class="btn-pwa-install" onclick="installPWA()">Install</button>
-          <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
-      </div>
-  </div>
+    <!-- PWA INSTALL POPUP -->
+    <div id="pwa-install-popup" class="pwa-install-popup">
+        <div class="pwa-content">
+            <div class="pwa-icon"><img src="./assets/images/logo.png" style="width:100%; height:100%; object-fit:cover;"></div>
+            <div>
+                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px; font-family: 'Cinzel', serif;">Install EastLink</div>
+                <div style="font-size:0.8rem; color:#94A3B8;">Access data faster, even offline.</div>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
+            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+        </div>
+    </div>
 
-  <script>
-    // Update queue count from IndexedDB
-    const checkQueue = () => {
-        const dbReq = indexedDB.open('eastlink-queue', 1);
-        dbReq.onsuccess = (e) => {
-          try {
-              const tx = e.target.result.transaction('queue', 'readonly').objectStore('queue').count();
-              tx.onsuccess = () => {
-                  document.getElementById('queue-count').textContent = tx.result;
-              };
-          } catch (err) {
-              console.log("Queue empty or not initialized");
-          }
+    <!-- MAIN SCRIPT -->
+    <script>
+        // Update queue count from IndexedDB
+        const checkQueue = () => {
+            const dbReq = indexedDB.open('eastlink-queue', 1);
+            dbReq.onsuccess = (e) => {
+              try {
+                  const tx = e.target.result.transaction('queue', 'readonly').objectStore('queue').count();
+                  tx.onsuccess = () => {
+                      document.getElementById('queue-count').textContent = tx.result;
+                  };
+              } catch (err) {
+                  // Queue likely empty or not initialized yet
+                  console.log("Offline storage clear");
+              }
+            };
         };
-    };
 
-    checkQueue();
+        checkQueue();
 
-    // Auto-reload if online
-    window.addEventListener('online', () => {
-        const btn = document.querySelector('.btn-retry');
-        btn.innerHTML = '<i class="fas fa-check"></i> Connected!';
-        btn.style.background = '#10B981';
-        btn.style.color = 'white';
-        setTimeout(() => location.reload(), 1000);
-    });
+        // Auto-reload if online
+        window.addEventListener('online', () => {
+            const btn = document.querySelector('.btn-retry');
+            btn.innerHTML = '<i class="fas fa-check"></i> Connected!';
+            btn.style.background = '#10B981'; // Green
+            btn.style.color = 'white';
+            btn.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.4)';
+            setTimeout(() => location.reload(), 1500);
+        });
 
-    // PWA Logic
-    let deferredPrompt;
-    const pwaPopup = document.getElementById('pwa-install-popup');
-    
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        if(!localStorage.getItem('pwaDismissed')) {
-            pwaPopup.style.display = 'flex';
-        }
-    });
+        // PWA Logic
+        let deferredPrompt;
+        const pwaPopup = document.getElementById('pwa-install-popup');
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if(!localStorage.getItem('pwaDismissed')) {
+                setTimeout(() => { pwaPopup.style.display = 'block'; }, 2000);
+            }
+        });
 
-    window.installPWA = async () => {
-        if (!deferredPrompt) return;
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
+        window.installPWA = async () => {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                pwaPopup.style.display = 'none';
+            }
+            deferredPrompt = null;
+        };
+
+        window.dismissPWA = () => {
             pwaPopup.style.display = 'none';
-        }
-        deferredPrompt = null;
-    };
+            localStorage.setItem('pwaDismissed', 'true');
+        };
+    </script>
 
-    window.dismissPWA = () => {
-        pwaPopup.style.display = 'none';
-        localStorage.setItem('pwaDismissed', 'true');
-    };
-  </script>
+    <!-- FIREBASE IMPORT (Safe Pattern) -->
+    <!-- Note: On a purely offline page, this might fail to load if not cached, 
+         but the structure is now secure via config.js -->
+    <script type="module">
+        import { app } from './config.js'; 
+        // We import it to ensure consistency, but we don't block the UI if it fails
+    </script>
 </body>
 </html>

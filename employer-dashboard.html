@@ -250,7 +250,7 @@
         <div class="nav-group-label">Organization</div>
         <a href="employer-profile.html" class="nav-item"><i class="fas fa-building"></i> Company profile</a>
         <a href="employer-wallet.html" class="nav-item"><i class="fas fa-wallet"></i> My wallet</a>
-        <a href="employer-premium.html" class="nav-item"><i class="fas fa-crown"></i> My plan</a>
+        <a href="employer-subscription.html" class="nav-item"><i class="fas fa-crown"></i> My plan</a>
 
         <div class="nav-group-label">Growth</div>
         <a href="employer-referrals.html" class="nav-item" id="nav-invite">
@@ -304,7 +304,7 @@
                     <div class="kpi-trend">Total Candidates</div>
                 </div>
 
-                <div class="kpi-card" onclick="location.href='employer-premium.html'">
+                <div class="kpi-card" onclick="location.href='employer-subscription.html'">
                     <div class="kpi-header">PLAN STATUS <i class="fas fa-crown"></i></div>
                     <div class="kpi-value" style="font-size:1.1rem; margin-top:5px;" id="stat-plan-badge">Loading...</div>
                     <div class="kpi-trend" style="color:var(--gold-base);">Upgrade Now</div>
@@ -392,14 +392,9 @@
     <!-- SCRIPTS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, collection, query, where, orderBy, limit, getDocs, onSnapshot, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        import { auth, db } from './config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { doc, collection, query, where, orderBy, limit, getDocs, onSnapshot, getCountFromServer } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         // --- UI HELPERS ---
         window.toggleSidebar = () => {
@@ -435,18 +430,20 @@
                 let pColor = 'rgba(255,255,255,0.1)'; 
                 let pText = 'FREE';
 
-                if(plan.includes('enterprise') || plan.includes('scale')) { 
+                if(plan.includes('scale')) { 
                     pColor = 'rgba(139, 92, 246, 0.2)'; pText = 'SCALE';
                 }
-                else if(plan.includes('growth') || plan.includes('premium')) { 
+                else if(plan.includes('growth')) { 
                     pColor = 'rgba(217, 119, 6, 0.2)'; pText = 'GROWTH';
                 }
-                else if(plan.includes('standard')) { 
-                    pColor = 'rgba(16, 185, 129, 0.2)'; pText = 'STANDARD';
+                else if(plan.includes('starter')) { 
+                    pColor = 'rgba(16, 185, 129, 0.2)'; pText = 'STARTER';
                 }
 
                 document.getElementById('stat-plan-badge').innerHTML = 
                     `<span style="padding:4px 10px; border-radius:15px; background:${pColor}; font-size:0.8rem; font-weight:700; border:1px solid ${pColor.replace('0.2','0.4')}">${pText}</span>`;
+
+                document.getElementById('status-badge').innerText = pText + " MEMBER";
 
                 // --- NAVIGATION LOCK LOGIC ---
                 // Lock Invite & Earn if Free
@@ -457,7 +454,7 @@
                 }
 
                 // Lock Invest & Resources if NOT Growth or Scale
-                if(!plan.includes('growth') && !plan.includes('scale') && !plan.includes('enterprise')) {
+                if(!plan.includes('growth') && !plan.includes('scale')) {
                     lockNav('nav-invest', 'lock-invest');
                     lockNav('nav-resources', 'lock-resources');
                 } else {

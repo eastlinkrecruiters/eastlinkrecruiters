@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
     
     <!-- Fonts & Icons -->
@@ -279,6 +280,9 @@
             <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
                 <i class="fa-solid fa-user-shield"></i>
             </div>
+            <div class="icon-btn" onclick="logout()" style="color:var(--danger);" title="Logout">
+                <i class="fa-solid fa-power-off"></i>
+            </div>
         </div>
     </header>
 
@@ -300,7 +304,7 @@
             <div class="nav-label">Jobs & Service</div>
             <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
             <a href="admin-guaranteed-jobs.html" class="nav-item link-pro"><i class="fa-solid fa-certificate" style="color:var(--gold-base);"></i> Guaranteed Jobs</a>
-            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Vacancy</a>
         </div>
 
         <div class="nav-group">
@@ -315,7 +319,7 @@
             <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
             <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
             <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
-            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="admin-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
@@ -461,12 +465,9 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, collection, doc, getDoc, getDocs, updateDoc, query, where, onSnapshot, orderBy, runTransaction, serverTimestamp, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+        import { auth, db } from './config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { collection, doc, getDoc, getDocs, updateDoc, query, where, onSnapshot, orderBy, runTransaction, serverTimestamp, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         // --- UI UTILS ---
         window.toggleSidebar = () => { 
@@ -488,12 +489,19 @@
         onAuthStateChanged(auth, async (user) => {
             if(!user) { window.location.href = 'signin.html'; return; }
             initBadges();
-            loadDeposits();
+            loadDeposits(true);
         });
 
-        function loadDeposits() {
-            // Note: Composite index (type + timestamp) needed in Firestore
-            const q = query(collection(db, "transactions"), where("type", "==", "deposit"), orderBy("timestamp", "desc"));
+        function loadDeposits(trySort = true) {
+            let q;
+            
+            if (trySort) {
+                // Requires composite index: type ASC, timestamp DESC
+                q = query(collection(db, "transactions"), where("type", "==", "deposit"), orderBy("timestamp", "desc"));
+            } else {
+                // Fallback if index missing
+                q = query(collection(db, "transactions"), where("type", "==", "deposit"));
+            }
             
             onSnapshot(q, async (snap) => {
                 allTx = [];
@@ -502,7 +510,6 @@
                 const uids = [...new Set(snap.docs.map(d => d.data().userId))];
                 await fetchUserNames(uids);
 
-                // Use simple loop with Promise.all for speed if checking duplicates is heavy
                 const promises = snap.docs.map(async (doc) => {
                     const d = doc.data();
                     if(d.status === 'pending') {
@@ -512,26 +519,38 @@
                     if(d.status === 'success') totalDep += Number(d.amount);
 
                     let isDuplicate = false;
-                    // Only check duplication for pending items to save reads
+                    // Check duplicate only for pending items
                     if(d.status === 'pending') isDuplicate = await checkDuplicate(d.reference);
 
                     return { id: doc.id, ...d, userName: userCache[d.userId] || "User", isDuplicate };
                 });
 
                 allTx = await Promise.all(promises);
-                // Sort after async map (timestamp desc)
-                allTx.sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+                
+                // If we fell back to unsorted query, sort in memory now
+                if (!trySort) {
+                    allTx.sort((a,b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+                }
 
                 document.getElementById('val-pending-amt').innerText = `Ksh ${pendingAmt.toLocaleString()}`;
                 document.getElementById('count-pending').innerText = pendingCount;
                 document.getElementById('val-total-dep').innerText = `Ksh ${totalDep.toLocaleString()}`;
                 
                 filterTable();
+            }, (error) => {
+                console.error("Query Error:", error);
+                if (trySort && (error.code === 'failed-precondition' || error.message.includes("index"))) {
+                    console.warn("Index missing. Falling back to unsorted query.");
+                    loadDeposits(false); // Retry without sort
+                    Toastify({text: "Index missing. Loaded unsorted list.", style: {background: "var(--gold-base)"}}).showToast();
+                } else {
+                    Toastify({text: "Error loading deposits: " + error.message, style: {background: "var(--danger)"}}).showToast();
+                }
             });
         }
 
         async function checkDuplicate(refCode) {
-            if(!refCode) return false;
+            if(!refCode || refCode.length < 5) return false;
             // Check if this ref code exists in any 'success' transaction
             const q = query(collection(db, "transactions"), where("reference", "==", refCode), where("status", "==", "success"), limit(1));
             const snap = await getDocs(q);
@@ -541,6 +560,8 @@
         async function fetchUserNames(uids) {
             const toFetch = uids.filter(id => !userCache[id]);
             if(!toFetch.length) return;
+            // Fetch individually to handle large arrays (Firestore 'in' limit is 10)
+            // A production app would use a cloud function to denormalize user names onto transactions
             for(const uid of toFetch) {
                 try {
                     const snap = await getDoc(doc(db, "users", uid));
@@ -578,11 +599,15 @@
                 
                 let actions = '-';
                 if(tx.status === 'pending') {
+                    // Pass parameters safely
+                    const safeId = tx.id;
+                    const safeUid = tx.userId;
+                    const safeAmt = tx.amount;
                     actions = `
                         <div style="display:flex; justify-content:flex-end; gap:4px;">
-                            <button class="row-action-btn btn-approve" title="Approve" onclick="approveDeposit('${tx.id}', '${tx.userId}', ${tx.amount})"><i class="fas fa-check"></i></button>
-                            <button class="row-action-btn btn-edit" title="Edit Amount" onclick="openEdit('${tx.id}', '${tx.userId}', ${tx.amount})"><i class="fas fa-pencil"></i></button>
-                            <button class="row-action-btn btn-reject" title="Reject" onclick="openReject('${tx.id}')"><i class="fas fa-times"></i></button>
+                            <button class="row-action-btn btn-approve" title="Approve" onclick="approveDeposit('${safeId}', '${safeUid}', ${safeAmt})"><i class="fas fa-check"></i></button>
+                            <button class="row-action-btn btn-edit" title="Edit Amount" onclick="openEdit('${safeId}', '${safeUid}', ${safeAmt})"><i class="fas fa-pencil"></i></button>
+                            <button class="row-action-btn btn-reject" title="Reject" onclick="openReject('${safeId}')"><i class="fas fa-times"></i></button>
                         </div>
                     `;
                 }
@@ -631,10 +656,13 @@
                     // Send Notification
                     const notifRef = doc(collection(db, "notifications"));
                     t.set(notifRef, {
-                        userId: userId, title: "Deposit Successful", 
+                        userId: userId, 
+                        title: "Deposit Successful", 
                         message: `Your wallet has been credited with KES ${Number(amount).toLocaleString()}.`, 
                         type: "transaction",
-                        read: false, timestamp: serverTimestamp()
+                        priority: "success",
+                        read: false, 
+                        timestamp: serverTimestamp()
                     });
                 });
                 Toastify({ text: "Approved & Credited Successfully", duration: 3000, style: { background: "#10B981" } }).showToast();
@@ -662,9 +690,27 @@
                     rejectionReason: fullReason, 
                     adminProcessedAt: serverTimestamp() 
                 });
+                
+                // Optional: Notify user of rejection
+                const txSnap = await getDoc(doc(db, "transactions", txId));
+                if(txSnap.exists()) {
+                    await addDoc(collection(db, "notifications"), {
+                        userId: txSnap.data().userId,
+                        title: "Deposit Rejected",
+                        message: `Deposit ref ${txSnap.data().reference} failed: ${reason}.`,
+                        type: "transaction",
+                        priority: "high",
+                        read: false,
+                        timestamp: serverTimestamp()
+                    });
+                }
+
                 closeModals();
                 Toastify({ text: "Deposit Rejected", duration: 3000, style: { background: "#EF4444" } }).showToast();
-            } catch(e) { console.error(e); }
+            } catch(e) { 
+                console.error(e);
+                Toastify({ text: "Error rejecting: " + e.message, style: { background: "#EF4444" } }).showToast();
+            }
         };
 
         window.openEdit = (id, uid, amt) => {
@@ -678,7 +724,9 @@
             const txId = document.getElementById('edit-tx-id').value;
             const userId = document.getElementById('edit-user-id').value;
             const amt = document.getElementById('edit-amount').value;
-            if(!amt || amt <= 0) return alert("Invalid Amount");
+            
+            if(!amt || amt <= 0) return Toastify({text: "Invalid Amount", style:{background:"var(--danger)"}}).showToast();
+            
             closeModals();
             approveDeposit(txId, userId, amt);
         };
@@ -693,7 +741,11 @@
             let csvContent = "data:text/csv;charset=utf-8,Date,User,Reference,Amount,Status,SMS_Name\n";
             list.forEach(tx => {
                  const date = tx.timestamp ? new Date(tx.timestamp.seconds*1000).toLocaleDateString() : '';
-                 csvContent += `${date},"${tx.userName}",${tx.reference},${tx.amount},${tx.status},"${tx.senderName||''}"\n`;
+                 // Handle CSV injection and commas
+                 const safeUser = (tx.userName || "").replace(/"/g, '""');
+                 const safeSMS = (tx.senderName || "").replace(/"/g, '""');
+                 
+                 csvContent += `${date},"${safeUser}",${tx.reference},${tx.amount},${tx.status},"${safeSMS}"\n`;
             });
 
             const link = document.createElement("a");
@@ -701,19 +753,20 @@
             link.setAttribute("download", `deposits_${statusFilter}_${new Date().toISOString().slice(0,10)}.csv`);
             document.body.appendChild(link);
             link.click();
+            document.body.removeChild(link);
         };
 
         function initBadges() {
-            const txQ = query(collection(db, "transactions"), where("status", "==", "pending"));
-            onSnapshot(txQ, (snap) => {
+            // Transaction Badge
+            onSnapshot(query(collection(db, "transactions"), where("status", "==", "pending")), (snap) => {
                 const count = snap.size;
                 const badge = document.getElementById('notif-badge');
                 if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
                 else badge.style.display = 'none';
             });
             
-            const msgQ = query(collection(db, "support_tickets"), where("status", "==", "open"));
-             onSnapshot(msgQ, (snap) => {
+            // Support Badge
+            onSnapshot(query(collection(db, "support_tickets"), where("status", "==", "open")), (snap) => {
                 const count = snap.size;
                 const badge = document.getElementById('msg-badge');
                 if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
@@ -746,6 +799,15 @@
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
         }
+
+        // Expose functions to window for HTML onClick events
+        window.approveDeposit = approveDeposit;
+        window.openReject = openReject;
+        window.confirmReject = confirmReject;
+        window.openEdit = openEdit;
+        window.confirmEditApprove = confirmEditApprove;
+        window.exportCSV = exportCSV;
+        window.filterTable = filterTable;
     </script>
 </body>
 </html>

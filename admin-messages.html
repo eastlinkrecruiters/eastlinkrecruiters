@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
     
     <!-- Fonts & Icons -->
@@ -315,6 +316,9 @@
             <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
                 <i class="fa-solid fa-user-shield"></i>
             </div>
+            <div class="icon-btn" onclick="logout()" style="color:var(--danger);" title="Logout">
+                <i class="fa-solid fa-power-off"></i>
+            </div>
         </div>
     </header>
 
@@ -336,7 +340,7 @@
             <div class="nav-label">Jobs & Service</div>
             <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
             <a href="admin-guaranteed-jobs.html" class="nav-item"><i class="fa-solid fa-certificate"></i> Guaranteed Jobs</a>
-            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Vacancy</a>
         </div>
 
         <div class="nav-group">
@@ -348,10 +352,7 @@
 
         <div class="nav-group">
             <div class="nav-label">System</div>
-            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
-            <a href="admin-support.html" class="nav-item active"><i class="fa-solid fa-headset"></i> Support</a>
-            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
-            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="admin-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
@@ -481,12 +482,9 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, query, where, addDoc, doc, getDocs, serverTimestamp, updateDoc, deleteDoc, writeBatch, setDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+        import { auth, db } from './config.js'; // Secure Import
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { collection, onSnapshot, query, where, addDoc, doc, getDocs, serverTimestamp, updateDoc, deleteDoc, writeBatch, setDoc, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         let currentUser = null;
         let activeChatId = null;
@@ -542,18 +540,19 @@
         }
 
         async function loadUsers() {
-            const snap = await getDocs(collection(db, "users"));
-            snap.forEach(d => {
-                const u = d.data();
-                usersMap[d.id] = { name: u.fullName || u.companyName || "User", email: u.email || "No Email", id: d.id };
-            });
+            try {
+                // Optimization: In real production, fetching all users is heavy. 
+                // Consider cloud functions or pagination.
+                const snap = await getDocs(collection(db, "users"));
+                snap.forEach(d => {
+                    const u = d.data();
+                    usersMap[d.id] = { name: u.fullName || u.companyName || "User", email: u.email || "No Email", id: d.id };
+                });
+            } catch (e) { console.error("Error loading users", e); }
         }
 
         function loadChats() {
-            // In a real app, query where participants array-contains currentUser.uid
-            // Since this is admin, we might want to see all support chats or similar.
-            // For this demo, we assume 'chats' collection exists.
-            const q = query(collection(db, "chats"));
+            const q = query(collection(db, "chats"), orderBy("lastUpdated", "desc"), limit(50));
             onSnapshot(q, (snap) => {
                 allChats = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 renderChatList();
@@ -572,8 +571,7 @@
             });
 
             const filtered = displayChats.filter(c => c.displayName.toLowerCase().includes(term) || (c.lastMessage || "").toLowerCase().includes(term));
-            filtered.sort((a,b) => b.timestamp - a.timestamp);
-
+            
             let html = "";
             filtered.forEach(c => {
                 const activeClass = c.id === activeChatId ? 'active' : '';
@@ -624,10 +622,9 @@
             const feed = document.getElementById('feed');
             feed.innerHTML = '<div style="text-align:center; padding:20px; opacity:0.5;">Loading history...</div>';
 
-            const q = query(collection(db, "messages"), where("chatId", "==", chatId));
+            const q = query(collection(db, "messages"), where("chatId", "==", chatId), orderBy("timestamp", "asc"));
             msgUnsub = onSnapshot(q, (snap) => {
                 const msgs = snap.docs.map(d => d.data());
-                msgs.sort((a,b) => (a.timestamp?.seconds || 0) - (b.timestamp?.seconds || 0));
                 
                 let html = "";
                 msgs.forEach(m => {
@@ -650,6 +647,7 @@
             document.getElementById('chat-view').style.display = 'none';
             document.getElementById('empty-state').style.display = 'flex';
             activeChatId = null;
+            if(msgUnsub) msgUnsub();
         };
 
         window.sendMessage = async () => {
@@ -739,27 +737,32 @@
                     loadChat(ref.id, uid);
                 }
             } else {
-                // Broadcast
+                // Broadcast using Batch
                 const msg = prompt(`Broadcast message to ${selectedUsers.size} users:`);
                 if(!msg) return;
                 
-                const batch = writeBatch(db);
-                selectedUsers.forEach(uid => {
-                    const newChatRef = doc(collection(db, "chats"));
-                    batch.set(newChatRef, {
-                        participants: [currentUser.uid, uid],
-                        lastUpdated: serverTimestamp(),
-                        seekerName: usersMap[uid].name,
-                        lastMessage: msg,
-                        isRead: false
+                try {
+                    const batch = writeBatch(db);
+                    selectedUsers.forEach(uid => {
+                        const newChatRef = doc(collection(db, "chats"));
+                        batch.set(newChatRef, {
+                            participants: [currentUser.uid, uid],
+                            lastUpdated: serverTimestamp(),
+                            seekerName: usersMap[uid].name,
+                            lastMessage: msg,
+                            isRead: false
+                        });
+                        const msgRef = doc(collection(db, "messages"));
+                        batch.set(msgRef, {
+                            chatId: newChatRef.id, text: msg, senderId: currentUser.uid, receiverId: uid, timestamp: serverTimestamp()
+                        });
                     });
-                    const msgRef = doc(collection(db, "messages"));
-                    batch.set(msgRef, {
-                        chatId: newChatRef.id, text: msg, senderId: currentUser.uid, receiverId: uid, timestamp: serverTimestamp()
-                    });
-                });
-                await batch.commit();
-                Toastify({text: "Broadcast Sent!", style:{background:"var(--success)"}}).showToast();
+                    await batch.commit();
+                    Toastify({text: "Broadcast Sent Successfully!", style:{background:"var(--success)"}}).showToast();
+                } catch(e) {
+                    console.error(e);
+                    Toastify({text: "Broadcast Failed.", style:{background:"var(--danger)"}}).showToast();
+                }
             }
             closeModal();
         };
@@ -792,7 +795,7 @@
         };
         
         window.deleteAllChats = async () => {
-            if(confirm("Delete ALL chats?")) {
+            if(confirm("Delete ALL chats? This cannot be undone.")) {
                 const batch = writeBatch(db);
                 allChats.forEach(c => batch.delete(doc(db, "chats", c.id)));
                 await batch.commit();
@@ -831,6 +834,21 @@
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
         }
+
+        // Expose
+        window.loadChat = loadChat;
+        window.closeChat = closeChat;
+        window.sendMessage = sendMessage;
+        window.openNewChatModal = openNewChatModal;
+        window.closeModal = closeModal;
+        window.toggleUser = toggleUser;
+        window.toggleSelectAll = toggleSelectAll;
+        window.startChatOrBroadcast = startChatOrBroadcast;
+        window.triggerAI = triggerAI;
+        window.deleteCurrentChat = deleteCurrentChat;
+        window.deleteAllChats = deleteAllChats;
+        window.markAllRead = markAllRead;
+
     </script>
 </body>
 </html>

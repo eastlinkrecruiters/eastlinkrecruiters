@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
     
     <!-- Fonts & Icons -->
@@ -276,6 +277,9 @@
             <div class="profile-widget" onclick="location.href='admin-settings.html'" title="Admin Settings">
                 <i class="fa-solid fa-user-shield"></i>
             </div>
+            <div class="icon-btn" onclick="logout()" style="color:var(--danger);" title="Logout">
+                <i class="fa-solid fa-power-off"></i>
+            </div>
         </div>
     </header>
 
@@ -297,7 +301,7 @@
             <div class="nav-label">Jobs & Service</div>
             <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
             <a href="admin-guaranteed-jobs.html" class="nav-item link-pro"><i class="fa-solid fa-certificate" style="color:var(--gold-base);"></i> Guaranteed Jobs</a>
-            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Vacancy</a>
         </div>
 
         <div class="nav-group">
@@ -309,11 +313,7 @@
 
         <div class="nav-group">
             <div class="nav-label">System</div>
-            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
-            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
-            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
-            <a href="admin-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> System Config</a>
-            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="admin-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
@@ -466,12 +466,9 @@
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, where, orderBy, limit, onSnapshot, runTransaction, serverTimestamp, getDocs, addDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); const auth = getAuth(app); const db = getFirestore(app);
+        import { auth, db } from './config.js'; // Secure Import
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { doc, getDoc, collection, query, where, orderBy, limit, onSnapshot, runTransaction, serverTimestamp, getDocs, addDoc, increment } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         let historyData = [];
 
@@ -495,24 +492,23 @@
         // Auth & Init
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = 'signin.html'; return; }
-            const d = await getDoc(doc(db, "users", user.uid));
-            if (!d.exists() || d.data().role !== 'admin') { window.location.href = 'signin.html'; return; }
-            
-            initListeners();
-            initBadges();
+            try {
+                const d = await getDoc(doc(db, "users", user.uid));
+                if (!d.exists() || d.data().role !== 'admin') { window.location.href = 'signin.html'; return; }
+                initListeners();
+                initBadges();
+            } catch(e) { console.error("Auth check failed", e); }
         });
 
         function initBadges() {
-            const txQ = query(collection(db, "transactions"), where("status", "==", "pending"));
-            onSnapshot(txQ, (snap) => {
+            onSnapshot(query(collection(db, "transactions"), where("status", "==", "pending")), (snap) => {
                 const count = snap.size;
                 const badge = document.getElementById('notif-badge');
                 if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
                 else badge.style.display = 'none';
             });
             
-            const msgQ = query(collection(db, "support_tickets"), where("status", "==", "open"));
-             onSnapshot(msgQ, (snap) => {
+            onSnapshot(query(collection(db, "support_tickets"), where("status", "==", "open")), (snap) => {
                 const count = snap.size;
                 const badge = document.getElementById('msg-badge');
                 if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
@@ -521,7 +517,7 @@
         }
 
         function initListeners() {
-            // 1. PENDING
+            // 1. PENDING (Live)
             const qPending = query(collection(db, "transactions"), where("status", "==", "pending"), orderBy("timestamp", "asc"));
             
             onSnapshot(qPending, (snap) => {
@@ -543,6 +539,7 @@
                     const iconColor = isDep ? 'var(--success)' : 'var(--danger)';
 
                     const time = t.timestamp ? new Date(t.timestamp.seconds*1000).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'Just now';
+                    const userIdShort = t.userId ? t.userId.substring(0, 5) : 'Unknown';
 
                     let displayInfo = "";
                     if(isDep) displayInfo = `<div style="font-size:0.75rem; color:var(--text-muted);">Sender: ${t.details?.senderName || 'Unknown'}</div>`;
@@ -560,7 +557,7 @@
                             </td>
                             <td class="amount ${colorClass}">KES ${Number(t.amount).toLocaleString()}</td>
                             <td>
-                                <div style="font-weight:600; color:var(--text-main); font-size:0.85rem;">ID: ...${t.userId.substr(-4)}</div>
+                                <div style="font-weight:600; color:var(--text-main); font-size:0.85rem;">ID: ...${userIdShort}</div>
                                 ${displayInfo}
                             </td>
                             <td class="tx-id">${t.code || '...'}</td>
@@ -580,11 +577,11 @@
                 if(count > 0) { badge.innerText = count; badge.style.display = 'inline-block'; }
                 else badge.style.display = 'none';
             }, (error) => {
-                console.warn("Listener Error (Index?):", error);
-                document.getElementById('tbl-pending').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Indexing... Refresh later.</td></tr>`;
+                console.warn("Index Pending:", error);
+                document.getElementById('tbl-pending').innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Sync Error. Retry later.</td></tr>`;
             });
 
-            // 2. HISTORY
+            // 2. HISTORY (Live)
             const qHist = query(collection(db, "transactions"), orderBy("timestamp", "desc"), limit(50));
             onSnapshot(qHist, (snap) => {
                 historyData = [];
@@ -628,7 +625,7 @@
                         <td style="font-weight:600; text-transform:capitalize; color:var(--text-main);">${t.type}</td>
                         <td class="amount" style="font-size:0.9rem; color:var(--text-main);">KES ${Number(t.amount).toLocaleString()}</td>
                         <td><span class="status-badge ${stClass}">${t.status}</span></td>
-                        <td class="tx-id">${t.code || t.id.substr(0,8)}</td>
+                        <td class="tx-id">${t.code || t.id.substring(0,8)}</td>
                     </tr>
                 `;
             });
@@ -663,9 +660,7 @@
 
                     if (approve) {
                         transaction.update(txRef, { status: 'completed', adminActionTime: now });
-                        // Only credit user on deposit. Withdrawals already deducted balance on request usually. 
-                        // If logic differs (e.g. withdrawal request doesn't deduct until approval), adjust here.
-                        // Assuming Deposits add funds:
+                        // Only credit user on deposit
                         if(type === 'deposit') transaction.update(userRef, { walletBalance: increment(amt) });
                         
                         transaction.set(notifRef, {
@@ -674,7 +669,7 @@
                         });
                     } else {
                         transaction.update(txRef, { status: 'rejected', adminActionTime: now });
-                        // If withdrawal rejected, REFUND the user
+                        // If withdrawal rejected, REFUND user (assuming it was deducted on request)
                         if(type === 'withdrawal') transaction.update(userRef, { walletBalance: increment(amt) });
                         
                         transaction.set(notifRef, {
@@ -743,7 +738,8 @@
             let csv = "Date,Tx_Type,Amount,Status,Reference_Code,Description\n";
             historyData.forEach(r => {
                 const safeDesc = (r.description || r.method || "").replace(/,/g, " ");
-                csv += `${new Date(r.timestamp?.seconds*1000).toLocaleDateString()},${r.type},${r.amount},${r.status},${r.code||r.id},${safeDesc}\n`;
+                const dateStr = r.timestamp ? new Date(r.timestamp.seconds*1000).toLocaleDateString() : "";
+                csv += `${dateStr},${r.type},${r.amount},${r.status},${r.code||r.id},${safeDesc}\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
@@ -775,6 +771,11 @@
         if ("serviceWorker" in navigator) {
             navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
         }
+
+        // Expose to window
+        window.processTx = processTx;
+        window.execManualCredit = execManualCredit;
+        window.exportCSV = exportCSV;
 
     </script>
 </body>

@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
     
     <!-- Fonts & Icons -->
@@ -21,26 +22,33 @@
         :root {
             /* Master Theme Variables */
             --bg-body: #0F172A;       
-            --bg-card: rgba(30, 41, 59, 0.65);
-            --bg-glass: rgba(30, 41, 59, 0.75);
+            --bg-glass: rgba(30, 41, 59, 0.70);
             --bg-glass-heavy: rgba(15, 23, 42, 0.95);
-            --bg-input: rgba(255, 255, 255, 0.07);
-            --bg-hover: rgba(255, 255, 255, 0.12);
+            --bg-input: rgba(255, 255, 255, 0.05);
+            --bg-hover: rgba(255, 255, 255, 0.1);
+            
             --border-color: rgba(255, 255, 255, 0.12);
+            --border-highlight: rgba(255, 255, 255, 0.2);
+            
             --text-main: #F8FAFC;     
             --text-muted: #94A3B8; 
+            
+            /* Accents */
             --gold-base: #D97706;
             --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
-            --neon-purple: #8b5cf6;
             --success: #10B981;
             --danger: #EF4444;
+            --info: #3b82f6;
+            
             --sidebar-width: 260px; 
-            --header-height: 70px;
-            --radius: 16px;
+            --header-height: 80px;
+            --radius: 20px;
+            
             --font-head: 'Cinzel', serif;
             --font-body: 'Inter', sans-serif;
             --font-display: 'Space Grotesk', sans-serif;
-            --ease-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            
+            --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -48,174 +56,179 @@
         body { 
             font-family: var(--font-body); 
             background-color: var(--bg-body); 
-            background-image: url('assets/images/background.png');
+            background-image: url('./assets/images/background.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            background-repeat: no-repeat;
             color: var(--text-main); 
             min-height: 100vh; 
+            display: flex; flex-direction: column;
             overflow-x: hidden;
-            transition: background 0.3s ease;
         }
 
-        /* Utils & Glassmorphism */
+        /* Overlay for contrast */
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background: rgba(15, 23, 42, 0.85); 
+            z-index: -5; pointer-events: none;
+        }
+
+        /* Glass Panel */
         .glass-panel {
             background: var(--bg-glass);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border-color);
+            border-top: 1px solid var(--border-highlight);
             border-radius: var(--radius);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s var(--ease-bounce), box-shadow 0.3s ease, border-color 0.3s ease;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s var(--ease-snap), box-shadow 0.3s ease;
         }
         
         /* Header */
         header {
             position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
-            background: var(--bg-glass-heavy); backdrop-filter: blur(30px);
+            background: var(--bg-glass-heavy); backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-color);
             display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 1000;
         }
         .header-left { display: flex; align-items: center; gap: 15px; }
         .logo { 
-            font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.3rem; 
-            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; 
+            font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.4rem; 
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; gap: 10px;
         }
-        .logo span { color: var(--gold-base); }
+        .logo span { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .hamburger { font-size: 1.4rem; cursor: pointer; color: var(--text-muted); display: none; }
 
         /* Search */
-        .global-search-container { flex: 1; max-width: 450px; position: relative; margin: 0 20px; }
+        .global-search-container { flex: 1; max-width: 500px; position: relative; margin: 0 30px; }
         .global-search-input {
             width: 100%; background: var(--bg-input); border: 1px solid var(--border-color);
-            padding: 10px 45px 10px 15px; border-radius: 12px; color: var(--text-main);
-            transition: all 0.3s ease; font-size: 0.9rem;
+            padding: 12px 45px 12px 20px; border-radius: 12px; color: var(--text-main);
+            transition: all 0.3s ease; font-size: 0.95rem; font-family: var(--font-body);
         }
-        .global-search-input:focus { border-color: var(--gold-base); background: var(--bg-hover); box-shadow: 0 0 15px rgba(217, 119, 6, 0.15); }
+        .global-search-input:focus { border-color: var(--gold-base); background: rgba(255,255,255,0.08); box-shadow: 0 0 20px rgba(217, 119, 6, 0.15); }
+        
         .search-results-dropdown {
             position: absolute; top: 115%; left: 0; width: 100%; background: var(--bg-glass-heavy);
             backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 12px; 
             box-shadow: 0 20px 40px rgba(0,0,0,0.4); max-height: 300px; overflow-y: auto; display: none; z-index: 2000;
         }
-        .search-result-item { padding: 12px 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-        .search-result-item:hover { background: var(--bg-hover); padding-left: 20px; }
+        .search-result-item { padding: 12px 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; font-size: 0.9rem; }
+        .search-result-item:hover { background: var(--bg-hover); padding-left: 20px; color: var(--gold-base); }
 
-        /* Header Actions */
-        .header-actions { display: flex; align-items: center; gap: 10px; }
+        /* Header Actions - Updated Icons */
+        .header-actions { display: flex; align-items: center; gap: 15px; }
         .icon-btn { 
-            width: 40px; height: 40px; display: grid; place-items: center; border-radius: 10px;
-            color: var(--text-muted); cursor: pointer; transition: all 0.3s var(--ease-bounce); position: relative;
+            width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px;
+            cursor: pointer; transition: all 0.3s var(--ease-snap); position: relative;
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-color);
         }
-        .icon-btn:hover { background: var(--bg-hover); color: var(--text-main); transform: translateY(-2px); }
+        .icon-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+        
+        .icon-msg { color: #3b82f6; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.4)); }
+        .icon-bell { color: #f59e0b; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.4)); }
+        
         .notification-badge { 
-            position: absolute; top: 5px; right: 5px; min-width: 16px; height: 16px; 
-            background: var(--danger); border-radius: 10px; font-size: 0.6rem; color: white; 
-            font-weight: 700; display: none; place-items: center; justify-content: center; border: 2px solid var(--bg-card);
+            position: absolute; top: -5px; right: -5px; width: 20px; height: 20px; 
+            background: #ef4444; border: 2px solid #0f172a; 
+            border-radius: 50%; font-size: 0.65rem; color: white; 
+            font-weight: 700; display: none; place-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
         }
-        .profile-widget { width: 42px; height: 42px; position: relative; cursor: pointer; transition: transform 0.3s var(--ease-bounce); margin-left: 5px; flex-shrink: 0; }
+
+        .profile-widget { width: 44px; height: 44px; position: relative; cursor: pointer; transition: transform 0.3s; margin-left: 5px; flex-shrink: 0; }
         .profile-widget:hover { transform: scale(1.05); }
         .user-avatar { 
             width: 100%; height: 100%; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; 
-            font-weight: 700; color: #fff; border: 2px solid var(--border-color); object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            font-weight: 700; color: #fff; border: 1px solid rgba(255,255,255,0.2); object-fit: cover;
         }
+        .user-avatar.img-mode { background: transparent; }
 
-        /* Sidebar */
+        /* Sidebar (Unlocked) */
         .sidebar {
             position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
-            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 20px 0; overflow-y: auto; 
+            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 30px 0; overflow-y: auto; 
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column; backdrop-filter: blur(20px);
         }
-        .nav-group { padding: 0 24px; margin-bottom: 20px; }
-        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-group { padding: 0 24px; margin-bottom: 25px; }
+        .nav-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 12px; letter-spacing: 1.2px; padding-left: 10px; }
         .nav-item { 
-            display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; 
-            font-size: 0.9rem; transition: all 0.3s ease; border-radius: 10px; margin-bottom: 4px;
+            display: flex; align-items: center; padding: 12px 16px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.95rem; transition: all 0.2s ease; border-radius: 12px; margin-bottom: 5px; position: relative; font-weight: 500; cursor: pointer;
         }
-        .nav-item:hover { color: var(--text-main); background: var(--bg-hover); transform: translateX(5px); }
-        .nav-item.active { background: rgba(217, 119, 6, 0.1); color: var(--gold-base); font-weight: 600; }
-        .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
-        .lock-icon { margin-left: auto; font-size: 0.7rem; opacity: 0.7; }
+        .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.05); transform: translateX(5px); }
+        .nav-item.active { background: var(--gold-gradient); color: #000; font-weight: 700; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3); }
+        .nav-item i { width: 25px; text-align: center; margin-right: 12px; font-size: 1rem; }
 
         /* Main Content */
-        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 40px; width: calc(100% - var(--sidebar-width)); min-height: calc(100vh - var(--header-height)); display: flex; flex-direction: column; }
         
-        .page-header { margin-bottom: 30px; display:flex; flex-direction: column; gap: 5px; }
-        .page-header h2 { font-family: var(--font-head); font-size: 1.8rem; color: var(--text-main); font-weight: 700; display: flex; align-items: center; gap: 10px; }
-        .page-header p { color: var(--text-muted); font-size: 0.95rem; }
+        .page-header { margin-bottom: 35px; display:flex; flex-direction: column; gap: 8px; }
+        .page-header h2 { font-family: var(--font-head); font-size: 2rem; color: var(--text-main); font-weight: 700; display: flex; align-items: center; gap: 15px; }
+        .page-header p { color: var(--text-muted); font-size: 1rem; }
 
-        /* --- PAGE SPECIFIC --- */
-        
         /* Tabs */
-        .tab-controls { display: flex; gap: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 30px; overflow-x: auto; scrollbar-width: none; }
-        .tab-btn { padding: 10px 0; background: none; border: none; color: var(--text-muted); font-size: 0.95rem; cursor: pointer; position: relative; transition: 0.3s; white-space: nowrap; }
-        .tab-btn:hover { color: var(--text-main); }
-        .tab-btn.active { color: var(--gold-base); font-weight: 600; }
-        .tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 2px; background: var(--gold-base); box-shadow: 0 -2px 10px var(--gold-base); }
+        .tab-controls { display: flex; gap: 15px; margin-bottom: 35px; overflow-x: auto; scrollbar-width: none; padding-bottom: 5px; border-bottom: 1px solid var(--border-color); }
+        .tab-btn { 
+            padding: 10px 20px; background: transparent; border: none; color: var(--text-muted); 
+            font-size: 0.95rem; cursor: pointer; position: relative; transition: 0.3s; white-space: nowrap; font-weight: 500;
+            border-radius: 8px;
+        }
+        .tab-btn:hover { color: var(--text-main); background: var(--bg-hover); }
+        .tab-btn.active { color: #000; background: var(--gold-gradient); font-weight: 700; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.2); }
 
         /* Resource Grid */
-        .resources-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
+        .resources-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
         
         .resource-card {
-            display: flex; flex-direction: column; padding: 25px; 
-            position: relative; transition: all 0.3s var(--ease-bounce);
-            overflow: hidden; height: 100%;
+            display: flex; flex-direction: column; padding: 30px; 
+            position: relative; transition: all 0.4s var(--ease-snap);
+            overflow: hidden; height: 100%; border-radius: 24px;
         }
-        .resource-card:hover { transform: translateY(-5px); border-color: var(--gold-base); }
+        .resource-card:hover { transform: translateY(-8px); border-color: var(--gold-base); box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
         
         .icon-box {
-            width: 55px; height: 55px; border-radius: 14px; display: grid; place-items: center; 
-            font-size: 1.4rem; margin-bottom: 20px; border: 1px solid var(--border-color);
-            transition: 0.3s;
+            width: 60px; height: 60px; border-radius: 16px; display: grid; place-items: center; 
+            font-size: 1.6rem; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1);
+            transition: 0.4s var(--ease-snap);
         }
         .resource-card:hover .icon-box { transform: scale(1.1) rotate(5deg); }
 
         /* Icon Variants */
-        .icon-resume { background: rgba(37, 99, 235, 0.1); color: #3b82f6; border-color: rgba(37, 99, 235, 0.2); }
-        .icon-interview { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.2); }
-        .icon-guide { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border-color: rgba(245, 158, 11, 0.2); }
+        .icon-resume { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border-color: rgba(59, 130, 246, 0.2); }
+        .icon-interview { background: rgba(16, 185, 129, 0.1); color: #34d399; border-color: rgba(16, 185, 129, 0.2); }
+        .icon-guide { background: rgba(245, 158, 11, 0.1); color: #fbbf24; border-color: rgba(245, 158, 11, 0.2); }
 
-        .res-title { font-family: var(--font-head); font-size: 1.1rem; color: var(--text-main); margin-bottom: 8px; font-weight: 700; }
-        .res-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px; flex-grow: 1; }
+        .res-title { font-family: var(--font-display); font-size: 1.25rem; color: var(--text-main); margin-bottom: 10px; font-weight: 700; }
+        .res-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 25px; flex-grow: 1; }
 
         .btn-download {
-            background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-color); padding: 12px;
-            border-radius: 10px; font-weight: 600; cursor: pointer; text-decoration: none;
-            display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; font-size: 0.9rem;
+            background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid var(--border-color); padding: 14px;
+            border-radius: 12px; font-weight: 600; cursor: pointer; text-decoration: none;
+            display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; font-size: 0.95rem;
         }
-        .btn-download:hover { background: var(--bg-hover); border-color: var(--gold-base); color: var(--gold-base); }
+        .btn-download:hover { background: var(--gold-gradient); border-color: transparent; color: #000; box-shadow: 0 5px 15px rgba(217,119,6,0.3); }
 
-        /* LOCKED STATE */
-        .locked-container {
-            text-align: center; padding: 80px 20px;
-            display: flex; flex-direction: column; align-items: center;
+        /* Footer */
+        .footer { 
+            margin-top: auto; padding: 40px 0 0; border-top: 1px solid var(--border-color); 
+            color: var(--text-muted); font-size: 0.85rem; text-align: center; width: 100%;
         }
-        .lock-circle { 
-            width: 80px; height: 80px; border-radius: 50%; background: var(--bg-input); border: 1px solid var(--border-color);
-            display: grid; place-items: center; font-size: 2rem; color: var(--text-muted); margin-bottom: 25px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.3);
-        }
-        
-        .btn-upgrade {
-            background: var(--gold-gradient); color: black; border: none; padding: 14px 35px;
-            border-radius: 30px; font-weight: 700; cursor: pointer; text-decoration: none;
-            display: inline-flex; align-items: center; gap: 10px; transition: 0.2s; margin-top: 25px;
-            box-shadow: 0 10px 20px rgba(217, 119, 6, 0.2);
-        }
-        .btn-upgrade:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(217, 119, 6, 0.4); }
 
         .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 998; backdrop-filter: blur(4px); }
 
         /* PWA Popup */
         .pwa-install-popup {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
-            border-radius: 20px; padding: 20px; z-index: 3000;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
-            animation: slideUp 0.5s ease;
+            position: fixed; bottom: 20px; right: 20px; 
+            background: rgba(15, 23, 42, 0.95); 
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            backdrop-filter: blur(12px);
+            padding: 20px; border-radius: 16px; 
+            z-index: 10000; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            max-width: 300px; animation: slideUp 0.5s ease-out; display: none;
         }
-        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
         .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
         .pwa-actions { display: flex; gap: 10px; }
@@ -225,9 +238,19 @@
         @media (max-width: 992px) {
             .global-search-container { display: none; }
             .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
-            main { margin-left: 0; padding: 20px 10px; width: 100%; } 
+            main { margin-left: 0; padding: 25px 20px; width: 100%; } 
             .hamburger { display: block; }
+            .page-header h2 { font-size: 1.6rem; }
+            .resources-grid { grid-template-columns: 1fr; }
         }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block; width: 16px; height: 16px;
+            border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite; margin-right: 5px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -246,20 +269,24 @@
         </div>
 
         <div class="header-actions">
-            <div class="icon-btn" title="Messages" onclick="location.href='seeker-messages.html'">
-                <i class="fa-regular fa-envelope"></i><div class="notification-badge" id="msg-badge">0</div>
+            <!-- Messages -->
+            <div class="icon-btn" onclick="handleActionWithSpinner(this, () => location.href='seeker-messages.html')">
+                <i class="fa-solid fa-envelope icon-msg"></i>
+                <div class="notification-badge" id="msg-badge">0</div>
             </div>
-            <div class="icon-btn" title="Notifications" onclick="location.href='seeker-notifications.html'">
-                <i class="fa-regular fa-bell"></i><div class="notification-badge" id="notif-badge">0</div>
+            <!-- Notifications -->
+            <div class="icon-btn" onclick="handleActionWithSpinner(this, () => location.href='seeker-notifications.html')">
+                <i class="fa-solid fa-bell icon-bell"></i>
+                <div class="notification-badge" id="notif-badge">0</div>
             </div>
-            <div class="profile-widget" onclick="location.href='seeker-profile.html'">
-                <img src="" id="header-avatar-img" class="user-avatar" alt="Profile" style="display:none;">
+            <div class="profile-widget" onclick="handleActionWithSpinner(this, () => location.href='seeker-profile.html')">
+                <img src="" id="header-avatar-img" class="user-avatar img-mode" alt="Profile" style="display:none;">
                 <div id="header-avatar-fallback" class="user-avatar">U</div>
             </div>
         </div>
     </header>
 
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR (Unlocked) -->
     <nav class="sidebar" id="sidebar">
         <div class="nav-group">
             <div class="nav-label">Overview</div>
@@ -269,38 +296,55 @@
             <div class="nav-label">Job Hunt</div>
             <a href="seeker-applications.html" class="nav-item"><i class="fa-solid fa-file-signature"></i> Applied Jobs</a>
             <a href="seeker-jobs.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Browse Jobs</a>
-            <a href="seeker-featured-jobs.html" class="nav-item link-std"><i class="fa-solid fa-star"></i> Featured Jobs <i class="fas fa-lock lock-icon"></i></a>
-            <a href="seeker-urgentlyhiring.html" class="nav-item link-pro"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended <i class="fas fa-lock lock-icon"></i></a>
-            <a href="seeker-guaranteed-jobs.html" class="nav-item link-pro"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-featured-jobs.html" class="nav-item"><i class="fa-solid fa-star"></i> Featured Jobs</a>
+            <a href="seeker-urgentlyhiring.html" class="nav-item"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended</a>
+            <a href="seeker-guaranteed-jobs.html" class="nav-item"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Finance</div>
             <a href="seeker-wallet.html" class="nav-item"><i class="fa-solid fa-wallet"></i> My Wallet</a>
             <a href="seeker-premium.html" class="nav-item"><i class="fa-solid fa-crown"></i> My Plan</a>
-            <a href="seeker-referrals.html" class="nav-item link-std"><i class="fa-solid fa-user-plus"></i> Invite & Earn <i class="fas fa-lock lock-icon"></i></a>
-            <a href="seeker-invest.html" class="nav-item link-std"><i class="fa-solid fa-chart-line"></i> Invest <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-referrals.html" class="nav-item"><i class="fa-solid fa-user-plus"></i> Invite & Earn</a>
+            <a href="seeker-invest.html" class="nav-item"><i class="fa-solid fa-chart-line"></i> Invest</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Resources</div>
             <a href="seeker-blog.html" class="nav-item"><i class="fa-solid fa-newspaper"></i> News & Insights</a>
-            <a href="seeker-resources.html" class="nav-item active link-pro"><i class="fa-solid fa-book"></i> Resources <i class="fas fa-lock lock-icon"></i></a>
+            <a href="seeker-resources.html" class="nav-item active"><i class="fa-solid fa-book"></i> Resources</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Settings</div>
             <a href="seeker-profile.html" class="nav-item"><i class="fa-solid fa-user-gear"></i> Profile</a>
             <a href="seeker-settings.html" class="nav-item"><i class="fa-solid fa-sliders"></i> Settings</a>
-            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="#" onclick="handleActionWithSpinner(this, logout)" class="nav-item" style="color:var(--danger); margin-top:10px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
     <!-- MAIN CONTENT -->
     <main id="main-content">
-        <!-- Initial Loader -->
-        <div class="glass-panel" style="padding:50px; text-align:center;">
-             <i class="fas fa-circle-notch fa-spin" style="font-size:2rem; color:var(--gold-base);"></i>
-             <p style="margin-top:20px; color:var(--text-muted);">Verifying plan status...</p>
+        <div class="page-header animate__animated animate__fadeInDown">
+            <h2><i class="fas fa-book-open" style="color:var(--gold-base)"></i> Premium Resources</h2>
+            <p>Exclusive tools and guides designed to accelerate your career path.</p>
         </div>
+        
+        <div class="tab-controls animate__animated animate__fadeIn">
+            <button class="tab-btn active" onclick="filterResources('all', this)">All</button>
+            <button class="tab-btn" onclick="filterResources('resume', this)">Resumes</button>
+            <button class="tab-btn" onclick="filterResources('interview', this)">Interviews</button>
+            <button class="tab-btn" onclick="filterResources('guide', this)">Guides</button>
+        </div>
+        
+        <div class="resources-grid" id="resources-grid">
+            <!-- Content Injected via JS -->
+            <div style="grid-column:1/-1; text-align:center; padding:50px;">
+                <i class="fas fa-circle-notch fa-spin" style="font-size:2rem; color:var(--gold-base);"></i>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <div class="copyright">&copy; 2026 EastLink Recruiters. All Rights Reserved.</div>
+        </footer>
     </main>
 
     <!-- PWA INSTALL POPUP -->
@@ -313,7 +357,7 @@
             </div>
         </div>
         <div class="pwa-actions">
-            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
+            <button class="btn-pwa-install" onclick="handleActionWithSpinner(this, installPWA)">Install</button>
             <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
         </div>
     </div>
@@ -321,28 +365,45 @@
     <!-- SCRIPTS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { auth, db } from './config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { doc, getDoc, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
-        const app = initializeApp(firebaseConfig); 
-        const auth = getAuth(app); 
-        const db = getFirestore(app);
+        // --- SPINNER HELPER ---
+        window.handleActionWithSpinner = (btn, action) => {
+            if(btn.dataset.processing === "true") return;
+            btn.dataset.processing = "true";
+            
+            // Save original content
+            const originalContent = btn.innerHTML;
+            
+            // Set spinner content
+            btn.innerHTML = `<span class="loading-spinner"></span>`;
+            
+            setTimeout(() => {
+                // Execute action
+                if (typeof action === 'function') action();
+                
+                // Reset button (optional, in case page doesn't reload immediately)
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.dataset.processing = "false";
+                }, 500);
+            }, 1000);
+        };
 
         // --- UI UTILS ---
         window.toggleSidebar = () => {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            sb.classList.toggle('active');
+            ov.style.display = sb.classList.contains('active') ? 'block' : 'none';
         };
         window.closeSidebar = () => {
             document.getElementById('sidebar').classList.remove('active');
             document.getElementById('overlay').style.display = 'none';
         };
         window.logout = () => signOut(auth).then(() => window.location.href = 'signin.html');
-
-        // Theme Init
-        document.documentElement.setAttribute('data-theme', 'dark');
 
         // --- DATA ---
         const resourcesData = [
@@ -360,12 +421,13 @@
             
             listenForBadges(user.uid);
             
+            // Render content immediately (Unlocked)
+            renderResources('all');
+
             try {
                 const snap = await getDoc(doc(db, "users", user.uid));
                 if (snap.exists()) {
                     const data = snap.data();
-                    
-                    // Header Avatar
                     const avatarImg = document.getElementById('header-avatar-img');
                     const avatarFallback = document.getElementById('header-avatar-fallback');
                     if(data.photoURL || user.photoURL) {
@@ -377,64 +439,16 @@
                         avatarFallback.style.display = 'grid';
                         avatarFallback.innerText = (data.fullName || "U").charAt(0).toUpperCase();
                     }
-                    
-                    // Premium Check Logic
-                    const plan = (data.plan || 'free').toLowerCase();
-                    const isPremium = ['standard','pro','gold','premium','guaranteed'].some(p => plan.includes(p));
-
-                    if (isPremium) {
-                        // Unlock sidebar icons
-                        document.querySelectorAll('.lock-icon').forEach(el => el.style.display = 'none');
-                        renderPremiumContent();
-                    } else {
-                        renderLockedContent();
-                    }
-                } else { 
-                    renderLockedContent(); 
                 }
             } catch(e) { 
-                console.error(e);
-                renderLockedContent(); 
+                console.error("Profile load error", e);
             }
         });
 
-        function renderPremiumContent() {
-            const main = document.getElementById('main-content');
-            main.innerHTML = `
-                <div class="page-header animate__animated animate__fadeInDown">
-                    <h2><i class="fas fa-book-open" style="color:var(--gold-base)"></i> Premium Resources</h2>
-                    <p>Exclusive tools designed to accelerate your career path.</p>
-                </div>
-                
-                <div class="tab-controls animate__animated animate__fadeIn">
-                    <button class="tab-btn active" onclick="filterResources('all', this)">All</button>
-                    <button class="tab-btn" onclick="filterResources('resume', this)">Resumes</button>
-                    <button class="tab-btn" onclick="filterResources('interview', this)">Interviews</button>
-                    <button class="tab-btn" onclick="filterResources('guide', this)">Guides</button>
-                </div>
-                
-                <div class="resources-grid" id="resources-grid"></div>
-            `;
-            renderResources('all');
-        }
-
-        function renderLockedContent() {
-            const main = document.getElementById('main-content');
-            main.innerHTML = `
-                <div class="glass-panel locked-container animate__animated animate__zoomIn">
-                    <div class="lock-circle"><i class="fas fa-lock"></i></div>
-                    <h2 style="font-family:var(--font-head); font-size:1.6rem; color:var(--text-main); margin-bottom:10px;">Premium Content Locked</h2>
-                    <p style="color:var(--text-muted); max-width:450px; line-height:1.6;">
-                        Upgrade your plan to access exclusive resume templates, interview guides, and comprehensive career planning tools.
-                    </p>
-                    <a href="seeker-premium.html" class="btn-upgrade"><i class="fas fa-crown"></i> Unlock Now</a>
-                </div>
-            `;
-        }
-
         window.renderResources = (cat) => {
             const grid = document.getElementById('resources-grid');
-            if (!grid) return; grid.innerHTML = '';
+            if (!grid) return; 
+            grid.innerHTML = '';
             
             const list = cat === 'all' ? resourcesData : resourcesData.filter(r => r.category === cat);
             
@@ -445,7 +459,7 @@
                         <div class="icon-box ${res.iconClass}"><i class="${res.icon}"></i></div>
                         <h3 class="res-title">${res.title}</h3>
                         <p class="res-desc">${res.desc}</p>
-                        <a href="${res.url}" class="btn-download" download>
+                        <a href="${res.url}" class="btn-download" download onclick="handleActionWithSpinner(this)">
                             <i class="fas fa-download"></i> Download
                         </a>
                     </div>
@@ -465,7 +479,7 @@
             onSnapshot(query(collection(db, "messages"), where("receiverId", "==", uid), where("read", "==", false)), s => up('msg-badge', s.size));
         }
 
-        // --- SEARCH LOGIC (Master) ---
+        // --- SEARCH LOGIC ---
         const searchInput = document.getElementById('searchInput');
         const searchResults = document.getElementById('searchResults');
         if(searchInput) {
@@ -474,10 +488,10 @@
                 if(term.length < 2) { searchResults.style.display = 'none'; return; }
                 const matches = resourcesData.filter(r => r.title.toLowerCase().includes(term));
                 if(matches.length > 0) {
-                    searchResults.innerHTML = matches.map(r => `<div class="search-result-item">${r.title}</div>`).join('');
+                    searchResults.innerHTML = matches.map(r => `<div class="search-result-item" onclick="handleActionWithSpinner(this, () => window.location.href='${r.url}')">${r.title}</div>`).join('');
                     searchResults.style.display = 'block';
                 } else {
-                    searchResults.innerHTML = `<div style="padding:10px;">No matches</div>`;
+                    searchResults.innerHTML = `<div style="padding:10px; color:var(--text-muted); font-size:0.9rem;">No resources found</div>`;
                     searchResults.style.display = 'block';
                 }
             });
@@ -513,7 +527,6 @@
             localStorage.setItem('pwaDismissed', 'true');
         };
 
-        // Service Worker Registration
         if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js");
     </script>
 </body>
