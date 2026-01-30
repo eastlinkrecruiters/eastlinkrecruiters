@@ -423,6 +423,18 @@
                     Generate a branded PDF report. ID and Phone numbers will be masked for privacy in the final document.
                 </p>
                 
+                <!-- Date Range Inputs -->
+                <div style="display:flex; gap:10px; margin-bottom:15px;">
+                    <div class="form-group">
+                        <label class="form-label">From Date</label>
+                        <input type="date" id="exportStartDate" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">To Date</label>
+                        <input type="date" id="exportEndDate" class="form-input">
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label class="form-label">Filter Report By</label>
                     <select id="exportStatus" class="form-select">
@@ -444,7 +456,24 @@
             </div>
             <div class="modal-footer">
                 <button class="btn-action btn-glass" onclick="document.getElementById('exportModal').classList.remove('active')">Close</button>
-                <button class="btn-action btn-gold" onclick="generatePDF()"><i class="fas fa-download"></i> Download PDF</button>
+                <button class="btn-action btn-gold" onclick="generateAndPreviewPDF()"><i class="fas fa-eye"></i> Preview Report</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF PREVIEW MODAL -->
+    <div class="modal-overlay" id="pdfPreviewModal" style="z-index: 2100;">
+        <div class="modal-card" style="max-width: 90%; height: 90vh; display:flex; flex-direction:column;">
+            <div class="modal-header">
+                <h3>Report Preview</h3>
+                <i class="fas fa-times" onclick="closePreviewModal()" style="cursor:pointer;"></i>
+            </div>
+            <div class="modal-body" style="flex:1; padding:0; overflow:hidden;">
+                <iframe id="pdfPreviewFrame" width="100%" height="100%" style="border:none;"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-action btn-glass" onclick="closePreviewModal()">Close</button>
+                <button class="btn-action btn-gold" onclick="downloadFinalPDF()"><i class="fas fa-download"></i> Download Now</button>
             </div>
         </div>
     </div>
@@ -460,6 +489,7 @@
         import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, Timestamp, onSnapshot, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         let candidates = [];
+        let currentPDFDoc = null; // Store PDF instance for download
         const { jsPDF } = window.jspdf;
 
         // --- UI UTILS ---
@@ -656,15 +686,29 @@
 
         window.closeModal = () => document.getElementById('candidateModal').classList.remove('active');
         window.openExportModal = () => document.getElementById('exportModal').classList.add('active');
+        
+        window.closePreviewModal = () => {
+            document.getElementById('pdfPreviewModal').classList.remove('active');
+            // Clear iframe to free memory
+            setTimeout(() => { document.getElementById('pdfPreviewFrame').src = ""; }, 300);
+        };
 
-        // --- ADVANCED PDF EXPORT ---
-        window.generatePDF = () => {
+        // --- ADVANCED PDF EXPORT & PREVIEW ---
+        window.generateAndPreviewPDF = () => {
             const doc = new jsPDF();
             const filterStat = document.getElementById('exportStatus').value;
             const sortOrder = document.getElementById('exportSort').value;
+            const startDate = document.getElementById('exportStartDate').value;
+            const endDate = document.getElementById('exportEndDate').value;
 
-            // 1. Prepare Data
-            let exportData = candidates.filter(c => filterStat === 'all' || c.status === filterStat);
+            // 1. Prepare Data with Date Filter
+            let exportData = candidates.filter(c => {
+                const statusMatch = filterStat === 'all' || c.status === filterStat;
+                let dateMatch = true;
+                if(startDate && c.dateApplied < startDate) dateMatch = false;
+                if(endDate && c.dateApplied > endDate) dateMatch = false;
+                return statusMatch && dateMatch;
+            });
 
             // 2. Sort
             exportData.sort((a, b) => {
@@ -673,7 +717,7 @@
                 if(sortOrder === 'nameAsc') return a.name.localeCompare(b.name);
             });
 
-            if(exportData.length === 0) return Toastify({ text: "No records to export with current filters", style: { background: "var(--danger)" } }).showToast();
+            if(exportData.length === 0) return Toastify({ text: "No records to export with current date/filter criteria", style: { background: "var(--danger)" } }).showToast();
 
             // 3. Header Branding
             const logoUrl = 'assets/images/logo.png'; 
@@ -696,8 +740,14 @@
             doc.line(14, 30, 196, 30); // Horizontal Line
 
             doc.setFontSize(9);
+            // Construct Date Range String
+            let dateRangeStr = "All time";
+            if (startDate && endDate) dateRangeStr = `${startDate} to ${endDate}`;
+            else if (startDate) dateRangeStr = `From ${startDate}`;
+            else if (endDate) dateRangeStr = `Until ${endDate}`;
+
             doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 38);
-            doc.text(`Filter: ${filterStat.toUpperCase()}`, 14, 43);
+            doc.text(`Period: ${dateRangeStr}`, 14, 43);
 
             // 4. Watermark Hook
             const addWatermark = (data) => {
@@ -709,14 +759,24 @@
                 doc.text("EASTLINK CONFIDENTIAL", 30, 150, { angle: 45 });
                 doc.restoreGraphicsState();
                 
-                // Footer Page Number
-                let str = "Page " + doc.internal.getNumberOfPages();
+                // Footer Page Number & Copyright
+                const pageHeight = doc.internal.pageSize.height;
                 doc.setFontSize(8);
-                doc.setTextColor(150);
-                doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
+                doc.setTextColor(100);
+                
+                // Left: Copyright
+                doc.text("© " + new Date().getFullYear() + " EastLink Recruiters. All rights reserved.", 14, pageHeight - 10);
+                
+                // Center: Page Num
+                let str = "Page " + doc.internal.getNumberOfPages();
+                doc.text(str, data.settings.margin.left + 80, pageHeight - 10);
+
+                // Right: Support Email
+                doc.text("Support: eastlinkrecruiters@gmail.com", 196, pageHeight - 10, { align: 'right' });
             };
 
-            // 5. Table Data
+            // 5. Table Data 
+            // NOTE: Headers are clean ("ID Number", "Phone") but content is masked
             const body = exportData.map((c, i) => [
                 (i + 1).toString(),
                 c.name,
@@ -730,7 +790,8 @@
             // 6. Generate AutoTable
             doc.autoTable({
                 startY: 50,
-                head: [['#', 'Candidate Name', 'ID (Masked)', 'Phone (Masked)', 'Job Type', 'Applied On', 'Status']],
+                // Clean Professional Headers (No "Masked" label)
+                head: [['#', 'Candidate Name', 'ID Number', 'Phone', 'Job Type', 'Applied On', 'Status']],
                 body: body,
                 theme: 'striped',
                 headStyles: { 
@@ -761,10 +822,26 @@
                 didDrawPage: addWatermark
             });
 
-            // 7. Save
-            doc.save(`EastLink_Report_${new Date().toISOString().slice(0,10)}.pdf`);
+            // 7. Store doc for download and Show Preview
+            currentPDFDoc = doc;
+            const pdfBlob = doc.output('bloburl');
+            
+            document.getElementById('pdfPreviewFrame').src = pdfBlob;
+            
+            // Switch modals
             document.getElementById('exportModal').classList.remove('active');
-            Toastify({ text: "PDF Downloaded Successfully", style: { background: "var(--success)" } }).showToast();
+            document.getElementById('pdfPreviewModal').classList.add('active');
+        };
+
+        window.downloadFinalPDF = () => {
+            if(currentPDFDoc) {
+                currentPDFDoc.save(`EastLink_Report_${new Date().toISOString().slice(0,10)}.pdf`);
+                Toastify({ text: "PDF Downloaded Successfully", style: { background: "var(--success)" } }).showToast();
+                // Optional: Close preview after download
+                // closePreviewModal();
+            } else {
+                Toastify({ text: "Error: No PDF generated", style: { background: "var(--danger)" } }).showToast();
+            }
         };
     </script>
 </body>
