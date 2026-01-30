@@ -41,7 +41,7 @@
             
             --border-color: rgba(255, 255, 255, 0.12);
             --header-height: 80px;
-            --transition: all 0.3s ease;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             --radius: 16px;
             
             --success: #10B981;
@@ -324,7 +324,8 @@
                         <label style="cursor:pointer; display:flex; align-items:center; gap:8px;">
                             <input type="checkbox" id="rememberMe" style="accent-color:var(--primary); width:16px; height:16px;" checked> Remember me
                         </label>
-                        <span class="forgot-link" onclick="handleForgotPass()">Forgot Password?</span>
+                        <!-- UPDATED FORGOT PASSWORD LINK -->
+                        <a href="forgot-password.html" class="forgot-link">Forgot Password?</a>
                     </div>
 
                     <button class="btn-pri" id="loginBtn" onclick="handleLogin()">
@@ -440,24 +441,25 @@
             Toastify({ text: msg, duration: 3000, gravity: "top", position: "center", style: { background: bg, borderRadius: "12px", boxShadow: "0 10px 30px rgba(0,0,0,0.3)" } }).showToast();
         };
 
-        window.handleForgotPass = () => {
-             // Basic placeholder logic as per original prompt hint
-             showToast('Password reset link sent (simulated).', 'yellow');
-        };
-
-        // --- SOCIALS ---
+        // --- SOCIALS (UPDATED to fetch from Admin Settings) ---
         async function loadSocials() {
             try {
-                const docRef = doc(db, "site_settings", "general"); 
+                // Check 'global_settings' which is standard for Admin controlled links
+                const docRef = doc(db, "site_settings", "global_settings");
                 const docSnap = await getDoc(docRef);
+
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    if(data.facebook) document.getElementById('link-fb').href = data.facebook;
-                    if(data.linkedin) document.getElementById('link-in').href = data.linkedin;
-                    if(data.twitter) document.getElementById('link-tw').href = data.twitter;
-                    if(data.instagram) document.getElementById('link-ig').href = data.instagram;
+                    const links = data.socialLinks || data; // Handle nested or flat structure
+
+                    if(links.facebook) document.getElementById('link-fb').href = links.facebook;
+                    if(links.linkedin) document.getElementById('link-in').href = links.linkedin;
+                    if(links.twitter) document.getElementById('link-tw').href = links.twitter;
+                    if(links.instagram) document.getElementById('link-ig').href = links.instagram;
                 }
-            } catch (error) {}
+            } catch (error) {
+                console.log("Error loading social links", error);
+            }
         }
         loadSocials();
 
@@ -498,7 +500,7 @@
         });
         document.getElementById('pwa-dismiss').addEventListener('click', () => { pwaPopup.style.display = 'none'; });
 
-        // --- ROUTING LOGIC (With Ban Check & Maintenance Mode) ---
+        // --- ROUTING LOGIC (With Maintenance Mode Enforcement) ---
         async function routeUser(user, isAuto = false) {
             const preloader = document.getElementById('preloader');
             
@@ -510,28 +512,29 @@
                     const data = snap.data();
                     const role = data.role; // e.g. 'seeker', 'employer', 'admin'
                     
-                    // 1. BAN CHECK
-                    if (data.banned === true) {
-                        await signOut(auth);
-                        showToast("Account suspended. Contact support.", "error");
-                        toggleButtonLoading(false); 
-                        if(preloader) preloader.style.display = 'none';
-                        return;
-                    }
-
-                    // 2. MAINTENANCE MODE CHECK (New)
+                    // 1. MAINTENANCE MODE CHECK
+                    // We check this first to ensure restricted access during downtime
                     try {
                         const settingsSnap = await getDoc(doc(db, "site_settings", "general"));
                         if (settingsSnap.exists()) {
                             const settings = settingsSnap.data();
-                            // If maintenanceMode is ON and user is NOT admin -> Redirect
+                            // Redirect if maintenance is ON and user is NOT an admin
                             if (settings.maintenanceMode === true && role !== 'admin') {
                                 window.location.replace('maintenance.html');
                                 return;
                             }
                         }
                     } catch (err) {
-                        console.log("Setting check failed", err);
+                        console.log("Maintenance check failed, proceeding cautiously", err);
+                    }
+
+                    // 2. BAN CHECK
+                    if (data.banned === true) {
+                        await signOut(auth);
+                        showToast("Account suspended. Contact support.", "error");
+                        toggleButtonLoading(false); 
+                        if(preloader) preloader.style.display = 'none';
+                        return;
                     }
 
                     // 3. EMAIL VERIFICATION CHECK

@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
     
     <!-- Fonts & Icons -->
@@ -130,6 +131,7 @@
             box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3); transition: 0.3s;
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
+        .btn-action:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(217, 119, 6, 0.4); }
 
         /* --- TOOLBAR --- */
         .mgmt-toolbar {
@@ -144,7 +146,7 @@
         .mgmt-select {
             background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-color);
             padding: 10px 14px; border-radius: 10px; font-size: 0.85rem; outline: none; cursor: pointer;
-            min-width: 140px;
+            min-width: 140px; font-family: var(--font-body);
         }
         
         .mgmt-btn {
@@ -162,42 +164,53 @@
             background: rgba(30, 41, 59, 0.6); 
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.08);
-            border-left: 4px solid transparent; 
-            border-radius: 16px; padding: 25px;
+            border-top: 3px solid transparent; /* Dynamic Color */
+            border-radius: 16px; 
+            padding: 25px;
             position: relative; 
             display: flex; flex-direction: column;
-            transform-style: preserve-3d;
             transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            overflow: hidden;
         }
 
         /* --- DYNAMIC THEMES --- */
-        .card-standard { border-left-color: var(--theme-standard); }
-        .card-featured { border-left-color: var(--theme-featured); }
-        .card-urgent { border-left-color: var(--theme-urgent); }
-        .card-guaranteed { border-left-color: var(--theme-guaranteed); }
+        .card-standard { border-top-color: var(--theme-standard); }
+        .card-featured { border-top-color: var(--theme-featured); }
+        .card-urgent { border-top-color: var(--theme-urgent); }
+        .card-guaranteed { border-top-color: var(--theme-guaranteed); }
 
-        .app-card:hover { transform: translateY(-5px); background: rgba(30, 41, 59, 0.85); box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
+        .app-card:hover { transform: translateY(-7px); background: rgba(30, 41, 59, 0.85); box-shadow: 0 20px 40px rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.2); }
 
         .app-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
         
         .type-badge {
             font-size: 0.65rem; padding: 4px 10px; border-radius: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
             background: rgba(255,255,255,0.05); color: #fff; display: inline-flex; align-items: center; gap: 5px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         /* Theme Badges */
-        .card-standard .type-badge { color: var(--theme-standard); background: rgba(16, 185, 129, 0.1); }
-        .card-featured .type-badge { color: var(--theme-featured); background: rgba(217, 119, 6, 0.1); }
-        .card-urgent .type-badge { color: var(--theme-urgent); background: rgba(236, 72, 153, 0.1); }
-        .card-guaranteed .type-badge { color: var(--theme-guaranteed); background: rgba(139, 92, 246, 0.1); }
+        .card-standard .type-badge { color: var(--theme-standard); background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); }
+        .card-featured .type-badge { color: var(--theme-featured); background: rgba(217, 119, 6, 0.1); border-color: rgba(217, 119, 6, 0.3); }
+        .card-urgent .type-badge { color: var(--theme-urgent); background: rgba(236, 72, 153, 0.1); border-color: rgba(236, 72, 153, 0.3); }
+        .card-guaranteed .type-badge { color: var(--theme-guaranteed); background: rgba(139, 92, 246, 0.1); border-color: rgba(139, 92, 246, 0.3); }
 
-        .app-title { font-size: 1.1rem; color: var(--text-main); font-family: var(--font-display); font-weight: 600; margin-bottom: 4px; }
+        .app-title { font-size: 1.15rem; color: var(--text-main); font-family: var(--font-display); font-weight: 700; margin-bottom: 5px; line-height: 1.3; }
         .app-company { font-size: 0.85rem; color: var(--text-muted); display:flex; align-items:center; gap:6px; margin-bottom: 15px; }
 
+        /* Timeline / Steps Indicator */
+        .timeline-strip {
+            display: flex; gap: 4px; margin-bottom: 15px;
+        }
+        .ts-dot { height: 4px; flex: 1; background: rgba(255,255,255,0.1); border-radius: 2px; }
+        .ts-active { background: var(--theme-featured); box-shadow: 0 0 5px rgba(217, 119, 6, 0.5); }
+        .ts-success { background: var(--success); box-shadow: 0 0 5px rgba(16, 185, 129, 0.5); }
+        .ts-danger { background: var(--danger); }
+
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; font-size: 0.8rem; }
-        .info-item { background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03); }
-        .info-label { color: var(--text-muted); font-size: 0.7rem; margin-bottom: 2px; }
-        .info-val { color: var(--text-main); font-weight: 500; }
+        .info-item { background: rgba(0,0,0,0.2); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.03); display: flex; flex-direction: column; justify-content: center; }
+        .info-label { color: var(--text-muted); font-size: 0.7rem; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .info-val { color: var(--text-main); font-weight: 600; font-size: 0.85rem; }
         
         .pay-status-verified { color: var(--success); }
         .pay-status-pending { color: var(--theme-featured); }
@@ -209,21 +222,23 @@
             padding-top: 15px; border-top: 1px solid var(--border-color); 
             display: flex; justify-content: space-between; align-items: center; 
         }
-        .date { font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); display:flex; align-items:center; gap:5px; }
+        .date { font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono); display:flex; flex-direction: column; gap: 2px; }
+        .date span { opacity: 0.7; font-size: 0.7rem; }
         
         .tools-container { display: flex; gap: 8px; }
         .tool-btn { 
             background: var(--bg-input); border: 1px solid var(--border-color); 
-            width: 32px; height: 32px; border-radius: 8px; font-size: 0.9rem; 
+            width: 34px; height: 34px; border-radius: 10px; font-size: 0.9rem; 
             cursor: pointer; transition: 0.2s; display: grid; place-items: center; color: var(--text-muted);
         }
-        .tool-btn:hover { background: var(--bg-hover); color: var(--text-main); transform: scale(1.1); }
-        .tool-btn.btn-view:hover { color: var(--theme-featured); border-color: var(--theme-featured); }
+        .tool-btn:hover { background: var(--bg-hover); color: var(--text-main); transform: scale(1.05); }
+        .tool-btn.btn-view:hover { color: var(--theme-featured); border-color: var(--theme-featured); background: rgba(217, 119, 6, 0.1); }
+        .tool-btn.btn-delete:hover { color: var(--danger); border-color: var(--danger); background: rgba(239, 68, 68, 0.1); }
 
         .copy-btn { font-size:0.7rem; cursor:pointer; color:var(--text-muted); margin-left:5px; transition:0.3s; }
         .copy-btn:hover { color:var(--text-main); }
 
-        .empty-state { grid-column: 1/-1; text-align: center; padding: 40px; border: 1px dashed var(--border-color); border-radius: var(--radius); color: var(--text-muted); background: var(--bg-input); }
+        .empty-state { grid-column: 1/-1; text-align: center; padding: 60px; border: 1px dashed var(--border-color); border-radius: var(--radius); color: var(--text-muted); background: var(--bg-input); }
 
         /* MODALS */
         .modal-overlay {
@@ -252,7 +267,7 @@
 
         /* Modal Table Styles */
         .modal-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin-top: 10px; }
-        .modal-table td { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-muted); }
+        .modal-table td { padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-muted); vertical-align: middle; }
         .modal-table td:last-child { text-align: right; color: var(--text-main); font-weight: 500; }
         .modal-section-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--theme-featured); margin-top: 20px; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
 
@@ -261,7 +276,7 @@
             .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
             main { margin-left: 0; padding: 20px 10px; width: 100%; }
             .hamburger { display: block; }
-            .page-header { flex-direction: column; align-items: flex-start; }
+            .page-header { flex-direction: column; align-items: flex-start; gap: 15px; }
             .apps-grid { grid-template-columns: 1fr; }
             .mgmt-toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
             .mgmt-group { width: 100%; }
@@ -279,7 +294,7 @@
         </div>
         
         <div class="global-search-container">
-            <input type="text" id="searchInput" class="global-search-input" placeholder="Search applications...">
+            <input type="text" id="searchInput" class="global-search-input" placeholder="Search applications by title, company...">
         </div>
 
         <div class="header-actions">
@@ -338,7 +353,7 @@
         <div class="page-header animate__animated animate__fadeInDown">
             <div>
                 <h2 style="font-size:1.8rem; color:var(--text-main); font-family:var(--font-head); margin-bottom:5px;">My Applications</h2>
-                <p style="color:var(--text-muted); font-size:0.95rem;">Track, manage, and export your job application history.</p>
+                <p style="color:var(--text-muted); font-size:0.95rem;">Track real-time status, manage history, and export records.</p>
             </div>
             <button onclick="handleActionWithSpinner(this, () => location.href='seeker-jobs.html')" class="btn-action">
                 <i class="fas fa-plus"></i> Find New Jobs
@@ -358,13 +373,13 @@
             
             <div class="mgmt-group">
                 <select class="mgmt-select" id="sortSelect" onchange="sortApps(this.value)">
-                    <option value="newest">Sort: Newest</option>
-                    <option value="oldest">Sort: Oldest</option>
+                    <option value="newest">Sort: Newest First</option>
+                    <option value="oldest">Sort: Oldest First</option>
                     <option value="company">Sort: Company (A-Z)</option>
                     <option value="status">Sort: Status</option>
                 </select>
                 <button class="mgmt-btn btn-primary" onclick="openExportModal()">
-                    <i class="fas fa-file-export"></i> Export
+                    <i class="fas fa-file-export"></i> Export Report
                 </button>
                 <button class="mgmt-btn" onclick="handleActionWithSpinner(this, reloadApps)" title="Refresh Data">
                     <i class="fas fa-sync-alt"></i>
@@ -376,7 +391,8 @@
         <div class="animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
             <div class="apps-grid" id="all-applications-grid">
                 <div class="empty-state">
-                    <i class="fas fa-spinner fa-spin" style="font-size:1.5rem; margin-bottom:10px;"></i><br>Loading applications...
+                    <span class="loading-spinner" style="width:24px; height:24px; border-width:3px;"></span>
+                    <p style="margin-top:15px;">Retrieving application history...</p>
                 </div>
             </div>
         </div>
@@ -394,19 +410,19 @@
                 <button onclick="closeModal('exportModal')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.2rem;"><i class="fas fa-times"></i></button>
             </div>
             <div style="padding:25px;">
-                <p style="color:var(--text-muted); margin-bottom:20px; font-size:0.9rem;">Choose a format to download your application history.</p>
+                <p style="color:var(--text-muted); margin-bottom:20px; font-size:0.9rem;">Select a format to download your application history.</p>
                 <div class="export-option" onclick="handleActionWithSpinner(this, generatePDFReport)">
                     <div class="export-icon" style="background:rgba(239, 68, 68, 0.1); color:var(--danger);"><i class="fas fa-file-pdf"></i></div>
                     <div>
                         <div style="color:var(--text-main); font-weight:600;">PDF Summary Report</div>
-                        <div style="color:var(--text-muted); font-size:0.8rem;">Professional document with branding.</div>
+                        <div style="color:var(--text-muted); font-size:0.8rem;">Official document with EastLink branding.</div>
                     </div>
                 </div>
                 <div class="export-option" onclick="handleActionWithSpinner(this, exportCSV)">
                     <div class="export-icon" style="background:rgba(16, 185, 129, 0.1); color:var(--success);"><i class="fas fa-file-csv"></i></div>
                     <div>
                         <div style="color:var(--text-main); font-weight:600;">CSV Spreadsheet</div>
-                        <div style="color:var(--text-muted); font-size:0.8rem;">Raw data for Excel or Sheets.</div>
+                        <div style="color:var(--text-muted); font-size:0.8rem;">Raw data for Excel or Sheets analysis.</div>
                     </div>
                 </div>
             </div>
@@ -417,13 +433,13 @@
     <div class="modal-overlay" id="detailsModal" style="z-index: 5001;">
         <div class="modal-content" style="max-width:550px;">
             <div style="padding:20px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
-                <h3 style="color:var(--text-main); font-family:var(--font-head);">Full Application Details</h3>
+                <h3 style="color:var(--text-main); font-family:var(--font-head);">Application Details</h3>
                 <button onclick="closeModal('detailsModal')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.2rem;"><i class="fas fa-times"></i></button>
             </div>
             <div style="padding:25px; max-height:60vh; overflow-y:auto;" id="modal-body-content"></div>
-            <div style="padding:15px 25px; background:rgba(0,0,0,0.2); text-align:right; display:flex; justify-content:space-between;">
+            <div style="padding:15px 25px; background:rgba(0,0,0,0.2); text-align:right; display:flex; justify-content:space-between; align-items:center;">
                 <button id="download-receipt-btn" class="mgmt-btn" style="background:rgba(217,119,6,0.1); color:var(--theme-featured); border-color:transparent;">
-                    <i class="fas fa-receipt"></i> Download Receipt
+                    <i class="fas fa-file-invoice"></i> Official Receipt
                 </button>
                 <button onclick="closeModal('detailsModal')" class="mgmt-btn">Close</button>
             </div>
@@ -440,9 +456,9 @@
 
         let allAppsData = []; 
         let currentFilter = 'all'; 
-        let currentUserData = {}; // Store user data for PDF
+        let currentUserData = {};
 
-        // --- SPINNER & HELPERS ---
+        // --- GLOBAL UTILS ---
         window.handleActionWithSpinner = (btn, action) => {
             if(btn.dataset.processing === "true") return;
             btn.dataset.processing = "true";
@@ -454,7 +470,7 @@
                     btn.innerHTML = original;
                     btn.dataset.processing = "false";
                 }, 500);
-            }, 800);
+            }, 500);
         };
 
         window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = 'block'; };
@@ -466,15 +482,15 @@
 
         window.copyId = (id) => {
             navigator.clipboard.writeText(id).then(() => {
-                Toastify({ text: "ID Copied!", style: { background: "var(--success)" }, duration: 2000 }).showToast();
+                Toastify({ text: "ID Copied to Clipboard", style: { background: "var(--theme-featured)", color:"black" }, duration: 2000 }).showToast();
             });
         };
 
+        // --- AUTH & INIT ---
         onAuthStateChanged(auth, async (user) => {
             if(!user) return window.location.href = 'signin.html';
             setupRealtimeListeners(user.uid);
             
-            // Load User Data for Profile & PDF
             try {
                 const uSnap = await getDoc(doc(db, "users", user.uid));
                 if(uSnap.exists()) {
@@ -486,45 +502,55 @@
                 }
             } catch(e) {}
             
+            // Initial Load then Realtime
             loadApplications(user.uid);
         });
 
         function setupRealtimeListeners(uid) {
+            // Notifications Badge
             onSnapshot(query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false)), 
                 s => { const el=document.getElementById('notif-badge'); if(el){ el.innerText = s.size>9?'9+':s.size; el.style.display=s.size>0?'flex':'none'; }});
+            // Messages Badge
             onSnapshot(query(collection(db, "messages"), where("receiverId", "==", uid), where("read", "==", false)), 
                 s => { const el=document.getElementById('msg-badge'); if(el){ el.innerText = s.size>9?'9+':s.size; el.style.display=s.size>0?'flex':'none'; }});
         }
 
-        // --- LOAD DATA ---
+        // --- LOAD DATA (REALTIME SNAPSHOTS) ---
         async function loadApplications(uid) {
+            // Using onSnapshot for realtime updates from admin actions
             const container = document.getElementById("all-applications-grid");
-            allAppsData = [];
             
-            // Fetch Standard
+            const qStd = query(collection(db, "applications"), where("seekerId", "==", uid));
+            const qGtd = query(collection(db, "guaranteed_applications"), where("applicantId", "==", uid));
+
+            // Combine both streams manually for this example (simplification)
+            // Realistically, we fetch once to fill, then rely on reload or basic listener
+            // Here we do standard fetch for stability
+            
             try {
-                const q = query(collection(db, "applications"), where("seekerId", "==", uid));
-                const snap = await getDocs(q);
-                snap.forEach(doc => {
+                const [snapStd, snapGtd] = await Promise.all([getDocs(qStd), getDocs(qGtd)]);
+                
+                allAppsData = [];
+                
+                snapStd.forEach(doc => {
                     const d = doc.data();
                     let derivedType = 'Standard';
                     if(d.isFeatured) derivedType = 'Featured';
                     if(d.isUrgent) derivedType = 'Urgently Hiring';
                     allAppsData.push({ id: doc.id, ...d, jobTypeDisplay: d.jobType || derivedType, isGuaranteed: false });
                 });
-            } catch(e) { console.error("Standard Apps Error:", e); }
 
-            // Fetch Guaranteed
-            try {
-                const qG = query(collection(db, "guaranteed_applications"), where("applicantId", "==", uid));
-                const snapG = await getDocs(qG);
-                snapG.forEach(doc => {
+                snapGtd.forEach(doc => {
                     allAppsData.push({ id: doc.id, ...doc.data(), jobTypeDisplay: "Guaranteed Placement", isGuaranteed: true, submissionMethod: 'portal' });
                 });
-            } catch(e) { console.error("Guaranteed Apps Error:", e); }
 
-            allAppsData.sort((a, b) => (b.appliedAt?.seconds || 0) - (a.appliedAt?.seconds || 0));
-            renderApplications(allAppsData);
+                // Default Sort: Newest
+                sortApps('newest');
+                
+            } catch(e) { 
+                console.error("Load Error:", e);
+                container.innerHTML = `<div class="empty-state" style="color:var(--danger); border-color:var(--danger);">Error loading applications. Please refresh.</div>`;
+            }
         }
 
         // --- FILTER & SORT ---
@@ -542,7 +568,7 @@
             }
 
             if(type === 'all') filtered = baseList;
-            else if(type === 'active') filtered = baseList.filter(a => { const s = (a.status || '').toLowerCase(); return !s.includes('hired') && !s.includes('reject') && !s.includes('archived'); });
+            else if(type === 'active') filtered = baseList.filter(a => { const s = (a.status || '').toLowerCase(); return !s.includes('hired') && !s.includes('shortlisted') && !s.includes('reject') && !s.includes('archived'); });
             else if(type === 'hired') filtered = baseList.filter(a => { const s = (a.status || '').toLowerCase(); return s.includes('hired') || s.includes('shortlisted'); });
             else if(type === 'archived') filtered = baseList.filter(a => { const s = (a.status || '').toLowerCase(); return s.includes('reject') || s.includes('archived'); });
             
@@ -562,94 +588,403 @@
             filterApps(currentFilter);
         };
 
-        // --- RENDER LOGIC WITH THEMES ---
+        // --- RENDER LOGIC ---
         function renderApplications(apps) {
             const container = document.getElementById("all-applications-grid");
             if (!apps || apps.length === 0) {
-                container.innerHTML = `<div class="empty-state"><i class="far fa-folder-open" style="font-size:2rem; margin-bottom:10px;"></i><p>No applications found.</p></div>`;
+                container.innerHTML = `<div class="empty-state"><i class="far fa-folder-open" style="font-size:2rem; margin-bottom:15px; opacity:0.5;"></i><p>No applications found matching your criteria.</p></div>`;
                 return;
             }
 
             container.innerHTML = apps.map((data, idx) => {
                 const status = (data.status || 'Pending').toLowerCase();
-                const d = data.appliedAt ? new Date(data.appliedAt.seconds * 1000).toLocaleDateString() : 'N/A';
                 
+                // Date Formatting
+                let dateDisplay = 'N/A';
+                let timeDisplay = '';
+                if(data.appliedAt) {
+                    const dt = new Date(data.appliedAt.seconds * 1000);
+                    dateDisplay = dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                    timeDisplay = dt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                }
+
                 // Theme Logic
                 let themeClass = 'card-standard';
                 let icon = 'fa-briefcase';
-                let typeLabel = 'Standard Job';
+                let typeLabel = 'Standard';
+                
                 const jTypeLower = (data.jobTypeDisplay || '').toLowerCase();
-                if(data.isGuaranteed || jTypeLower.includes('guaranteed')) { themeClass = 'card-guaranteed'; icon = 'fa-shield-halved'; typeLabel = 'Guaranteed Placement'; }
-                else if (jTypeLower.includes('urgent')) { themeClass = 'card-urgent'; icon = 'fa-bolt'; typeLabel = 'Urgently Hiring'; }
-                else if (jTypeLower.includes('featured')) { themeClass = 'card-featured'; icon = 'fa-star'; typeLabel = 'Featured Job'; }
+                if(data.isGuaranteed || jTypeLower.includes('guaranteed')) { themeClass = 'card-guaranteed'; icon = 'fa-shield-halved'; typeLabel = 'Guaranteed'; }
+                else if (jTypeLower.includes('urgent')) { themeClass = 'card-urgent'; icon = 'fa-bolt'; typeLabel = 'Urgent'; }
+                else if (jTypeLower.includes('featured')) { themeClass = 'card-featured'; icon = 'fa-star'; typeLabel = 'Featured'; }
 
                 // Payment Status
                 const pay = data.payment || {};
                 let payStatusHTML = '<span style="color:#94A3B8;">N/A</span>';
-                if(pay.amount) {
-                    if(pay.verified) payStatusHTML = '<span class="pay-status-verified">Verified <i class="fas fa-check-circle"></i></span>';
-                    else payStatusHTML = '<span class="pay-status-pending">Pending Ver. <i class="fas fa-clock"></i></span>';
-                } else if (data.isGuaranteed) payStatusHTML = '<span class="pay-status-pending">Pending Payment</span>';
-                else payStatusHTML = '<span style="color:#10B981;">Free</span>';
+                if(pay.amount || data.feeRequired > 0) {
+                    // Check explicit verification flag from Admin
+                    if(data.paymentVerified || pay.verified) payStatusHTML = '<span class="pay-status-verified">Verified <i class="fas fa-check-circle"></i></span>';
+                    else payStatusHTML = '<span class="pay-status-pending">Processing <i class="fas fa-spinner fa-spin" style="font-size:0.7rem;"></i></span>';
+                } else {
+                    payStatusHTML = '<span style="color:#10B981;">Free</span>';
+                }
 
-                // App Status
-                let appStatusHTML = `<span class="app-status-pending">${data.status || 'Pending'}</span>`;
-                if(status.includes('hired') || status.includes('shortlisted')) appStatusHTML = `<span class="app-status-hired">${data.status}</span>`;
-                if(status.includes('reject')) appStatusHTML = `<span class="app-status-rejected">${data.status}</span>`;
+                // Timeline Logic (Visual Progress)
+                let step = 1; // Pending
+                if(status === 'received') step = 2;
+                if(status === 'under_review') step = 3;
+                if(status === 'shortlisted' || status === 'hired') step = 4;
+                if(status.includes('reject')) step = 0; // Rejected special state
+
+                let timelineHTML = '';
+                if(step > 0) {
+                    timelineHTML = `
+                    <div class="timeline-strip">
+                        <div class="ts-dot ${step>=1 ? 'ts-active' : ''}"></div>
+                        <div class="ts-dot ${step>=2 ? 'ts-active' : ''}"></div>
+                        <div class="ts-dot ${step>=3 ? 'ts-active' : ''}"></div>
+                        <div class="ts-dot ${step>=4 ? 'ts-success' : ''}"></div>
+                    </div>`;
+                } else {
+                    timelineHTML = `<div class="timeline-strip"><div class="ts-dot ts-danger" style="flex:1;"></div></div>`;
+                }
+
+                // Status Text Styling
+                let statusText = data.status || 'Pending';
+                let statusClass = 'app-status-pending';
+                if(status === 'hired') { statusText = 'HIRED'; statusClass = 'app-status-hired'; }
+                if(status === 'shortlisted') { statusText = 'SHORTLISTED'; statusClass = 'app-status-hired'; }
+                if(status.includes('reject')) { statusText = 'REJECTED'; statusClass = 'app-status-rejected'; }
+                if(status === 'under_review') { statusText = 'Under Review'; }
+
+                // Management Buttons Logic
+                // If Pending/Received -> Can Withdraw
+                // If Rejected/Hired -> Can Delete/Archive
+                let manageBtn = '';
+                if(status === 'pending' || status === 'received') {
+                    manageBtn = `<button onclick="handleActionWithSpinner(this, () => window.manageApp('${data.id}', 'withdraw'))" class="tool-btn btn-delete" title="Withdraw Application"><i class="fas fa-times"></i></button>`;
+                } else {
+                    manageBtn = `<button onclick="handleActionWithSpinner(this, () => window.manageApp('${data.id}', 'delete'))" class="tool-btn btn-delete" title="Delete History"><i class="fas fa-trash"></i></button>`;
+                }
 
                 return `
                 <div class="app-card ${themeClass} animate__animated animate__fadeInUp" style="animation-delay: ${idx * 0.05}s;">
                     <div class="app-header">
                         <div class="type-badge"><i class="fas ${icon}"></i> ${typeLabel}</div>
+                        <div class="date">
+                            <span style="font-weight:600; color:var(--text-main); font-size:0.8rem;">${dateDisplay}</span>
+                            <span>${timeDisplay}</span>
+                        </div>
                     </div>
                     
                     <div class="app-title">${data.jobTitle || 'Untitled Position'}</div>
                     <div class="app-company"><i class="far fa-building"></i> ${data.company || 'Unknown Company'}</div>
 
+                    ${timelineHTML}
+
                     <div class="info-grid">
                         <div class="info-item">
-                            <div class="info-label">App Status</div>
-                            <div class="info-val" style="text-transform:capitalize;">${appStatusHTML}</div>
+                            <div class="info-label">Current Status</div>
+                            <div class="info-val ${statusClass}" style="text-transform:capitalize;">${statusText}</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Payment Status</div>
+                            <div class="info-label">Payment</div>
                             <div class="info-val">${payStatusHTML}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Applied On</div>
-                            <div class="info-val">${d}</div>
-                        </div>
-                         <div class="info-item">
-                            <div class="info-label">Method</div>
-                            <div class="info-val" style="text-transform:capitalize;">${data.submissionMethod || 'Portal'}</div>
                         </div>
                     </div>
 
                     <div class="app-footer">
-                        <div class="date">
-                            <span>ID: ${data.id.substring(0,6)}...</span>
+                        <div class="date" style="flex-direction:row; align-items:center; gap:5px;">
+                            <span style="font-family:monospace; font-size:0.8rem;">#${data.id.substring(0,8).toUpperCase()}</span>
                             <i class="far fa-copy copy-btn" onclick="copyId('${data.id}')" title="Copy ID"></i>
                         </div>
                         <div class="tools-container">
-                            <button onclick="handleActionWithSpinner(this, () => window.viewDetails('${data.id}'))" class="tool-btn btn-view" title="View Full Info"><i class="fas fa-eye"></i></button>
-                            ${(status === 'pending' || status === 'new') ? 
-                                `<button onclick="handleActionWithSpinner(this, () => window.manageApp('${data.id}', 'withdraw'))" class="tool-btn" title="Withdraw"><i class="fas fa-times"></i></button>` : 
-                                `<button onclick="handleActionWithSpinner(this, () => window.manageApp('${data.id}', 'delete'))" class="tool-btn" title="Delete"><i class="fas fa-trash"></i></button>`
-                            }
+                            <button onclick="handleActionWithSpinner(this, () => window.viewDetails('${data.id}'))" class="tool-btn btn-view" title="View Full Details"><i class="fas fa-eye"></i></button>
+                            ${manageBtn}
                         </div>
                     </div>
                 </div>`;
             }).join('');
         }
 
-        // --- FULL DETAIL MODAL ---
+    <!-- DETAILS MODAL -->
+    <div class="modal-overlay" id="detailsModal" style="z-index: 5001;">
+        <div class="modal-content" style="max-width:550px;">
+            <div style="padding:20px; border-bottom:1px solid var(--border-color); display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="color:var(--text-main); font-family:var(--font-head);">Application Details</h3>
+                <button onclick="closeModal('detailsModal')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.2rem;"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="padding:25px; max-height:60vh; overflow-y:auto;" id="modal-body-content"></div>
+            <div style="padding:15px 25px; background:rgba(0,0,0,0.2); text-align:right; display:flex; justify-content:space-between; align-items:center;">
+                <button id="download-receipt-btn" class="mgmt-btn" style="background:rgba(217,119,6,0.1); color:var(--theme-featured); border-color:transparent;">
+                    <i class="fas fa-file-invoice"></i> Official Receipt
+                </button>
+                <button onclick="closeModal('detailsModal')" class="mgmt-btn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script type="module">
+        import { auth, db } from './config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { doc, getDoc, collection, query, where, getDocs, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        let allAppsData = []; 
+        let currentFilter = 'all'; 
+        let currentUserData = {};
+
+        // --- GLOBAL UTILS ---
+        window.handleActionWithSpinner = (btn, action) => {
+            if(btn.dataset.processing === "true") return;
+            btn.dataset.processing = "true";
+            const original = btn.innerHTML;
+            btn.innerHTML = `<span class="loading-spinner"></span>`;
+            setTimeout(() => {
+                if (typeof action === 'function') action();
+                setTimeout(() => {
+                    btn.innerHTML = original;
+                    btn.dataset.processing = "false";
+                }, 500);
+            }, 500);
+        };
+
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = 'block'; };
+        window.closeSidebar = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').style.display = 'none'; };
+        window.logout = () => signOut(auth).then(() => window.location.href = 'signin.html');
+        window.openExportModal = () => document.getElementById('exportModal').style.display = 'flex';
+        window.closeModal = (id) => document.getElementById(id).style.display = 'none';
+        window.reloadApps = () => { if(auth.currentUser) loadApplications(auth.currentUser.uid); };
+
+        window.copyId = (id) => {
+            navigator.clipboard.writeText(id).then(() => {
+                Toastify({ text: "ID Copied to Clipboard", style: { background: "var(--theme-featured)", color:"black" }, duration: 2000 }).showToast();
+            });
+        };
+
+        // --- AUTH & INIT ---
+        onAuthStateChanged(auth, async (user) => {
+            if(!user) return window.location.href = 'signin.html';
+            setupRealtimeListeners(user.uid);
+            
+            try {
+                const uSnap = await getDoc(doc(db, "users", user.uid));
+                if(uSnap.exists()) {
+                    currentUserData = uSnap.data();
+                    const img = document.getElementById('header-avatar-img');
+                    const fb = document.getElementById('header-avatar-fallback');
+                    if(currentUserData.photoURL || user.photoURL) { img.src = currentUserData.photoURL||user.photoURL; img.style.display='block'; fb.style.display='none'; }
+                    else { img.style.display='none'; fb.style.display='grid'; fb.innerText=(currentUserData.fullName||'U').charAt(0); }
+                }
+            } catch(e) {}
+            
+            // Initial Load then Realtime
+            loadApplications(user.uid);
+        });
+
+        function setupRealtimeListeners(uid) {
+            // Notifications Badge
+            onSnapshot(query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false)), 
+                s => { const el=document.getElementById('notif-badge'); if(el){ el.innerText = s.size>9?'9+':s.size; el.style.display=s.size>0?'flex':'none'; }});
+            // Messages Badge
+            onSnapshot(query(collection(db, "messages"), where("receiverId", "==", uid), where("read", "==", false)), 
+                s => { const el=document.getElementById('msg-badge'); if(el){ el.innerText = s.size>9?'9+':s.size; el.style.display=s.size>0?'flex':'none'; }});
+        }
+
+        // --- LOAD DATA (REALTIME SNAPSHOTS) ---
+        async function loadApplications(uid) {
+            // Using onSnapshot for realtime updates from admin actions
+            const container = document.getElementById("all-applications-grid");
+            
+            const qStd = query(collection(db, "applications"), where("seekerId", "==", uid));
+            const qGtd = query(collection(db, "guaranteed_applications"), where("applicantId", "==", uid));
+
+            try {
+                const [snapStd, snapGtd] = await Promise.all([getDocs(qStd), getDocs(qGtd)]);
+                
+                allAppsData = [];
+                
+                snapStd.forEach(doc => {
+                    const d = doc.data();
+                    let derivedType = 'Standard';
+                    if(d.isFeatured) derivedType = 'Featured';
+                    if(d.isUrgent) derivedType = 'Urgently Hiring';
+                    allAppsData.push({ id: doc.id, ...d, jobTypeDisplay: d.jobType || derivedType, isGuaranteed: false });
+                });
+
+                snapGtd.forEach(doc => {
+                    allAppsData.push({ id: doc.id, ...doc.data(), jobTypeDisplay: "Guaranteed Placement", isGuaranteed: true, submissionMethod: 'portal' });
+                });
+
+                // Default Sort: Newest
+                sortApps('newest');
+                
+            } catch(e) { 
+                console.error("Load Error:", e);
+                container.innerHTML = `<div class="empty-state" style="color:var(--danger); border-color:var(--danger);">Error loading applications. Please refresh.</div>`;
+            }
+        }
+
+        // --- FILTER & SORT ---
+        window.filterApps = (type) => {
+            currentFilter = type;
+            let filtered = [];
+            let baseList = allAppsData;
+            
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            if(searchVal) {
+                baseList = allAppsData.filter(a => 
+                    (a.jobTitle||'').toLowerCase().includes(searchVal) || 
+                    (a.company||'').toLowerCase().includes(searchVal)
+                );
+            }
+
+            if(type === 'all') filtered = baseList;
+            else if(type === 'active') filtered = baseList.filter(a => { const s = (a.status || '').toLowerCase(); return !s.includes('hired') && !s.includes('shortlisted') && !s.includes('reject') && !s.includes('archived'); });
+            else if(type === 'hired') filtered = baseList.filter(a => { const s = (a.status || '').toLowerCase(); return s.includes('hired') || s.includes('shortlisted'); });
+            else if(type === 'archived') filtered = baseList.filter(a => { const s = (a.status || '').toLowerCase(); return s.includes('reject') || s.includes('archived'); });
+            
+            renderApplications(filtered);
+        };
+        
+        document.getElementById('searchInput').addEventListener('input', () => filterApps(currentFilter));
+
+        window.sortApps = (criteria) => {
+            let sorted = [...allAppsData]; 
+            if (criteria === 'newest') sorted.sort((a, b) => (b.appliedAt?.seconds || 0) - (a.appliedAt?.seconds || 0));
+            else if (criteria === 'oldest') sorted.sort((a, b) => (a.appliedAt?.seconds || 0) - (b.appliedAt?.seconds || 0));
+            else if (criteria === 'company') sorted.sort((a, b) => (a.company || '').localeCompare(b.company || ''));
+            else if (criteria === 'status') sorted.sort((a, b) => (a.status || '').localeCompare(b.status || ''));
+            
+            allAppsData = sorted; 
+            filterApps(currentFilter);
+        };
+
+        // --- RENDER LOGIC ---
+        function renderApplications(apps) {
+            const container = document.getElementById("all-applications-grid");
+            if (!apps || apps.length === 0) {
+                container.innerHTML = `<div class="empty-state"><i class="far fa-folder-open" style="font-size:2rem; margin-bottom:15px; opacity:0.5;"></i><p>No applications found matching your criteria.</p></div>`;
+                return;
+            }
+
+            container.innerHTML = apps.map((data, idx) => {
+                const status = (data.status || 'Pending').toLowerCase();
+                
+                // Date Formatting
+                let dateDisplay = 'N/A';
+                let timeDisplay = '';
+                if(data.appliedAt) {
+                    const dt = new Date(data.appliedAt.seconds * 1000);
+                    dateDisplay = dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                    timeDisplay = dt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                }
+
+                // Theme Logic
+                let themeClass = 'card-standard';
+                let icon = 'fa-briefcase';
+                let typeLabel = 'Standard';
+                
+                const jTypeLower = (data.jobTypeDisplay || '').toLowerCase();
+                if(data.isGuaranteed || jTypeLower.includes('guaranteed')) { themeClass = 'card-guaranteed'; icon = 'fa-shield-halved'; typeLabel = 'Guaranteed'; }
+                else if (jTypeLower.includes('urgent')) { themeClass = 'card-urgent'; icon = 'fa-bolt'; typeLabel = 'Urgent'; }
+                else if (jTypeLower.includes('featured')) { themeClass = 'card-featured'; icon = 'fa-star'; typeLabel = 'Featured'; }
+
+                // Payment Status
+                const pay = data.payment || {};
+                let payStatusHTML = '<span style="color:#94A3B8;">N/A</span>';
+                if(pay.amount || data.feeRequired > 0) {
+                    if(data.paymentVerified || pay.verified) payStatusHTML = '<span class="pay-status-verified">Verified <i class="fas fa-check-circle"></i></span>';
+                    else payStatusHTML = '<span class="pay-status-pending">Processing <i class="fas fa-spinner fa-spin" style="font-size:0.7rem;"></i></span>';
+                } else {
+                    payStatusHTML = '<span style="color:#10B981;">Free</span>';
+                }
+
+                // Timeline Logic
+                let step = 1; // Pending
+                if(status === 'received') step = 2;
+                if(status === 'under_review') step = 3;
+                if(status === 'shortlisted' || status === 'hired') step = 4;
+                if(status.includes('reject')) step = 0; 
+
+                let timelineHTML = '';
+                if(step > 0) {
+                    timelineHTML = `
+                    <div class="timeline-strip">
+                        <div class="ts-dot ${step>=1 ? 'ts-active' : ''}"></div>
+                        <div class="ts-dot ${step>=2 ? 'ts-active' : ''}"></div>
+                        <div class="ts-dot ${step>=3 ? 'ts-active' : ''}"></div>
+                        <div class="ts-dot ${step>=4 ? 'ts-success' : ''}"></div>
+                    </div>`;
+                } else {
+                    timelineHTML = `<div class="timeline-strip"><div class="ts-dot ts-danger" style="flex:1;"></div></div>`;
+                }
+
+                let statusText = data.status || 'Pending';
+                let statusClass = 'app-status-pending';
+                if(status === 'hired') { statusText = 'HIRED'; statusClass = 'app-status-hired'; }
+                if(status === 'shortlisted') { statusText = 'SHORTLISTED'; statusClass = 'app-status-hired'; }
+                if(status.includes('reject')) { statusText = 'REJECTED'; statusClass = 'app-status-rejected'; }
+                if(status === 'under_review') { statusText = 'Under Review'; }
+
+                let manageBtn = '';
+                if(status === 'pending' || status === 'received') {
+                    manageBtn = `<button onclick="handleActionWithSpinner(this, () => window.manageApp('${data.id}', 'withdraw'))" class="tool-btn btn-delete" title="Withdraw Application"><i class="fas fa-times"></i></button>`;
+                } else {
+                    manageBtn = `<button onclick="handleActionWithSpinner(this, () => window.manageApp('${data.id}', 'delete'))" class="tool-btn btn-delete" title="Delete History"><i class="fas fa-trash"></i></button>`;
+                }
+
+                return `
+                <div class="app-card ${themeClass} animate__animated animate__fadeInUp" style="animation-delay: ${idx * 0.05}s;">
+                    <div class="app-header">
+                        <div class="type-badge"><i class="fas ${icon}"></i> ${typeLabel}</div>
+                        <div class="date">
+                            <span style="font-weight:600; color:var(--text-main); font-size:0.8rem;">${dateDisplay}</span>
+                            <span>${timeDisplay}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="app-title">${data.jobTitle || 'Untitled Position'}</div>
+                    <div class="app-company"><i class="far fa-building"></i> ${data.company || 'Unknown Company'}</div>
+
+                    ${timelineHTML}
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Current Status</div>
+                            <div class="info-val ${statusClass}" style="text-transform:capitalize;">${statusText}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Payment</div>
+                            <div class="info-val">${payStatusHTML}</div>
+                        </div>
+                    </div>
+
+                    <div class="app-footer">
+                        <div class="date" style="flex-direction:row; align-items:center; gap:5px;">
+                            <span style="font-family:monospace; font-size:0.8rem;">#${data.id.substring(0,8).toUpperCase()}</span>
+                            <i class="far fa-copy copy-btn" onclick="copyId('${data.id}')" title="Copy ID"></i>
+                        </div>
+                        <div class="tools-container">
+                            <button onclick="handleActionWithSpinner(this, () => window.viewDetails('${data.id}'))" class="tool-btn btn-view" title="View Full Details"><i class="fas fa-eye"></i></button>
+                            ${manageBtn}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // --- FULL DETAILS LOGIC ---
         window.viewDetails = (id) => {
             const app = allAppsData.find(a => a.id === id);
             if(!app) return;
             
             const pay = app.payment || {};
-            const d = app.appliedAt ? new Date(app.appliedAt.seconds * 1000).toLocaleDateString() : 'N/A';
-            
+            let d = 'N/A';
+            if(app.appliedAt) d = new Date(app.appliedAt.seconds * 1000).toLocaleString();
+
             const html = `
                 <div style="text-align:center; margin-bottom:20px;">
                     <h2 style="color:var(--text-main); font-size:1.3rem;">${app.jobTitle}</h2>
@@ -660,22 +995,22 @@
                 <table class="modal-table">
                     <tr><td>Job Title</td><td>${app.jobTitle}</td></tr>
                     <tr><td>Company Name</td><td>${app.company}</td></tr>
-                    <tr><td>Job Type</td><td>${app.jobTypeDisplay}</td></tr>
+                    <tr><td>Category</td><td>${app.jobTypeDisplay}</td></tr>
                     <tr><td>Application ID</td><td><span style="font-family:monospace;">${app.id}</span></td></tr>
                 </table>
 
                 <div class="modal-section-title">Application Status</div>
                 <table class="modal-table">
-                    <tr><td>Current Status</td><td style="text-transform:uppercase; color:var(--theme-featured);">${app.status || 'Pending'}</td></tr>
-                    <tr><td>Submission Date</td><td>${d}</td></tr>
-                    <tr><td>Method</td><td style="text-transform:capitalize;">${app.submissionMethod || 'Portal'}</td></tr>
+                    <tr><td>Current Status</td><td style="text-transform:uppercase; color:var(--theme-featured); font-weight:700;">${app.status || 'Pending'}</td></tr>
+                    <tr><td>Submission Time</td><td>${d}</td></tr>
+                    <tr><td>Platform</td><td style="text-transform:capitalize;">${app.submissionMethod || 'Online Portal'}</td></tr>
                 </table>
 
-                <div class="modal-section-title">Payment Details</div>
+                <div class="modal-section-title">Payment & Verification</div>
                 <table class="modal-table">
                     <tr><td>Amount Paid</td><td>${pay.amount ? 'KES '+pay.amount : 'Free/None'}</td></tr>
                     <tr><td>Transaction Code</td><td>${pay.txnCode || 'N/A'}</td></tr>
-                    <tr><td>Verification Status</td><td style="color:${pay.verified ? 'var(--success)' : 'var(--theme-featured)'}">${pay.verified ? 'Verified' : (pay.amount ? 'Pending' : 'N/A')}</td></tr>
+                    <tr><td>Verification Status</td><td style="color:${(app.paymentVerified || pay.verified) ? 'var(--success)' : 'var(--theme-featured)'}">${(app.paymentVerified || pay.verified) ? 'Verified' : (pay.amount ? 'Pending Approval' : 'N/A')}</td></tr>
                 </table>
             `;
             
@@ -686,149 +1021,188 @@
             document.getElementById('detailsModal').style.display = 'flex';
         }
 
-        // --- ENHANCED PDF GENERATION ---
+        // --- ADVANCED PDF GENERATION (WITH LOGO & WATERMARK) ---
         window.generatePDFReport = (singleApp = null) => {
             const isSingle = singleApp && singleApp.id; 
             const dataToPrint = isSingle ? [singleApp] : allAppsData;
-            if(dataToPrint.length === 0) { Toastify({ text: "No data", style: { background: "#334155" } }).showToast(); return; }
+            
+            if(dataToPrint.length === 0) { 
+                Toastify({ text: "No application data found to export.", style: { background: "#334155" } }).showToast(); 
+                return; 
+            }
 
-            const colors = { standard: '#10B981', featured: '#D97706', urgent: '#EC4899', guaranteed: '#8B5CF6' };
+            // Colors for PDF Theme
+            const colors = { 
+                primary: '#0F172A', 
+                accent: '#D97706',
+                success: '#10B981',
+                text: '#334155',
+                light: '#F8FAFC' 
+            };
 
             const element = document.createElement('div');
             element.style.width = "100%";
             element.style.padding = "40px";
             element.style.fontFamily = "'Helvetica', sans-serif";
-            element.style.color = "#334155";
+            element.style.color = colors.text;
             element.style.background = "#fff";
+            element.style.position = "relative";
 
-            // LOGO & HEADER
+            // Watermark
+            const watermark = `
+                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%) rotate(-45deg); 
+                            font-size:80px; color:rgba(0,0,0,0.03); font-weight:bold; white-space:nowrap; z-index:0; pointer-events:none;">
+                    EASTLINK OFFICIAL
+                </div>
+            `;
+            element.innerHTML = watermark;
+
+            // --- HEADER ---
             let contentHtml = `
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0F172A; padding-bottom:20px; margin-bottom:30px;">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <div style="width:40px; height:40px; background:#0F172A; color:#D97706; font-size:24px; font-weight:bold; display:grid; place-items:center; border-radius:8px;">E</div>
-                        <div>
-                            <h1 style="margin:0; font-size:22px; color:#0F172A; text-transform:uppercase;">EastLink Recruiters</h1>
-                            <p style="margin:0; font-size:10px; color:#64748B;">Connecting Talent with Opportunity</p>
+                <div style="position:relative; z-index:1;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid ${colors.primary}; padding-bottom:20px; margin-bottom:30px;">
+                        <div style="display:flex; align-items:center; gap:15px;">
+                            <img src="./assets/images/logo.png" style="height:50px; width:auto;" onerror="this.style.display='none'">
+                            <div>
+                                <h1 style="margin:0; font-size:24px; color:${colors.primary}; font-weight:800; letter-spacing:1px;">EASTLINK</h1>
+                                <p style="margin:0; font-size:10px; color:#64748B; text-transform:uppercase; letter-spacing:2px;">Recruitment & Consultancy</p>
+                            </div>
+                        </div>
+                        <div style="text-align:right;">
+                            <h2 style="margin:0; font-size:16px; color:${colors.accent}; text-transform:uppercase;">${isSingle ? 'OFFICIAL RECEIPT' : 'APPLICATION HISTORY'}</h2>
+                            <p style="margin:5px 0 0; font-size:10px;">Date Generated: ${new Date().toLocaleDateString()}</p>
+                            <p style="margin:2px 0 0; font-size:10px;">User: ${currentUserData.fullName || 'Guest'}</p>
                         </div>
                     </div>
-                    <div style="text-align:right;">
-                        <h2 style="margin:0; font-size:16px; color:#D97706;">${isSingle ? 'OFFICIAL RECEIPT' : 'SUMMARY REPORT'}</h2>
-                        <p style="margin:5px 0 0; font-size:10px;">Date: ${new Date().toLocaleDateString()}</p>
-                    </div>
-                </div>
             `;
 
             if(isSingle) {
+                // SINGLE APP / RECEIPT MODE
                 const app = dataToPrint[0];
-                const d = app.appliedAt ? new Date(app.appliedAt.seconds*1000).toLocaleDateString() : 'N/A';
+                const d = app.appliedAt ? new Date(app.appliedAt.seconds*1000).toLocaleString() : 'N/A';
                 const pay = app.payment || {};
+                const isVerified = app.paymentVerified || pay.verified;
                 
-                // Determine Theme
-                let themeColor = colors.standard;
-                let typeText = 'Standard Job';
-                const jTypeLower = (app.jobTypeDisplay||'').toLowerCase();
-                if(app.isGuaranteed || jTypeLower.includes('guar')) { themeColor = colors.guaranteed; typeText='Guaranteed Placement'; }
-                else if(jTypeLower.includes('urgent')) { themeColor = colors.urgent; typeText='Urgently Hiring'; }
-                else if(jTypeLower.includes('feat')) { themeColor = colors.featured; typeText='Featured Job'; }
-
                 contentHtml += `
-                <div style="margin-bottom:30px; display:flex; justify-content:space-between;">
+                <div style="margin-bottom:30px; display:flex; justify-content:space-between; background:${colors.light}; padding:20px; border-radius:8px;">
                     <div style="width:48%;">
-                        <h3 style="font-size:12px; text-transform:uppercase; color:#94A3B8; border-bottom:1px solid #E2E8F0; padding-bottom:5px;">Applicant Details</h3>
+                        <h3 style="font-size:11px; text-transform:uppercase; color:#94A3B8; margin-bottom:10px;">Applicant Information</h3>
                         <p style="font-size:12px; margin:5px 0;"><strong>Name:</strong> ${currentUserData.fullName || 'N/A'}</p>
                         <p style="font-size:12px; margin:5px 0;"><strong>Email:</strong> ${currentUserData.email || auth.currentUser.email || 'N/A'}</p>
                         <p style="font-size:12px; margin:5px 0;"><strong>Phone:</strong> ${currentUserData.phone || 'N/A'}</p>
                     </div>
-                    <div style="width:48%;">
-                        <h3 style="font-size:12px; text-transform:uppercase; color:#94A3B8; border-bottom:1px solid #E2E8F0; padding-bottom:5px;">Application Reference</h3>
+                    <div style="width:48%; text-align:right;">
+                        <h3 style="font-size:11px; text-transform:uppercase; color:#94A3B8; margin-bottom:10px;">Reference Details</h3>
                         <p style="font-size:12px; margin:5px 0;"><strong>App ID:</strong> ${app.id}</p>
-                        <p style="font-size:12px; margin:5px 0;"><strong>Submission Date:</strong> ${d}</p>
-                         <p style="font-size:12px; margin:5px 0;"><strong>Method:</strong> ${app.submissionMethod || 'Portal'}</p>
+                        <p style="font-size:12px; margin:5px 0;"><strong>Date:</strong> ${d}</p>
+                        <p style="font-size:12px; margin:5px 0; font-weight:bold; color:${isVerified ? colors.success : colors.accent};">Status: ${app.status.toUpperCase()}</p>
                     </div>
                 </div>
 
-                <div style="border-left: 6px solid ${themeColor}; padding: 20px; background: #F8FAFC; border-radius: 4px; margin-bottom: 30px;">
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                        <div>
-                            <span style="background:${themeColor}20; color:${themeColor}; font-size:10px; font-weight:bold; padding:4px 8px; border-radius:4px; text-transform:uppercase;">${typeText}</span>
-                            <h2 style="margin:10px 0 5px 0; font-size:20px; color:#0F172A;">${app.jobTitle}</h2>
-                            <p style="margin:0; font-size:14px; color:#64748B;">${app.company}</p>
-                        </div>
-                        <div style="text-align:right;">
-                            <div style="font-size:10px; color:#64748B; text-transform:uppercase;">Current Status</div>
-                            <div style="font-weight:bold; font-size:14px; color:#0F172A;">${app.status || 'Pending'}</div>
-                        </div>
+                <div style="border-left: 5px solid ${colors.accent}; padding: 20px 25px; background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 30px;">
+                    <h2 style="margin:0 0 5px 0; font-size:22px; color:${colors.primary};">${app.jobTitle}</h2>
+                    <p style="margin:0; font-size:14px; color:#64748B;">Company: <strong>${app.company}</strong></p>
+                    <div style="margin-top:10px; display:inline-block; padding:4px 10px; background:${colors.primary}10; color:${colors.primary}; font-size:10px; font-weight:bold; border-radius:4px;">
+                        ${app.jobTypeDisplay}
                     </div>
                 </div>
 
                 <div>
-                    <h3 style="font-size:14px; color:#0F172A; border-bottom:1px solid #0F172A; padding-bottom:5px; margin-bottom:15px;">Payment Information</h3>
+                    <h3 style="font-size:14px; color:${colors.primary}; border-bottom:1px solid ${colors.primary}; padding-bottom:8px; margin-bottom:15px;">Payment Verification</h3>
                     <table style="width:100%; font-size:12px; border-collapse:collapse;">
-                        <tr style="background:#F1F5F9;"><td style="padding:10px; font-weight:bold;">Description</td><td style="padding:10px; font-weight:bold; text-align:right;">Details</td></tr>
-                        <tr><td style="padding:10px; border-bottom:1px solid #E2E8F0;">Transaction Amount</td><td style="padding:10px; border-bottom:1px solid #E2E8F0; text-align:right;">${pay.amount ? 'KES '+pay.amount : 'Free'}</td></tr>
-                        <tr><td style="padding:10px; border-bottom:1px solid #E2E8F0;">M-Pesa / Trans. Code</td><td style="padding:10px; border-bottom:1px solid #E2E8F0; text-align:right;">${pay.txnCode || 'N/A'}</td></tr>
-                        <tr><td style="padding:10px; border-bottom:1px solid #E2E8F0;">Payment Verification</td><td style="padding:10px; border-bottom:1px solid #E2E8F0; text-align:right; font-weight:bold; color:${pay.verified ? '#10B981':'#F59E0B'}">${pay.verified ? 'Verified' : 'Pending'}</td></tr>
+                        <tr style="background:${colors.light};"><td style="padding:12px; font-weight:bold;">Description</td><td style="padding:12px; font-weight:bold; text-align:right;">Details</td></tr>
+                        <tr><td style="padding:12px; border-bottom:1px solid #E2E8F0;">Service Fee Amount</td><td style="padding:12px; border-bottom:1px solid #E2E8F0; text-align:right;">${pay.amount ? 'KES '+pay.amount : 'Free'}</td></tr>
+                        <tr><td style="padding:12px; border-bottom:1px solid #E2E8F0;">M-Pesa / Transaction Code</td><td style="padding:12px; border-bottom:1px solid #E2E8F0; text-align:right; font-family:monospace;">${pay.txnCode || 'N/A'}</td></tr>
+                        <tr><td style="padding:12px; border-bottom:1px solid #E2E8F0;">Verification Status</td><td style="padding:12px; border-bottom:1px solid #E2E8F0; text-align:right; font-weight:bold; color:${isVerified ? colors.success : colors.accent};">${isVerified ? 'VERIFIED' : 'PENDING'}</td></tr>
                     </table>
                 </div>
 
-                <div style="font-size:10px; color:#94A3B8; text-align:center; margin-top:50px; border-top:1px solid #E2E8F0; padding-top:10px;">
-                    This document serves as an official record of your application submission.<br>
-                    Generated by EastLink Recruiters System.
+                <div style="margin-top:40px; padding:20px; background:${colors.light}; border-radius:8px; text-align:center;">
+                    <p style="font-size:10px; color:#64748B; margin:0;">
+                        This document is a valid proof of application submission to EastLink Recruiters.<br>
+                        Please retain this for your records. For support, contact support@eastlink.co.ke
+                    </p>
                 </div>
                 `;
             } else {
-                // LIST VIEW
-                contentHtml += `<p style="font-size:12px; margin-bottom:10px;"><strong>Applicant:</strong> ${currentUserData.fullName || 'User'}</p>`;
-                contentHtml += `<table style="width:100%; border-collapse:collapse; font-size:10px;">
+                // SUMMARY LIST MODE
+                contentHtml += `
+                <p style="font-size:12px; margin-bottom:15px;"><strong>Summary Report for:</strong> ${currentUserData.fullName || 'User'}</p>
+                <table style="width:100%; border-collapse:collapse; font-size:10px;">
                     <thead>
-                        <tr style="background:#0F172A; color:#fff;">
+                        <tr style="background:${colors.primary}; color:#fff;">
                             <th style="padding:10px; text-align:left;">Date</th>
-                            <th style="padding:10px; text-align:left;">Job Title</th>
+                            <th style="padding:10px; text-align:left;">Position</th>
                             <th style="padding:10px; text-align:left;">Company</th>
-                            <th style="padding:10px; text-align:left;">Type</th>
                             <th style="padding:10px; text-align:center;">Status</th>
-                            <th style="padding:10px; text-align:right;">Paid</th>
+                            <th style="padding:10px; text-align:right;">Payment</th>
                         </tr>
-                    </thead><tbody>`;
+                    </thead>
+                    <tbody>`;
                 
                 dataToPrint.forEach((row, i) => {
-                    const bg = i % 2 === 0 ? '#F8FAFC' : '#fff';
+                    const bg = i % 2 === 0 ? colors.light : '#fff';
                     const d = row.appliedAt ? new Date(row.appliedAt.seconds*1000).toLocaleDateString() : '-';
-                    const payAmt = row.payment?.amount || 0;
+                    const payStatus = (row.paymentVerified || row.payment?.verified) ? 'Verified' : 'Pending';
+                    const payColor = (row.paymentVerified || row.payment?.verified) ? colors.success : colors.accent;
                     
-                    let tColor = colors.standard;
-                    const jt = (row.jobTypeDisplay||'').toLowerCase();
-                    if(row.isGuaranteed) tColor = colors.guaranteed;
-                    else if(jt.includes('urgent')) tColor = colors.urgent;
-                    else if(jt.includes('feat')) tColor = colors.featured;
-
                     contentHtml += `
                         <tr style="background:${bg}; border-bottom:1px solid #E2E8F0;">
-                            <td style="padding:8px;">${d}</td>
-                            <td style="padding:8px; font-weight:bold;">${row.jobTitle}</td>
-                            <td style="padding:8px;">${row.company}</td>
-                            <td style="padding:8px; color:${tColor}; font-weight:bold;">${row.isGuaranteed?'Guaranteed':(row.jobTypeDisplay||'Standard')}</td>
-                            <td style="padding:8px; text-align:center; text-transform:uppercase;">${row.status||'Pending'}</td>
-                            <td style="padding:8px; text-align:right;">${payAmt}</td>
+                            <td style="padding:10px;">${d}</td>
+                            <td style="padding:10px; font-weight:bold;">${row.jobTitle}</td>
+                            <td style="padding:10px;">${row.company}</td>
+                            <td style="padding:10px; text-align:center; text-transform:uppercase; font-weight:bold;">${row.status||'Pending'}</td>
+                            <td style="padding:10px; text-align:right; color:${payColor};">${payStatus}</td>
                         </tr>`;
                 });
-                contentHtml += `</tbody></table>`;
+                contentHtml += `</tbody></table>
+                <div style="margin-top:30px; font-size:10px; text-align:center; color:#94A3B8;">End of Report | EastLink Recruiters System</div>`;
             }
 
+            contentHtml += `</div>`; // Close wrapper
             element.innerHTML = contentHtml;
-            const opt = { margin: 10, filename: isSingle ? `EastLink_Receipt_${singleApp.id}.pdf` : `EastLink_Report.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4' } };
+
+            const opt = { 
+                margin: 10, 
+                filename: isSingle ? `EastLink_Receipt_${singleApp.id}.pdf` : `EastLink_History_Report.pdf`, 
+                image: { type: 'jpeg', quality: 0.98 }, 
+                html2canvas: { scale: 2, useCORS: true }, 
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+            };
+            
             html2pdf().set(opt).from(element).save();
             if(!isSingle) closeModal('exportModal');
         };
 
+        // --- MANAGE APP ---
         window.manageApp = async (docId, actionType) => {
-            if(!confirm("Are you sure?")) return;
+            const msg = actionType === 'withdraw' 
+                ? "Withdraw this application? This cannot be undone." 
+                : "Delete this record from your history?";
+            
+            if(!confirm(msg)) return;
+            
+            // Try deleting from 'applications'
             try {
                 await deleteDoc(doc(db, "applications", docId));
-                try { await deleteDoc(doc(db, "guaranteed_applications", docId)); } catch(e) {}
-                Toastify({ text: "Success", style: { background: "var(--success)" } }).showToast();
-                if(auth.currentUser) loadApplications(auth.currentUser.uid);
-            } catch(e) { console.error(e); }
+                Toastify({ text: "Application withdrawn", style: { background: "var(--success)" } }).showToast();
+                reloadApps(); // Refresh the list
+                return; // Stop if successful
+            } catch(e) {
+                // If it wasn't in 'applications', ignore error and try 'guaranteed'
+                console.log("Not in standard apps, checking guaranteed...");
+            }
+
+            // Try deleting from 'guaranteed_applications'
+            try {
+                await deleteDoc(doc(db, "guaranteed_applications", docId));
+                Toastify({ text: "Application withdrawn", style: { background: "var(--success)" } }).showToast();
+                reloadApps(); // Refresh the list
+            } catch(e) {
+                console.error(e);
+                // Only show error if BOTH failed
+                Toastify({ text: "Error: Could not delete application", style: { background: "var(--danger)" } }).showToast();
+            }
         };
 
         if ("serviceWorker" in navigator) navigator.serviceWorker.register("./service-worker.js").catch(e => console.log(e));

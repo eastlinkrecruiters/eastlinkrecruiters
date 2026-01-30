@@ -134,45 +134,72 @@
         /* --- MAIN CONTENT --- */
         main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 25px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
         
-        .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color); }
-        .page-title h1 { font-family: var(--font-head); font-size: 1.5rem; color: var(--text-main); margin-bottom: 5px; }
-        .page-title p { color: var(--text-muted); font-size: 0.85rem; }
+        /* VIEW CONTROLLER */
+        #list-view { display: block; max-width: 900px; margin: 0 auto; }
+        #detail-view { display: none; max-width: 800px; margin: 0 auto; animation: slideInRight 0.3s ease-out; }
+        @keyframes slideInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 
-        /* TABS */
-        .tabs-wrapper { 
-            display: flex; gap: 5px; background: var(--bg-input); padding: 4px; 
-            border-radius: 12px; border: 1px solid var(--border-color); width: fit-content;
-        }
-        .tab {
-            padding: 8px 20px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; 
-            color: var(--text-muted); cursor: pointer; transition: 0.3s;
-        }
-        .tab:hover { color: var(--text-main); }
-        .tab.active { background: var(--bg-glass); color: var(--gold-base); box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .tab-badge { 
-            background: var(--danger); color: white; padding: 1px 6px; border-radius: 10px; 
-            font-size: 0.7rem; margin-left: 6px; display: none;
+        /* --- UPDATED HEADER & TABS --- */
+        .page-header-simple {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
+        .filter-tabs { 
+            display: flex; 
+            gap: 15px; 
+            background: var(--bg-card); 
+            padding: 5px; 
+            border-radius: 14px; 
+            border: 1px solid var(--border-color); 
+            width: 100%;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            background: none; 
+            border: none; 
+            color: var(--text-muted); 
+            font-size: 0.9rem; 
+            font-weight: 500;
+            padding: 12px 0; 
+            cursor: pointer; 
+            border-radius: 10px;
+            transition: 0.3s;
+            text-align: center;
+        }
+        
+        .tab-btn:hover { background: rgba(255,255,255,0.03); color: var(--text-main); }
+        
+        .tab-btn.active { 
+            background: var(--gold-base); 
+            color: #fff; 
+            font-weight: 700; 
+            box-shadow: 0 4px 15px rgba(217, 119, 6, 0.4);
+        }
+        
         /* NOTIFICATION LIST */
-        .content-wrapper { max-width: 1000px; margin: 0 auto; }
-        .notif-list { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+        .notif-list { display: flex; flex-direction: column; gap: 0; margin-top: 10px; }
 
         .notif-item {
-            display: flex; gap: 16px; padding: 20px; align-items: center;
-            background: var(--bg-glass); border: 1px solid var(--border-color);
-            border-radius: var(--radius); cursor: pointer; transition: 0.3s;
-            position: relative; overflow: hidden;
+            display: flex; gap: 16px; padding: 20px 10px; align-items: flex-start;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer; transition: 0.2s; position: relative;
         }
-        .notif-item:hover { transform: translateX(5px); border-color: var(--gold-base); background: var(--bg-hover); }
+        .notif-item:active { background: var(--bg-hover); }
         
-        .notif-item.unread { border-left: 3px solid var(--gold-base); background: rgba(30, 41, 59, 0.8); }
         .notif-item.unread .notif-title { color: var(--text-main); font-weight: 700; }
+        .notif-item.unread::before {
+            content:''; position: absolute; left: -5px; top: 28px;
+            width: 4px; height: 4px; background: var(--gold-base); border-radius: 50%;
+        }
 
         .notif-icon-box { 
             width: 48px; height: 48px; border-radius: 12px; flex-shrink: 0;
             display: grid; place-items: center; font-size: 1.2rem;
-            border: 1px solid var(--border-color);
+            margin-top: 2px; border: 1px solid var(--border-color);
         }
 
         /* Icon Colors */
@@ -183,83 +210,76 @@
         .type-default { background: var(--bg-input); color: var(--text-muted); }
 
         .notif-content { flex: 1; display: flex; flex-direction: column; gap: 4px; }
-        .notif-header { display: flex; justify-content: space-between; align-items: baseline; }
-        .notif-title { font-family: var(--font-body); font-size: 0.95rem; color: var(--text-main); font-weight: 600; }
-        .notif-body { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .notif-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 8px; font-family: var(--font-display); opacity: 0.7; }
+        .notif-title { font-family: var(--font-body); font-size: 0.95rem; color: #e2e8f0; line-height: 1.3; }
+        .notif-body-brief { font-size: 0.85rem; color: #94a3b8; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .notif-meta { font-size: 0.75rem; color: #64748b; margin-top: 4px; display: flex; align-items: center; gap: 8px; font-family: var(--font-display); }
 
-        /* Empty State */
-        .empty-state { 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            padding: 60px 20px; text-align: center; color: var(--text-muted);
-            background: var(--bg-glass); border-radius: var(--radius); border: 1px dashed var(--border-color);
+        /* --- DETAIL VIEW --- */
+        .detail-header { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
+        .btn-back { 
+            background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main);
+            width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; transition: 0.2s;
         }
-        .empty-icon { font-size: 3rem; margin-bottom: 20px; color: var(--bg-input); }
+        .btn-back:hover { background: var(--bg-hover); transform: translateX(-3px); }
 
-        /* Floating Controls */
-        .controls-fab {
-            position: fixed; bottom: 30px; right: 30px; 
-            background: var(--bg-glass-heavy); padding: 10px 20px; border-radius: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid var(--border-color);
-            display: flex; gap: 20px; z-index: 950; backdrop-filter: blur(10px);
-        }
-        .control-item { font-size: 0.85rem; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; transition: 0.2s; }
-        .control-item:hover { color: var(--gold-base); }
-
-        /* Modal */
-        .modal-overlay { 
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
-            z-index: 2000; backdrop-filter: blur(5px); justify-content: center; align-items: center; padding: 20px; 
-        }
-        .modal-overlay.active { display: flex; }
-        
-        .modal-card { 
-            background: var(--bg-glass-heavy); width: 100%; max-width: 500px; border-radius: var(--radius); 
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5); overflow: hidden; border: 1px solid var(--border-color);
+        .detail-card { 
+            background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px;
+            padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
         
-        .modal-header { padding: 25px; display: flex; gap: 16px; align-items: start; border-bottom: 1px solid var(--border-color); background: rgba(255,255,255,0.02); }
-        .modal-title-area h3 { font-family: var(--font-head); font-size: 1.1rem; color: var(--text-main); margin-bottom: 4px; }
-        .modal-date { font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-display); }
-        .modal-body { padding: 25px; color: var(--text-main); line-height: 1.6; font-size: 0.9rem; white-space: pre-wrap; }
-        .modal-footer { 
-            padding: 20px 25px; display: flex; justify-content: flex-end; gap: 12px; 
-            border-top: 1px solid var(--border-color); background: rgba(0,0,0,0.2);
+        .detail-top { display: flex; gap: 20px; margin-bottom: 25px; align-items: flex-start; }
+        .detail-icon-large {
+            width: 60px; height: 60px; border-radius: 18px; display: grid; place-items: center;
+            font-size: 1.8rem; flex-shrink: 0; border: 1px solid var(--border-color);
         }
-        .btn-text { 
-            background: transparent; border: 1px solid var(--border-color); padding: 8px 20px; border-radius: 20px; 
-            font-family: var(--font-body); font-weight: 600; font-size: 0.85rem; cursor: pointer; color: var(--text-muted); 
-            transition: 0.2s;
+        
+        .detail-timestamp { color: var(--text-muted); font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
+        .detail-body-full { font-size: 1rem; color: #cbd5e1; line-height: 1.7; white-space: pre-wrap; margin-bottom: 30px; border-top: 1px solid var(--border-color); padding-top: 20px; }
+
+        .detail-actions { display: flex; justify-content: flex-end; }
+        .btn-action-primary {
+            background: var(--gold-gradient); color: #000; border: none; padding: 12px 25px; 
+            border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;
+            transition: 0.2s; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3);
         }
-        .btn-text:hover { background: var(--bg-hover); color: var(--text-main); }
-        .btn-text.primary { background: var(--gold-gradient); color: #000; border: none; }
-        .btn-text.primary:hover { transform: translateY(-2px); }
-        .btn-text.danger { color: var(--danger); border-color: var(--danger); }
-        .btn-text.danger:hover { background: var(--danger); color: white; }
+        .btn-action-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(217, 119, 6, 0.4); }
+
+
+        /* BOTTOM SHEET */
+        .bottom-sheet-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 3000;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s; backdrop-filter: blur(4px);
+        }
+        .bottom-sheet-overlay.active { opacity: 1; pointer-events: auto; }
+        
+        .bottom-sheet {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: #1e293b; border-radius: 24px 24px 0 0;
+            padding: 24px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            border-top: 1px solid var(--border-color);
+        }
+        .bottom-sheet-overlay.active .bottom-sheet { transform: translateY(0); }
+        
+        .sheet-handle { width: 40px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin: 0 auto 20px; }
+        .sheet-title { font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 15px; text-align: center; }
+        .sheet-actions { display: flex; flex-direction: column; gap: 8px; }
+        .sheet-btn {
+            padding: 16px; border-radius: 12px; background: rgba(255,255,255,0.03); 
+            border: none; color: var(--text-main); font-size: 1rem; display: flex; align-items: center; gap: 15px;
+            cursor: pointer; transition: 0.2s;
+        }
+        .sheet-btn i { font-size: 1.2rem; width: 24px; text-align: center; }
+        .sheet-btn.danger { color: var(--danger); }
+
+        /* Loading Spinner */
+        .loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 998; backdrop-filter: blur(4px); }
-
-        /* PWA Popup */
-        .pwa-install-popup {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 400px; background: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px); border: 1px solid var(--gold-base);
-            border-radius: 20px; padding: 20px; z-index: 3000;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: none;
-            animation: slideUp 0.5s ease;
-        }
-        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
-        .pwa-content { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-        .pwa-icon { width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000; }
-        .pwa-actions { display: flex; gap: 10px; }
-        .btn-pwa-install { flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000; }
-        .btn-pwa-dismiss { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-muted); cursor: pointer; }
-
 
         @media (max-width: 992px) {
             .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
             main { margin-left: 0; padding: 20px 10px; width: 100%; }
-            .controls-fab { left: 50%; transform: translateX(-50%); right: auto; bottom: 80px; width: 90%; justify-content: center; }
             .hamburger { display: block; }
             .header-left { gap: 10px; }
         }
@@ -329,82 +349,85 @@
 
     <!-- MAIN -->
     <main>
-        <div class="page-header animate__animated animate__fadeInDown">
-            <div class="page-title">
-                <h1>System Notifications</h1>
-                <p>Alerts, transaction logs, and system messages.</p>
+        <!-- LIST VIEW -->
+        <div id="list-view">
+            <div class="page-header-simple animate__animated animate__fadeInDown">
+                <div class="filter-tabs">
+                    <button class="tab-btn active" onclick="filterNotifications('all', this)">All Logs</button>
+                    <button class="tab-btn" onclick="filterNotifications('unread', this)">Unread</button>
+                    <button class="tab-btn" onclick="filterNotifications('critical', this)">Critical</button>
+                </div>
             </div>
-            
-            <div class="tabs-wrapper">
-                <div class="tab active" onclick="filterNotifications('all', this)">All Logs</div>
-                <div class="tab" onclick="filterNotifications('unread', this)">Unread <span class="tab-badge" id="tab-count">0</span></div>
-            </div>
-        </div>
 
-        <div class="content-wrapper">
             <div class="notif-list" id="notif-container">
-                <div class="empty-state">
+                <div style="padding:40px; text-align:center; color:var(--text-muted);">
                     <i class="fas fa-circle-notch fa-spin" style="color:var(--gold-base); font-size: 2rem;"></i>
                     <p style="margin-top:20px">Syncing system logs...</p>
                 </div>
             </div>
+            
+            <div id="clear-actions" style="margin-top:30px; text-align:center; display:none;">
+                <button onclick="markAllRead()" style="background:none; border:none; color:var(--text-muted); font-size:0.9rem; cursor:pointer;">Mark all as read</button>
+            </div>
         </div>
 
-        <!-- Floating Controls -->
-        <div class="controls-fab animate__animated animate__fadeInUp" id="fab-controls" style="display:none;">
-            <div class="control-item" onclick="markAllRead()"><i class="fas fa-check-double"></i> Mark All Read</div>
-            <div style="width:1px; height:20px; background:var(--border-color);"></div>
-            <div class="control-item" onclick="deleteAllNotifications()" style="color:var(--danger);"><i class="fas fa-trash-alt"></i> Clear All</div>
+        <!-- DETAIL VIEW (Initially Hidden) -->
+        <div id="detail-view">
+            <div class="detail-header">
+                <button class="btn-back" onclick="closeDetailView()"><i class="fas fa-arrow-left"></i></button>
+                <h3 style="margin:0; font-size:1.1rem; color:var(--text-muted);">Log Details</h3>
+            </div>
+            
+            <div class="detail-card">
+                <div class="detail-top">
+                    <div id="detail-icon" class="detail-icon-large type-default">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div style="flex:1;">
+                        <h2 id="detail-title" style="font-family:var(--font-head); font-size:1.3rem; margin-bottom:8px;">Notification Title</h2>
+                        <div id="detail-time" class="detail-timestamp"><i class="far fa-clock"></i> Just now</div>
+                    </div>
+                </div>
+                
+                <div id="detail-body" class="detail-body-full">
+                    Full log content...
+                </div>
+                
+                <div class="detail-actions">
+                    <button id="detail-action-btn" class="btn-action-primary" onclick="handleDetailAction()">
+                        <span>Review Item</span> <i class="fas fa-external-link-alt"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </main>
 
-    <!-- DETAIL MODAL -->
-    <div class="modal-overlay" id="modal-container" onclick="closeModal()">
-        <div class="modal-card animate__animated animate__zoomIn" onclick="event.stopPropagation()">
-            <div class="modal-header">
-                <div id="modal-icon-container" class="notif-icon-box"><i id="modal-icon" class="fas fa-bell"></i></div>
-                <div>
-                    <h3 id="modal-title">Notification Title</h3>
-                    <div class="modal-date" id="modal-time">Just now</div>
-                </div>
-            </div>
-            <div class="modal-body" id="modal-body">
-                <!-- Content -->
-            </div>
-            <div class="modal-footer">
-                <button class="btn-text danger" onclick="deleteCurrentNotification()">Delete</button>
-                <button class="btn-text" onclick="closeModal()">Close</button>
-                <button class="btn-text primary" id="modal-action-btn" onclick="handleAction()">View Details</button>
+    <!-- BOTTOM SHEET (LONG PRESS ACTIONS) -->
+    <div class="bottom-sheet-overlay" id="bottomSheetOverlay" onclick="closeBottomSheet()">
+        <div class="bottom-sheet" onclick="event.stopPropagation()">
+            <div class="sheet-handle"></div>
+            <div class="sheet-title">Manage Log</div>
+            <div class="sheet-actions">
+                <button class="sheet-btn" onclick="handleSheetAction('open')"><i class="fas fa-expand"></i> View Details</button>
+                <button class="sheet-btn" onclick="handleSheetAction('read')"><i class="fas fa-check-double"></i> Mark as Read</button>
+                <button class="sheet-btn" onclick="handleSheetAction('unread')"><i class="fas fa-envelope"></i> Mark as Unread</button>
+                <button class="sheet-btn danger" onclick="handleSheetAction('delete')"><i class="fas fa-trash-alt"></i> Delete Log</button>
             </div>
         </div>
     </div>
 
-    <!-- PWA INSTALL POPUP -->
-    <div id="pwa-install-popup" class="pwa-install-popup">
-        <div class="pwa-content">
-            <div class="pwa-icon"><i class="fas fa-download"></i></div>
-            <div>
-                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install Admin App</div>
-                <div style="font-size:0.8rem; color:#94A3B8;">Add to home screen for quick access.</div>
-            </div>
-        </div>
-        <div class="pwa-actions">
-            <button class="btn-pwa-install" onclick="installPWA()">Install</button>
-            <button class="btn-pwa-dismiss" onclick="dismissPWA()">Later</button>
-        </div>
-    </div>
-
+    <!-- SCRIPTS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-
     <script type="module">
-        import { auth, db } from './config.js'; // Secure import
+        import { auth, db } from './config.js';
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
         import { doc, getDoc, collection, query, where, orderBy, onSnapshot, updateDoc, writeBatch, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         let allNotifications = [];
         let currentFilter = 'all';
-        let activeNotifId = null;
-        let activeLink = null;
+        let longPressTimer;
+        let selectedNotifId = null;
+        let selectedNotifLink = null;
 
         // --- UI UTILS ---
         window.toggleSidebar = () => { 
@@ -412,49 +435,51 @@
             document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
         };
         
-        window.logout = () => {
-            if(confirm("Confirm Log Out?")) {
-                signOut(auth).then(() => window.location.href = 'signin.html');
-            }
-        };
-
-        window.closeModal = () => document.getElementById('modal-container').classList.remove('active');
+        window.logout = () => { if(confirm("Confirm Log Out?")) signOut(auth).then(() => window.location.href = 'signin.html'); };
+        window.closeBottomSheet = () => document.getElementById('bottomSheetOverlay').classList.remove('active');
 
         // Relative Time
         function timeAgo(dateParam) {
-            if (!dateParam) return null;
-            const date = typeof dateParam === 'object' ? dateParam : new Date(dateParam);
-            const today = new Date();
-            const seconds = Math.round((today - date) / 1000);
-            const minutes = Math.round(seconds / 60);
-            const isToday = today.toDateString() === date.toDateString();
-
-            if (seconds < 10) return 'Just now';
-            if (seconds < 60) return 'Moments ago';
-            if (minutes < 60) return `${minutes} mins ago`;
-            if (isToday) return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+            if (!dateParam) return '';
+            const date = dateParam.seconds ? new Date(dateParam.seconds * 1000) : new Date(dateParam);
+            const seconds = Math.floor((new Date() - date) / 1000);
+            if (seconds < 60) return 'Just now';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes}m ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h ago`;
+            return date.toLocaleDateString();
         }
 
+        // --- AUTH & DATA ---
         onAuthStateChanged(auth, user => {
             if (!user) { window.location.href = 'signin.html'; return; }
             initBadges();
             
-            // Notifications Listener
             const q = query(collection(db, "notifications"), where("userId", "==", user.uid), orderBy("timestamp", "desc"));
             onSnapshot(q, (snapshot) => {
                 allNotifications = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 renderList();
-                updateUnreadCount();
+                updateUnreadUI();
             });
         });
 
         function initBadges() {
+            // Unread Notifications Badge
+            const notifQ = query(collection(db, "notifications"), where("read", "==", false));
+            onSnapshot(notifQ, s => {
+                const b = document.getElementById('notif-badge');
+                if(s.size > 0) { b.innerText = s.size > 9 ? '9+' : s.size; b.style.display = 'flex'; } 
+                else b.style.display = 'none';
+            });
+
+            // Pending Transactions
             const txQ = query(collection(db, "transactions"), where("status", "==", "pending"));
             onSnapshot(txQ, s => {
-                const b = document.getElementById('notif-badge');
-                if(s.size > 0) { b.innerText = s.size; b.style.display = 'flex'; } else b.style.display = 'none';
+                // If you want a separate badge for finance, handle here. 
             });
+            
+            // Support Tickets
             const msgQ = query(collection(db, "support_tickets"), where("status", "==", "open"));
              onSnapshot(msgQ, (snap) => {
                 const badge = document.getElementById('msg-badge');
@@ -462,36 +487,28 @@
             });
         }
 
-        function updateUnreadCount() {
-            const count = allNotifications.filter(n => !n.read).length;
-            const tabBadge = document.getElementById('tab-count');
-            const fab = document.getElementById('fab-controls');
-            
-            if(count > 0) {
-                tabBadge.innerText = count;
-                tabBadge.style.display = 'inline-block';
-                fab.style.display = 'flex'; 
-            } else {
-                tabBadge.style.display = 'none';
-                if(allNotifications.length === 0) fab.style.display = 'none';
-            }
+        function updateUnreadUI() {
+            const hasUnread = allNotifications.some(n => !n.read);
+            document.getElementById('clear-actions').style.display = hasUnread ? 'block' : 'none';
         }
 
         function renderList() {
             const container = document.getElementById('notif-container');
-            const list = currentFilter === 'all' ? allNotifications : allNotifications.filter(n => !n.read);
+            let list = allNotifications;
+
+            if (currentFilter === 'unread') list = list.filter(n => !n.read);
+            if (currentFilter === 'critical') list = list.filter(n => (n.type && (n.type.includes('danger') || n.type.includes('error'))));
 
             if (list.length === 0) {
                 container.innerHTML = `
-                    <div class="empty-state animate__animated animate__fadeIn">
-                        <div class="empty-icon"><i class="fas fa-check-circle"></i></div>
-                        <h3>All caught up!</h3>
-                        <p>${currentFilter === 'unread' ? 'No unread alerts.' : 'System logs are clear.'}</p>
+                    <div style="text-align:center; padding:60px 20px; color:var(--text-muted); opacity:0.6;">
+                        <i class="fas fa-clipboard-check" style="font-size:3rem; margin-bottom:15px;"></i>
+                        <p>${currentFilter === 'unread' ? 'All caught up' : 'No logs found'}</p>
                     </div>`;
                 return;
             }
 
-            container.innerHTML = list.map(n => {
+            container.innerHTML = list.map((n, i) => {
                 let icon = 'fa-bell', cls = 'type-default';
                 const type = (n.type||'').toLowerCase();
                 
@@ -500,22 +517,25 @@
                 else if(type === 'danger' || type === 'error') { icon = 'fa-times'; cls = 'type-danger'; }
                 else if(type === 'info' || type === 'system') { icon = 'fa-info'; cls = 'type-info'; }
 
-                const jsDate = n.timestamp ? new Date(n.timestamp.seconds * 1000) : new Date();
-                const timeString = timeAgo(jsDate);
                 const isUnread = !n.read;
+                const time = timeAgo(n.timestamp);
 
                 return `
-                    <div class="notif-item animate__animated animate__fadeInUp ${isUnread ? 'unread' : ''}" onclick="openModal('${n.id}')">
+                    <div class="notif-item animate__animated animate__fadeInUp ${isUnread ? 'unread' : ''}" 
+                         style="animation-delay:${i * 0.05}s;"
+                         onclick="openDetailView('${n.id}')"
+                         ontouchstart="startLongPress('${n.id}')" 
+                         ontouchend="cancelLongPress()" 
+                         oncontextmenu="event.preventDefault(); startLongPress('${n.id}', true)">
+                        
                         <div class="notif-icon-box ${cls}">
                             <i class="fas ${icon}"></i>
                         </div>
                         <div class="notif-content">
-                            <div class="notif-header">
-                                <span class="notif-title">${n.title}</span>
-                            </div>
-                            <div class="notif-body">${n.message}</div>
+                            <div class="notif-title">${n.title}</div>
+                            <div class="notif-body-brief">${n.message || ''}</div>
                             <div class="notif-meta">
-                                <span>${timeString}</span>
+                                <span>${time}</span>
                             </div>
                         </div>
                     </div>
@@ -523,133 +543,109 @@
             }).join('');
         }
 
-        window.filterNotifications = (type, el) => {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-            currentFilter = type;
-            renderList();
-        };
-
-        window.openModal = async (id) => {
+        // --- DETAIL VIEW LOGIC ---
+        window.openDetailView = async (id) => {
             const n = allNotifications.find(x => x.id === id);
             if (!n) return;
-            activeNotifId = id;
-            activeLink = n.link || null;
+            selectedNotifId = id;
 
+            // Populate View
+            document.getElementById('detail-title').innerText = n.title;
+            document.getElementById('detail-body').innerText = n.message || "No specific details.";
+            document.getElementById('detail-time').innerHTML = `<i class="far fa-clock"></i> ${new Date(n.timestamp?.seconds * 1000).toLocaleString()}`;
+            
+            // Icon
+            const iconDiv = document.getElementById('detail-icon');
             let icon = 'fa-bell', cls = 'type-default';
             const type = (n.type||'').toLowerCase();
             if(type === 'success' || type === 'approved') { icon = 'fa-check'; cls = 'type-success'; }
-            else if(type === 'danger' || type === 'error') { icon = 'fa-times'; cls = 'type-danger'; }
             else if(type === 'warning' || type === 'pending') { icon = 'fa-exclamation'; cls = 'type-wallet'; }
+            else if(type === 'danger' || type === 'error') { icon = 'fa-times'; cls = 'type-danger'; }
             else if(type === 'info' || type === 'system') { icon = 'fa-info'; cls = 'type-info'; }
-
-            const jsDate = n.timestamp ? new Date(n.timestamp.seconds * 1000) : new Date();
-
-            document.getElementById('modal-title').textContent = n.title;
-            document.getElementById('modal-body').textContent = n.message;
-            document.getElementById('modal-time').textContent = jsDate.toLocaleString();
             
-            const iconContainer = document.getElementById('modal-icon-container');
-            iconContainer.className = `notif-icon-box ${cls}`;
-            document.getElementById('modal-icon').className = `fas ${icon}`;
-            
-            const actionBtn = document.getElementById('modal-action-btn');
-            actionBtn.style.display = activeLink ? 'block' : 'none';
+            iconDiv.className = `detail-icon-large ${cls}`;
+            iconDiv.innerHTML = `<i class="fas ${icon}"></i>`;
 
-            document.getElementById('modal-container').classList.add('active');
-            
+            // Action Button
+            const btn = document.getElementById('detail-action-btn');
+            if(n.link) {
+                btn.style.display = 'flex';
+                selectedNotifLink = n.link;
+            } else {
+                btn.style.display = 'none';
+            }
+
+            // Switch
+            document.getElementById('list-view').style.display = 'none';
+            document.getElementById('detail-view').style.display = 'block';
+            window.scrollTo(0,0);
+
+            // Read
             if (!n.read) {
                 try { await updateDoc(doc(db, "notifications", id), { read: true }); } catch(e){}
             }
         };
 
-        window.handleAction = () => {
-            if(activeLink) window.location.href = activeLink;
-            closeModal();
+        window.closeDetailView = () => {
+            document.getElementById('detail-view').style.display = 'none';
+            document.getElementById('list-view').style.display = 'block';
+            selectedNotifLink = null;
+        };
+
+        window.handleDetailAction = () => {
+            if(selectedNotifLink) window.location.href = selectedNotifLink;
+        };
+
+        // --- FILTER & ACTIONS ---
+        window.filterNotifications = (type, el) => {
+            document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+            currentFilter = type;
+            renderList();
+        };
+
+        // Long Press Logic
+        window.startLongPress = (id, force = false) => {
+            selectedNotifId = id;
+            if(force) { openBottomSheet(); return; }
+            longPressTimer = setTimeout(() => {
+                if(navigator.vibrate) navigator.vibrate(50);
+                openBottomSheet();
+            }, 600);
+        };
+        window.cancelLongPress = () => clearTimeout(longPressTimer);
+        
+        function openBottomSheet() { document.getElementById('bottomSheetOverlay').classList.add('active'); }
+
+        window.handleSheetAction = async (action) => {
+            closeBottomSheet();
+            if(!selectedNotifId) return;
+
+            if(action === 'open') {
+                openDetailView(selectedNotifId);
+            } else if (action === 'read') {
+                await updateDoc(doc(db, "notifications", selectedNotifId), { read: true });
+                Toastify({ text: "Marked Read", style: { background: "var(--success)" } }).showToast();
+            } else if (action === 'unread') {
+                await updateDoc(doc(db, "notifications", selectedNotifId), { read: false });
+                Toastify({ text: "Marked Unread", style: { background: "var(--bg-card)" } }).showToast();
+            } else if (action === 'delete') {
+                if(confirm("Delete this log permanently?")) {
+                    await deleteDoc(doc(db, "notifications", selectedNotifId));
+                    Toastify({ text: "Log Deleted", style: { background: "var(--danger)" } }).showToast();
+                }
+            }
         };
 
         window.markAllRead = async () => {
-            const unreadIds = allNotifications.filter(n => !n.read).map(n => n.id);
-            if (unreadIds.length === 0) return Toastify({ text: "No unread items", style: { background: "#3B82F6" } }).showToast();
-            
-            // Limit batch size to 500
             const batch = writeBatch(db);
-            let count = 0;
-            unreadIds.forEach(id => {
-                if(count < 500) {
-                    batch.update(doc(db, "notifications", id), { read: true });
-                    count++;
-                }
-            });
-            
-            try {
-                await batch.commit();
-                Toastify({ text: "Marked as read", style: { background: "#10B981" } }).showToast();
-            } catch(e) { console.error(e); }
-        };
-
-        window.deleteAllNotifications = async () => {
-            if (allNotifications.length === 0) return;
-            if (!confirm("Clear all logs? This cannot be undone.")) return;
-            
-            // Limit batch size to 500
-            const batch = writeBatch(db);
-            let count = 0;
+            let c = 0;
             allNotifications.forEach(n => {
-                 if(count < 500) {
-                    batch.delete(doc(db, "notifications", n.id));
-                    count++;
-                 }
+                if(!n.read && c < 450) { batch.update(doc(db, "notifications", n.id), { read: true }); c++; }
             });
-            
-            try {
-                await batch.commit();
-                Toastify({ text: "Logs cleared", style: { background: "#EF4444" } }).showToast();
-            } catch(e) { console.error(e); }
+            await batch.commit();
+            Toastify({ text: "All Marked Read", style: { background: "var(--success)" } }).showToast();
         };
-
-        window.deleteCurrentNotification = async () => {
-            if (!activeNotifId) return;
-            const tempId = activeNotifId;
-            closeModal();
-            try {
-                await deleteDoc(doc(db, "notifications", tempId));
-            } catch(e) { console.error(e); }
-        };
-
-        // --- PWA LOGIC ---
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            document.getElementById('pwa-install-popup').style.display = 'block';
-        });
-
-        window.installPWA = async () => {
-            if (!deferredPrompt) return;
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                document.getElementById('pwa-install-popup').style.display = 'none';
-            }
-            deferredPrompt = null;
-        };
-
-        window.dismissPWA = () => {
-            document.getElementById('pwa-install-popup').style.display = 'none';
-        };
-
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("./service-worker.js").catch(e => console.log("SW Fail:", e));
-        }
-
-        // Expose functions globally for HTML handlers
-        window.filterNotifications = filterNotifications;
-        window.openModal = openModal;
-        window.handleAction = handleAction;
-        window.markAllRead = markAllRead;
-        window.deleteAllNotifications = deleteAllNotifications;
-        window.deleteCurrentNotification = deleteCurrentNotification;
 
     </script>
 </body>

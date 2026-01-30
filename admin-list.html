@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Candidate Database | EastLink Admin</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
+    <meta name="theme-color" content="#1e293b">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@800&family=Playfair+Display:ital,wght@0,600;1,600&family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <style>
+        :root {
+            /* Theme Variables (Matches Dashboard) */
+            --bg-body: #0f172a;       
+            --bg-glass: rgba(30, 41, 59, 0.7);
+            --bg-solid: #1e293b;
+            --bg-card-dark: #111827;
+            
+            --text-main: #F1F5F9;     
+            --text-muted: #94A3B8; 
+            
+            /* Gradients & Colors */
+            --gold-base: #fbbf24;
+            --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            
+            --neon-purple: #8b5cf6;
+            --success: #10B981;
+            --danger: #EF4444;
+            --blue: #3B82F6;
+            --sky: #38bdf8;
+
+            --sidebar-width: 260px; 
+            --header-height: 70px;
+            --radius: 16px;
+            
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            
+            --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%), url('./assets/images/background.png');
+            background-blend-mode: overlay;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            overflow-x: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        /* --- HEADER --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 1000;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .logo { font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; }
+        .logo span { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .admin-badge { 
+            font-family: var(--font-body); font-size: 0.6rem; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 6px; 
+            margin-left: 10px; color: var(--text-muted); letter-spacing: 0.5px; font-weight: 600;
+        }
+        .hamburger { font-size: 1.2rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .icon-btn { 
+            width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; 
+            cursor: pointer; background: rgba(255,255,255,0.03); position: relative; 
+            border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
+        }
+        .icon-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
+        .icon-msg { color: #3b82f6; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.4)); }
+        .icon-bell { color: #f59e0b; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.4)); }
+        .notification-badge { 
+            position: absolute; top: -3px; right: -3px; width: 18px; height: 18px; 
+            background: #ef4444; border: 2px solid #0f172a; border-radius: 50%; 
+            font-size: 0.65rem; color: white; display: none; place-items: center; 
+            justify-content: center; font-weight: 700;
+        }
+        .profile-widget { width: 42px; height: 42px; position: relative; cursor: pointer; margin-left: 5px; }
+        .user-avatar { width: 100%; height: 100%; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-weight: 700; color: #000; font-size: 1.2rem; }
+
+        /* --- SIDEBAR --- */
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: rgba(15, 23, 42, 0.95); border-right: 1px solid rgba(255,255,255,0.05); padding: 20px 0; overflow-y: auto; transition: transform 0.3s; z-index: 999; display: flex; flex-direction: column; backdrop-filter: blur(20px); }
+        .nav-group { padding: 0 24px; margin-bottom: 20px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; }
+        .nav-item { display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; border-radius: 10px; margin-bottom: 4px; cursor: pointer; transition: 0.2s; }
+        .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.05); transform: translateX(5px); }
+        .nav-item.active { background: linear-gradient(90deg, rgba(251, 191, 36, 0.15) 0%, transparent 100%); color: var(--gold-base); font-weight: 600; border-left: 3px solid var(--gold-base); }
+        .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
+
+        /* --- MAIN LAYOUT --- */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); flex: 1; }
+        
+        .page-header { 
+            display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: flex-end; 
+            margin-bottom: 30px; padding-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .page-title h1 { font-family: var(--font-display); font-size: 1.8rem; margin-bottom: 5px; color: var(--text-main); font-weight: 700; }
+        .page-title p { color: var(--text-muted); font-size: 0.9rem; max-width: 600px; }
+
+        /* --- BUTTONS --- */
+        .btn-action {
+            padding: 12px 24px; border-radius: 12px; font-weight: 600; cursor: pointer; display: inline-flex; 
+            align-items: center; gap: 10px; font-size: 0.9rem; transition: 0.3s; border: 1px solid transparent;
+        }
+        .btn-action:hover { transform: translateY(-3px); }
+        .btn-gold { background: var(--gold-gradient); color: black; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.2); }
+        .btn-glass { background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid rgba(255,255,255,0.1); }
+        .btn-glass:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+
+        /* --- FILTERS --- */
+        .glass-panel {
+            background: var(--bg-glass); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: var(--radius); padding: 25px; margin-bottom: 25px;
+        }
+        
+        .filters-row { display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; }
+        .form-group { flex: 1; min-width: 180px; display: flex; flex-direction: column; gap: 8px; }
+        .form-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .form-input, .form-select {
+            background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); color: var(--text-main);
+            padding: 12px 15px; border-radius: 10px; font-size: 0.9rem; font-family: var(--font-body);
+            transition: 0.2s; width: 100%;
+        }
+        .form-input:focus, .form-select:focus { border-color: var(--gold-base); box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.1); }
+
+        /* --- TABLE --- */
+        .table-responsive { overflow-x: auto; background: var(--bg-glass); border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        
+        thead th {
+            text-align: left; padding: 18px 20px; background: rgba(255,255,255,0.03); 
+            color: var(--gold-base); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;
+            border-bottom: 1px solid rgba(255,255,255,0.1); font-family: var(--font-display); letter-spacing: 0.5px;
+        }
+        
+        tbody td { 
+            padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); 
+            font-size: 0.9rem; color: var(--text-muted); vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255,255,255,0.03); color: var(--text-main); }
+
+        /* Status Badges */
+        .status-badge { padding: 6px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; letter-spacing: 0.5px; }
+        .status-hired { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .status-shortlisted { background: rgba(59, 130, 246, 0.15); color: var(--blue); border: 1px solid rgba(59, 130, 246, 0.3); }
+        .status-review { background: rgba(251, 191, 36, 0.15); color: var(--gold-base); border: 1px solid rgba(251, 191, 36, 0.3); }
+        
+        .job-type-tag { font-family: var(--font-mono); font-size: 0.75rem; opacity: 0.8; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.05); }
+
+        .action-btns { display: flex; gap: 8px; justify-content: flex-end; }
+        .btn-icon-sm { 
+            width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; 
+            cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: transparent; 
+            color: var(--text-muted); transition: 0.2s;
+        }
+        .btn-icon-sm:hover { background: rgba(255,255,255,0.1); color: var(--text-main); border-color: rgba(255,255,255,0.2); }
+        .btn-icon-sm.delete:hover { background: rgba(239, 68, 68, 0.2); color: var(--danger); border-color: var(--danger); }
+
+        /* --- MODAL --- */
+        .modal-overlay { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; 
+            display: none; place-items: center; backdrop-filter: blur(8px); padding: 20px;
+        }
+        .modal-overlay.active { display: grid; }
+        .modal-card { 
+            background: #1e293b; width: 100%; max-width: 550px; border-radius: var(--radius); 
+            border: 1px solid rgba(255,255,255,0.1); overflow: hidden; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); animation: zoomIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes zoomIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .modal-header { padding: 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); }
+        .modal-header h3 { color: var(--text-main); font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; margin: 0; }
+        .modal-body { padding: 25px; display: flex; flex-direction: column; gap: 20px; max-height: 70vh; overflow-y: auto; }
+        .modal-footer { padding: 20px 25px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: flex-end; gap: 10px; background: rgba(0,0,0,0.2); }
+
+        /* Loading Spinner */
+        .loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; margin-right: 5px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index:998; display:none; }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 20px 15px; width: 100%; }
+            .hamburger { display: block; }
+            .filters-row { flex-direction: column; }
+            .form-group { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="admin-dashboard.html" class="logo">
+                EAST<span>LINK</span> <span class="admin-badge">ADMIN</span>
+            </a>
+        </div>
+        
+        <div class="header-actions">
+            <!-- Messages -->
+            <div class="icon-btn" onclick="location.href='admin-support.html'">
+                <i class="fa-solid fa-envelope icon-msg"></i>
+                <div class="notification-badge" id="msg-badge">0</div>
+            </div>
+            
+            <!-- Notifications -->
+            <div class="icon-btn" onclick="location.href='admin-notifications.html'">
+                <i class="fa-solid fa-bell icon-bell"></i>
+                <div class="notification-badge" id="notif-badge">0</div>
+            </div>
+            
+            <!-- Profile -->
+            <div class="profile-widget" onclick="location.href='admin-settings.html'">
+                <div class="user-avatar"><i class="fa-solid fa-user-shield"></i></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Analytics</div>
+            <a href="admin-dashboard.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        </div>
+        
+        <div class="nav-group">
+            <div class="nav-label">User Management</div>
+            <a href="admin-users.html" class="nav-item"><i class="fa-solid fa-users"></i> Manage Users</a>
+            <a href="admin-plans.html" class="nav-item"><i class="fa-solid fa-tags"></i> Manage Plans</a>
+            <a href="admin-referrals.html" class="nav-item"><i class="fa-solid fa-share-nodes"></i> Referrals</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Jobs & Service</div>
+            <a href="admin-list.html" class="nav-item active"><i class="fa-solid fa-list-ul"></i> Candidate List</a>
+            <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
+            <a href="admin-guaranteed-jobs.html" class="nav-item" style="color:var(--success);"><i class="fa-solid fa-certificate"></i> Guaranteed Jobs</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+            <a href="admin-post-job.html" class="nav-item"><i class="fa-solid fa-pen-to-square"></i> Post Job</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="admin-deposits.html" class="nav-item"><i class="fa-solid fa-arrow-down" style="color:var(--success);"></i> Deposits</a>
+            <a href="admin-withdrawals.html" class="nav-item"><i class="fa-solid fa-arrow-up" style="color:var(--danger);"></i> Withdrawals</a>
+            <a href="admin-deposit-issues.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> Errors</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">System</div>
+            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
+            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
+            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:20px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="page-header animate__animated animate__fadeInDown">
+            <div class="page-title">
+                <h1>Candidate Database</h1>
+                <p>Manage offline & online applications, update statuses, and generate official placement reports.</p>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-action btn-glass" onclick="openExportModal()"><i class="fas fa-file-pdf" style="color:var(--danger)"></i> Export Report</button>
+                <button class="btn-action btn-gold" onclick="openAddModal()"><i class="fas fa-plus"></i> Add Candidate</button>
+            </div>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="glass-panel animate__animated animate__fadeInUp">
+            <div class="filters-row">
+                <div class="form-group" style="flex:2;">
+                    <label class="form-label">Search Candidates</label>
+                    <div style="position:relative;">
+                        <input type="text" id="searchInput" class="form-input" placeholder="Search by name, partial ID..." style="padding-left:40px;" onkeyup="applyFilters()">
+                        <i class="fas fa-search" style="position:absolute; left:12px; top:13px; color:var(--text-muted);"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Application Status</label>
+                    <select id="filterStatus" class="form-select" onchange="applyFilters()">
+                        <option value="all">All Statuses</option>
+                        <option value="Shortlisted">Shortlisted</option>
+                        <option value="Under Review">Under Review</option>
+                        <option value="Hired">Hired</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Job Type</label>
+                    <select id="filterJobType" class="form-select" onchange="applyFilters()">
+                        <option value="all">All Job Types</option>
+                        <option value="Standard">Standard</option>
+                        <option value="Featured">Featured</option>
+                        <option value="Urgently Hiring">Urgently Hiring</option>
+                        <option value="Guaranteed">Guaranteed</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-responsive animate__animated animate__fadeInUp animate__delay-1s">
+            <table id="candidateTable">
+                <thead>
+                    <tr>
+                        <th width="20%">Candidate Name</th>
+                        <th width="15%">ID Number</th>
+                        <th width="15%">Phone</th>
+                        <th width="15%">Job Type</th>
+                        <th width="15%">Applied Date</th>
+                        <th width="10%">Status</th>
+                        <th width="10%" style="text-align:right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="7" style="text-align:center; padding:40px; color:var(--text-muted);"><span class="loading-spinner"></span> Loading database...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div id="recordCount" style="margin-top:15px; font-size:0.8rem; color:var(--text-muted); text-align:right;"></div>
+    </main>
+
+    <!-- ADD/EDIT MODAL -->
+    <div class="modal-overlay" id="candidateModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modalTitle"><i class="fas fa-user-plus" style="color:var(--gold-base); margin-right:10px;"></i> Add Candidate</h3>
+                <i class="fas fa-times" onclick="closeModal()" style="cursor:pointer; color:var(--text-muted); font-size:1.2rem;"></i>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" id="inpName" class="form-input" placeholder="e.g. John Kamau">
+                </div>
+                
+                <div style="display:flex; gap:15px;">
+                    <div class="form-group">
+                        <label class="form-label">National ID</label>
+                        <input type="text" id="inpId" class="form-input" placeholder="e.g. 12345678">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input type="text" id="inpPhone" class="form-input" placeholder="e.g. 0712...">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Job Category / Type</label>
+                    <select id="inpJobType" class="form-select">
+                        <option value="Standard">Standard Application</option>
+                        <option value="Featured">Featured Job</option>
+                        <option value="Urgently Hiring">Urgently Hiring</option>
+                        <option value="Guaranteed">Guaranteed Job</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Date Applied</label>
+                    <input type="date" id="inpDate" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Current Status</label>
+                    <select id="inpStatus" class="form-select">
+                        <option value="Under Review">Under Review (Pending)</option>
+                        <option value="Shortlisted">Shortlisted (Interview)</option>
+                        <option value="Hired">Hired (Success)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-action btn-glass" onclick="closeModal()" style="padding:10px 20px;">Cancel</button>
+                <button class="btn-action btn-gold" id="saveBtn" onclick="saveCandidate()" style="padding:10px 20px;">Save Record</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXPORT MODAL -->
+    <div class="modal-overlay" id="exportModal">
+        <div class="modal-card" style="max-width:450px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-file-export" style="color:var(--danger); margin-right:10px;"></i> Export Options</h3>
+                <i class="fas fa-times" onclick="document.getElementById('exportModal').classList.remove('active')" style="cursor:pointer;"></i>
+            </div>
+            <div class="modal-body">
+                <p style="color:var(--text-muted); font-size:0.85rem; line-height:1.5;">
+                    Generate a branded PDF report. ID and Phone numbers will be masked for privacy in the final document.
+                </p>
+                
+                <div class="form-group">
+                    <label class="form-label">Filter Report By</label>
+                    <select id="exportStatus" class="form-select">
+                        <option value="all">Everything</option>
+                        <option value="Shortlisted">Only Shortlisted Candidates</option>
+                        <option value="Hired">Only Hired Candidates</option>
+                        <option value="Under Review">Only Pending Review</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Sort Order</label>
+                    <select id="exportSort" class="form-select">
+                        <option value="dateDesc">Newest Applications First</option>
+                        <option value="dateAsc">Oldest Applications First</option>
+                        <option value="nameAsc">Alphabetical (A-Z)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-action btn-glass" onclick="document.getElementById('exportModal').classList.remove('active')">Close</button>
+                <button class="btn-action btn-gold" onclick="generatePDF()"><i class="fas fa-download"></i> Download PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.7.1/jspdf.plugin.autotable.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script type="module">
+        import { auth, db } from './config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, Timestamp, onSnapshot, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        let candidates = [];
+        const { jsPDF } = window.jspdf;
+
+        // --- UI UTILS ---
+        window.toggleSidebar = () => { 
+            document.getElementById('sidebar').classList.toggle('active'); 
+            document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
+        };
+        
+        window.logout = () => { if(confirm("Confirm Log Out?")) signOut(auth).then(() => window.location.href = 'signin.html'); };
+
+        // --- AUTH & DATA ---
+        onAuthStateChanged(auth, user => {
+            if(!user) { window.location.href = 'signin.html'; return; }
+            initBadges();
+            fetchCandidates();
+        });
+
+        function initBadges() {
+             // Real-time listener for Open Tickets (Badge)
+            try {
+                const msgQ = query(collection(db, "support_tickets"), where("status", "==", "open"));
+                 onSnapshot(msgQ, (snap) => {
+                    const count = snap.size;
+                    const badge = document.getElementById('msg-badge');
+                    if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
+                    else badge.style.display = 'none';
+                });
+            } catch(e) { console.log(e); }
+
+             // Real-time listener for Notifications (Badge)
+             try {
+                const notifQ = query(collection(db, "notifications"), where("read", "==", false));
+                 onSnapshot(notifQ, (snap) => {
+                    const count = snap.size;
+                    const badge = document.getElementById('notif-badge');
+                    if(count > 0) { badge.innerText = count > 9 ? '9+' : count; badge.style.display = 'flex'; }
+                    else badge.style.display = 'none';
+                });
+            } catch(e) { console.log(e); }
+        }
+
+        async function fetchCandidates() {
+            try {
+                // Fetching from 'candidate_list' collection as per new rules
+                const q = query(collection(db, "candidate_list"), orderBy("createdAt", "desc"));
+                // Using onSnapshot for real-time updates
+                onSnapshot(q, (snapshot) => {
+                    candidates = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderTable(candidates);
+                });
+            } catch (e) {
+                console.error("Error fetching", e);
+                document.getElementById('tableBody').innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--danger);"><i class="fas fa-exclamation-circle"></i> Error loading data. Check permissions.</td></tr>`;
+            }
+        }
+
+        // --- CRUD OPERATIONS ---
+        window.saveCandidate = async () => {
+            const btn = document.getElementById('saveBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="loading-spinner"></span> Saving...';
+            btn.disabled = true;
+
+            const id = document.getElementById('editId').value;
+            const data = {
+                name: document.getElementById('inpName').value,
+                idNumber: document.getElementById('inpId').value,
+                phone: document.getElementById('inpPhone').value,
+                jobType: document.getElementById('inpJobType').value,
+                dateApplied: document.getElementById('inpDate').value,
+                status: document.getElementById('inpStatus').value,
+                updatedAt: Timestamp.now()
+            };
+
+            if(!data.name || !data.idNumber || !data.dateApplied) {
+                Toastify({ text: "Please fill required fields (Name, ID, Date)", style: { background: "var(--danger)" } }).showToast();
+                btn.innerHTML = originalText; btn.disabled = false;
+                return;
+            }
+
+            try {
+                if(id) {
+                    await updateDoc(doc(db, "candidate_list", id), data);
+                    Toastify({ text: "Record Updated", style: { background: "var(--success)" } }).showToast();
+                } else {
+                    data.createdAt = Timestamp.now();
+                    await addDoc(collection(db, "candidate_list"), data);
+                    Toastify({ text: "Candidate Added", style: { background: "var(--success)" } }).showToast();
+                }
+                closeModal();
+            } catch(e) {
+                console.error(e);
+                Toastify({ text: "Error Saving. Try again.", style: { background: "var(--danger)" } }).showToast();
+            } finally {
+                btn.innerHTML = originalText; btn.disabled = false;
+            }
+        };
+
+        window.deleteCandidate = async (id) => {
+            if(!confirm("Are you sure you want to permanently delete this candidate?")) return;
+            try {
+                await deleteDoc(doc(db, "candidate_list", id));
+                Toastify({ text: "Record Deleted", style: { background: "var(--text-muted)" } }).showToast();
+            } catch(e) { 
+                console.error(e);
+                Toastify({ text: "Delete Failed", style: { background: "var(--danger)" } }).showToast();
+            }
+        }
+
+        // --- RENDER & FILTERS ---
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            const countDiv = document.getElementById('recordCount');
+            
+            countDiv.innerText = `Showing ${data.length} records`;
+
+            if(data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:50px; opacity:0.6;"><i class="fas fa-folder-open" style="font-size:2rem; margin-bottom:10px;"></i><br>No candidates found matching your criteria.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = data.map(c => {
+                const maskedId = maskString(c.idNumber, 2, 2);
+                const maskedPhone = maskString(c.phone, 3, 2);
+                
+                let badgeClass = 'status-review';
+                let icon = 'fa-clock';
+                if(c.status === 'Hired') { badgeClass = 'status-hired'; icon = 'fa-check-circle'; }
+                if(c.status === 'Shortlisted') { badgeClass = 'status-shortlisted'; icon = 'fa-calendar-alt'; }
+
+                return `
+                <tr class="animate__animated animate__fadeIn">
+                    <td style="font-weight:600; color:var(--text-main);">${c.name}</td>
+                    <td style="font-family:var(--font-mono);">${maskedId}</td>
+                    <td style="font-family:var(--font-mono);">${maskedPhone}</td>
+                    <td><span class="job-type-tag">${c.jobType}</span></td>
+                    <td>${c.dateApplied}</td>
+                    <td><span class="status-badge ${badgeClass}"><i class="fas ${icon}"></i> ${c.status}</span></td>
+                    <td>
+                        <div class="action-btns">
+                            <button class="btn-icon-sm" onclick="openEditModal('${c.id}')" title="Edit Details"><i class="fas fa-pen"></i></button>
+                            <button class="btn-icon-sm delete" onclick="deleteCandidate('${c.id}')" title="Delete Record"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function maskString(str, start, end) {
+            if(!str || str.length < 5) return str || '--';
+            const len = str.length;
+            return str.substring(0, start) + "****" + str.substring(len - end);
+        }
+
+        window.applyFilters = () => {
+            const status = document.getElementById('filterStatus').value;
+            const jobType = document.getElementById('filterJobType').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+
+            const filtered = candidates.filter(c => {
+                const sMatch = status === 'all' || c.status === status;
+                const jMatch = jobType === 'all' || c.jobType === jobType;
+                const textMatch = (c.name || '').toLowerCase().includes(search) || (c.idNumber || '').includes(search);
+                return sMatch && jMatch && textMatch;
+            });
+            renderTable(filtered);
+        };
+
+        // --- MODAL CONTROLS ---
+        window.openAddModal = () => {
+            document.getElementById('editId').value = '';
+            document.getElementById('inpName').value = '';
+            document.getElementById('inpId').value = '';
+            document.getElementById('inpPhone').value = '';
+            document.getElementById('inpDate').valueAsDate = new Date();
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus" style="color:var(--gold-base); margin-right:10px;"></i> Add Candidate';
+            document.getElementById('candidateModal').classList.add('active');
+        };
+
+        window.openEditModal = (id) => {
+            const c = candidates.find(x => x.id === id);
+            if(!c) return;
+            document.getElementById('editId').value = c.id;
+            document.getElementById('inpName').value = c.name;
+            document.getElementById('inpId').value = c.idNumber;
+            document.getElementById('inpPhone').value = c.phone;
+            document.getElementById('inpJobType').value = c.jobType;
+            document.getElementById('inpDate').value = c.dateApplied;
+            document.getElementById('inpStatus').value = c.status;
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-pen" style="color:var(--blue); margin-right:10px;"></i> Edit Details';
+            document.getElementById('candidateModal').classList.add('active');
+        };
+
+        window.closeModal = () => document.getElementById('candidateModal').classList.remove('active');
+        window.openExportModal = () => document.getElementById('exportModal').classList.add('active');
+
+        // --- ADVANCED PDF EXPORT ---
+        window.generatePDF = () => {
+            const doc = new jsPDF();
+            const filterStat = document.getElementById('exportStatus').value;
+            const sortOrder = document.getElementById('exportSort').value;
+
+            // 1. Prepare Data
+            let exportData = candidates.filter(c => filterStat === 'all' || c.status === filterStat);
+
+            // 2. Sort
+            exportData.sort((a, b) => {
+                if(sortOrder === 'dateDesc') return new Date(b.dateApplied) - new Date(a.dateApplied);
+                if(sortOrder === 'dateAsc') return new Date(a.dateApplied) - new Date(b.dateApplied);
+                if(sortOrder === 'nameAsc') return a.name.localeCompare(b.name);
+            });
+
+            if(exportData.length === 0) return Toastify({ text: "No records to export with current filters", style: { background: "var(--danger)" } }).showToast();
+
+            // 3. Header Branding
+            const logoUrl = 'assets/images/logo.png'; 
+            try {
+                // Try adding logo if available, else skip
+                doc.addImage(logoUrl, 'PNG', 14, 10, 16, 16); 
+            } catch(e) { console.warn("Logo not found for PDF"); }
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(18);
+            doc.setTextColor(217, 119, 6); // Gold #d97706
+            doc.text("EASTLINK AGENCY", 34, 18);
+            
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text("Official Candidate Status Report", 34, 24);
+            
+            doc.setDrawColor(200);
+            doc.line(14, 30, 196, 30); // Horizontal Line
+
+            doc.setFontSize(9);
+            doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 38);
+            doc.text(`Filter: ${filterStat.toUpperCase()}`, 14, 43);
+
+            // 4. Watermark Hook
+            const addWatermark = (data) => {
+                // Add watermark on every page
+                doc.saveGraphicsState();
+                doc.setGState(new doc.GState({ opacity: 0.05 }));
+                doc.setFontSize(50);
+                doc.setTextColor(150);
+                doc.text("EASTLINK CONFIDENTIAL", 30, 150, { angle: 45 });
+                doc.restoreGraphicsState();
+                
+                // Footer Page Number
+                let str = "Page " + doc.internal.getNumberOfPages();
+                doc.setFontSize(8);
+                doc.setTextColor(150);
+                doc.text(str, data.settings.margin.left, doc.internal.pageSize.height - 10);
+            };
+
+            // 5. Table Data
+            const body = exportData.map((c, i) => [
+                (i + 1).toString(),
+                c.name,
+                maskString(c.idNumber, 2, 2),
+                maskString(c.phone, 3, 2),
+                c.jobType,
+                c.dateApplied,
+                c.status.toUpperCase()
+            ]);
+
+            // 6. Generate AutoTable
+            doc.autoTable({
+                startY: 50,
+                head: [['#', 'Candidate Name', 'ID (Masked)', 'Phone (Masked)', 'Job Type', 'Applied On', 'Status']],
+                body: body,
+                theme: 'striped',
+                headStyles: { 
+                    fillColor: [30, 41, 59], // Dark Blue/Slate
+                    textColor: [251, 191, 36], // Gold Text
+                    fontStyle: 'bold',
+                    lineWidth: 0.1,
+                    lineColor: [50, 50, 50]
+                },
+                styles: { 
+                    fontSize: 8, 
+                    cellPadding: 4,
+                    valign: 'middle'
+                },
+                columnStyles: {
+                    0: { cellWidth: 10 },
+                    6: { fontStyle: 'bold' } // Status Column Bold
+                },
+                didParseCell: function(data) {
+                    // Custom Coloring for Status
+                    if (data.section === 'body' && data.column.index === 6) {
+                        const val = data.cell.raw;
+                        if (val === 'HIRED') data.cell.styles.textColor = [16, 185, 129]; // Green
+                        else if (val === 'SHORTLISTED') data.cell.styles.textColor = [59, 130, 246]; // Blue
+                        else data.cell.styles.textColor = [217, 119, 6]; // Gold/Orange
+                    }
+                },
+                didDrawPage: addWatermark
+            });
+
+            // 7. Save
+            doc.save(`EastLink_Report_${new Date().toISOString().slice(0,10)}.pdf`);
+            document.getElementById('exportModal').classList.remove('active');
+            Toastify({ text: "PDF Downloaded Successfully", style: { background: "var(--success)" } }).showToast();
+        };
+    </script>
+</body>
+</html>

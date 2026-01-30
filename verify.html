@@ -25,6 +25,7 @@
         :root {
             --primary: #D97706;
             --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            --success: #10B981;
             
             --bg-body: #0F172A; 
             --bg-glass: rgba(30, 41, 59, 0.7); 
@@ -232,23 +233,23 @@
                 if (user.emailVerified) {
                     handleSuccessRedirect();
                 } else {
-                    // Configure Smart Button
+                    // Configure Smart Button based on email domain
                     configureInboxButton(user.email);
-                    // Start Polling for changes
+                    // Start Polling for verification status changes
                     startPolling();
                 }
             } else {
-                // No user found, go to login
+                // No user found, redirect to login
                 window.location.href = 'signin.html';
             }
         });
 
         // --- POLLING LOGIC ---
         function startPolling() {
-            // Check every 3 seconds
+            // Check every 3 seconds if the user verified their email
             checkInterval = setInterval(async () => {
                 if (auth.currentUser) {
-                    // We must reload the user to get the latest emailVerified status from Firebase
+                    // Force reload user metadata to get the latest emailVerified status
                     await auth.currentUser.reload();
                     
                     if (auth.currentUser.emailVerified) {
@@ -262,23 +263,23 @@
         function handleSuccessRedirect() {
             showToast("Email Verified Successfully!", "success");
             
-            // Visual feedback
+            // Visual feedback update
             const card = document.querySelector('.verify-card');
             card.innerHTML = `
                 <div style="padding:40px 0;">
-                    <i class="fas fa-check-circle" style="font-size:4rem; color:var(--success); margin-bottom:20px;"></i>
+                    <i class="fas fa-check-circle animate__animated animate__zoomIn" style="font-size:4rem; color:var(--success); margin-bottom:20px;"></i>
                     <h2 class="brand-font" style="margin-bottom:10px;">Verified!</h2>
                     <p style="color:var(--text-muted);">Redirecting to Sign In...</p>
                 </div>
             `;
             
-            // Wait 2 seconds then redirect to Sign In as requested
+            // Wait 2 seconds then redirect
             setTimeout(() => {
                 window.location.href = 'signin.html'; 
             }, 2000);
         }
 
-        // --- SMART BUTTON LOGIC ---
+        // --- SMART INBOX BUTTON LOGIC ---
         function configureInboxButton(email) {
             const btn = document.getElementById('inboxBtn');
             const txt = document.getElementById('inboxText');
@@ -286,10 +287,10 @@
 
             const domain = email.split('@')[1]?.toLowerCase();
 
-            // Direct Links to Search Query in Inbox
+            // Direct Links to Search Query in specific Inbox providers
             if (domain.includes('gmail.com')) {
-                // Opens Gmail searching for "EastLink"
-                btn.href = "https://mail.google.com/mail/u/0/#search/from%3Afirebase+OR+verification";
+                // Opens Gmail searching for "EastLink" or "firebase"
+                btn.href = "https://mail.google.com/mail/u/0/#search/verification";
                 txt.innerText = "Open Gmail Inbox";
             } 
             else if (domain.includes('outlook.com') || domain.includes('hotmail.com')) {
@@ -305,7 +306,7 @@
                 txt.innerText = "Open iCloud Mail";
             }
             else {
-                // Fallback to generic mailto (opens default app)
+                // Fallback to generic mailto (opens default system app)
                 btn.href = "mailto:";
                 txt.innerText = "Open Email App";
             }
@@ -323,7 +324,7 @@
                     await sendEmailVerification(currentUser);
                     showToast("Verification link sent! Check your email.", "success");
                     
-                    // Disable button and start timer
+                    // Disable button and start timer to prevent spam
                     btn.disabled = true;
                     btn.style.textDecoration = 'none';
                     btn.innerText = "Resend available in";
@@ -352,6 +353,7 @@
         };
 
         window.handleLogout = async () => {
+            if(checkInterval) clearInterval(checkInterval);
             await signOut(auth);
             window.location.href = 'signin.html';
         };

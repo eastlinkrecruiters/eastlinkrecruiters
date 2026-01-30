@@ -153,28 +153,28 @@
 
         /* Hero Text Container */
         .hero-text-block {
-            display: flex; flex-direction: column; align-items: flex-start;
+            display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
             margin-bottom: 20px; position: relative; z-index: 2; width: 100%;
         }
 
-        /* --- HIGH END ANIMATION SYSTEM --- */
+        /* --- UPDATED HIGH END ANIMATION SYSTEM (Faster & Shinier) --- */
         
-        /* 1. Entrance: Slide Up + Blur Dissolve */
+        /* 1. Entrance: Slide Up + Blur Dissolve (Faster) */
         @keyframes revealText {
-            0% { opacity: 0; transform: translateY(16px); filter: blur(10px); }
+            0% { opacity: 0; transform: translateY(20px); filter: blur(10px); }
             100% { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
 
-        /* 2. Loop: Ambient Light Flow (Diagonal Gradient Sweep) */
+        /* 2. Loop: Ambient Light Flow (Accelerated) */
         @keyframes lightFlow {
             0% { background-position: 200% 0; }
             100% { background-position: -200% 0; }
         }
 
-        /* 3. Pulse: Glow Intensity (Breath) */
+        /* 3. Pulse: Glow Intensity (Sharper) */
         @keyframes glowPulse {
-            0%, 100% { text-shadow: 0 0 20px rgba(251, 191, 36, 0); }
-            50% { text-shadow: 0 0 30px rgba(251, 191, 36, 0.2); }
+            0%, 100% { text-shadow: 0 0 10px rgba(251, 191, 36, 0.1); }
+            50% { text-shadow: 0 0 25px rgba(251, 191, 36, 0.4); }
         }
 
         @keyframes scaleLine {
@@ -182,30 +182,35 @@
             100% { transform: scaleX(1); }
         }
 
-        /* Greeting Text - REFACTORED */
-        .hero-greeting { 
+        /* Greeting Text - SPLIT LINE LOGIC */
+        .hero-greeting-line { 
             font-family: var(--font-hero-greeting);
             font-weight: 800; 
-            line-height: 1;
+            line-height: 0.9; /* Tight line height for stacked look */
             white-space: nowrap;
-            font-size: clamp(2.8rem, 6vw, 5rem); 
+            display: block; /* Forces new line */
+            font-size: clamp(3.2rem, 7vw, 5.5rem); 
             
-            /* Gradient Setup for Light Flow */
-            background: linear-gradient(110deg, #d97706 20%, #fbbf24 40%, #fff 50%, #fbbf24 60%, #d97706 80%);
+            /* High Shine Gradient */
+            background: linear-gradient(110deg, #b45309 10%, #fbbf24 45%, #ffffff 50%, #fbbf24 55%, #b45309 90%);
             background-size: 200% auto;
             -webkit-background-clip: text; 
             -webkit-text-fill-color: transparent; 
             color: transparent;
             
-            /* Layered Animations */
-            opacity: 0; /* Initial State */
+            /* Faster Animations */
+            opacity: 0; 
             animation: 
-                revealText 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards, /* Entrance */
-                lightFlow 8s linear infinite 1.2s, /* Flow Loop (starts after entrance) */
-                glowPulse 12s ease-in-out infinite 1.2s; /* Pulse Loop */
+                revealText 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards, 
+                lightFlow 4s linear infinite 0.8s, /* Speed increased (4s instead of 8s) */
+                glowPulse 3s ease-in-out infinite 0.8s;
         }
 
-        /* Name Text - FIRST NAME ONLY + REDUCED WIDTH */
+        .hero-greeting-line:nth-child(2) {
+            animation-delay: 0.15s, 0.95s, 0.95s; /* Staggered */
+        }
+
+        /* Name Text */
         .hero-username {
             font-family: var(--font-hero-name);
             font-weight: 600; 
@@ -214,15 +219,14 @@
             color: #F8FAFC; 
             opacity: 0; 
             
-            display: flex; align-items: center; margin-top: 8px;
-            /* Reduced size constraint */
+            display: flex; align-items: center; margin-top: 15px;
             font-size: clamp(1.2rem, 3.5vw, 1.8rem); 
             letter-spacing: 0.1em;
             white-space: nowrap;
-            max-width: 80%; /* Width constraint */
+            max-width: 80%;
 
-            animation: revealText 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-            animation-delay: 0.15s;
+            animation: revealText 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation-delay: 0.3s;
         }
 
         .hero-name-line {
@@ -231,22 +235,22 @@
             transform-origin: left;
             transform: scaleX(0);
             animation: scaleLine 0.4s ease-out forwards;
-            animation-delay: 0.2s;
+            animation-delay: 0.4s;
         }
 
         /* Profile Strength */
         .profile-strength-container { 
             width: 100%; max-width: 350px; margin-bottom: 25px; position: relative; z-index: 2; 
             opacity: 0;
-            animation: revealText 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-            animation-delay: 0.3s;
+            animation: revealText 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation-delay: 0.5s;
         }
         .strength-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--gold-base); font-weight: 700; margin-bottom: 5px; }
         .strength-track { height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
         .strength-fill { 
             height: 100%; background: var(--success-gradient); width: 0; border-radius: 10px; 
-            animation: loadBar 1s ease-out forwards; 
-            animation-delay: 0.4s; 
+            animation: loadBar 0.8s ease-out forwards; 
+            animation-delay: 0.6s; 
         }
         @keyframes loadBar { from { width: 0; } to { width: 85%; } }
 
@@ -255,10 +259,12 @@
             color: #cbd5e1; font-size: 0.8rem;
             margin-bottom: 25px; max-width: 650px;
             line-height: 1.5; font-style: italic; position: relative; z-index: 2;
-            opacity: 0.9;
+            opacity: 0;
+            animation: revealText 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation-delay: 0.7s;
         }
 
-        .hero-btn-row { display: flex; flex-direction: row; gap: 15px; align-items: center; position: relative; z-index: 2; }
+        .hero-btn-row { display: flex; flex-direction: row; gap: 15px; align-items: center; position: relative; z-index: 2; opacity: 0; animation: revealText 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: 0.8s; }
         .btn-hero { 
             padding: 12px 30px; border-radius: 50px; font-weight: 700; cursor: pointer; 
             border: none; font-size: 0.95rem; transition: 0.3s; position: relative;
@@ -271,7 +277,7 @@
         
         @media (max-width: 768px) {
             .welcome-card { padding: 25px; min-height: auto; }
-            .hero-greeting { font-size: 10vw; } 
+            .hero-greeting-line { font-size: 13vw; } /* Adjusted for 2-line mobile visibility */
             .hero-username { font-size: 5vw; }
             .hero-text-block { margin-bottom: 15px; }
             #hero-subtext { font-size: 0.75rem; }
@@ -506,9 +512,9 @@
                     </div>
                 </div>
 
-                <p id="hero-subtext" class="animate__animated animate__fadeInUp animate__delay-1s">Your digital profile is active. Check out the latest opportunities curated for you.</p>
+                <p id="hero-subtext">Your digital profile is active. Check out the latest opportunities curated for you.</p>
                 
-                <div class="hero-btn-row animate__animated animate__fadeInUp animate__delay-2s">
+                <div class="hero-btn-row">
                     <button onclick="handleActionWithSpinner(this, () => location.href='seeker-jobs.html')" class="btn-hero btn-hero-green">
                         <i class="fas fa-briefcase"></i> Jobs
                     </button>
@@ -801,13 +807,16 @@
 
             const welcomeContainer = document.getElementById('welcome-msg-container');
             const hour = new Date().getHours();
-            const greeting = hour < 12 ? "GOOD MORNING," : hour < 18 ? "GOOD AFTERNOON," : "GOOD EVENING,";
+            let greetingWord = "MORNING";
+            if (hour >= 12 && hour < 18) greetingWord = "AFTERNOON";
+            else if (hour >= 18) greetingWord = "EVENING";
 
-            // UPDATED GREETING LOGIC: Layered Motion System
+            // UPDATED GREETING LOGIC: Layered Motion System (Split Lines)
             if(welcomeContainer) { 
                 welcomeContainer.innerHTML = `
                     <div class="hero-text-block">
-                        <span class="hero-greeting">${greeting}</span>
+                        <span class="hero-greeting-line">GOOD</span>
+                        <span class="hero-greeting-line">${greetingWord},</span>
                         <div class="hero-username">
                             <span class="hero-name-line"></span>
                             ${firstName.toUpperCase()}
@@ -920,18 +929,6 @@
             const container = document.getElementById('recent-activities-panel');
             if(!container) return;
 
-            // Simple logic: Fetch last 3 items from a hypothetical 'activities' collection
-            // Or aggregate from 'applications', 'transactions', etc.
-            // For this snippet, we will pull from 'notifications' as a proxy for activity history 
-            // OR create a manual query if you have an 'audit_logs' or 'activities' collection.
-            
-            // Assuming we use 'activities' collection:
-            const q = query(collection(db, "activities"), where("userId", "==", uid), orderBy("timestamp", "desc"), limit(3));
-            
-            // If you don't have an 'activities' collection, we can simulate one or use notifications.
-            // Let's use notifications for now as a fallback to ensure it works without errors if the collection is missing,
-            // but structure it as activities.
-            
             // USING NOTIFICATIONS AS ACTIVITY FEED (Fallback)
             const fallbackQ = query(collection(db, "notifications"), where("userId", "==", uid), orderBy("createdAt", "desc"), limit(3));
             
