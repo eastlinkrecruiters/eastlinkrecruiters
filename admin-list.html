@@ -130,6 +130,20 @@
         .btn-gold { background: var(--gold-gradient); color: black; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.2); }
         .btn-glass { background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid rgba(255,255,255,0.1); }
         .btn-glass:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+        
+        /* Pagination Controls */
+        .pagination-controls {
+            display: flex; justify-content: space-between; align-items: center; margin-top: 20px;
+            padding: 15px; background: rgba(255,255,255,0.02); border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .page-btn {
+            background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: 0.2s; font-size: 0.9rem;
+        }
+        .page-btn:hover:not(:disabled) { background: rgba(255,255,255,0.1); color: var(--text-main); }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .page-info { color: var(--text-muted); font-size: 0.9rem; font-family: var(--font-mono); }
 
         /* --- FILTERS --- */
         .glass-panel {
@@ -148,34 +162,50 @@
         }
         .form-input:focus, .form-select:focus { border-color: var(--gold-base); box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.1); }
 
-        /* --- TABLE --- */
-        .table-responsive { overflow-x: auto; background: var(--bg-glass); border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        /* --- TABLE (Professional Styling) --- */
+        .table-responsive { 
+            overflow-x: auto; background: var(--bg-glass); border-radius: var(--radius); 
+            border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 8px 32px rgba(0,0,0,0.2); 
+            max-height: 70vh; /* Fixed height for scrolling */
+        }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1000px; }
         
         thead th {
-            text-align: left; padding: 18px 20px; background: rgba(255,255,255,0.03); 
+            text-align: left; padding: 18px 20px; background: #1e293b; 
             color: var(--gold-base); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;
-            border-bottom: 1px solid rgba(255,255,255,0.1); font-family: var(--font-display); letter-spacing: 0.5px;
+            border-bottom: 2px solid rgba(255,255,255,0.1); font-family: var(--font-display); letter-spacing: 0.5px;
+            position: sticky; top: 0; z-index: 10; /* Sticky Header */
         }
         
         tbody td { 
-            padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); 
+            padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); 
             font-size: 0.9rem; color: var(--text-muted); vertical-align: middle;
         }
-        tr:last-child td { border-bottom: none; }
-        tr:hover td { background: rgba(255,255,255,0.03); color: var(--text-main); }
+        /* Zebra Striping */
+        tbody tr:nth-child(even) { background-color: rgba(255,255,255,0.015); }
+        tbody tr:hover { background-color: rgba(255,255,255,0.04); color: var(--text-main); }
+
+        /* App Ref Code Styling */
+        .app-ref-box {
+            font-family: var(--font-mono); font-size: 0.8rem; color: var(--sky);
+            background: rgba(56, 189, 248, 0.08); padding: 4px 8px; border-radius: 4px;
+            border: 1px solid rgba(56, 189, 248, 0.15); display: inline-flex; align-items: center; gap: 8px;
+            white-space: nowrap;
+        }
+        .copy-icon { cursor: pointer; font-size: 0.8rem; opacity: 0.6; transition: 0.2s; }
+        .copy-icon:hover { opacity: 1; color: #fff; }
 
         /* Status Badges */
-        .status-badge { padding: 6px 12px; border-radius: 30px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; letter-spacing: 0.5px; }
+        .status-badge { padding: 4px 10px; border-radius: 30px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; letter-spacing: 0.5px; white-space: nowrap; }
         .status-hired { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
         .status-shortlisted { background: rgba(59, 130, 246, 0.15); color: var(--blue); border: 1px solid rgba(59, 130, 246, 0.3); }
         .status-review { background: rgba(251, 191, 36, 0.15); color: var(--gold-base); border: 1px solid rgba(251, 191, 36, 0.3); }
         
-        .job-type-tag { font-family: var(--font-mono); font-size: 0.75rem; opacity: 0.8; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.05); }
+        .job-type-tag { font-family: var(--font-mono); font-size: 0.75rem; opacity: 0.8; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.05); white-space: nowrap; }
 
-        .action-btns { display: flex; gap: 8px; justify-content: flex-end; }
+        .action-btns { display: flex; gap: 6px; justify-content: flex-end; }
         .btn-icon-sm { 
-            width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; 
+            width: 30px; height: 30px; border-radius: 6px; display: grid; place-items: center; 
             cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: transparent; 
             color: var(--text-muted); transition: 0.2s;
         }
@@ -294,6 +324,7 @@
                 <p>Manage offline & online applications, update statuses, and generate official placement reports.</p>
             </div>
             <div style="display:flex; gap:10px;">
+                <button class="btn-action btn-glass" onclick="fetchCandidates()"><i class="fas fa-sync-alt"></i> Refresh</button>
                 <button class="btn-action btn-glass" onclick="openExportModal()"><i class="fas fa-file-pdf" style="color:var(--danger)"></i> Export Report</button>
                 <button class="btn-action btn-gold" onclick="openAddModal()"><i class="fas fa-plus"></i> Add Candidate</button>
             </div>
@@ -305,13 +336,13 @@
                 <div class="form-group" style="flex:2;">
                     <label class="form-label">Search Candidates</label>
                     <div style="position:relative;">
-                        <input type="text" id="searchInput" class="form-input" placeholder="Search by name, partial ID..." style="padding-left:40px;" onkeyup="applyFilters()">
+                        <input type="text" id="searchInput" class="form-input" placeholder="Search by name, ID, phone number or Ref..." style="padding-left:40px;" onkeyup="applyFilters(true)">
                         <i class="fas fa-search" style="position:absolute; left:12px; top:13px; color:var(--text-muted);"></i>
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Application Status</label>
-                    <select id="filterStatus" class="form-select" onchange="applyFilters()">
+                    <select id="filterStatus" class="form-select" onchange="applyFilters(true)">
                         <option value="all">All Statuses</option>
                         <option value="Shortlisted">Shortlisted</option>
                         <option value="Under Review">Under Review</option>
@@ -320,7 +351,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">Job Type</label>
-                    <select id="filterJobType" class="form-select" onchange="applyFilters()">
+                    <select id="filterJobType" class="form-select" onchange="applyFilters(true)">
                         <option value="all">All Job Types</option>
                         <option value="Standard">Standard</option>
                         <option value="Featured">Featured</option>
@@ -336,22 +367,30 @@
             <table id="candidateTable">
                 <thead>
                     <tr>
-                        <th width="20%">Candidate Name</th>
-                        <th width="15%">ID Number</th>
-                        <th width="15%">Phone</th>
+                        <th width="5%">#</th>
+                        <th width="15%">App Ref</th>
+                        <th width="15%">Candidate Name</th>
+                        <th width="10%">ID No.</th>
+                        <th width="10%">Phone</th>
                         <th width="15%">Job Type</th>
-                        <th width="15%">Applied Date</th>
+                        <th width="10%">Applied On</th>
                         <th width="10%">Status</th>
                         <th width="10%" style="text-align:right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr><td colspan="7" style="text-align:center; padding:40px; color:var(--text-muted);"><span class="loading-spinner"></span> Loading database...</td></tr>
+                    <tr><td colspan="9" style="text-align:center; padding:40px; color:var(--text-muted);"><span class="loading-spinner"></span> Loading database...</td></tr>
                 </tbody>
             </table>
         </div>
         
-        <div id="recordCount" style="margin-top:15px; font-size:0.8rem; color:var(--text-muted); text-align:right;"></div>
+        <!-- Pagination Controls -->
+        <div class="pagination-controls" id="paginationControls">
+            <button class="page-btn" id="prevBtn" onclick="changePage(-1)"><i class="fas fa-chevron-left"></i> Previous</button>
+            <span class="page-info" id="pageInfo">Page 1 of 1</span>
+            <button class="page-btn" id="nextBtn" onclick="changePage(1)">Next <i class="fas fa-chevron-right"></i></button>
+        </div>
+        
     </main>
 
     <!-- ADD/EDIT MODAL -->
@@ -363,6 +402,7 @@
             </div>
             <div class="modal-body">
                 <input type="hidden" id="editId">
+                <input type="hidden" id="existingRef"> <!-- Hidden field to store ref code during edit -->
                 
                 <div class="form-group">
                     <label class="form-label">Full Name</label>
@@ -399,7 +439,7 @@
                     <label class="form-label">Current Status</label>
                     <select id="inpStatus" class="form-select">
                         <option value="Under Review">Under Review (Pending)</option>
-                        <option value="Shortlisted">Shortlisted (Interview)</option>
+                        <option value="Shortlisted">Shortlisted</option>
                         <option value="Hired">Hired (Success)</option>
                     </select>
                 </div>
@@ -456,24 +496,8 @@
             </div>
             <div class="modal-footer">
                 <button class="btn-action btn-glass" onclick="document.getElementById('exportModal').classList.remove('active')">Close</button>
-                <button class="btn-action btn-gold" onclick="generateAndPreviewPDF()"><i class="fas fa-eye"></i> Preview Report</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- PDF PREVIEW MODAL -->
-    <div class="modal-overlay" id="pdfPreviewModal" style="z-index: 2100;">
-        <div class="modal-card" style="max-width: 90%; height: 90vh; display:flex; flex-direction:column;">
-            <div class="modal-header">
-                <h3>Report Preview</h3>
-                <i class="fas fa-times" onclick="closePreviewModal()" style="cursor:pointer;"></i>
-            </div>
-            <div class="modal-body" style="flex:1; padding:0; overflow:hidden;">
-                <iframe id="pdfPreviewFrame" width="100%" height="100%" style="border:none;"></iframe>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-action btn-glass" onclick="closePreviewModal()">Close</button>
-                <button class="btn-action btn-gold" onclick="downloadFinalPDF()"><i class="fas fa-download"></i> Download Now</button>
+                <!-- Direct Download, No Preview -->
+                <button class="btn-action btn-gold" onclick="generateAndDownloadPDF()"><i class="fas fa-download"></i> Download Report</button>
             </div>
         </div>
     </div>
@@ -488,8 +512,14 @@
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
         import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, Timestamp, onSnapshot, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        let candidates = [];
-        let currentPDFDoc = null; // Store PDF instance for download
+        let allCandidates = []; // Stores the full fetched list
+        let filteredCandidates = []; // Stores list after search/filters
+        
+        // Pagination State
+        const ITEMS_PER_PAGE = 15;
+        let currentPage = 1;
+        let totalPages = 1;
+
         const { jsPDF } = window.jspdf;
 
         // --- UI UTILS ---
@@ -500,15 +530,20 @@
         
         window.logout = () => { if(confirm("Confirm Log Out?")) signOut(auth).then(() => window.location.href = 'signin.html'); };
 
+        window.copyRef = (text) => {
+            navigator.clipboard.writeText(text).then(() => {
+                Toastify({ text: "Reference copied!", style: { background: "var(--success)" }, duration: 2000 }).showToast();
+            });
+        };
+
         // --- AUTH & DATA ---
         onAuthStateChanged(auth, user => {
             if(!user) { window.location.href = 'signin.html'; return; }
             initBadges();
-            fetchCandidates();
+            fetchCandidates(); // Initial Fetch
         });
 
         function initBadges() {
-             // Real-time listener for Open Tickets (Badge)
             try {
                 const msgQ = query(collection(db, "support_tickets"), where("status", "==", "open"));
                  onSnapshot(msgQ, (snap) => {
@@ -519,7 +554,6 @@
                 });
             } catch(e) { console.log(e); }
 
-             // Real-time listener for Notifications (Badge)
              try {
                 const notifQ = query(collection(db, "notifications"), where("read", "==", false));
                  onSnapshot(notifQ, (snap) => {
@@ -531,19 +565,40 @@
             } catch(e) { console.log(e); }
         }
 
-        async function fetchCandidates() {
+        // --- FETCH DATA (Removed onSnapshot to fix blinking/crashing) ---
+        window.fetchCandidates = async () => {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:40px; color:var(--text-muted);"><span class="loading-spinner"></span> Loading database...</td></tr>`;
+
             try {
-                // Fetching from 'candidate_list' collection as per new rules
                 const q = query(collection(db, "candidate_list"), orderBy("createdAt", "desc"));
-                // Using onSnapshot for real-time updates
-                onSnapshot(q, (snapshot) => {
-                    candidates = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    renderTable(candidates);
+                const querySnapshot = await getDocs(q);
+                
+                allCandidates = querySnapshot.docs.map(docSnap => {
+                    const data = docSnap.data();
+                    
+                    // --- FIX OLD DATA (Silent Update) ---
+                    if(!data.appRef) {
+                        const newRef = generateRefCode();
+                        // Update DB in background
+                        updateDoc(doc(db, "candidate_list", docSnap.id), { appRef: newRef }).catch(e => console.error(e));
+                        return { id: docSnap.id, ...data, appRef: newRef };
+                    }
+                    return { id: docSnap.id, ...data };
                 });
+                
+                applyFilters(true); // Reset to page 1
             } catch (e) {
                 console.error("Error fetching", e);
-                document.getElementById('tableBody').innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--danger);"><i class="fas fa-exclamation-circle"></i> Error loading data. Check permissions.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:30px; color:var(--danger);"><i class="fas fa-exclamation-circle"></i> Error loading data.</td></tr>`;
             }
+        }
+
+        // --- HELPER: GENERATE REF CODE ---
+        function generateRefCode() {
+            const year = new Date().getFullYear();
+            const randomPart = Math.random().toString(36).substring(2, 6).toUpperCase();
+            return `EL-${year}-${randomPart}`;
         }
 
         // --- CRUD OPERATIONS ---
@@ -554,6 +609,13 @@
             btn.disabled = true;
 
             const id = document.getElementById('editId').value;
+            const existingRef = document.getElementById('existingRef').value;
+            
+            let appRefCode = existingRef;
+            if(!appRefCode || appRefCode.trim() === '') {
+                appRefCode = generateRefCode();
+            }
+
             const data = {
                 name: document.getElementById('inpName').value,
                 idNumber: document.getElementById('inpId').value,
@@ -561,6 +623,7 @@
                 jobType: document.getElementById('inpJobType').value,
                 dateApplied: document.getElementById('inpDate').value,
                 status: document.getElementById('inpStatus').value,
+                appRef: appRefCode,
                 updatedAt: Timestamp.now()
             };
 
@@ -574,11 +637,21 @@
                 if(id) {
                     await updateDoc(doc(db, "candidate_list", id), data);
                     Toastify({ text: "Record Updated", style: { background: "var(--success)" } }).showToast();
+                    
+                    // Update Local State without Full Fetch
+                    const idx = allCandidates.findIndex(c => c.id === id);
+                    if(idx !== -1) allCandidates[idx] = { ...allCandidates[idx], ...data };
+
                 } else {
                     data.createdAt = Timestamp.now();
-                    await addDoc(collection(db, "candidate_list"), data);
+                    const docRef = await addDoc(collection(db, "candidate_list"), data);
                     Toastify({ text: "Candidate Added", style: { background: "var(--success)" } }).showToast();
+                    
+                    // Add to Local State
+                    allCandidates.unshift({ id: docRef.id, ...data });
                 }
+                
+                applyFilters(false); // Re-render current page
                 closeModal();
             } catch(e) {
                 console.error(e);
@@ -593,40 +666,89 @@
             try {
                 await deleteDoc(doc(db, "candidate_list", id));
                 Toastify({ text: "Record Deleted", style: { background: "var(--text-muted)" } }).showToast();
+                
+                // Remove from Local State
+                allCandidates = allCandidates.filter(c => c.id !== id);
+                applyFilters(false);
             } catch(e) { 
                 console.error(e);
                 Toastify({ text: "Delete Failed", style: { background: "var(--danger)" } }).showToast();
             }
         }
 
-        // --- RENDER & FILTERS ---
-        function renderTable(data) {
-            const tbody = document.getElementById('tableBody');
-            const countDiv = document.getElementById('recordCount');
-            
-            countDiv.innerText = `Showing ${data.length} records`;
+        // --- FILTERING & PAGINATION LOGIC ---
+        
+        window.applyFilters = (resetPage = false) => {
+            const status = document.getElementById('filterStatus').value;
+            const jobType = document.getElementById('filterJobType').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
 
-            if(data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:50px; opacity:0.6;"><i class="fas fa-folder-open" style="font-size:2rem; margin-bottom:10px;"></i><br>No candidates found matching your criteria.</td></tr>`;
+            filteredCandidates = allCandidates.filter(c => {
+                const sMatch = status === 'all' || c.status === status;
+                const jMatch = jobType === 'all' || c.jobType === jobType;
+                const textMatch = (c.name || '').toLowerCase().includes(search) || 
+                                  (c.idNumber || '').includes(search) ||
+                                  (c.phone || '').includes(search) || 
+                                  (c.appRef || '').toLowerCase().includes(search);
+                                  
+                return sMatch && jMatch && textMatch;
+            });
+
+            if (resetPage) currentPage = 1;
+            renderTable();
+        };
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            
+            // Calculate Pages
+            totalPages = Math.ceil(filteredCandidates.length / ITEMS_PER_PAGE) || 1;
+            
+            // Ensure currentPage is valid
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            // Slice Data for Current Page
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIndex = startIndex + ITEMS_PER_PAGE;
+            const dataToRender = filteredCandidates.slice(startIndex, endIndex);
+            
+            // Update UI Info
+            document.getElementById('pageInfo').innerText = `Page ${currentPage} of ${totalPages} (${filteredCandidates.length} total)`;
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+
+            if(filteredCandidates.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:50px; opacity:0.6;"><i class="fas fa-folder-open" style="font-size:2rem; margin-bottom:10px;"></i><br>No candidates found.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = data.map(c => {
-                const maskedId = maskString(c.idNumber, 2, 2);
-                const maskedPhone = maskString(c.phone, 3, 2);
+            tbody.innerHTML = dataToRender.map((c, i) => {
+                const globalIndex = startIndex + i + 1; // Continuous numbering
+                const displayId = c.idNumber || '--';
+                const displayPhone = c.phone || '--'; 
+                const refCode = c.appRef || 'N/A';
                 
                 let badgeClass = 'status-review';
                 let icon = 'fa-clock';
                 if(c.status === 'Hired') { badgeClass = 'status-hired'; icon = 'fa-check-circle'; }
-                if(c.status === 'Shortlisted') { badgeClass = 'status-shortlisted'; icon = 'fa-calendar-alt'; }
+                if(c.status === 'Shortlisted') { badgeClass = 'status-shortlisted'; icon = 'fa-list-check'; } 
+
+                const copyHtml = `<i class="fas fa-copy copy-icon" onclick="copyRef('${refCode}')" title="Copy Reference"></i>`;
 
                 return `
-                <tr class="animate__animated animate__fadeIn">
+                <tr class="animate__animated animate__fadeIn" style="animation-duration: 0.3s;">
+                    <td style="color:var(--text-muted); font-size:0.8rem;">${globalIndex}</td>
+                    <td>
+                        <div class="app-ref-box">
+                            ${refCode} ${copyHtml}
+                        </div>
+                    </td>
                     <td style="font-weight:600; color:var(--text-main);">${c.name}</td>
-                    <td style="font-family:var(--font-mono);">${maskedId}</td>
-                    <td style="font-family:var(--font-mono);">${maskedPhone}</td>
+                    <td style="font-family:var(--font-mono); font-size:0.85rem;">${displayId}</td>
+                    <td style="font-family:var(--font-mono); font-size:0.85rem;">${displayPhone}</td>
                     <td><span class="job-type-tag">${c.jobType}</span></td>
-                    <td>${c.dateApplied}</td>
+                    <td style="font-size:0.85rem; color:var(--text-muted);">${c.dateApplied}</td>
                     <td><span class="status-badge ${badgeClass}"><i class="fas ${icon}"></i> ${c.status}</span></td>
                     <td>
                         <div class="action-btns">
@@ -639,29 +761,21 @@
             }).join('');
         }
 
+        window.changePage = (direction) => {
+            currentPage += direction;
+            renderTable();
+        };
+
         function maskString(str, start, end) {
             if(!str || str.length < 5) return str || '--';
             const len = str.length;
             return str.substring(0, start) + "****" + str.substring(len - end);
         }
 
-        window.applyFilters = () => {
-            const status = document.getElementById('filterStatus').value;
-            const jobType = document.getElementById('filterJobType').value;
-            const search = document.getElementById('searchInput').value.toLowerCase();
-
-            const filtered = candidates.filter(c => {
-                const sMatch = status === 'all' || c.status === status;
-                const jMatch = jobType === 'all' || c.jobType === jobType;
-                const textMatch = (c.name || '').toLowerCase().includes(search) || (c.idNumber || '').includes(search);
-                return sMatch && jMatch && textMatch;
-            });
-            renderTable(filtered);
-        };
-
         // --- MODAL CONTROLS ---
         window.openAddModal = () => {
             document.getElementById('editId').value = '';
+            document.getElementById('existingRef').value = ''; 
             document.getElementById('inpName').value = '';
             document.getElementById('inpId').value = '';
             document.getElementById('inpPhone').value = '';
@@ -671,9 +785,10 @@
         };
 
         window.openEditModal = (id) => {
-            const c = candidates.find(x => x.id === id);
+            const c = allCandidates.find(x => x.id === id);
             if(!c) return;
             document.getElementById('editId').value = c.id;
+            document.getElementById('existingRef').value = c.appRef || ''; 
             document.getElementById('inpName').value = c.name;
             document.getElementById('inpId').value = c.idNumber;
             document.getElementById('inpPhone').value = c.phone;
@@ -687,22 +802,16 @@
         window.closeModal = () => document.getElementById('candidateModal').classList.remove('active');
         window.openExportModal = () => document.getElementById('exportModal').classList.add('active');
         
-        window.closePreviewModal = () => {
-            document.getElementById('pdfPreviewModal').classList.remove('active');
-            // Clear iframe to free memory
-            setTimeout(() => { document.getElementById('pdfPreviewFrame').src = ""; }, 300);
-        };
-
-        // --- ADVANCED PDF EXPORT & PREVIEW ---
-        window.generateAndPreviewPDF = () => {
+        // --- ADVANCED PDF EXPORT (DIRECT DOWNLOAD) ---
+        window.generateAndDownloadPDF = () => {
             const doc = new jsPDF();
             const filterStat = document.getElementById('exportStatus').value;
             const sortOrder = document.getElementById('exportSort').value;
             const startDate = document.getElementById('exportStartDate').value;
             const endDate = document.getElementById('exportEndDate').value;
 
-            // 1. Prepare Data with Date Filter
-            let exportData = candidates.filter(c => {
+            // 1. Prepare Data
+            let exportData = allCandidates.filter(c => {
                 const statusMatch = filterStat === 'all' || c.status === filterStat;
                 let dateMatch = true;
                 if(startDate && c.dateApplied < startDate) dateMatch = false;
@@ -717,18 +826,15 @@
                 if(sortOrder === 'nameAsc') return a.name.localeCompare(b.name);
             });
 
-            if(exportData.length === 0) return Toastify({ text: "No records to export with current date/filter criteria", style: { background: "var(--danger)" } }).showToast();
+            if(exportData.length === 0) return Toastify({ text: "No records to export with current criteria", style: { background: "var(--danger)" } }).showToast();
 
             // 3. Header Branding
             const logoUrl = 'assets/images/logo.png'; 
-            try {
-                // Try adding logo if available, else skip
-                doc.addImage(logoUrl, 'PNG', 14, 10, 16, 16); 
-            } catch(e) { console.warn("Logo not found for PDF"); }
+            try { doc.addImage(logoUrl, 'PNG', 14, 10, 16, 16); } catch(e) {}
 
             doc.setFont("helvetica", "bold");
             doc.setFontSize(18);
-            doc.setTextColor(217, 119, 6); // Gold #d97706
+            doc.setTextColor(217, 119, 6); 
             doc.text("EASTLINK AGENCY", 34, 18);
             
             doc.setFont("helvetica", "normal");
@@ -737,10 +843,9 @@
             doc.text("Official Candidate Status Report", 34, 24);
             
             doc.setDrawColor(200);
-            doc.line(14, 30, 196, 30); // Horizontal Line
+            doc.line(14, 30, 196, 30); 
 
             doc.setFontSize(9);
-            // Construct Date Range String
             let dateRangeStr = "All time";
             if (startDate && endDate) dateRangeStr = `${startDate} to ${endDate}`;
             else if (startDate) dateRangeStr = `From ${startDate}`;
@@ -751,7 +856,6 @@
 
             // 4. Watermark Hook
             const addWatermark = (data) => {
-                // Add watermark on every page
                 doc.saveGraphicsState();
                 doc.setGState(new doc.GState({ opacity: 0.05 }));
                 doc.setFontSize(50);
@@ -759,29 +863,21 @@
                 doc.text("EASTLINK CONFIDENTIAL", 30, 150, { angle: 45 });
                 doc.restoreGraphicsState();
                 
-                // Footer Page Number & Copyright
                 const pageHeight = doc.internal.pageSize.height;
                 doc.setFontSize(8);
                 doc.setTextColor(100);
-                
-                // Left: Copyright
                 doc.text("© " + new Date().getFullYear() + " EastLink Recruiters. All rights reserved.", 14, pageHeight - 10);
-                
-                // Center: Page Num
-                let str = "Page " + doc.internal.getNumberOfPages();
-                doc.text(str, data.settings.margin.left + 80, pageHeight - 10);
-
-                // Right: Support Email
+                doc.text("Page " + doc.internal.getNumberOfPages(), data.settings.margin.left + 80, pageHeight - 10);
                 doc.text("Support: eastlinkrecruiters@gmail.com", 196, pageHeight - 10, { align: 'right' });
             };
 
-            // 5. Table Data 
-            // NOTE: Headers are clean ("ID Number", "Phone") but content is masked
+            // 5. Table Data - MASKED FOR PRIVACY
             const body = exportData.map((c, i) => [
                 (i + 1).toString(),
+                c.appRef || 'N/A', 
                 c.name,
-                maskString(c.idNumber, 2, 2),
-                maskString(c.phone, 3, 2),
+                maskString(c.idNumber, 2, 2), // Masked in PDF
+                maskString(c.phone, 3, 2),    // Masked in PDF
                 c.jobType,
                 c.dateApplied,
                 c.status.toUpperCase()
@@ -790,58 +886,40 @@
             // 6. Generate AutoTable
             doc.autoTable({
                 startY: 50,
-                // Clean Professional Headers (No "Masked" label)
-                head: [['#', 'Candidate Name', 'ID Number', 'Phone', 'Job Type', 'Applied On', 'Status']],
+                head: [['#', 'Ref Code', 'Candidate Name', 'ID Number', 'Phone', 'Job Type', 'Applied On', 'Status']],
                 body: body,
                 theme: 'striped',
                 headStyles: { 
-                    fillColor: [30, 41, 59], // Dark Blue/Slate
-                    textColor: [251, 191, 36], // Gold Text
+                    fillColor: [30, 41, 59], 
+                    textColor: [251, 191, 36], 
                     fontStyle: 'bold',
                     lineWidth: 0.1,
                     lineColor: [50, 50, 50]
                 },
                 styles: { 
-                    fontSize: 8, 
-                    cellPadding: 4,
+                    fontSize: 7, 
+                    cellPadding: 3,
                     valign: 'middle'
                 },
                 columnStyles: {
-                    0: { cellWidth: 10 },
-                    6: { fontStyle: 'bold' } // Status Column Bold
+                    0: { cellWidth: 8 },
+                    7: { fontStyle: 'bold' } 
                 },
                 didParseCell: function(data) {
-                    // Custom Coloring for Status
-                    if (data.section === 'body' && data.column.index === 6) {
+                    if (data.section === 'body' && data.column.index === 7) {
                         const val = data.cell.raw;
-                        if (val === 'HIRED') data.cell.styles.textColor = [16, 185, 129]; // Green
-                        else if (val === 'SHORTLISTED') data.cell.styles.textColor = [59, 130, 246]; // Blue
-                        else data.cell.styles.textColor = [217, 119, 6]; // Gold/Orange
+                        if (val === 'HIRED') data.cell.styles.textColor = [16, 185, 129]; 
+                        else if (val === 'SHORTLISTED') data.cell.styles.textColor = [59, 130, 246]; 
+                        else data.cell.styles.textColor = [217, 119, 6]; 
                     }
                 },
                 didDrawPage: addWatermark
             });
 
-            // 7. Store doc for download and Show Preview
-            currentPDFDoc = doc;
-            const pdfBlob = doc.output('bloburl');
-            
-            document.getElementById('pdfPreviewFrame').src = pdfBlob;
-            
-            // Switch modals
+            // SAVE DIRECTLY
+            doc.save(`EastLink_Report_${new Date().toISOString().slice(0,10)}.pdf`);
+            Toastify({ text: "PDF Downloaded Successfully", style: { background: "var(--success)" } }).showToast();
             document.getElementById('exportModal').classList.remove('active');
-            document.getElementById('pdfPreviewModal').classList.add('active');
-        };
-
-        window.downloadFinalPDF = () => {
-            if(currentPDFDoc) {
-                currentPDFDoc.save(`EastLink_Report_${new Date().toISOString().slice(0,10)}.pdf`);
-                Toastify({ text: "PDF Downloaded Successfully", style: { background: "var(--success)" } }).showToast();
-                // Optional: Close preview after download
-                // closePreviewModal();
-            } else {
-                Toastify({ text: "Error: No PDF generated", style: { background: "var(--danger)" } }).showToast();
-            }
         };
     </script>
 </body>
