@@ -7,6 +7,7 @@
     
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
     <meta name="theme-color" content="#0F172A">
     
     <!-- Fonts & Icons -->
@@ -21,27 +22,34 @@
         :root {
             /* Master Theme Palette */
             --bg-body: #0F172A;       
-            --bg-glass: rgba(30, 41, 59, 0.70); 
-            --bg-glass-hover: rgba(255, 255, 255, 0.08);
-            --bg-glass-heavy: rgba(15, 23, 42, 0.95);
+            --bg-glass: rgba(30, 41, 59, 0.65); 
+            --bg-glass-hover: rgba(255, 255, 255, 0.05);
+            --bg-glass-heavy: rgba(15, 23, 42, 0.90);
+            --bg-card: rgba(30, 41, 59, 0.4);
             --bg-input: rgba(255, 255, 255, 0.05);
-            --border-color: rgba(255, 255, 255, 0.12);
-            --border-highlight: rgba(255, 255, 255, 0.2);
+            
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(255, 255, 255, 0.15);
             
             --text-main: #F8FAFC;     
             --text-muted: #94A3B8; 
+            --text-sub: #64748B;
             
             /* Gradients & Accents */
-            --gold-base: #D97706;
+            --gold-base: #fbbf24;
             --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
-            --neon-purple: #8b5cf6;
+            --gold-glow: rgba(251, 191, 36, 0.3);
+            
+            --purple-base: #a855f7;
             --purple-gradient: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+            --purple-glow: rgba(168, 85, 247, 0.3);
+
             --success: #10B981;
             --danger: #EF4444;
             
             --sidebar-width: 260px; 
             --header-height: 70px;
-            --radius: 20px;
+            --radius: 24px;
             
             --font-head: 'Cinzel', serif;
             --font-body: 'Inter', sans-serif;
@@ -55,9 +63,8 @@
         body { 
             font-family: var(--font-body); 
             background-color: var(--bg-body); 
-            background-image: url('./assets/images/background.png');
-            background-size: cover;
-            background-position: center;
+            background-image: radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.08), transparent 25%),
+                              radial-gradient(circle at 85% 30%, rgba(217, 119, 6, 0.05), transparent 25%);
             background-attachment: fixed;
             color: var(--text-main); 
             min-height: 100vh; 
@@ -65,39 +72,19 @@
             display: flex; flex-direction: column;
         }
 
-        /* Dark Overlay */
-        body::before {
-            content: ''; position: fixed; inset: 0;
-            background: rgba(15, 23, 42, 0.85); 
-            z-index: -5; pointer-events: none;
-        }
-
-        /* Utils */
-        .glass-panel {
-            background: var(--bg-glass);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid var(--border-color);
-            border-top: 1px solid var(--border-highlight);
-            border-radius: var(--radius);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-
-        /* Header */
+        /* --- Header --- */
         header {
             position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
-            background: var(--bg-glass-heavy); backdrop-filter: blur(20px);
+            background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-color);
             display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 1000;
         }
         .header-left { display: flex; align-items: center; gap: 15px; }
         .logo { 
-            font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.4rem; 
-            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; gap: 10px;
+            font-family: var(--font-head); font-weight: 700; color: #fff; font-size: 1.4rem; 
+            text-transform: uppercase; letter-spacing: 1px; text-decoration: none; 
         }
-        .logo span { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo span { color: #d97706; }
         .hamburger { font-size: 1.4rem; cursor: pointer; color: var(--text-muted); display: none; }
 
         /* Search */
@@ -116,29 +103,23 @@
         .search-result-item { padding: 12px 15px; border-bottom: 1px solid var(--border-color); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
         .search-result-item:hover { background: var(--bg-glass-hover); padding-left: 20px; }
 
-        /* Header Icons & Realistic Styles */
+        /* Icons Group */
         .header-actions { display: flex; align-items: center; gap: 12px; }
-        
         .icon-btn { 
-            width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; 
+            width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; 
             cursor: pointer; background: rgba(255,255,255,0.03); position: relative; 
             border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
         }
         .icon-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
-        
-        /* Realistic Colors */
-        .icon-msg { color: #3b82f6; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.4)); }
-        .icon-bell { color: #f59e0b; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.4)); }
-
+        .icon-msg { color: #3b82f6; font-size: 1rem; }
+        .icon-bell { color: #f59e0b; font-size: 1rem; }
         .notification-badge { 
-            position: absolute; top: -3px; right: -3px; width: 18px; height: 18px; 
-            background: #ef4444; border: 2px solid #0f172a; /* Red Badge with dark border */
-            border-radius: 50%; font-size: 0.65rem; color: white; 
-            display: none; place-items: center; justify-content: center; font-weight: 700; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            position: absolute; top: -2px; right: -2px; width: 16px; height: 16px; 
+            background: #ef4444; border: 2px solid #0f172a; border-radius: 50%; 
+            font-size: 0.6rem; color: white; display: none; place-items: center; 
+            justify-content: center; font-weight: 700; 
         }
-
-        .profile-widget { width: 42px; height: 42px; position: relative; cursor: pointer; transition: transform 0.3s; margin-left: 5px; flex-shrink: 0; }
+        .profile-widget { width: 40px; height: 40px; position: relative; cursor: pointer; transition: transform 0.3s; margin-left: 5px; flex-shrink: 0; }
         .profile-widget:hover { transform: scale(1.05); }
         .user-avatar { 
             width: 100%; height: 100%; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; 
@@ -146,173 +127,170 @@
         }
         .user-avatar.img-mode { background: transparent; }
 
-        /* Sidebar */
+        /* --- Sidebar --- */
         .sidebar {
             position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height));
-            background: var(--bg-glass-heavy); border-right: 1px solid var(--border-color); padding: 25px 0; overflow-y: auto; 
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column; backdrop-filter: blur(20px);
+            background: rgba(15, 23, 42, 0.95); border-right: 1px solid var(--border-color); padding: 25px 0; overflow-y: auto; 
+            transition: transform 0.3s var(--ease-snap); z-index: 999; display: flex; flex-direction: column; backdrop-filter: blur(20px);
         }
         .nav-group { padding: 0 24px; margin-bottom: 25px; }
-        .nav-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 12px; letter-spacing: 1.2px; padding-left: 10px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 12px; letter-spacing: 1px; opacity: 0.8; }
         .nav-item { 
-            display: flex; align-items: center; padding: 12px 16px; color: var(--text-muted); text-decoration: none; 
-            font-size: 0.9rem; transition: all 0.2s ease; border-radius: 12px; margin-bottom: 5px; position: relative; font-weight: 500;
+            display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; 
+            font-size: 0.9rem; transition: all 0.2s ease; border-radius: 10px; margin-bottom: 4px;
         }
-        .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.05); transform: translateX(5px); }
-        .nav-item.active { background: var(--gold-gradient); color: #000; font-weight: 700; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3); }
-        .nav-item i { width: 25px; text-align: center; margin-right: 12px; font-size: 1rem; }
+        .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.05); transform: translateX(4px); }
+        .nav-item.active { background: linear-gradient(90deg, rgba(251, 191, 36, 0.15) 0%, transparent 100%); color: var(--gold-base); font-weight: 600; border-left: 3px solid var(--gold-base); }
+        .nav-item i { width: 24px; text-align: center; margin-right: 12px; font-size: 0.95rem; }
 
-        /* Main Content */
-        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 40px; width: calc(100% - var(--sidebar-width)); min-height: calc(100vh - var(--header-height)); display: flex; flex-direction: column; }
-        .container { max-width: 1200px; margin: 0 auto; width: 100%; }
+        /* --- Main Layout --- */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 40px; width: calc(100% - var(--sidebar-width)); min-height: calc(100vh - var(--header-height)); display: flex; flex-direction: column; align-items: center; }
+        .container { max-width: 1200px; width: 100%; position: relative; }
 
-        /* Page Specific: Upgrade Plan */
-        .premium-hero { text-align: center; margin-bottom: 50px; padding: 0 10px; }
-        .premium-hero h1 { font-family: var(--font-head); font-size: 2.5rem; color: var(--text-main); margin-bottom: 15px; text-shadow: 0 2px 20px rgba(0,0,0,0.5); }
-        .premium-hero p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+        /* --- Hero Section --- */
+        .premium-hero { text-align: center; margin-bottom: 40px; position: relative; z-index: 2; }
+        .premium-tag { 
+            display: inline-block; padding: 6px 16px; background: rgba(251, 191, 36, 0.1); 
+            border: 1px solid rgba(251, 191, 36, 0.3); color: var(--gold-base); border-radius: 20px; 
+            font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; margin-bottom: 20px; text-transform: uppercase;
+        }
+        .premium-hero h1 { 
+            font-family: var(--font-display); font-size: 3rem; color: var(--text-main); margin-bottom: 15px; 
+            letter-spacing: -1px; line-height: 1.1; 
+            background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .premium-hero p { color: var(--text-muted); font-size: 1.1rem; max-width: 580px; margin: 0 auto; line-height: 1.6; }
 
-        /* Wallet Strip */
+        /* --- Wallet Strip (Top Position) --- */
         .wallet-strip {
-            background: var(--bg-glass); 
+            background: rgba(30, 41, 59, 0.4); 
             border: 1px solid var(--border-color); 
             border-top: 1px solid var(--border-highlight);
             border-radius: 50px;
-            padding: 12px 30px; 
+            padding: 10px 25px; 
             margin: 0 auto 50px auto; 
             width: fit-content;
-            max-width: 100%;
-            display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap;
-            box-shadow: 0 15px 40px -10px rgba(0,0,0,0.4); 
+            max-width: 90%;
+            display: flex; justify-content: center; align-items: center; gap: 20px;
+            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.3); 
             backdrop-filter: blur(20px);
             transition: transform 0.3s;
         }
-        .wallet-strip:hover { transform: translateY(-5px); border-color: var(--gold-base); }
+        .wallet-strip:hover { transform: translateY(-2px); border-color: var(--gold-base); }
         .wallet-val { font-family: var(--font-display); font-weight: 700; color: var(--gold-base); font-size: 1.1rem; letter-spacing: 0.5px; }
         .btn-topup-sm { font-size: 0.85rem; text-decoration: none; color: var(--text-main); border-bottom: 1px dashed var(--text-muted); transition: 0.3s; white-space: nowrap; }
         .btn-topup-sm:hover { color: var(--gold-base); border-color: var(--gold-base); }
 
-        /* Pricing Grid */
-        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-bottom: 60px; }
+        /* --- Pricing Grid --- */
+        .pricing-grid { 
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 30px; margin-bottom: 60px; align-items: stretch; 
+        }
         
         .plan-card {
-            background: var(--bg-glass); border: 1px solid var(--border-color); border-radius: 24px;
-            padding: 40px 30px; display: flex; flex-direction: column; transition: all 0.4s var(--ease-snap);
-            position: relative; overflow: hidden; height: 100%; backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border-highlight);
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color); 
+            border-radius: var(--radius);
+            padding: 40px 30px; 
+            display: flex; flex-direction: column; 
+            position: relative; overflow: hidden; 
+            transition: 0.4s var(--ease-snap);
+            backdrop-filter: blur(20px);
         }
-        .plan-card:hover { transform: translateY(-15px); border-color: var(--border-highlight); box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
+        .plan-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); border-color: var(--border-highlight); }
         
-        /* Plan Variations */
+        /* Specific Plan Styles */
         .plan-standard { border-top: 4px solid var(--gold-base); }
         .plan-pro { 
-            border: 2px solid var(--neon-purple); 
-            background: linear-gradient(180deg, rgba(139, 92, 246, 0.1) 0%, rgba(30, 41, 59, 0.7) 100%);
-            transform: scale(1.03); z-index: 2;
-            box-shadow: 0 20px 50px rgba(139, 92, 246, 0.15);
+            background: linear-gradient(160deg, rgba(30, 41, 59, 0.6) 0%, rgba(124, 58, 237, 0.05) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.05);
+            transform: scale(1.03); z-index: 5;
         }
-        .plan-pro:hover { transform: scale(1.05) translateY(-15px); box-shadow: 0 30px 80px rgba(139, 92, 246, 0.3); }
+        .plan-pro:hover { transform: scale(1.05) translateY(-10px); box-shadow: 0 25px 50px rgba(139, 92, 246, 0.15); border-color: rgba(139, 92, 246, 0.5); }
 
         .badge-popular {
-            position: absolute; top: 20px; right: 20px;
-            background: var(--purple-gradient); color: white; padding: 5px 15px; border-radius: 20px;
-            font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
-            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
+            position: absolute; top: 15px; right: 15px;
+            background: var(--purple-gradient); color: white; padding: 6px 14px; border-radius: 20px;
+            font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.4);
         }
 
-        .plan-name { font-family: var(--font-head); font-size: 1.8rem; font-weight: 700; margin-bottom: 10px; color: var(--text-main); }
-        .plan-price { display: flex; align-items: baseline; gap: 5px; margin-bottom: 30px; }
-        .currency { font-size: 1.1rem; color: var(--text-muted); }
-        .amount { font-size: 3.2rem; font-weight: 700; color: var(--text-main); font-family: var(--font-display); letter-spacing: -1px; }
-        .period { color: var(--text-muted); font-size: 0.95rem; }
+        .plan-header { margin-bottom: 30px; border-bottom: 1px solid var(--border-color); padding-bottom: 25px; }
+        .plan-name { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; color: var(--text-main); }
+        .plan-price { display: flex; align-items: baseline; gap: 4px; }
+        .currency { font-size: 1rem; color: var(--text-muted); font-weight: 500; }
+        .amount { font-size: 3rem; font-weight: 700; color: var(--text-main); font-family: var(--font-display); letter-spacing: -1.5px; }
+        .period { color: var(--text-muted); font-size: 0.85rem; margin-left: 5px; }
 
-        .features { list-style: none; margin-bottom: 40px; flex: 1; }
-        .features li { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 18px; font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; }
-        .features li i { color: var(--success); margin-top: 4px; font-size: 0.9rem; }
-        .features li.locked { opacity: 0.5; text-decoration: line-through; }
-        .features li.locked i { color: var(--danger); }
+        .features { list-style: none; margin-bottom: 35px; flex: 1; padding: 0; }
+        .features li { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 16px; font-size: 0.9rem; color: #cbd5e1; line-height: 1.5; }
+        .features li i { margin-top: 3px; font-size: 0.9rem; flex-shrink: 0; }
+        .check-icon { color: var(--success); }
+        .lock-icon { color: var(--text-sub); }
+        .features li.locked { opacity: 0.5; }
 
         /* Buttons */
         .btn-plan { 
-            width: 100%; padding: 18px; border-radius: 16px; border: none; font-weight: 700; cursor: pointer; transition: 0.3s; 
-            font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px; 
-            letter-spacing: 0.5px;
+            width: 100%; padding: 16px; border-radius: 14px; border: none; font-weight: 600; cursor: pointer; transition: 0.3s; 
+            font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px; font-family: var(--font-body);
         }
-        .btn-current { background: var(--bg-input); color: var(--text-muted); cursor: default; border: 1px solid var(--border-color); }
-        .btn-std { background: var(--gold-gradient); color: black; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.3); }
-        .btn-std:hover { box-shadow: 0 10px 30px rgba(217, 119, 6, 0.5); transform: translateY(-3px); }
-        .btn-pro { background: var(--purple-gradient); color: white; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3); }
-        .btn-pro:hover { box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5); transform: translateY(-3px); }
+        .btn-current { background: rgba(255,255,255,0.05); color: var(--text-muted); cursor: default; border: 1px solid var(--border-color); }
+        
+        .btn-std { 
+            background: transparent; color: var(--gold-base); border: 1px solid var(--gold-base); 
+        }
+        .btn-std:hover { background: var(--gold-base); color: #000; box-shadow: 0 5px 20px var(--gold-glow); }
+        
+        .btn-pro { 
+            background: var(--purple-gradient); color: white; 
+            box-shadow: 0 5px 20px var(--purple-glow);
+        }
+        .btn-pro:hover { box-shadow: 0 10px 30px var(--purple-glow); transform: translateY(-2px); }
 
-        /* Modal */
+        /* --- Modal --- */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
             z-index: 3000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s;
         }
         .modal-overlay.open { display: flex; opacity: 1; }
         .modal-card {
             background: #1e293b; border: 1px solid var(--border-color);
-            padding: 35px; border-radius: 24px; width: 90%; max-width: 480px; text-align: left;
-            position: relative; transform: scale(0.9); transition: transform 0.3s var(--ease-snap);
-            box-shadow: 0 30px 80px rgba(0,0,0,0.7);
-            overflow: hidden;
+            padding: 0; border-radius: 24px; width: 90%; max-width: 450px; text-align: left;
+            position: relative; transform: scale(0.95); transition: transform 0.3s var(--ease-snap);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); overflow: hidden;
         }
-        .modal-card::before { content:''; position: absolute; top:0; left:0; width:100%; height:4px; background: var(--gold-gradient); }
         .modal-overlay.open .modal-card { transform: scale(1); }
         
-        .bill-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 1rem; color: var(--text-muted); }
-        .bill-total { border-top: 1px dashed var(--border-color); padding-top: 18px; margin-top: 18px; color: var(--gold-base); font-weight: 700; font-size: 1.2rem; }
-        .alert-fund { background: rgba(239, 68, 68, 0.1); color: var(--danger); padding: 15px; border-radius: 12px; text-align: center; margin-top: 25px; display: none; font-size: 0.9rem; border: 1px solid rgba(239, 68, 68, 0.3); display: flex; gap:10px; align-items:center; justify-content:center; }
+        .modal-header { padding: 25px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); }
+        .modal-body { padding: 30px 25px; }
+        
+        .bill-item { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.95rem; color: var(--text-muted); }
+        .bill-divider { height: 1px; background: var(--border-color); margin: 20px 0; border: none; }
+        .bill-total { display: flex; justify-content: space-between; font-size: 1.1rem; color: var(--text-main); font-weight: 700; font-family: var(--font-display); }
+        
+        .alert-box { 
+            background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); 
+            color: var(--danger); padding: 12px; border-radius: 12px; font-size: 0.85rem; 
+            display: none; align-items: center; justify-content: center; gap: 8px; margin-top: 20px; 
+        }
+
+        .loading-spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* Footer */
-        .footer-copyright {
-            margin-top: auto;
-            text-align: center;
-            padding: 20px;
-            color: var(--text-muted);
-            font-size: 0.8rem;
-            border-top: 1px solid var(--border-color);
-            background: rgba(15, 23, 42, 0.8);
-        }
-        .social-links { display: flex; justify-content: center; gap: 15px; margin: 0 0 15px 0; }
-        .social-links a { color: var(--text-muted); font-size: 1.2rem; transition: 0.2s; width: 40px; height: 40px; border: 1px solid var(--border-color); border-radius: 50%; display: grid; place-items: center; text-decoration: none; background: rgba(255,255,255,0.03); }
-        .social-links a:hover { color: #000; background: var(--gold-gradient); border-color: transparent; transform: translateY(-3px); }
-
-        /* PWA Popup */
-        .pwa-install-popup {
-            position: fixed; bottom: 20px; right: 20px; 
-            background: rgba(15, 23, 42, 0.95); 
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            backdrop-filter: blur(12px);
-            padding: 20px; border-radius: 16px; 
-            z-index: 10000; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            max-width: 300px; animation: slideUp 0.5s ease-out; display: none;
-        }
-        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        /* Floating Support */
-        .floating-support {
-            position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: var(--gold-gradient);
-            border-radius: 50%; display: grid; place-items: center; color: black; font-size: 1.6rem;
-            box-shadow: 0 10px 30px rgba(217, 119, 6, 0.4); z-index: 2000; transition: transform 0.3s;
-        }
-        .floating-support:hover { transform: scale(1.1) rotate(10deg); }
-
-        /* Loading Spinner */
-        .loading-spinner {
-            display: inline-block; width: 16px; height: 16px;
-            border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite; margin-right: 5px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .footer-copyright { margin-top: auto; text-align: center; padding: 30px; color: var(--text-sub); font-size: 0.8rem; border-top: 1px solid var(--border-color); }
+        .social-links { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
+        .social-links a { color: var(--text-muted); transition: 0.2s; font-size: 1.1rem; }
+        .social-links a:hover { color: var(--gold-base); }
 
         @media (max-width: 992px) {
             .global-search-container { display: none; }
             .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
-            main { margin-left: 0; padding: 25px 15px; width: 100%; max-width: 100vw; overflow-x: hidden; }
+            main { margin-left: 0; padding: 25px 20px; width: 100%; padding-bottom: 100px; }
             .hamburger { display: block; }
-            .header-left { gap: 10px; }
+            .premium-hero h1 { font-size: 2.2rem; }
             .plan-pro { transform: scale(1); }
-            .premium-hero h1 { font-size: 2rem; }
             .wallet-strip { width: 100%; border-radius: 16px; padding: 15px; flex-direction: row; justify-content: space-between; }
         }
     </style>
@@ -325,21 +303,19 @@
             <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
             <a href="seeker-dashboard.html" class="logo">EAST<span>LINK</span></a>
         </div>
-        
+
         <div class="global-search-container">
             <input type="text" id="searchInput" class="global-search-input" placeholder="Search jobs, skills, or companies...">
             <i class="fas fa-search" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
             <div id="searchResults" class="search-results-dropdown"></div>
         </div>
-
+        
         <div class="header-actions">
-            <!-- Messages with Blue Icon & Red Badge -->
-            <div class="icon-btn" title="Messages" onclick="handleActionWithSpinner(this, () => location.href='seeker-messages.html')">
+            <div class="icon-btn" onclick="handleActionWithSpinner(this, () => location.href='seeker-messages.html')">
                 <i class="fa-solid fa-envelope icon-msg"></i>
                 <div class="notification-badge" id="msg-badge">0</div>
             </div>
-            <!-- Notifications with Amber Icon & Red Badge -->
-            <div class="icon-btn" title="Notifications" onclick="handleActionWithSpinner(this, () => location.href='seeker-notifications.html')">
+            <div class="icon-btn" onclick="handleActionWithSpinner(this, () => location.href='seeker-notifications.html')">
                 <i class="fa-solid fa-bell icon-bell"></i>
                 <div class="notification-badge" id="notif-badge">0</div>
             </div>
@@ -350,7 +326,7 @@
         </div>
     </header>
 
-    <!-- SIDEBAR (Unlocked) -->
+    <!-- SIDEBAR -->
     <nav class="sidebar" id="sidebar">
         <div class="nav-group">
             <div class="nav-label">Overview</div>
@@ -390,11 +366,12 @@
         <div class="container">
             <!-- Hero -->
             <div class="premium-hero animate__animated animate__fadeInDown">
+                <div class="premium-tag">Unlock Your Potential</div>
                 <h1>Upgrade Your Career</h1>
                 <p>Unlock verified status, direct employer messaging, and exclusive guaranteed placements. Choose the plan that fits your ambition.</p>
             </div>
 
-            <!-- Wallet Strip -->
+            <!-- Wallet Strip (Now at Top) -->
             <div class="wallet-strip animate__animated animate__bounceIn animate__delay-1s">
                 <div style="display:flex; align-items:center; gap:12px;">
                     <i class="fas fa-wallet" style="color:var(--text-muted); font-size:1.3rem;"></i>
@@ -407,59 +384,64 @@
             <div class="pricing-grid">
                 
                 <!-- Free -->
-                <div class="plan-card animate__animated animate__zoomInUp animate__delay-1s" style="animation-delay: 0.1s;">
-                    <div class="plan-name">Free</div>
-                    <div class="plan-price">
-                        <span class="currency">KES</span><span class="amount">0</span><span class="period">/ forever</span>
+                <div class="plan-card animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+                    <div class="plan-header">
+                        <div class="plan-name">Starter</div>
+                        <div class="plan-price">
+                            <span class="currency">KES</span><span class="amount">0</span><span class="period">/ forever</span>
+                        </div>
                     </div>
                     <ul class="features">
-                        <li><i class="fas fa-check"></i> <strong>1 Application / Month</strong></li>
-                        <li><i class="fas fa-check"></i> Public Job Pool Access</li>
-                        <li><i class="fas fa-check"></i> Delayed Alerts (24h)</li>
-                        <li class="locked"><i class="fas fa-times"></i> Featured & Urgent Jobs</li>
-                        <li class="locked"><i class="fas fa-times"></i> Salary Insights</li>
+                        <li><i class="fas fa-check-circle check-icon"></i> 1 Application / Month</li>
+                        <li><i class="fas fa-check-circle check-icon"></i> Public Job Pool Access</li>
+                        <li><i class="fas fa-check-circle check-icon"></i> Basic Profile</li>
+                        <li class="locked"><i class="fas fa-lock lock-icon"></i> Featured & Urgent Jobs</li>
+                        <li class="locked"><i class="fas fa-lock lock-icon"></i> Salary Insights</li>
                     </ul>
                     <button class="btn-plan btn-current" id="btn-free" disabled>Current Plan</button>
                 </div>
 
                 <!-- Standard -->
-                <div class="plan-card plan-standard animate__animated animate__zoomInUp animate__delay-1s" style="animation-delay: 0.2s;">
-                    <div class="plan-name" style="color:var(--gold-base)">Standard</div>
-                    <div class="plan-price">
-                        <span class="currency">KES</span><span class="amount" id="price-std-display">550</span><span class="period">/ 3 months</span>
+                <div class="plan-card plan-standard animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+                    <div class="plan-header">
+                        <div class="plan-name" style="color:var(--gold-base);">Standard</div>
+                        <div class="plan-price">
+                            <span class="currency">KES</span><span class="amount" id="price-std-display">330</span><span class="period">/ 3 months</span>
+                        </div>
                     </div>
                     <ul class="features">
-                        <li><i class="fas fa-check"></i> <strong>5 Applications / Month</strong></li>
-                        <li><i class="fas fa-check"></i> <strong>Featured Jobs Access</strong></li>
-                        <li><i class="fas fa-check"></i> Salary Range Estimates</li>
-                        <li><i class="fas fa-check"></i> 1 Rollover Credit</li>
-                        <li><i class="fas fa-check"></i> Profile Completeness Tool</li>
-                        <li class="locked"><i class="fas fa-times"></i> Guaranteed Placements</li>
+                        <li><i class="fas fa-check-circle check-icon"></i> <strong>5 Applications / Month</strong></li>
+                        <li><i class="fas fa-check-circle check-icon"></i> Featured Jobs Access</li>
+                        <li><i class="fas fa-check-circle check-icon"></i> Salary Range Estimates</li>
+                        <li><i class="fas fa-check-circle check-icon"></i> 1 Rollover Credit</li>
+                        <li><i class="fas fa-check-circle check-icon"></i> Verified Badge</li>
+                        <li class="locked"><i class="fas fa-lock lock-icon"></i> Guaranteed Placements</li>
                     </ul>
-                    <button class="btn-plan btn-std" id="btn-standard">Get Verified</button>
+                    <button class="btn-plan btn-std" id="btn-standard">Upgrade Standard</button>
                 </div>
 
                 <!-- Pro -->
-                <div class="plan-card plan-pro animate__animated animate__zoomInUp animate__delay-1s" style="animation-delay: 0.3s;">
-                    <div class="badge-popular">Best Value</div>
-                    <div class="plan-name" style="color:var(--neon-purple)">Pro Access</div>
-                    <div class="plan-price">
-                        <span class="currency">KES</span><span class="amount" id="price-pro-display">850</span><span class="period">/ 6 months</span>
+                <div class="plan-card plan-pro animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+                    <div class="badge-popular">Most Popular</div>
+                    <div class="plan-header" style="border-color: rgba(255,255,255,0.1);">
+                        <div class="plan-name" style="color: #c084fc;">Pro Access</div>
+                        <div class="plan-price">
+                            <span class="currency">KES</span><span class="amount" id="price-pro-display">850</span><span class="period">/ 6 months</span>
+                        </div>
                     </div>
                     <ul class="features">
-                        <li><i class="fas fa-check"></i> <strong>Unlimited Applications</strong></li>
-                        <li><i class="fas fa-check"></i> <strong>Guaranteed Interview Loop</strong></li>
-                        <li><i class="fas fa-check"></i> Priority "Gold" Ranking</li>
-                        <li><i class="fas fa-check"></i> Exact Salary Data</li>
-                        <li><i class="fas fa-check"></i> AI Resume Tailoring</li>
-                        <li><i class="fas fa-check"></i> Recruiter Direct Message</li>
+                        <li><i class="fas fa-check-circle check-icon" style="color:#c084fc;"></i> <strong>Unlimited Applications</strong></li>
+                        <li><i class="fas fa-check-circle check-icon" style="color:#c084fc;"></i> <strong>Guaranteed Interview Loop</strong></li>
+                        <li><i class="fas fa-check-circle check-icon" style="color:#c084fc;"></i> Priority "Gold" Ranking</li>
+                        <li><i class="fas fa-check-circle check-icon" style="color:#c084fc;"></i> Exact Salary Data</li>
+                        <li><i class="fas fa-check-circle check-icon" style="color:#c084fc;"></i> Recruiter Direct Message</li>
                     </ul>
                     <button class="btn-plan btn-pro" id="btn-pro"><i class="fas fa-crown"></i> Go Pro</button>
                 </div>
             </div>
 
             <!-- FOOTER -->
-            <footer class="footer-copyright animate__animated animate__fadeIn">
+            <footer class="footer-copyright">
                 <div class="social-links" id="social-container">
                     <!-- Injected via JS -->
                 </div>
@@ -471,50 +453,50 @@
     <!-- PAYMENT MODAL -->
     <div class="modal-overlay" id="paymentModal">
         <div class="modal-card animate__animated animate__zoomIn">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h3 style="font-family:var(--font-head); color:var(--text-main); font-size:1.6rem;">Confirm Upgrade</h3>
-                <i class="fas fa-times" style="cursor:pointer; color:var(--text-muted); font-size:1.3rem;" onclick="closeModal()"></i>
-            </div>
-            <p style="color:var(--text-muted); margin-bottom:25px; font-size:0.95rem;">You are upgrading to the <strong id="modal-plan-name" style="color:var(--text-main); font-size:1.1rem;">---</strong> plan.</p>
-            
-            <div style="background:var(--bg-input); padding:20px; border-radius:16px; border:1px solid var(--border-color);">
-                <div class="bill-row"><span>Wallet Balance</span><span style="color:var(--text-main); font-family:var(--font-display);" id="modal-bal">0</span></div>
-                <div class="bill-row"><span>Plan Cost</span><span style="color:var(--danger); font-family:var(--font-display);" id="modal-cost">0</span></div>
-                <div class="bill-row bill-total"><span>Remaining</span><span id="modal-remain" style="font-family:var(--font-display);">0</span></div>
+            <div class="modal-header">
+                <h3 style="font-family:var(--font-head); color:var(--text-main); font-size:1.2rem; margin:0;">Confirm Upgrade</h3>
+                <i class="fas fa-times" style="cursor:pointer; color:var(--text-muted); font-size:1.1rem;" onclick="closeModal()"></i>
             </div>
             
-            <div class="alert-fund" id="insufficient-alert">
-                <i class="fas fa-exclamation-circle" style="font-size:1.2rem;"></i> 
-                <div>Insufficient funds. <a href="seeker-wallet.html" style="color:var(--danger); font-weight:700; text-decoration:underline;">Top Up Now</a></div>
-            </div>
-            
-            <button class="btn-plan btn-std" id="btn-confirm-pay" style="margin-top:25px;" onclick="processTransaction()">Confirm Payment</button>
-            <div id="pay-loader" style="display:none; text-align:center; margin-top:25px;">
-                <i class="fas fa-circle-notch fa-spin" style="font-size:2rem; color:var(--gold-base);"></i>
-                <p style="color:var(--text-muted); font-size:0.9rem; margin-top:10px;">Processing secure transaction...</p>
+            <div class="modal-body">
+                <p style="color:var(--text-muted); margin-bottom:25px; font-size:0.9rem; line-height:1.5;">You are upgrading to the <strong id="modal-plan-name" style="color:var(--text-main);">---</strong> plan.</p>
+                
+                <div class="bill-item"><span>Current Wallet Balance</span><span id="modal-bal" style="color:var(--text-main); font-weight:600;">0</span></div>
+                <div class="bill-item"><span>Plan Cost</span><span id="modal-cost" style="color:var(--danger); font-weight:600;">0</span></div>
+                
+                <hr class="bill-divider">
+                
+                <div class="bill-total">
+                    <span>New Balance</span>
+                    <span id="modal-remain">0</span>
+                </div>
+                
+                <div class="alert-box" id="insufficient-alert">
+                    <i class="fas fa-exclamation-circle"></i> 
+                    <span>Insufficient funds. <a href="seeker-wallet.html" style="color:var(--danger); font-weight:700; text-decoration:underline;">Top Up</a></span>
+                </div>
+                
+                <button class="btn-plan btn-pro" id="btn-confirm-pay" style="margin-top:25px; width:100%;" onclick="processTransaction()">Pay & Upgrade</button>
+                
+                <div id="pay-loader" style="display:none; text-align:center; margin-top:25px;">
+                    <span class="loading-spinner" style="border-color:var(--text-muted); border-top-color:var(--gold-base);"></span>
+                    <p style="color:var(--text-muted); font-size:0.8rem; margin-top:10px;">Processing secure transaction...</p>
+                </div>
             </div>
         </div>
     </div>
     
     <!-- PWA INSTALL POPUP -->
-    <div id="pwa-install-popup" class="pwa-install-popup">
-        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
-            <img src="./assets/images/logo.png" style="width:45px; height:45px; border-radius:10px;">
-            <div>
-                <h4 style="color:#fff; margin:0; font-family:'Cinzel', serif; font-size:0.9rem;">Install EastLink</h4>
-                <p style="color:#94A3B8; margin:3px 0 0; font-size:0.75rem;">Add to Home Screen for fast access.</p>
-            </div>
+    <div id="pwa-install-popup" style="display:none; position:fixed; bottom:20px; right:20px; background:#1e293b; border:1px solid var(--border-color); padding:15px; border-radius:12px; z-index:9000; box-shadow:0 10px 30px rgba(0,0,0,0.5); width:280px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+            <i class="fas fa-download" style="color:var(--gold-base);"></i>
+            <div style="font-size:0.85rem; color:#fff; font-weight:600;">Install App</div>
         </div>
-        <div style="display:flex; gap:10px;">
-            <button onclick="dismissPWA()" style="flex:1; padding:8px; background:transparent; border:1px solid rgba(255,255,255,0.1); color:#fff; border-radius:8px; cursor:pointer; font-size:0.8rem;">Later</button>
-            <button onclick="installPWA()" style="flex:1; padding:8px; background:linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border:none; color:#000; font-weight:700; border-radius:8px; cursor:pointer; font-size:0.8rem;">Install</button>
+        <div style="display:flex; gap:8px;">
+            <button onclick="dismissPWA()" style="flex:1; padding:6px; background:rgba(255,255,255,0.05); border:1px solid var(--border-color); color:#cbd5e1; border-radius:6px; font-size:0.75rem; cursor:pointer;">Later</button>
+            <button onclick="installPWA()" style="flex:1; padding:6px; background:var(--gold-base); border:none; color:#000; border-radius:6px; font-weight:700; font-size:0.75rem; cursor:pointer;">Install</button>
         </div>
     </div>
-
-    <!-- FLOATING SUPPORT -->
-    <a href="seeker-support.html" class="floating-support animate__animated animate__fadeInRight">
-        <i class="fa-solid fa-headset"></i>
-    </a>
 
     <!-- SCRIPTS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
@@ -528,30 +510,22 @@
         let currentUserPlan = 'free';
         let targetPlan = { id: '', cost: 0, name: '' };
         
-        // Default Pricing (Fallback)
-        let globalPricing = { standard: 550, pro: 850 };
+        // --- DEFAULT PRICING UPDATED TO 330 & 850 ---
+        let globalPricing = { standard: 330, pro: 850 };
 
         // --- SPINNER HELPER ---
         window.handleActionWithSpinner = (btn, action) => {
             if(btn.dataset.processing === "true") return;
             btn.dataset.processing = "true";
-            
-            // Save original content
             const originalContent = btn.innerHTML;
-            
-            // Set spinner content
             btn.innerHTML = `<span class="loading-spinner"></span>`;
-            
             setTimeout(() => {
-                // Execute action
                 if (typeof action === 'function') action();
-                
-                // Reset button (optional, in case page doesn't reload immediately)
                 setTimeout(() => {
                     btn.innerHTML = originalContent;
                     btn.dataset.processing = "false";
                 }, 500);
-            }, 1500);
+            }, 1000);
         };
 
         // --- UI UTILS ---
@@ -568,9 +542,6 @@
         window.logout = () => signOut(auth).then(() => window.location.href = 'signin.html');
         window.closeModal = () => document.getElementById('paymentModal').classList.remove('open');
         
-        // Navigation is now unlocked, but we keep this stub in case other scripts reference it
-        window.checkAccess = (r, u) => { location.href = u; };
-
         // --- AUTH & DATA ---
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = 'signin.html'; return; }
@@ -610,11 +581,12 @@
                 }
             });
 
-            // 2. Real-time Pricing Sync
-            onSnapshot(doc(db, "site_settings", "global_settings"), (snap) => {
+            // 2. Real-time Pricing Sync (Overrides defaults if admin settings exist)
+            // Note: Changed from "site_settings/global_settings" to "site_settings/general" based on context
+            onSnapshot(doc(db, "site_settings", "general"), (snap) => {
                 if(snap.exists()) {
                     const data = snap.data();
-                    globalPricing.standard = Number(data.priceStandard) || 550;
+                    globalPricing.standard = Number(data.priceStandard) || 330;
                     globalPricing.pro = Number(data.pricePremium) || 850;
                     
                     const stdEl = document.getElementById('price-std-display');
@@ -644,7 +616,7 @@
                     btn.className = 'btn-plan btn-current';
                     btn.onclick = null;
                 } else if(plan === 'standard') {
-                    btn.innerText = "Get Verified"; 
+                    btn.innerText = "Upgrade Standard"; 
                     btn.className = 'btn-plan btn-std';
                     btn.onclick = () => initiateUpgrade('standard', globalPricing.standard);
                 } else if(plan === 'pro') {
@@ -660,6 +632,7 @@
                 currentBtn.innerHTML = `<i class="fas fa-check-circle"></i> Current Plan`;
                 currentBtn.disabled = true;
                 currentBtn.className = "btn-plan btn-current";
+                currentBtn.style.opacity = "0.7";
                 currentBtn.onclick = null;
             }
         }
@@ -680,9 +653,11 @@
             remainEl.style.color = isInsufficient ? 'var(--danger)' : 'var(--gold-base)';
             
             document.getElementById('insufficient-alert').style.display = isInsufficient ? 'flex' : 'none';
-            document.getElementById('btn-confirm-pay').style.display = isInsufficient ? 'none' : 'block';
-            document.getElementById('pay-loader').style.display = 'none';
+            const confirmBtn = document.getElementById('btn-confirm-pay');
+            confirmBtn.style.display = isInsufficient ? 'none' : 'block';
+            confirmBtn.innerText = `Pay KES ${cost} & Upgrade`;
             
+            document.getElementById('pay-loader').style.display = 'none';
             document.getElementById('paymentModal').classList.add('open');
         };
 
@@ -739,14 +714,14 @@
                 });
 
                 closeModal();
-                Toastify({ text: "Plan Upgraded Successfully!", duration: 3000, style: { background: "#10B981", borderRadius:"10px" } }).showToast();
+                Toastify({ text: "Plan Upgraded Successfully!", duration: 3000, style: { background: "#10B981", borderRadius:"12px", boxShadow:"0 10px 20px rgba(16, 185, 129, 0.3)" } }).showToast();
 
             } catch (e) {
                 console.error(e);
                 document.getElementById('pay-loader').style.display = 'none';
                 document.getElementById('btn-confirm-pay').style.display = 'block';
                 const msg = typeof e === 'string' ? e : "Transaction Failed";
-                Toastify({ text: msg, style: { background: "#EF4444", borderRadius:"10px" } }).showToast();
+                Toastify({ text: msg, style: { background: "#EF4444", borderRadius:"12px" } }).showToast();
             }
         };
 
@@ -773,7 +748,8 @@
                 const el = document.getElementById(id); 
                 if(el) { 
                     el.innerText = c > 9 ? '9+' : c; 
-                    el.style.display = c > 0 ? 'flex' : 'none'; 
+                    el.style.display = c > 0 ? 'grid' : 'none'; 
+                    if(c > 0) el.classList.add('animate__animated', 'animate__bounceIn');
                 }
             };
             onSnapshot(query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false)), s => up('notif-badge', s.size));

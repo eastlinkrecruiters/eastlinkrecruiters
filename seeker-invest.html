@@ -13,7 +13,7 @@
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
@@ -47,6 +47,7 @@
             --font-head: 'Cinzel', serif;
             --font-body: 'Inter', sans-serif;
             --font-display: 'Space Grotesk', sans-serif;
+            --font-mono: 'Space Mono', monospace;
             
             --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
@@ -98,7 +99,6 @@
 
         .header-actions { display: flex; align-items: center; gap: 15px; }
         
-        /* Realistic Icons (Matched to Dashboard) */
         .icon-btn { 
             width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px;
             cursor: pointer; transition: all 0.3s var(--ease-snap); position: relative;
@@ -148,13 +148,13 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* --- INVEST PAGE STYLES --- */
+        /* --- INVEST COMING SOON STYLES --- */
         .invest-container { width: 100%; max-width: 900px; position: relative; z-index: 1; margin: auto 0; }
 
         .invest-card {
             background: var(--bg-glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border: 1px solid var(--border-color); border-top: 1px solid var(--border-highlight);
-            border-radius: var(--radius); padding: 60px 40px; text-align: center; 
+            border-radius: var(--radius); padding: 80px 40px; text-align: center; 
             position: relative; overflow: hidden; box-shadow: 0 30px 60px rgba(0,0,0,0.3);
             display: flex; flex-direction: column; align-items: center;
         }
@@ -167,27 +167,49 @@
 
         .invest-content { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 100%; }
 
-        .icon-hex {
-            width: 100px; height: 100px; background: rgba(255,255,255,0.03); 
-            border-radius: 24px; border: 1px solid rgba(217, 119, 6, 0.3);
-            display: grid; place-items: center; font-size: 3rem; color: var(--gold-base); margin-bottom: 30px;
-            box-shadow: 0 0 50px rgba(217, 119, 6, 0.2); animation: float 6s ease-in-out infinite;
+        .coming-soon-badge {
+            background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.3);
+            color: var(--gold-base); padding: 8px 20px; border-radius: 50px;
+            font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
+            margin-bottom: 25px; box-shadow: 0 0 20px rgba(251, 191, 36, 0.1);
+            animation: fadeInDown 1s ease;
         }
-        @keyframes float { 0%, 100% {transform: translateY(0px);} 50% {transform: translateY(-15px);} }
 
-        .title { font-family: var(--font-head); font-size: 2.5rem; color: var(--text-main); margin-bottom: 15px; letter-spacing: 1px; }
-        .desc { color: var(--text-muted); font-size: 1.1rem; line-height: 1.6; margin-bottom: 45px; max-width: 600px; }
-
-        /* Features */
-        .features-grid { display: flex; justify-content: center; gap: 20px; margin-bottom: 45px; flex-wrap: wrap; width: 100%; }
-        .feature-item { 
-            background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 18px 30px; 
-            border-radius: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px;
-            min-width: 160px; transition: 0.3s var(--ease-snap);
+        .title-large { 
+            font-family: var(--font-head); font-size: 4rem; 
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            margin-bottom: 15px; letter-spacing: 2px; text-transform: uppercase;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            line-height: 1.1;
         }
-        .feature-item:hover { border-color: var(--gold-base); background: rgba(217,119,6,0.05); transform: translateY(-5px); }
-        .feature-item i { font-size: 1.6rem; color: var(--gold-base); }
-        .feature-item span { font-size: 0.9rem; font-weight: 600; color: var(--text-main); font-family: var(--font-display); }
+
+        .desc { color: var(--text-muted); font-size: 1.1rem; line-height: 1.6; margin-bottom: 50px; max-width: 600px; }
+
+        /* COUNTDOWN TIMER */
+        .countdown-wrapper {
+            display: flex; gap: 20px; margin-bottom: 50px;
+            flex-wrap: wrap; justify-content: center;
+        }
+
+        .count-box {
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border-color);
+            padding: 20px; min-width: 100px; border-radius: 16px;
+            display: flex; flex-direction: column; align-items: center;
+            position: relative; overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        .count-box:hover { transform: translateY(-5px); border-color: var(--gold-base); }
+        
+        .count-val {
+            font-family: var(--font-mono); font-size: 2.5rem; font-weight: 700;
+            color: var(--gold-base); line-height: 1; margin-bottom: 5px;
+            text-shadow: 0 0 15px rgba(217, 119, 6, 0.4);
+        }
+        .count-label {
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);
+        }
 
         /* Waitlist Form */
         .waitlist-form {
@@ -205,7 +227,9 @@
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         .btn-notify:hover { box-shadow: 0 0 25px rgba(217, 119, 6, 0.4); transform: scale(1.05); }
-        .btn-notify.success { background: var(--success); color: #fff; pointer-events: none; }
+        .btn-notify:disabled, .btn-notify.success { 
+            background: var(--success); color: #fff; cursor: default; transform: none; box-shadow: none;
+        }
 
         /* Footer */
         .footer { 
@@ -239,12 +263,13 @@
             .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
             main { margin-left: 0; padding: 25px 20px; width: 100%; }
             .hamburger { display: block; }
-            .features-grid { flex-direction: column; width: 100%; }
-            .feature-item { width: 100%; flex-direction: row; }
             .waitlist-form { flex-direction: column; background: transparent; border: none; gap: 15px; border-radius: 0; padding: 0; box-shadow: none; }
             .waitlist-input { background: var(--bg-input); padding: 14px; border-radius: 12px; border: 1px solid var(--border-color); width: 100%; text-align: center; }
             .btn-notify { width: 100%; border-radius: 12px; }
-            .title { font-size: 2rem; }
+            .title-large { font-size: 2.5rem; }
+            .countdown-wrapper { gap: 10px; }
+            .count-box { min-width: 70px; padding: 15px 10px; }
+            .count-val { font-size: 1.8rem; }
         }
 
         /* Loading Spinner */
@@ -333,31 +358,37 @@
                 <div class="blob blob-2"></div>
 
                 <div id="promo-content" class="invest-content">
-                    <div class="icon-hex">
-                        <i class="fa-solid fa-arrow-trend-up"></i>
+                    
+                    <div class="coming-soon-badge animate__animated animate__pulse animate__infinite">
+                        <i class="fa-solid fa-rocket"></i> Launching Soon
                     </div>
                     
-                    <h1 class="title">Investment Platform</h1>
-                    <p class="desc">We are building a secure platform for EastLink members to invest in high-yield, vetted opportunities directly from their wallet earnings.</p>
+                    <h1 class="title-large">COMING SOON!!</h1>
+                    <p class="desc">We are finalizing the secure infrastructure for EastLink Investments. Get ready to grow your earnings with high-yield, verified opportunities.</p>
                     
-                    <div class="features-grid">
-                        <div class="feature-item animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
-                            <i class="fa-solid fa-shield-halved"></i> 
-                            <span>Secure Partners</span>
+                    <!-- COUNTDOWN TIMER -->
+                    <div class="countdown-wrapper">
+                        <div class="count-box">
+                            <span class="count-val" id="d-val">00</span>
+                            <span class="count-label">Days</span>
                         </div>
-                        <div class="feature-item animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
-                            <i class="fa-solid fa-coins"></i> 
-                            <span>Low Entry Cap</span>
+                        <div class="count-box">
+                            <span class="count-val" id="h-val">00</span>
+                            <span class="count-label">Hours</span>
                         </div>
-                        <div class="feature-item animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
-                            <i class="fa-solid fa-chart-line"></i> 
-                            <span>High Yields</span>
+                        <div class="count-box">
+                            <span class="count-val" id="m-val">00</span>
+                            <span class="count-label">Minutes</span>
+                        </div>
+                        <div class="count-box">
+                            <span class="count-val" id="s-val">00</span>
+                            <span class="count-label">Seconds</span>
                         </div>
                     </div>
 
                     <div class="waitlist-form animate__animated animate__fadeInUp" style="animation-delay: 0.4s;">
                         <input type="email" id="notify-email" class="waitlist-input" readonly placeholder="Your Email">
-                        <button class="btn-notify" onclick="handleActionWithSpinner(this, joinWaitlist)" id="waitlist-btn">Join Waitlist</button>
+                        <button class="btn-notify" onclick="handleActionWithSpinner(this, joinWaitlist)" id="waitlist-btn">Notify Me</button>
                     </div>
                     <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 15px; font-family: var(--font-display);">*Priority access limited to first 500 members.</p>
                 </div>
@@ -399,24 +430,69 @@
         let userUid = null;
         let userEmail = null;
 
+        // --- COUNTDOWN LOGIC (10 Days) ---
+        function startCountdown() {
+            // Updated Logic: Target 10 days from now (persisting via logic or fixed target)
+            // To simulate a "10 day launch" that loops or starts, we set the target to 10 days from current moment
+            // stored in localStorage to persist across refreshes for the user, OR purely algorithmic.
+            // Here we use a rolling 10-day logic based on a fixed epoch to keep it synchronized for all users.
+            
+            const now = new Date();
+            const timeSinceEpoch = now.getTime();
+            const tenDaysInMs = 10 * 24 * 60 * 60 * 1000;
+            
+            // Calculate next target based on 10-day intervals from Epoch
+            // This ensures all users see roughly the same countdown without a server
+            const nextTargetTime = Math.ceil(timeSinceEpoch / tenDaysInMs) * tenDaysInMs;
+            
+            // If the calculated target is basically "now", add another 10 days
+            let targetDate = new Date(nextTargetTime);
+            if (targetDate <= now) {
+                targetDate = new Date(now.getTime() + tenDaysInMs);
+            }
+
+            function updateTimer() {
+                const currentTime = new Date().getTime();
+                const distance = targetDate.getTime() - currentTime;
+
+                if (distance < 0) {
+                    // Reset for next 10 days
+                    targetDate = new Date(new Date().getTime() + tenDaysInMs);
+                    updateTimer(); 
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById("d-val").innerText = days < 10 ? "0" + days : days;
+                document.getElementById("h-val").innerText = hours < 10 ? "0" + hours : hours;
+                document.getElementById("m-val").innerText = minutes < 10 ? "0" + minutes : minutes;
+                document.getElementById("s-val").innerText = seconds < 10 ? "0" + seconds : seconds;
+            }
+
+            setInterval(updateTimer, 1000);
+            updateTimer(); 
+        }
+
+        startCountdown();
+
         // --- SPINNER HELPER ---
         window.handleActionWithSpinner = (btn, action) => {
             if(btn.dataset.processing === "true") return;
+            if(btn.disabled) return;
+            
             btn.dataset.processing = "true";
             
-            // Save original content
             const originalContent = btn.innerHTML;
-            
-            // Set spinner content
             btn.innerHTML = `<span class="loading-spinner"></span>`;
             
-            // Execute action immediately or with delay
             setTimeout(() => {
                 if (typeof action === 'function') action();
                 
-                // If it's the waitlist button, handle success state separately inside the function
-                // otherwise reset after delay
-                if(btn.id !== 'waitlist-btn') {
+                if(btn.id !== 'waitlist-btn' || !btn.classList.contains('success')) {
                      setTimeout(() => {
                         btn.innerHTML = originalContent;
                         btn.dataset.processing = "false";
@@ -447,7 +523,8 @@
             const emailInput = document.getElementById('notify-email');
             if(emailInput) emailInput.value = user.email;
 
-            // Fetch User Data for Header
+            checkWaitlistStatus(user.uid);
+
             try {
                 const userDoc = await getDoc(doc(db, "users", userUid));
                 if(userDoc.exists()) {
@@ -470,11 +547,25 @@
             loadSocials();
         });
 
-        // --- WAITLIST ---
+        // --- CHECK WAITLIST STATUS ---
+        async function checkWaitlistStatus(uid) {
+            const btn = document.getElementById('waitlist-btn');
+            try {
+                const docSnap = await getDoc(doc(db, "waitlist_invest", uid));
+                if (docSnap.exists()) {
+                    btn.innerHTML = '<i class="fas fa-check"></i> You\'re on the list!';
+                    btn.classList.add('success');
+                    btn.disabled = true; 
+                    btn.dataset.processing = "false";
+                }
+            } catch (e) {
+                console.log("Waitlist check:", e);
+            }
+        }
+
+        // --- WAITLIST ACTION ---
         window.joinWaitlist = async () => {
             const btn = document.getElementById('waitlist-btn');
-            // We don't manually set spinner here because handleActionWithSpinner did it
-            // But we need to handle success/error state updates
             
             try {
                 await setDoc(doc(db, "waitlist_invest", userUid), {
@@ -484,10 +575,10 @@
                     notified: false
                 });
 
-                // Override spinner with success message
-                btn.innerHTML = '<i class="fas fa-check"></i> You\'re on the list!';
+                btn.innerHTML = '<i class="fas fa-check"></i> Notified!';
                 btn.classList.add('success');
-                btn.dataset.processing = "false"; // Reset processing state but keep success UI
+                btn.disabled = true;
+                btn.dataset.processing = "false"; 
                 
                 Toastify({ 
                     text: "Success! We'll notify you when investing launches.", 
@@ -495,10 +586,12 @@
                 }).showToast();
 
             } catch (e) {
-                console.error(e);
-                btn.innerHTML = 'Join Waitlist'; // Reset text on failure
+                console.error("Waitlist Error:", e);
+                btn.innerHTML = 'Notify Me'; 
                 btn.dataset.processing = "false";
-                Toastify({ text: "Error joining list. Try again.", style: { background: "#EF4444", borderRadius: "10px" } }).showToast();
+                let msg = "Error joining list. Try again.";
+                if(e.code === 'permission-denied') msg = "Permission denied. Please refresh.";
+                Toastify({ text: msg, style: { background: "#EF4444", borderRadius: "10px" } }).showToast();
             }
         };
 

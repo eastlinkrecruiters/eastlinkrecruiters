@@ -485,7 +485,13 @@
             document.getElementById('article-view').style.display = 'none';
 
             try {
-                const q = query(collection(db, "blog_posts"), orderBy("createdAt", "desc"));
+                // *** UPDATED QUERY TO MATCH INDEX: status == 'published' ordered by timestamp ***
+                const q = query(
+                    collection(db, "blog_posts"), 
+                    where("status", "==", "published"), 
+                    orderBy("timestamp", "desc")
+                );
+                
                 const snap = await getDocs(q);
                 
                 grid.innerHTML = '';
@@ -510,10 +516,10 @@
         }
 
         function renderCard(d, container) {
-            // Handle createdAt or timestamp
+            // Updated Date Logic to favor 'timestamp' field
             let date = 'Recent';
-            if(d.createdAt && d.createdAt.seconds) date = new Date(d.createdAt.seconds*1000).toLocaleDateString();
-            else if(d.timestamp && d.timestamp.seconds) date = new Date(d.timestamp.seconds*1000).toLocaleDateString();
+            if(d.timestamp && d.timestamp.seconds) date = new Date(d.timestamp.seconds*1000).toLocaleDateString();
+            else if(d.createdAt && d.createdAt.seconds) date = new Date(d.createdAt.seconds*1000).toLocaleDateString();
 
             const img = d.imageUrl || 'assets/images/logo.png'; 
             
@@ -564,10 +570,10 @@
 
                 const d = docSnap.data();
                 
-                // Date Handling
+                // Date Handling matching index logic
                 let date = 'Recent';
-                if(d.createdAt && d.createdAt.seconds) date = new Date(d.createdAt.seconds*1000).toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric'});
-                else if(d.timestamp && d.timestamp.seconds) date = new Date(d.timestamp.seconds*1000).toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric'});
+                if(d.timestamp && d.timestamp.seconds) date = new Date(d.timestamp.seconds*1000).toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric'});
+                else if(d.createdAt && d.createdAt.seconds) date = new Date(d.createdAt.seconds*1000).toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric'});
 
                 const img = d.imageUrl || 'assets/images/logo.png';
                 

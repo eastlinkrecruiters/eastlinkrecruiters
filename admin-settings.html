@@ -330,7 +330,7 @@
         <div class="tabs-container animate__animated animate__fadeInUp animate__delay-1s">
             <button class="tab-btn active" onclick="switchTab('my-profile', event)"><i class="fas fa-user-circle"></i> My Profile</button>
             <button class="tab-btn" onclick="switchTab('site-info', event)"><i class="fas fa-globe"></i> Site Identity</button>
-            <button class="tab-btn" onclick="switchTab('general', event)"><i class="fas fa-toggle-on"></i> System Toggles</button>
+            <button class="tab-btn" onclick="switchTab('general', event)"><i class="fas fa-toggle-on"></i> Advanced</button>
             <button class="tab-btn" onclick="switchTab('data-lists', event)"><i class="fas fa-list"></i> Data Lists</button>
             <button class="tab-btn" onclick="switchTab('community', event)">
                 <i class="fas fa-users"></i> Communities & Requests <span id="req-count" class="req-badge">0</span>
@@ -429,11 +429,11 @@
             </div>
         </div>
 
-        <!-- TAB: GENERAL (MAINTENANCE) -->
+        <!-- TAB: GENERAL (ADVANCED) -->
         <div id="general" class="tab-content">
             <div class="settings-grid">
                 <div class="card">
-                    <div class="card-header"><i class="fas fa-power-off"></i> <h3>Platform Status</h3></div>
+                    <div class="card-header"><i class="fas fa-power-off"></i> <h3>Platform Status & Safety</h3></div>
                     
                     <!-- Maintenance Config Logic -->
                     <div class="control-row">
@@ -447,6 +447,22 @@
                     <div class="input-group" style="margin-top:20px;">
                         <label>Maintenance End Time (Optional)</label>
                         <input type="datetime-local" id="maintEndTime" class="form-control" onchange="updateMaintenanceTime()">
+                    </div>
+
+                    <div class="control-row" style="margin-top:20px;">
+                        <div class="control-text">
+                            <strong>Debug Mode</strong>
+                            <small>Enable verbose console logging for troubleshooting.</small>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="debugModeToggle" onchange="updateConfig('debugMode', this.checked)"><span class="slider"></span></label>
+                    </div>
+
+                    <div class="control-row">
+                        <div class="control-text">
+                            <strong>Strict IP Checking</strong>
+                            <small>Alert on login from new IP addresses.</small>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="ipCheckToggle" onchange="updateConfig('strictIPCheck', this.checked)"><span class="slider"></span></label>
                     </div>
                 </div>
 
@@ -480,6 +496,20 @@
                             <small>Users must add ID Number to activate profile.</small>
                         </div>
                         <label class="switch"><input type="checkbox" id="reqIdToggle" onchange="updateConfig('requireIdVerify', this.checked)"><span class="slider"></span></label>
+                    </div>
+                     <div class="control-row">
+                        <div class="control-text">
+                            <strong>Require Email Verification</strong>
+                            <small>Users must verify email before accessing dashboard.</small>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="reqEmailVerifyToggle" onchange="updateConfig('requireEmailVerify', this.checked)"><span class="slider"></span></label>
+                    </div>
+                    <div class="control-row">
+                        <div class="control-text">
+                            <strong>Restrict File Uploads</strong>
+                            <small>Only allow PDF/DOCX below 2MB.</small>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="restrictFilesToggle" onchange="updateConfig('restrictFileUploads', this.checked)"><span class="slider"></span></label>
                     </div>
                 </div>
             </div>
@@ -598,15 +628,38 @@
                     <button class="btn-action" onclick="saveAppFees()">Update Application Fees</button>
                 </div>
 
+                 <!-- REFERRAL BONUSES -->
+                 <div class="card" style="border-color: var(--primary);">
+                    <div class="card-header"><i class="fas fa-hand-holding-dollar" style="color:var(--success);"></i> <h3>Referral Commissions</h3></div>
+                    <p style="color:var(--text-muted); font-size:0.8rem; margin-bottom:15px;">Amount a referrer earns when their referee applies for these job types.</p>
+                    <div class="input-group">
+                        <label>Bonus: Guaranteed Job (KES)</label>
+                        <input type="number" id="bonusGuaranteed" class="form-control" placeholder="100">
+                    </div>
+                    <div class="input-group">
+                        <label>Bonus: Urgent Job (KES)</label>
+                        <input type="number" id="bonusUrgent" class="form-control" placeholder="50">
+                    </div>
+                    <div class="input-group">
+                        <label>Bonus: Featured Job (KES)</label>
+                        <input type="number" id="bonusFeatured" class="form-control" placeholder="30">
+                    </div>
+                     <div class="input-group">
+                        <label>Bonus: Standard Job (KES)</label>
+                        <input type="number" id="bonusStandard" class="form-control" placeholder="10">
+                    </div>
+                    <button class="btn-action" onclick="saveReferralBonuses()">Update Commissions</button>
+                </div>
+
                 <div class="card">
                     <div class="card-header"><i class="fas fa-tag"></i> <h3>Plan Pricing</h3></div>
                     <div class="input-group">
                         <label>Standard Plan (KES)</label>
-                        <input type="number" id="priceStandard" class="form-control" placeholder="150">
+                        <input type="number" id="priceStandard" class="form-control" placeholder="330">
                     </div>
                     <div class="input-group">
                         <label>Premium Plan (KES)</label>
-                        <input type="number" id="pricePremium" class="form-control" placeholder="500">
+                        <input type="number" id="pricePremium" class="form-control" placeholder="850">
                     </div>
                     <button class="btn-action" onclick="savePricing()">Update Plan Pricing</button>
                 </div>
@@ -947,16 +1000,28 @@
                     document.getElementById('autoJobToggle').checked = d.autoApproveJobs || false;
                     document.getElementById('feeToggle').checked = d.enableFees || false;
                     document.getElementById('reqIdToggle').checked = d.requireIdVerify || false;
+                    document.getElementById('reqEmailVerifyToggle').checked = d.requireEmailVerify || false;
+                    document.getElementById('restrictFilesToggle').checked = d.restrictFileUploads || false;
+                    document.getElementById('debugModeToggle').checked = d.debugMode || false;
+                    document.getElementById('ipCheckToggle').checked = d.strictIPCheck || false;
                     
                     // Financials
-                    if(document.activeElement.id !== 'priceStandard') document.getElementById('priceStandard').value = d.priceStandard || 150;
-                    if(document.activeElement.id !== 'pricePremium') document.getElementById('pricePremium').value = d.pricePremium || 500;
+                    if(document.activeElement.id !== 'priceStandard') document.getElementById('priceStandard').value = d.priceStandard || 330;
+                    if(document.activeElement.id !== 'pricePremium') document.getElementById('pricePremium').value = d.pricePremium || 850;
                     if(document.activeElement.id !== 'withdrawalFeeAmount') document.getElementById('withdrawalFeeAmount').value = d.withdrawalFee || 50;
 
                     if(d.costs) {
                         if(document.activeElement.id !== 'costGuaranteed') document.getElementById('costGuaranteed').value = d.costs.guaranteed || 850;
                         if(document.activeElement.id !== 'costUrgent') document.getElementById('costUrgent').value = d.costs.urgent || 850;
                         if(document.activeElement.id !== 'costFeatured') document.getElementById('costFeatured').value = d.costs.featured || 550;
+                    }
+
+                    // Referral Bonuses
+                    if(d.referralBonuses) {
+                        if(document.activeElement.id !== 'bonusGuaranteed') document.getElementById('bonusGuaranteed').value = d.referralBonuses.guaranteed || 100;
+                        if(document.activeElement.id !== 'bonusUrgent') document.getElementById('bonusUrgent').value = d.referralBonuses.urgent || 50;
+                        if(document.activeElement.id !== 'bonusFeatured') document.getElementById('bonusFeatured').value = d.referralBonuses.featured || 30;
+                        if(document.activeElement.id !== 'bonusStandard') document.getElementById('bonusStandard').value = d.referralBonuses.standard || 10;
                     }
 
                     if(d.paymentInfo) {
@@ -1012,6 +1077,16 @@
                 featured: Number(document.getElementById('costFeatured').value)
             };
             await updateConfigDoc('general', { costs: costs }, `Updated App Fees`);
+        };
+
+        window.saveReferralBonuses = async () => {
+             const bonuses = {
+                guaranteed: Number(document.getElementById('bonusGuaranteed').value),
+                urgent: Number(document.getElementById('bonusUrgent').value),
+                featured: Number(document.getElementById('bonusFeatured').value),
+                standard: Number(document.getElementById('bonusStandard').value)
+            };
+            await updateConfigDoc('general', { referralBonuses: bonuses }, `Updated Referral Commission Rates`);
         };
 
         window.savePricing = async () => {

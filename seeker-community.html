@@ -125,77 +125,168 @@
             background-size: cover; background-position: center;
             border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius);
             box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
-            text-align: center; position: relative; overflow: hidden; margin-bottom: 30px;
+            text-align: center; position: relative; overflow: hidden; margin-bottom: 20px;
         }
-        .page-hero h1 { font-family: var(--font-head); font-size: 2rem; color: #fff; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-        .page-hero p { color: #cbd5e1; max-width: 600px; margin: 0 auto 25px; font-size: 0.9rem; line-height: 1.6; }
+        .page-hero h1 { font-family: var(--font-head); font-size: 2.2rem; color: #fff; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .page-hero p { color: #cbd5e1; max-width: 600px; margin: 0 auto 25px; font-size: 0.95rem; line-height: 1.6; }
         
+        /* Stats Bar */
+        .stats-bar {
+            display: flex; justify-content: center; gap: 40px; margin-bottom: 20px; flex-wrap: wrap;
+        }
+        .stat-item { text-align: center; }
+        .stat-val { font-family: var(--font-mono); font-size: 1.5rem; font-weight: 700; color: var(--gold-base); }
+        .stat-lbl { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; }
+
         .filter-bar { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
         .filter-chip {
-            padding: 8px 18px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 20px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1);
             background: rgba(255,255,255,0.03); color: var(--text-muted); font-size: 0.85rem; font-weight: 600;
             cursor: pointer; transition: 0.3s;
         }
         .filter-chip:hover, .filter-chip.active {
-            background: var(--gold-gradient); color: #000; border-color: transparent; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+            background: var(--gold-gradient); color: #000; border-color: transparent; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3); transform: translateY(-2px);
         }
 
-        /* COMMUNITY GRID */
+        /* SECTION HEADERS */
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; margin-top: 20px;
+        }
+        .section-title { font-size: 1.1rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+        .section-title i { color: var(--gold-base); }
+
+        /* SUGGESTIONS ROW */
+        .suggestion-row {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 30px;
+        }
+        .suggestion-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.6), rgba(17, 24, 39, 0.8));
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 15px;
+            display: flex; align-items: center; gap: 15px; transition: 0.3s; cursor: pointer;
+        }
+        .suggestion-card:hover { border-color: var(--gold-base); background: rgba(30, 41, 59, 0.9); }
+        .sugg-icon {
+            width: 45px; height: 45px; border-radius: 10px; background: rgba(255,255,255,0.05);
+            display: grid; place-items: center; font-size: 1.2rem; flex-shrink: 0;
+        }
+        .sugg-info h4 { font-size: 0.95rem; margin-bottom: 3px; color: var(--text-main); }
+        .sugg-info p { font-size: 0.75rem; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+        .sugg-badge { font-size: 0.65rem; background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 2px 6px; border-radius: 4px; margin-left: auto; }
+
+        /* --- ADVANCED 3D CARD STYLES --- */
         .comm-grid { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; perspective: 1000px;
         }
 
         .comm-card-3d {
-            background: var(--bg-glass); 
-            backdrop-filter: blur(12px) saturate(180%);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius);
-            overflow: hidden; transition: 0.3s var(--ease-snap); 
+            background: linear-gradient(160deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 20px;
+            overflow: visible; /* Changed to visible for 3D elements sticking out */
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex; flex-direction: column; position: relative;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+            box-shadow: 0 15px 35px -10px rgba(0,0,0,0.5);
+            transform-style: preserve-3d;
         }
-        .comm-card-3d:hover { transform: translateY(-8px); border-color: var(--gold-base); box-shadow: 0 20px 30px -5px rgba(0,0,0,0.4); }
+        
+        .comm-card-3d::before {
+            content:''; position: absolute; inset: -1px; border-radius: 20px;
+            background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.1), transparent 60%);
+            z-index: -1; pointer-events: none;
+        }
+
+        .comm-card-3d:hover { 
+            transform: translateY(-12px) scale(1.02); 
+            box-shadow: 0 30px 60px -12px rgba(0,0,0,0.6); 
+            border-color: rgba(255,255,255,0.2);
+        }
         
         .comm-banner {
-            height: 110px; background-size: cover; background-position: center; position: relative;
+            height: 130px; background-size: cover; background-position: center; 
+            border-radius: 20px 20px 0 0; position: relative; overflow: hidden;
+            transform: translateZ(0); /* Fix for overflow clipping */
         }
         .comm-banner::after {
-            content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, var(--bg-solid));
+            content: ''; position: absolute; inset: 0; 
+            background: linear-gradient(to bottom, transparent 20%, rgba(15, 23, 42, 1));
         }
         
         .comm-icon {
-            width: 64px; height: 64px; border-radius: 16px; background: var(--bg-solid);
-            border: 2px solid rgba(255,255,255,0.1); position: absolute; bottom: -32px; left: 24px;
-            display: grid; place-items: center; font-size: 2rem; z-index: 2; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            width: 72px; height: 72px; border-radius: 18px; 
+            background: rgba(30, 41, 59, 1);
+            border: 2px solid rgba(255,255,255,0.15); 
+            position: absolute; top: 94px; left: 24px;
+            display: grid; place-items: center; font-size: 2.2rem; z-index: 10; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4); 
+            transition: 0.4s ease;
+            transform: translateZ(20px);
+        }
+        
+        .comm-card-3d:hover .comm-icon { 
+            transform: translateZ(30px) scale(1.1) rotate(-5deg); 
+            border-color: var(--gold-base); 
+            box-shadow: 0 15px 30px rgba(251, 191, 36, 0.2);
         }
 
-        .comm-body { padding: 45px 24px 24px; flex: 1; display: flex; flex-direction: column; }
+        .comm-body { 
+            padding: 45px 24px 24px; flex: 1; display: flex; flex-direction: column; 
+            background: transparent; transform: translateZ(10px);
+        }
         
         .comm-platform {
-            position: absolute; top: 15px; right: 15px; font-size: 0.7rem; font-weight: 700;
-            padding: 4px 12px; border-radius: 20px; text-transform: uppercase; background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px); display: flex; align-items: center; gap: 6px; border: 1px solid rgba(255,255,255,0.1); color: white;
+            position: absolute; top: 15px; right: 15px; font-size: 0.7rem; font-weight: 800;
+            padding: 6px 14px; border-radius: 30px; text-transform: uppercase; 
+            background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(8px); display: flex; align-items: center; gap: 6px; 
+            color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transform: translateZ(25px); letter-spacing: 0.5px;
         }
         
-        .comm-name { font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px; font-family: var(--font-display); }
-        .comm-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; flex: 1; }
+        .comm-name { 
+            font-size: 1.35rem; font-weight: 700; color: var(--text-main); margin-bottom: 12px; 
+            font-family: var(--font-display); line-height: 1.2;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        
+        .comm-meta {
+            display: flex; gap: 10px; margin-bottom: 20px; font-size: 0.75rem; color: var(--text-muted); flex-wrap: wrap;
+        }
+        .meta-badge { 
+            display: flex; align-items: center; gap: 6px; 
+            background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .comm-desc { 
+            font-size: 0.9rem; color: var(--text-muted); margin-bottom: 24px; 
+            line-height: 1.6; flex: 1; font-weight: 300;
+        }
         
         .comm-footer {
-            margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05);
-            display: flex; justify-content: space-between; align-items: center;
+            margin-top: auto; padding-top: 20px; 
+            border-top: 1px solid rgba(255,255,255,0.08);
         }
-        .comm-members { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; font-weight: 500; }
         
+        /* Advanced Button Styles */
         .btn-join {
-            padding: 10px 24px; border-radius: 12px; font-size: 0.85rem; font-weight: 700; text-decoration: none;
-            transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; border: none;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            width: 100%; height: 48px;
+            border-radius: 12px; font-size: 0.95rem; font-weight: 700; 
+            text-decoration: none; cursor: pointer; border: none; outline: none;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+            position: relative; overflow: hidden; transform: translateZ(20px);
         }
-        .btn-join.whatsapp { background: #25D366; color: #000; box-shadow: 0 0 15px rgba(37, 211, 102, 0.3); }
-        .btn-join.telegram { background: #0088cc; color: #fff; box-shadow: 0 0 15px rgba(0, 136, 204, 0.3); }
-        .btn-join.discord { background: #5865F2; color: #fff; box-shadow: 0 0 15px rgba(88, 101, 242, 0.3); }
-        .btn-join.default { background: var(--gold-gradient); color: #000; box-shadow: 0 0 15px rgba(251, 191, 36, 0.3); }
-        .btn-join:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        
+        .btn-join:hover { transform: translateZ(25px) translateY(-2px); filter: brightness(1.15); }
+        .btn-join:active { transform: translateZ(20px) translateY(1px); }
+
+        /* Specific Colors */
+        .btn-join.whatsapp { background: linear-gradient(135deg, #25D366, #075e54); color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .btn-join.telegram { background: linear-gradient(135deg, #0088cc, #005687); color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .btn-join.discord { background: linear-gradient(135deg, #5865F2, #3944bc); color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .btn-join.linkedin { background: linear-gradient(135deg, #0077b5, #004d7c); color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+        .btn-join.default { background: var(--gold-gradient); color: #1a0f00; font-weight: 800; }
 
         .empty-state {
             grid-column: 1 / -1; text-align: center; padding: 60px 20px;
@@ -204,9 +295,9 @@
 
         /* Loading Spinner */
         .loading-spinner {
-            display: inline-block; width: 16px; height: 16px;
-            border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite; margin-right: 5px;
+            display: inline-block; width: 18px; height: 18px;
+            border: 2px solid rgba(255,255,255,0.4); border-radius: 50%; border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -221,6 +312,7 @@
             .hamburger { display: block; }
             .page-hero { padding: 30px 20px; }
             .comm-grid { grid-template-columns: 1fr; }
+            .stats-bar { gap: 20px; }
         }
     </style>
 </head>
@@ -292,8 +384,23 @@
             <!-- Page Hero -->
             <div class="page-hero animate__animated animate__fadeIn">
                 <h1 class="animate__animated animate__fadeInDown">Community Hub</h1>
-                <p class="animate__animated animate__fadeInUp animate__delay-1s">Connect with professionals, join exclusive groups, and get real-time job alerts directly on your favorite platforms.</p>
+                <p class="animate__animated animate__fadeInUp animate__delay-1s">Connect with industry leaders, join exclusive mentorship groups, and get real-time job alerts directly on your favorite platforms.</p>
                 
+                <div class="stats-bar animate__animated animate__fadeInUp animate__delay-1s">
+                    <div class="stat-item">
+                        <div class="stat-val" id="total-groups">0</div>
+                        <div class="stat-lbl">Active Groups</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-val">24/7</div>
+                        <div class="stat-lbl">Updates</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-val">FREE</div>
+                        <div class="stat-lbl">Access</div>
+                    </div>
+                </div>
+
                 <div class="filter-bar animate__animated animate__fadeInUp animate__delay-1s">
                     <div class="filter-chip active" onclick="filterCommunities('all', this)">All Groups</div>
                     <div class="filter-chip" onclick="filterCommunities('whatsapp', this)"><i class="fab fa-whatsapp" style="color:#25D366"></i> WhatsApp</div>
@@ -303,17 +410,33 @@
                 </div>
             </div>
 
+            <!-- Suggestions Section (Advanced Feature) -->
+            <div id="suggestions-section" style="display:none;">
+                <div class="section-header">
+                    <div class="section-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Recommended for You</div>
+                </div>
+                <div class="suggestion-row" id="suggestions-container">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+
+            <!-- Main Grid Section -->
+            <div class="section-header">
+                <div class="section-title"><i class="fa-solid fa-layer-group"></i> Browse Communities</div>
+            </div>
+
             <!-- Grid Container -->
             <div id="community-grid" class="comm-grid animate__animated animate__fadeInUp animate__delay-1s">
                 <!-- Skeletons -->
-                <div class="comm-card-3d" style="height:350px;"><div style="width:100%; height:100%" class="skeleton"></div></div>
-                <div class="comm-card-3d" style="height:350px;"><div style="width:100%; height:100%" class="skeleton"></div></div>
-                <div class="comm-card-3d" style="height:350px;"><div style="width:100%; height:100%" class="skeleton"></div></div>
+                <div class="comm-card-3d" style="height:380px;"><div style="width:100%; height:100%" class="skeleton"></div></div>
+                <div class="comm-card-3d" style="height:380px;"><div style="width:100%; height:100%" class="skeleton"></div></div>
+                <div class="comm-card-3d" style="height:380px;"><div style="width:100%; height:100%" class="skeleton"></div></div>
             </div>
 
             <!-- Footer (Simple) -->
-            <div style="text-align:center; padding:30px 0; color:var(--text-muted); font-size:0.8rem; border-top:1px solid rgba(255,255,255,0.05);">
-                &copy; 2026 EastLink Recruiters. Community links are managed by administrators.
+            <div style="text-align:center; padding:30px 0; color:var(--text-muted); font-size:0.8rem; border-top:1px solid rgba(255,255,255,0.05); margin-top: 40px;">
+                &copy; 2026 EastLink Recruiters. Community links are managed by administrators.<br>
+                <span style="opacity:0.6;">Need to create a group? Contact support.</span>
             </div>
 
         </div>
@@ -342,6 +465,29 @@
                     btn.dataset.processing = "false";
                 }, 500);
             }, 1000);
+        };
+
+        // --- NEW SPINNER FOR LINKS ---
+        window.openLinkWithSpinner = (btn, url) => {
+            if(btn.dataset.loading === "true") return;
+            btn.dataset.loading = "true";
+            
+            // Save width to prevent collapse
+            btn.style.width = getComputedStyle(btn).width;
+            const originalContent = btn.innerHTML;
+            
+            // Show Spinner
+            btn.innerHTML = `<span class="loading-spinner"></span>`;
+            
+            setTimeout(() => {
+                window.open(url, '_blank');
+                // Reset after a moment
+                setTimeout(() => {
+                    btn.innerHTML = originalContent;
+                    btn.style.width = ''; // Reset width
+                    btn.dataset.loading = "false";
+                }, 500);
+            }, 600); // Simulate brief "connecting" delay
         };
 
         // --- UI HELPERS ---
@@ -382,34 +528,119 @@
         function loadCommunities() {
             const grid = document.getElementById('community-grid');
             
-            // Listening to 'settings/communities' doc
+            // Listening to 'settings/communities' doc (Admin managed)
             onSnapshot(doc(db, "settings", "communities"), (docSnap) => {
                 grid.innerHTML = '';
                 
                 if(!docSnap.exists() || !docSnap.data().list || docSnap.data().list.length === 0) {
                     renderEmptyState(grid);
+                    updateStats(0);
                     return;
                 }
 
                 allCommunities = docSnap.data().list;
+                
+                // Sort by name for neatness
+                allCommunities.sort((a, b) => a.name.localeCompare(b.name));
+
                 renderCommunities(allCommunities);
+                renderSuggestions(allCommunities); // Show top suggestions
+                updateStats(allCommunities.length);
+            }, (error) => {
+                console.error("Error fetching communities:", error);
+                grid.innerHTML = `<div class="empty-state" style="color:var(--danger)">Failed to load communities. Please try again later.</div>`;
             });
+        }
+
+        function updateStats(count) {
+            const el = document.getElementById('total-groups');
+            if(el) {
+                // Number animation
+                let start = 0;
+                const end = count;
+                if (start === end) return;
+                const duration = 1000;
+                const startTime = performance.now();
+                function animate(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    // Ease out quart
+                    const ease = 1 - Math.pow(1 - progress, 4);
+                    
+                    el.innerText = Math.floor(start + (end - start) * ease);
+
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        el.innerText = end;
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
         }
 
         window.filterCommunities = (type, btn) => {
             document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
             btn.classList.add('active');
 
-            if(type === 'all') {
-                renderCommunities(allCommunities);
-            } else if(type === 'other') {
-                const filtered = allCommunities.filter(c => !['whatsapp','telegram','discord'].includes(c.platform?.toLowerCase()));
-                renderCommunities(filtered);
-            } else {
-                const filtered = allCommunities.filter(c => c.platform?.toLowerCase() === type);
-                renderCommunities(filtered);
-            }
+            // Add simple fade animation
+            const grid = document.getElementById('community-grid');
+            grid.style.opacity = '0';
+            
+            setTimeout(() => {
+                if(type === 'all') {
+                    renderCommunities(allCommunities);
+                } else if(type === 'other') {
+                    const filtered = allCommunities.filter(c => !['whatsapp','telegram','discord'].includes(c.platform?.toLowerCase()));
+                    renderCommunities(filtered);
+                } else {
+                    const filtered = allCommunities.filter(c => c.platform?.toLowerCase().includes(type));
+                    renderCommunities(filtered);
+                }
+                grid.style.opacity = '1';
+            }, 200);
         };
+
+        function renderSuggestions(list) {
+            const container = document.getElementById('suggestions-container');
+            const section = document.getElementById('suggestions-section');
+            container.innerHTML = '';
+
+            // Logic: Pick 2-3 random communities as "Recommended"
+            if(list.length < 2) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            // Shuffle and pick 2
+            const shuffled = [...list].sort(() => 0.5 - Math.random()).slice(0, 2);
+
+            shuffled.forEach(comm => {
+                const platform = comm.platform ? comm.platform.toLowerCase() : 'link';
+                let iconClass = 'fa-link';
+                let iconColor = 'var(--text-main)';
+                
+                if(platform.includes('whatsapp')) { iconClass = 'fa-whatsapp'; iconColor = '#25D366'; }
+                else if(platform.includes('telegram')) { iconClass = 'fa-telegram'; iconColor = '#0088cc'; }
+                else if(platform.includes('discord')) { iconClass = 'fa-discord'; iconColor = '#5865F2'; }
+
+                const div = document.createElement('div');
+                div.className = 'suggestion-card';
+                div.onclick = () => window.open(comm.link, '_blank');
+                div.innerHTML = `
+                    <div class="sugg-icon" style="color:${iconColor}">
+                        <i class="fab ${iconClass}"></i>
+                    </div>
+                    <div class="sugg-info">
+                        <h4>${comm.name}</h4>
+                        <p>${comm.description || 'Join for updates...'}</p>
+                    </div>
+                    <div class="sugg-badge">Suggested</div>
+                `;
+                container.appendChild(div);
+            });
+        }
 
         function renderCommunities(list) {
             const grid = document.getElementById('community-grid');
@@ -439,12 +670,15 @@
                     iconClass = 'fa-discord'; iconColor = '#5865F2'; btnClass = 'discord'; 
                     bgGradient = 'linear-gradient(135deg, #312e81, #1e1b4b)';
                 } else if(platform.includes('linkedin')) {
-                    iconClass = 'fa-linkedin'; iconColor = '#0a66c2'; 
+                    iconClass = 'fa-linkedin'; iconColor = '#0a66c2'; btnClass = 'linkedin';
                 }
+
+                // Random members count simulation for aesthetics if not provided
+                const members = comm.membersCount || Math.floor(Math.random() * (5000 - 500 + 1) + 500);
 
                 const card = document.createElement('div');
                 card.className = 'comm-card-3d animate__animated animate__fadeInUp';
-                card.style.animationDelay = `${index * 0.1}s`;
+                card.style.animationDelay = `${index * 0.05}s`; // Staggered animation
                 
                 card.innerHTML = `
                     <div class="comm-banner" style="background:${bgGradient}"></div>
@@ -456,15 +690,18 @@
                     </div>
                     <div class="comm-body">
                         <div class="comm-name">${comm.name}</div>
-                        <div class="comm-desc">${comm.description || 'Join this community to connect with peers and get updates.'}</div>
+                        
+                        <div class="comm-meta">
+                            <div class="meta-badge"><i class="fas fa-users" style="color:var(--text-muted)"></i> ${members}+ Members</div>
+                            <div class="meta-badge"><i class="fas fa-circle" style="color:var(--success); font-size:0.6rem;"></i> Active</div>
+                        </div>
+
+                        <div class="comm-desc">${comm.description || 'Join this community to connect with peers, share insights, and get instant updates.'}</div>
                         
                         <div class="comm-footer">
-                            <div class="comm-members">
-                                <i class="fas fa-users" style="color:var(--text-muted)"></i> ${comm.membersCount || '100+'} Members
-                            </div>
-                            <a href="${comm.link}" target="_blank" class="btn-join ${btnClass}">
-                                <span>Join Now</span> <i class="fas fa-arrow-right"></i>
-                            </a>
+                            <button onclick="openLinkWithSpinner(this, '${comm.link}')" class="btn-join ${btnClass}">
+                                <i class="fab ${iconClass}"></i> <span>Join Group</span>
+                            </button>
                         </div>
                     </div>
                 `;

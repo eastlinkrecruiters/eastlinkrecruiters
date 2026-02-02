@@ -278,6 +278,7 @@
 
         .ref-status { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 0.8rem; font-weight: 600; display: none; }
         .ref-valid { color: var(--success); } .ref-invalid { color: var(--danger); }
+        .ref-loading { color: var(--primary); display: none; }
         
         /* PASSWORD STRENGTH */
         .password-strength {
@@ -603,6 +604,7 @@
                             <div class="input-group">
                                 <input type="text" id="referralCode" class="input-control" placeholder="e.g. EL-X892A" onblur="validateRef(this.value)" style="border-color: rgba(217, 119, 6, 0.4);">
                                 <i class="fas fa-ticket-alt icon-start" style="color: var(--primary);"></i>
+                                <span id="ref-loading" class="ref-status ref-loading"><i class="fas fa-circle-notch fa-spin"></i> Checking...</span>
                                 <span id="ref-success" class="ref-status ref-valid"><i class="fas fa-check"></i> Applied</span>
                                 <span id="ref-error" class="ref-status ref-invalid"><i class="fas fa-times"></i> Invalid</span>
                             </div>
@@ -789,10 +791,8 @@
             query, 
             where, 
             getDocs, 
-            updateDoc, 
-            arrayUnion, 
-            increment, 
-            getDoc 
+            getDoc,
+            writeBatch
         } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         // --- INIT UI ---
@@ -811,23 +811,16 @@
                 
                 if (snap.exists()) {
                     const data = snap.data();
+                    if(data.admin_whatsapp) { adminWhatsAppNumber = data.admin_whatsapp; }
                     
-                    // 1. Update WhatsApp Number
-                    if(data.admin_whatsapp) {
-                        adminWhatsAppNumber = data.admin_whatsapp;
-                    }
-
-                    // 2. CHECK REGISTRATION STATUS
-                    // If seeker_reg_open is strictly FALSE, show the closed screen overlay
                     if (data.seeker_reg_open === false) {
                         document.getElementById('closed-screen').style.display = 'flex';
-                        document.body.style.overflow = 'hidden'; // Stop scrolling
+                        document.body.style.overflow = 'hidden'; 
                     } else {
                         document.getElementById('closed-screen').style.display = 'none';
                         document.body.style.overflow = 'auto';
                     }
 
-                    // Socials
                     if(data.facebook) document.getElementById('link-fb').href = data.facebook;
                     if(data.linkedin) document.getElementById('link-in').href = data.linkedin;
                     if(data.twitter) document.getElementById('link-tw').href = data.twitter;
@@ -837,13 +830,10 @@
         }
         checkRegistrationControls();
 
-
         // --- PASSWORD UTILS (Toggle & Strength) ---
-        
         window.togglePassword = (fieldId, iconId) => {
             const field = document.getElementById(fieldId);
             const icon = document.getElementById(iconId);
-            
             if (field.type === "password") {
                 field.type = "text";
                 icon.classList.remove("fa-eye");
@@ -861,39 +851,25 @@
             const meter = document.getElementById('strength-meter');
             const bar = document.getElementById('strength-bar');
             const txt = document.getElementById('strength-text');
-            
-            if(!val) {
-                meter.style.display = 'none';
-                txt.innerText = '';
-                return;
-            }
+            if(!val) { meter.style.display = 'none'; txt.innerText = ''; return; }
             meter.style.display = 'block';
 
-            // Strength Logic
             let strength = 0;
             if (val.length >= 6) strength++;
             if (val.length >= 10) strength++;
-            if (/[A-Z]/.test(val)) strength++; // Has Uppercase
-            if (/[0-9]/.test(val)) strength++; // Has Number
-            if (/[^A-Za-z0-9]/.test(val)) strength++; // Has Special Char
+            if (/[A-Z]/.test(val)) strength++; 
+            if (/[0-9]/.test(val)) strength++; 
+            if (/[^A-Za-z0-9]/.test(val)) strength++; 
 
-            // Visuals
-            bar.className = 'strength-bar'; // reset
+            bar.className = 'strength-bar'; 
             if (strength < 2) {
-                bar.classList.add('st-weak');
-                txt.innerText = 'Weak';
-                txt.style.color = 'var(--danger)';
+                bar.classList.add('st-weak'); txt.innerText = 'Weak'; txt.style.color = 'var(--danger)';
             } else if (strength < 4) {
-                bar.classList.add('st-med');
-                txt.innerText = 'Medium';
-                txt.style.color = '#FBBF24';
+                bar.classList.add('st-med'); txt.innerText = 'Medium'; txt.style.color = '#FBBF24';
             } else {
-                bar.classList.add('st-strong');
-                txt.innerText = 'Strong';
-                txt.style.color = 'var(--success)';
+                bar.classList.add('st-strong'); txt.innerText = 'Strong'; txt.style.color = 'var(--success)';
             }
         };
-
 
         // --- ADVANCED INPUT LOGIC (Date) ---
         const dobInput = document.getElementById('dob');
@@ -910,20 +886,13 @@
                     const parts = v.split('/');
                     const birthDate = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`); 
                     const today = new Date();
-                    
                     if (isValidDate(birthDate)) {
                         let age = today.getFullYear() - birthDate.getFullYear();
                         const m = today.getMonth() - birthDate.getMonth();
-                        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-                            age--;
-                        }
+                        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) { age--; }
                         ageInput.value = age >= 0 ? age : 0;
-                    } else {
-                        ageInput.value = "";
-                    }
-                } else {
-                    ageInput.value = "";
-                }
+                    } else { ageInput.value = ""; }
+                } else { ageInput.value = ""; }
             });
         }
         function isValidDate(d) { return d instanceof Date && !isNaN(d); }
@@ -939,22 +908,15 @@
             input.addEventListener('input', () => {
                 const val = input.value;
                 if(!val.includes('@') || val.split('@')[1].length > 0) { box.style.display = 'none'; return; }
-                
                 const prefix = val.split('@')[0];
                 box.innerHTML = domains.map(d => `<div class="suggestion-item">${prefix}@${d}</div>`).join('');
                 box.style.display = 'block';
 
                 box.querySelectorAll('.suggestion-item').forEach(item => {
-                    item.onclick = () => {
-                        input.value = item.innerText;
-                        box.style.display = 'none';
-                    };
+                    item.onclick = () => { input.value = item.innerText; box.style.display = 'none'; };
                 });
             });
-            
-            document.addEventListener('click', (e) => {
-                if(e.target !== input && e.target !== box) box.style.display = 'none';
-            });
+            document.addEventListener('click', (e) => { if(e.target !== input && e.target !== box) box.style.display = 'none'; });
         }
 
         // --- PRELOADER & MENU ---
@@ -988,29 +950,11 @@
             const email = document.getElementById('ad-email').value.trim();
             const extraInfo = document.getElementById('ad-info').value.trim();
 
-            if(!title || !salary || !location || !reqs || !contact) {
-                showToast("Please fill in all required fields.", "error");
-                return;
-            }
+            if(!title || !salary || !location || !reqs || !contact) { showToast("Please fill in all required fields.", "error"); return; }
 
-            let formattedText = `📢 *NEW JOB ALERT* 📢
-
-✨ *Role:* ${title}
-📍 *Location:* ${location}
-💰 *Salary:* ${salary}
-
-📝 *Requirements:*
-${reqs}`;
-
-            if(extraInfo) { formattedText += `\n\nℹ️ *Additional Info:*
-${extraInfo}`; }
-
-            formattedText += `\n
----------------------------------
-📞 *Contact:* ${contact}
-📧 *Email:* ${email || "N/A"}
----------------------------------
-*Applied via EastLink Recruiters*`;
+            let formattedText = `📢 *NEW JOB ALERT* 📢\n\n✨ *Role:* ${title}\n📍 *Location:* ${location}\n💰 *Salary:* ${salary}\n\n📝 *Requirements:*\n${reqs}`;
+            if(extraInfo) { formattedText += `\n\nℹ️ *Additional Info:*\n${extraInfo}`; }
+            formattedText += `\n\n---------------------------------\n📞 *Contact:* ${contact}\n📧 *Email:* ${email || "N/A"}\n---------------------------------\n*Applied via EastLink Recruiters*`;
 
             document.getElementById('ad-preview-content').innerText = formattedText;
             document.getElementById('previewModal').style.display = 'flex';
@@ -1031,7 +975,6 @@ ${extraInfo}`; }
         window.setRole = (r) => {
             const box = document.getElementById(`role-${r}`);
             if(box.classList.contains('disabled')) return;
-
             role = r;
             document.querySelectorAll('.role-box').forEach(el => el.classList.remove('selected'));
             box.classList.add('selected');
@@ -1039,7 +982,6 @@ ${extraInfo}`; }
             const nameLbl = document.getElementById('lbl-name');
             const dobWrap = document.getElementById('wrap-dob-row');
             const idWrap = document.getElementById('wrap-id');
-            
             nameLbl.innerText = "Full Name";
             dobWrap.style.display = 'grid';
             idWrap.style.display = 'block';
@@ -1048,25 +990,21 @@ ${extraInfo}`; }
 
         window.moveStep = async (dir) => {
             if (dir === 1 && !validateCurrentStep()) return;
-
             const next = step + dir;
             let nextId = '';
 
-            // ID selection
             if (step === 1) nextId = 'step-2';
             else if (step === 2) nextId = 'step-3-seeker';
             else if (step === 3) nextId = 'step-4';
             
-            // Back logic
             if (dir === -1) {
                 if (step === 4) nextId = 'step-3-seeker';
                 else if (step === 3) nextId = 'step-2';
                 else if (step === 2) nextId = 'step-1';
             }
 
-            let targetStepNum = next;
             performTransition(getCurrentId(), nextId);
-            step = targetStepNum;
+            step = next;
             updateWizardUI();
         };
 
@@ -1080,7 +1018,6 @@ ${extraInfo}`; }
         function performTransition(from, to) {
             const f = document.getElementById(from);
             const t = document.getElementById(to);
-            
             gsap.to(f, { opacity:0, x: -20, duration: 0.3, onComplete: () => {
                 f.style.display = 'none';
                 t.style.display = 'block';
@@ -1091,7 +1028,6 @@ ${extraInfo}`; }
         function updateWizardUI() {
             const pct = ((step - 1) / 3) * 100;
             document.getElementById('trackFill').style.width = pct + "%";
-
             for(let i=1; i<=4; i++) {
                 const n = document.getElementById(`node-${i}`);
                 n.classList.remove('active', 'completed');
@@ -1099,7 +1035,6 @@ ${extraInfo}`; }
                 else if(i === step) { n.classList.add('active'); n.innerText = i; }
                 else { n.innerText = i; }
             }
-
             document.getElementById('btnBack').style.display = (step === 1) ? 'none' : 'block';
             if (step === 4) {
                 document.getElementById('btnNext').style.display = 'none';
@@ -1114,12 +1049,7 @@ ${extraInfo}`; }
             const div = document.createElement('div');
             div.className = 'edu-row';
             div.style.marginBottom = "10px";
-            div.innerHTML = `
-                <input class="input-control sub-school" placeholder="School/Uni" style="margin-bottom:8px">
-                <input class="input-control sub-deg" placeholder="Degree" style="margin-bottom:8px">
-                <input type="number" class="input-control sub-yr" placeholder="Year">
-                <i class="fas fa-trash" style="color:var(--danger); cursor:pointer; float:right; margin-top:5px;" onclick="this.parentElement.remove()"></i>
-            `;
+            div.innerHTML = `<input class="input-control sub-school" placeholder="School/Uni" style="margin-bottom:8px"><input class="input-control sub-deg" placeholder="Degree" style="margin-bottom:8px"><input type="number" class="input-control sub-yr" placeholder="Year"><i class="fas fa-trash" style="color:var(--danger); cursor:pointer; float:right; margin-top:5px;" onclick="this.parentElement.remove()"></i>`;
             document.getElementById('edu-container').appendChild(div);
         };
 
@@ -1129,52 +1059,68 @@ ${extraInfo}`; }
             const inputs = currentContainer.querySelectorAll('input[type="text"], input[type="tel"], input[type="email"], input[type="password"], input[type="number"], select');
             let valid = true;
 
-            // Check DOB
             if(step === 2) {
                 const dobVal = document.getElementById('dob').value;
                 const ageVal = document.getElementById('age').value;
                 const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-                if(!dobVal || !dateRegex.test(dobVal)) {
-                     showToast("Please enter a valid Date of Birth (DD/MM/YYYY)", "error");
-                     return false;
-                }
-                if(ageVal < 18) {
-                    showToast("You must be at least 18 years old.", "error");
-                    return false;
-                }
+                if(!dobVal || !dateRegex.test(dobVal)) { showToast("Please enter a valid Date of Birth (DD/MM/YYYY)", "error"); return false; }
+                if(ageVal < 18) { showToast("You must be at least 18 years old.", "error"); return false; }
             }
 
             inputs.forEach(inp => {
                 if (inp.id === 'referralCode' || inp.id === 'website' || inp.id === 'prevJobTitle' || inp.id === 'ad-info') return;
                 if(inp.classList.contains('sub-school') || inp.classList.contains('sub-deg') || inp.classList.contains('sub-yr')) return;
                 if (inp.offsetParent && inp.value.trim() === "") {
-                    inp.style.borderColor = 'var(--danger)';
-                    valid = false;
-                } else {
-                    inp.style.borderColor = 'rgba(255,255,255,0.08)';
-                }
+                    inp.style.borderColor = 'var(--danger)'; valid = false;
+                } else { inp.style.borderColor = 'rgba(255,255,255,0.08)'; }
             });
             if (!valid) showToast("Please fill in all required fields.", "error");
             return valid;
         }
 
-        // --- REFERRAL & SUBMIT ---
+        // --- UPDATED REFERRAL LOGIC ---
         window.validateRef = async (code) => {
             const successEl = document.getElementById('ref-success');
             const errorEl = document.getElementById('ref-error');
-            successEl.style.display = 'none'; errorEl.style.display = 'none';
+            const loadingEl = document.getElementById('ref-loading');
+            
+            successEl.style.display = 'none'; 
+            errorEl.style.display = 'none';
+            loadingEl.style.display = 'none';
+            
             referrerID = null;
             if (!code || code.trim() === "") return;
 
+            loadingEl.style.display = 'block';
+
             try {
-                const q = query(collection(db, "users"), where("ownReferralCode", "==", code.trim()));
-                const snapshot = await getDocs(q);
-                if (!snapshot.empty) {
-                    referrerID = snapshot.docs[0].id; successEl.style.display = 'block';
+                // 1. Check the specialized 'referral_codes' collection first (Faster, Cheaper)
+                // This aligns with the new rule: match /referral_codes/{code} { allow read: if true; }
+                const codeDocRef = doc(db, "referral_codes", code.trim());
+                const codeSnap = await getDoc(codeDocRef);
+
+                if (codeSnap.exists()) {
+                    referrerID = codeSnap.data().ownerId;
+                    loadingEl.style.display = 'none';
+                    successEl.style.display = 'block';
                 } else {
-                    errorEl.style.display = 'block';
+                    // Fallback: Check old method (query users) just in case migration isn't 100%
+                    const q = query(collection(db, "users"), where("ownReferralCode", "==", code.trim()));
+                    const snapshot = await getDocs(q);
+                    
+                    loadingEl.style.display = 'none';
+                    if (!snapshot.empty) {
+                        referrerID = snapshot.docs[0].id;
+                        successEl.style.display = 'block';
+                    } else {
+                        errorEl.style.display = 'block';
+                    }
                 }
-            } catch (e) {}
+            } catch (e) { 
+                console.error("Referral validation error:", e);
+                loadingEl.style.display = 'none';
+                // Don't show error to user, just assume invalid or network issue
+            }
         };
 
         window.finalizeSignup = async () => {
@@ -1186,6 +1132,7 @@ ${extraInfo}`; }
             if (p1 !== p2) return showToast("Passwords do not match.", "error");
             if (!terms) return showToast("You must accept the Terms of Service.", "error");
             
+            // Re-validate referral if present
             const refCodeInput = document.getElementById('referralCode').value;
             if (refCodeInput && !referrerID) {
                 await validateRef(refCodeInput);
@@ -1198,9 +1145,11 @@ ${extraInfo}`; }
                 const email = document.getElementById('email').value;
                 const userCred = await createUserWithEmailAndPassword(auth, email, p1);
                 const uid = userCred.user.uid;
+                
+                // Generate a unique code for the NEW user
                 const newRefCode = "EL-" + Math.random().toString(36).substring(2, 8).toUpperCase();
 
-                // Build User Data (Seeker Only)
+                // Build User Data
                 const userData = {
                     uid: uid, email: email, role: 'seeker',
                     fullName: document.getElementById('fullName').value,
@@ -1208,18 +1157,16 @@ ${extraInfo}`; }
                     location: document.getElementById('location').value,
                     createdAt: serverTimestamp(),
                     ownReferralCode: newRefCode,
-                    referralStats: { count: 0, earnings: 0 },
                     referredBy: referrerID || null,
+                    referralCommissionBalance: 0, 
                     plan: 'free',
-                    isVerified: false
+                    isVerified: false,
+                    walletBalance: 0
                 };
 
-                // Convert DD/MM/YYYY to YYYY-MM-DD for database consistency
                 const rawDob = document.getElementById('dob').value;
                 const parts = rawDob.split('/');
-                if(parts.length === 3) {
-                    userData.dob = `${parts[2]}-${parts[1]}-${parts[0]}`; 
-                }
+                if(parts.length === 3) userData.dob = `${parts[2]}-${parts[1]}-${parts[0]}`; 
                 
                 userData.idNumber = document.getElementById('idNumber').value;
                 userData.age = parseInt(document.getElementById('age').value);
@@ -1233,29 +1180,33 @@ ${extraInfo}`; }
                     const school = row.querySelector('.sub-school').value;
                     const degree = row.querySelector('.sub-deg').value;
                     const yr = row.querySelector('.sub-yr').value;
-                    if(school && degree) {
-                        eduArr.push({ school, degree, year: yr });
-                    }
+                    if(school && degree) eduArr.push({ school, degree, year: yr });
                 });
                 userData.education = eduArr;
 
-                // 1. Save User Profile
-                await setDoc(doc(db, "users", uid), userData);
+                // --- BATCH WRITE (CRITICAL UPDATE) ---
+                // We write to 'users' AND 'referral_codes' simultaneously.
+                // This ensures consistency and satisfies the new security rules.
+                const batch = writeBatch(db);
+                
+                // 1. User Profile
+                const userRef = doc(db, "users", uid);
+                batch.set(userRef, userData);
 
-                // 2. Update Referrer (if applicable)
-                if (referrerID) {
-                    const referrerRef = doc(db, "users", referrerID);
-                    await updateDoc(referrerRef, {
-                        "referralStats.count": increment(1),
-                        "referralList": arrayUnion(uid)
-                    });
-                }
+                // 2. Referral Code Mapping (So this user can refer others immediately)
+                const codeRef = doc(db, "referral_codes", newRefCode);
+                batch.set(codeRef, {
+                    ownerId: uid,
+                    createdAt: serverTimestamp(),
+                    active: true
+                });
 
-                // 3. Send Verification Email
+                await batch.commit();
+
+                // Send Verification Email
                 await sendEmailVerification(userCred.user);
 
                 showToast("Account Created Successfully! Redirecting...", "success");
-                
                 setTimeout(() => { window.location.href = "verify.html"; }, 2500);
 
             } catch (err) {
@@ -1271,26 +1222,15 @@ ${extraInfo}`; }
         function showToast(msg, type) {
             let bg = type === 'error' ? "linear-gradient(to right, #EF4444, #B91C1C)" : "linear-gradient(to right, #10B981, #059669)";
             Toastify({ 
-                text: msg, 
-                duration: 3000, 
-                gravity: "top", 
-                position: "center", 
-                style: { 
-                    background: bg, 
-                    borderRadius:'12px', 
-                    fontWeight:'600',
-                    color: '#ffffff',
-                    boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
-                } 
+                text: msg, duration: 3000, gravity: "top", position: "center", 
+                style: { background: bg, borderRadius:'12px', fontWeight:'600', color: '#ffffff', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' } 
             }).showToast();
         }
 
         // --- PWA LOGIC START ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./service-worker.js')
-                    .then(reg => console.log('SW Registered'))
-                    .catch(err => console.log('SW Failed', err));
+                navigator.serviceWorker.register('./service-worker.js').catch(err => console.log('SW Failed', err));
             });
         }
         let deferredPrompt;
@@ -1298,16 +1238,11 @@ ${extraInfo}`; }
         const installBtn = document.getElementById('pwa-install-btn');
         const dismissBtn = document.getElementById('pwa-dismiss');
         window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            setTimeout(() => { pwaPopup.style.display = 'block'; }, 3000);
+            e.preventDefault(); deferredPrompt = e; setTimeout(() => { pwaPopup.style.display = 'block'; }, 3000);
         });
         installBtn.addEventListener('click', (e) => {
             pwaPopup.style.display = 'none';
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => { deferredPrompt = null; });
-            }
+            if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then((choiceResult) => { deferredPrompt = null; }); }
         });
         dismissBtn.addEventListener('click', () => { pwaPopup.style.display = 'none'; });
         window.addEventListener('appinstalled', () => { pwaPopup.style.display = 'none'; });

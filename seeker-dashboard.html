@@ -23,29 +23,18 @@
             /* Theme Variables */
             --bg-body: #0f172a;       
             --bg-glass: rgba(30, 41, 59, 0.7);
-            --bg-solid: #1e293b;
-            --bg-card-dark: #111827;
-            
             --text-main: #F1F5F9;     
             --text-muted: #94A3B8; 
             
             /* Gradients & Colors */
             --gold-base: #fbbf24;
             --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
-            
             --neon-purple: #8b5cf6;
             --purple-gradient: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
-            
             --success: #10B981;
             --success-gradient: linear-gradient(135deg, #34d399 0%, #059669 100%);
-            
             --danger: #EF4444;
-            --danger-gradient: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
-            
             --pink-gradient: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
-            
-            --ai-glow: #0ea5e9;
-            --ai-gradient: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
 
             --sidebar-width: 260px; 
             --header-height: 70px;
@@ -54,11 +43,8 @@
             --font-body: 'Inter', sans-serif;
             --font-display: 'Space Grotesk', sans-serif;
             --font-mono: 'Space Mono', monospace;
-            
-            /* Hero Fonts */
             --font-hero-greeting: 'Outfit', sans-serif;
             --font-hero-name: 'Playfair Display', serif;
-            
             --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1); 
         }
 
@@ -75,19 +61,12 @@
             display: flex; flex-direction: column;
         }
 
-        /* --- DASHBOARD LAYOUT COMPONENTS --- */
-        .glass-panel {
-            background: var(--bg-glass);
-            backdrop-filter: blur(12px) saturate(180%);
-            -webkit-backdrop-filter: blur(12px) saturate(180%);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: var(--radius);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
-            width: 100%;
-            transition: all 0.25s var(--ease-snap);
-        }
-        
-        /* Header */
+        /* --- UTILITIES --- */
+        .reveal-on-scroll { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+        .reveal-on-scroll.active { opacity: 1; transform: translateY(0); }
+        .glass-panel { background: var(--bg-glass); backdrop-filter: blur(12px) saturate(180%); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius); width: 100%; }
+
+        /* --- HEADER --- */
         header {
             position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
             background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px);
@@ -95,337 +74,174 @@
             display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 1000;
         }
         .header-left { display: flex; align-items: center; gap: 15px; }
-        .logo { font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; }
-        .logo span { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hamburger { font-size: 1.2rem; cursor: pointer; color: var(--text-muted); display: none; }
-
-        /* Global Search (Header) */
-        .global-search-container { flex: 1; max-width: 450px; position: relative; margin: 0 20px; }
-        .global-search-input { width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); padding: 10px 45px 10px 15px; border-radius: 12px; color: var(--text-main); font-size: 0.9rem; }
-        .search-results-dropdown { position: absolute; top: 115%; left: 0; width: 100%; background: #1e293b; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; max-height: 300px; overflow-y: auto; display: none; z-index: 2000; }
+        
+        /* Updated Logo Styles */
+        .logo { 
+            font-family: var(--font-head); 
+            font-weight: 700; 
+            color: #ffffff; 
+            font-size: 1.5rem; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            text-decoration: none; 
+        }
+        .logo span { 
+            color: #d97706; /* Solid Gold Color matching image */
+            font-weight: 700;
+        }
         
         .header-actions { display: flex; align-items: center; gap: 12px; }
-        .icon-btn { 
-            width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; 
-            cursor: pointer; background: rgba(255,255,255,0.03); position: relative; 
-            border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
-        }
-        .icon-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
-        .icon-msg { color: #3b82f6; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.4)); }
-        .icon-bell { color: #f59e0b; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.4)); }
+        .icon-btn { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; cursor: pointer; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); position: relative; }
+        .notification-badge { position: absolute; top: -3px; right: -3px; width: 18px; height: 18px; background: #ef4444; border-radius: 50%; font-size: 0.65rem; color: white; display: none; place-items: center; justify-content: center; font-weight: 700; }
+        .user-avatar { width: 42px; height: 42px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-weight: 700; color: #fff; object-fit: cover; cursor: pointer; }
 
-        .notification-badge { 
-            position: absolute; top: -3px; right: -3px; width: 18px; height: 18px; 
-            background: #ef4444; border: 2px solid #0f172a; border-radius: 50%; 
-            font-size: 0.65rem; color: white; display: none; place-items: center; 
-            justify-content: center; font-weight: 700; box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 10;
+        /* --- LAYOUT & SIDEBAR (RESPONSIVE FIX) --- */
+        .sidebar { 
+            position: fixed; top: var(--header-height); left: 0; 
+            width: var(--sidebar-width); height: calc(100vh - var(--header-height)); 
+            background: rgba(15, 23, 42, 0.95); border-right: 1px solid rgba(255,255,255,0.05); 
+            padding: 20px 0; overflow-y: auto; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            z-index: 999; display: flex; flex-direction: column; backdrop-filter: blur(20px); 
+            transform: translateX(0); /* Visible on desktop */
         }
-        .profile-widget { width: 42px; height: 42px; position: relative; cursor: pointer; margin-left: 5px; }
-        .user-avatar { width: 100%; height: 100%; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-weight: 700; color: #fff; object-fit: cover; }
+        
+        main { 
+            margin-left: var(--sidebar-width); 
+            margin-top: var(--header-height); 
+            padding: 25px; 
+            width: calc(100% - var(--sidebar-width)); 
+            flex: 1; 
+            transition: all 0.3s ease;
+        }
 
-        /* Sidebar */
-        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: rgba(15, 23, 42, 0.95); border-right: 1px solid rgba(255,255,255,0.05); padding: 20px 0; overflow-y: auto; transition: transform 0.3s; z-index: 999; display: flex; flex-direction: column; backdrop-filter: blur(20px); }
+        .hamburger { font-size: 1.4rem; cursor: pointer; color: var(--text-muted); display: none; }
+        
         .nav-group { padding: 0 24px; margin-bottom: 20px; }
         .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; }
-        .nav-item { display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; border-radius: 10px; margin-bottom: 4px; cursor: pointer; transition: 0.2s; }
+        .nav-item { display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; border-radius: 10px; margin-bottom: 4px; transition: 0.2s; }
         .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.05); transform: translateX(5px); }
         .nav-item.active { background: linear-gradient(90deg, rgba(251, 191, 36, 0.15) 0%, transparent 100%); color: var(--gold-base); font-weight: 600; border-left: 3px solid var(--gold-base); }
         .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
-        
-        /* Layout */
-        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 25px; width: calc(100% - var(--sidebar-width)); flex: 1; }
+
+        /* GRID LAYOUT */
         .grid-layout { max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: 2.8fr 1.2fr; gap: 24px; }
-        
+
+        /* --- MOBILE QUERIES --- */
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); box-shadow: 5px 0 15px rgba(0,0,0,0.5); width: 280px; }
+            .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; width: 100%; padding: 15px; }
+            .hamburger { display: block; }
+            .grid-layout { grid-template-columns: 1fr; }
+            .hero-greeting-line { font-size: clamp(3rem, 10vw, 4rem); }
+            .hero-username { font-size: clamp(1.2rem, 5vw, 1.5rem); }
+        }
+
         /* --- HERO SECTION --- */
         .hero-section { grid-column: 1 / -1; margin-bottom: 30px; }
         .welcome-card { 
-            padding: 40px; 
-            display: flex; flex-direction: column; justify-content: center; 
-            background: linear-gradient(90deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.8)), url('./assets/images/welcomehero.png');
-            background-size: cover;
-            background-position: center;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: var(--radius);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
-            min-height: 320px;
-            position: relative; overflow: hidden;
+            padding: 50px 40px; display: flex; flex-direction: column; justify-content: center; 
+            background: linear-gradient(90deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.7)), url('./assets/images/welcomehero.png');
+            background-size: cover; border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius);
+            min-height: 380px; position: relative; overflow: hidden;
         }
-
-        /* Hero Text Container */
-        .hero-text-block {
-            display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
-            margin-bottom: 20px; position: relative; z-index: 2; width: 100%;
-        }
-
-        /* --- UPDATED HIGH END ANIMATION SYSTEM (Faster & Shinier) --- */
+        .hero-text-block { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 25px; position: relative; z-index: 2; }
+        .hero-greeting-line { font-family: var(--font-hero-greeting); font-weight: 800; line-height: 1; background: linear-gradient(110deg, #b45309 10%, #fbbf24 45%, #ffffff 50%, #fbbf24 55%, #b45309 90%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; color: transparent; animation: revealText 0.8s forwards; }
+        .hero-username { font-family: var(--font-hero-name); font-weight: 600; font-style: italic; color: #F8FAFC; display: flex; align-items: center; margin-top: 15px; letter-spacing: 0.1em; animation: revealText 0.5s forwards 0.3s; opacity: 0; }
+        .hero-name-line { width: 50px; height: 3px; background: #FBBF24; margin-right: 15px; }
         
-        /* 1. Entrance: Slide Up + Blur Dissolve (Faster) */
-        @keyframes revealText {
-            0% { opacity: 0; transform: translateY(20px); filter: blur(10px); }
-            100% { opacity: 1; transform: translateY(0); filter: blur(0); }
-        }
-
-        /* 2. Loop: Ambient Light Flow (Accelerated) */
-        @keyframes lightFlow {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        /* 3. Pulse: Glow Intensity (Sharper) */
-        @keyframes glowPulse {
-            0%, 100% { text-shadow: 0 0 10px rgba(251, 191, 36, 0.1); }
-            50% { text-shadow: 0 0 25px rgba(251, 191, 36, 0.4); }
-        }
-
-        @keyframes scaleLine {
-            0% { transform: scaleX(0); }
-            100% { transform: scaleX(1); }
-        }
-
-        /* Greeting Text - SPLIT LINE LOGIC */
-        .hero-greeting-line { 
-            font-family: var(--font-hero-greeting);
-            font-weight: 800; 
-            line-height: 0.9; /* Tight line height for stacked look */
-            white-space: nowrap;
-            display: block; /* Forces new line */
-            font-size: clamp(3.2rem, 7vw, 5.5rem); 
-            
-            /* High Shine Gradient */
-            background: linear-gradient(110deg, #b45309 10%, #fbbf24 45%, #ffffff 50%, #fbbf24 55%, #b45309 90%);
-            background-size: 200% auto;
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            color: transparent;
-            
-            /* Faster Animations */
-            opacity: 0; 
-            animation: 
-                revealText 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards, 
-                lightFlow 4s linear infinite 0.8s, /* Speed increased (4s instead of 8s) */
-                glowPulse 3s ease-in-out infinite 0.8s;
-        }
-
-        .hero-greeting-line:nth-child(2) {
-            animation-delay: 0.15s, 0.95s, 0.95s; /* Staggered */
-        }
-
-        /* Name Text */
-        .hero-username {
-            font-family: var(--font-hero-name);
-            font-weight: 600; 
-            font-style: italic;
-            text-transform: uppercase;
-            color: #F8FAFC; 
-            opacity: 0; 
-            
-            display: flex; align-items: center; margin-top: 15px;
-            font-size: clamp(1.2rem, 3.5vw, 1.8rem); 
-            letter-spacing: 0.1em;
-            white-space: nowrap;
-            max-width: 80%;
-
-            animation: revealText 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-            animation-delay: 0.3s;
-        }
-
-        .hero-name-line {
-            display: block; width: 40px; height: 3px; 
-            background: #FBBF24; margin-right: 15px;
-            transform-origin: left;
-            transform: scaleX(0);
-            animation: scaleLine 0.4s ease-out forwards;
-            animation-delay: 0.4s;
-        }
-
-        /* Profile Strength */
-        .profile-strength-container { 
-            width: 100%; max-width: 350px; margin-bottom: 25px; position: relative; z-index: 2; 
-            opacity: 0;
-            animation: revealText 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-            animation-delay: 0.5s;
-        }
-        .strength-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--gold-base); font-weight: 700; margin-bottom: 5px; }
-        .strength-track { height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
-        .strength-fill { 
-            height: 100%; background: var(--success-gradient); width: 0; border-radius: 10px; 
-            animation: loadBar 0.8s ease-out forwards; 
-            animation-delay: 0.6s; 
-        }
+        .profile-strength-container { width: 100%; max-width: 380px; margin-bottom: 25px; z-index: 2; position: relative; }
+        .strength-label { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--gold-base); font-weight: 700; margin-bottom: 6px; }
+        .strength-track { height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
+        .strength-fill { height: 100%; background: var(--success-gradient); width: 0; animation: loadBar 0.8s ease-out forwards 0.6s; }
         @keyframes loadBar { from { width: 0; } to { width: 85%; } }
+        @keyframes revealText { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Subtext */
-        #hero-subtext {
-            color: #cbd5e1; font-size: 0.8rem;
-            margin-bottom: 25px; max-width: 650px;
-            line-height: 1.5; font-style: italic; position: relative; z-index: 2;
-            opacity: 0;
-            animation: revealText 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-            animation-delay: 0.7s;
-        }
+        #hero-subtext { color: #cbd5e1; font-size: 0.9rem; margin-bottom: 30px; max-width: 650px; z-index: 2; position: relative; }
+        .hero-btn-row { display: flex; gap: 15px; z-index: 2; position: relative; }
+        .btn-hero { padding: 14px 35px; border-radius: 50px; font-weight: 700; cursor: pointer; border: none; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .btn-hero:hover { transform: translateY(-4px); }
+        .btn-hero-green { background: var(--success-gradient); color: #fff; }
+        .btn-hero-yellow { background: var(--gold-gradient); color: #000; }
 
-        .hero-btn-row { display: flex; flex-direction: row; gap: 15px; align-items: center; position: relative; z-index: 2; opacity: 0; animation: revealText 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: 0.8s; }
-        .btn-hero { 
-            padding: 12px 30px; border-radius: 50px; font-weight: 700; cursor: pointer; 
-            border: none; font-size: 0.95rem; transition: 0.3s; position: relative;
-            display: flex; align-items: center; gap: 8px; justify-content: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-        .btn-hero:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
-        .btn-hero-green { background: var(--success-gradient); color: #fff; box-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
-        .btn-hero-yellow { background: var(--gold-gradient); color: #000; box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); }
-        
-        @media (max-width: 768px) {
-            .welcome-card { padding: 25px; min-height: auto; }
-            .hero-greeting-line { font-size: 13vw; } /* Adjusted for 2-line mobile visibility */
-            .hero-username { font-size: 5vw; }
-            .hero-text-block { margin-bottom: 15px; }
-            #hero-subtext { font-size: 0.75rem; }
-        }
+        /* --- KPI CARDS --- */
+        .kpi-strip { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 24px; }
+        .stat-card-3d { background: url('./assets/images/kpibackground.png') no-repeat center center; background-size: cover; border-radius: 16px; padding: 20px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.08); border-bottom: 2px solid rgba(0,0,0,0.5); min-height: 110px; cursor: pointer; position: relative; overflow: hidden; transition: 0.3s; }
+        .stat-card-3d::before { content: ''; position: absolute; inset: 0; background: rgba(15,23,42,0.8); z-index: 1; }
+        .stat-card-3d:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.5); border-color: rgba(251,191,36,0.3); }
+        .stat-content { z-index: 2; display: flex; flex-direction: column; }
+        .stat-label { font-size: 0.8rem; color: #e2e8f0; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
+        .stat-value { font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat-icon-container { width: 50px; height: 50px; z-index: 2; }
+        .stat-3d-icon { width: 100%; height: 100%; object-fit: contain; }
+        @media (max-width: 992px) { .kpi-strip { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 500px) { .kpi-strip { gap: 10px; } .stat-card-3d { padding: 15px; } }
 
-        /* --- STATS CARDS --- */
-        .kpi-strip { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 24px; }
-        .stat-card-3d {
-            padding: 15px; border-radius: 14px; cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 6px 0px rgba(0,0,0,0.3), 0 8px 10px rgba(0,0,0,0.2); 
-            transition: transform 0.15s, box-shadow 0.15s;
-            position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 100px;
-        }
-        .stat-card-3d:active { transform: translateY(4px); box-shadow: 0 2px 0px rgba(0,0,0,0.3); }
-        .stat-card-applied { background: #0f172a; border-top: 2px solid var(--success); }
-        .stat-card-plan { background: #1e1b4b; border-top: 2px solid var(--gold-base); }
-        .stat-card-wallet { background: #2e1065; border-top: 2px solid var(--neon-purple); }
-        .stat-card-saved { background: #172554; border-top: 2px solid #60a5fa; }
-        .stat-icon { position: absolute; top: 10px; right: 10px; font-size: 1.2rem; opacity: 0.6; }
-        .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 700; margin-bottom: 2px; }
-        .stat-value { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; color: white; line-height: 1.1; }
-        .stat-sub { font-size: 0.65rem; color: var(--text-muted); margin-top: 2px; }
-        
-        /* --- JOB CARD 3D --- */
-        .job-card-3d {
-            background: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.95)), url('./assets/images/jobcard.png');
-            background-size: cover; background-position: center;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            padding: 18px; margin-bottom: 20px;
-            box-shadow: 0 10px 0px rgba(0,0,0,0.3), 0 15px 20px rgba(0,0,0,0.2);
-            transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative; display: flex; flex-direction: column;
-        }
-        .job-card-3d:hover { transform: translateY(-5px); border-color: var(--gold-base); box-shadow: 0 15px 0px rgba(0,0,0,0.3), 0 20px 30px rgba(0,0,0,0.2); }
+        /* --- TESTIMONIAL TICKER --- */
+        .testimonial-ticker-wrapper { grid-column: 1 / -1; width: 100%; overflow: hidden; background: rgba(30, 41, 59, 0.4); margin-bottom: 24px; padding: 15px 0; border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); position: relative; }
+        .testimonial-ticker-content { display: flex; white-space: nowrap; gap: 60px; animation: scrollText 40s linear infinite; width: max-content; }
+        .testimonial-ticker-content:hover { animation-play-state: paused; }
+        .testimonial-item { display: inline-flex; align-items: center; gap: 12px; color: var(--text-muted); font-size: 0.95rem; font-style: italic; }
+        .testimonial-item strong { color: var(--gold-base); font-style: normal; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; }
+        .testimonial-item i { color: var(--gold-base); opacity: 0.8; }
+        @keyframes scrollText { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
-        .tier-badge {
-            position: absolute; top: 0; right: 0; padding: 4px 10px; border-bottom-left-radius: 12px; 
-            font-size: 0.65rem; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 4px; z-index: 10;
-        }
+        /* --- JOB CARDS --- */
+        .job-card-3d { position: relative; display: flex; flex-direction: column; background: linear-gradient(160deg, #1e293b 0%, #0f172a 100%); border-radius: 16px; padding: 20px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.06); border-bottom: 4px solid rgba(0,0,0,0.5); transition: 0.3s; }
+        .job-card-3d:hover { transform: translateY(-6px); box-shadow: 0 15px 30px rgba(0,0,0,0.4); border-color: rgba(251,191,36,0.4); }
+        .tier-badge { position: absolute; top: 15px; right: 15px; padding: 4px 10px; border-radius: 6px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; }
         .badge-guaranteed { background: var(--pink-gradient); color: white; }
-        .badge-urgent { background: var(--purple-gradient); color: white; animation: pulse-red 2s infinite; }
-        .badge-featured { background: var(--gold-gradient); color: #000; }
+        .badge-urgent { background: var(--purple-gradient); color: white; animation: pulse 2s infinite; }
+        .badge-featured { background: var(--gold-gradient); color: black; }
         .badge-free { background: rgba(255,255,255,0.1); color: var(--text-muted); }
-
-        .job-head { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px; }
-        .j-logo { width: 45px; height: 45px; background: rgba(255,255,255,0.05); border-radius: 10px; display: grid; place-items: center; overflow: hidden; flex-shrink: 0; backdrop-filter: blur(5px); }
+        .job-head { display: flex; gap: 15px; align-items: center; margin-bottom: 12px; }
+        .j-logo { width: 48px; height: 48px; background: #111827; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: grid; place-items: center; overflow: hidden; }
         .j-logo img { width: 100%; height: 100%; object-fit: cover; }
-        .j-logo-text { font-weight: 700; font-size: 1.1rem; color: var(--gold-base); }
-        .j-details h3 { font-size: 1rem; font-weight: 700; color: var(--text-main); margin-bottom: 2px; }
+        .j-logo-text { font-weight: 800; color: var(--gold-base); font-size: 1.2rem; }
+        .j-details h3 { font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
         .j-details p { font-size: 0.8rem; color: var(--text-muted); }
+        .j-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
+        .j-tag { font-size: 0.7rem; padding: 4px 10px; border-radius: 8px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); color: var(--text-muted); }
+        .j-salary { font-family: var(--font-mono); font-size: 0.85rem; color: var(--success); font-weight: 700; padding: 10px 0; border-top: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px; }
+        .job-actions { display: flex; gap: 10px; margin-top: auto; }
+        .btn-j-action { flex: 1; padding: 10px; border-radius: 10px; border: none; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-j-view { background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid rgba(255,255,255,0.1); }
+        .btn-j-save { background: rgba(0,0,0,0.3); border: 1px solid var(--gold-base); color: var(--gold-base); max-width: 42px; }
+        .btn-j-saved { background: var(--gold-base); color: black; border: 1px solid var(--gold-base); max-width: 42px; }
 
-        .j-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
-        .j-tag { font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); }
+        /* WIDGETS & OTHERS */
+        .search-bar-main { position: relative; margin-bottom: 20px; }
+        .search-bar-main input { width: 100%; padding: 14px 15px 14px 45px; border-radius: 14px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; }
+        .search-bar-main i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+        .tier-filters { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 25px; scrollbar-width: none; }
+        .filter-btn { white-space: nowrap; padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02); color: var(--text-muted); cursor: pointer; }
+        .filter-btn.active { background: var(--gold-gradient); color: black; border-color: transparent; }
         
-        .j-salary { font-family: var(--font-mono); font-size: 0.85rem; color: var(--success); font-weight: 600; padding: 8px 0; border-top: 1px solid rgba(255,255,255,0.05); margin-bottom: 12px; }
+        .recent-activity-container { margin-top: 30px; }
+        .activity-item { display: flex; align-items: center; gap: 14px; padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .activity-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.2); display: grid; place-items: center; color: var(--gold-base); }
+        .act-title { font-size: 0.85rem; font-weight: 600; color: var(--text-main); }
+        .act-time { font-size: 0.7rem; color: var(--text-muted); }
 
-        .job-actions { display: flex; gap: 8px; margin-top: auto; }
-        .btn-j-action {
-            flex: 1; padding: 10px 4px; border-radius: 8px; border: none; font-size: 0.75rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px; transition: 0.2s; white-space: nowrap;
-        }
-        .btn-j-view { background: rgba(255,255,255,0.1); color: var(--text-main); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(4px); }
-        .btn-j-view:hover { background: rgba(255,255,255,0.2); }
+        .quick-link-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.02); cursor: pointer; transition: 0.2s; }
+        .quick-link-item:hover { background: rgba(255,255,255,0.05); transform: translateX(5px); }
+        .ql-icon { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; }
         
-        .btn-j-save { background: rgba(0,0,0,0.3); border: 1px solid var(--gold-base); color: var(--gold-base); max-width: 40px; }
-        .btn-j-save:hover { background: var(--gold-base); color: black; }
-        .btn-j-saved { background: var(--gold-base); color: black; border: 1px solid var(--gold-base); max-width: 40px; }
+        .app-footer { margin-top: auto; padding: 30px 25px; background: #0f172a; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; }
+        .footer-quick-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .footer-link { color: var(--text-muted); font-size: 0.8rem; text-decoration: none; }
+        .social-links { display: flex; justify-content: center; gap: 20px; margin-bottom: 15px; }
+        .social-btn { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.05); display: grid; place-items: center; color: var(--text-muted); text-decoration: none; }
 
-        /* RECENT ACTIVITIES */
-        .recent-activity-container { margin-top: 25px; }
-        .activity-item { 
-            display: flex; align-items: center; gap: 12px; padding: 12px; 
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            transition: 0.2s;
-        }
-        .activity-item:last-child { border-bottom: none; }
-        .activity-icon { 
-            width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.05); 
-            display: grid; place-items: center; font-size: 0.8rem; color: var(--gold-base); 
-        }
-        .activity-details { flex: 1; }
-        .act-title { font-size: 0.8rem; font-weight: 600; color: var(--text-main); }
-        .act-time { font-size: 0.65rem; color: var(--text-muted); }
-
-        /* SEARCH & FILTER STYLES */
-        .search-bar-main { position: relative; margin-bottom: 15px; }
-        .search-bar-main input { width: 100%; padding: 12px 15px 12px 40px; border-radius: 12px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; outline: none; transition: 0.3s; font-size: 0.85rem; }
-        .search-bar-main input:focus { border-color: var(--gold-base); background: rgba(0,0,0,0.4); }
-        .search-bar-main i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem; }
-
-        .tier-filters { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px; scrollbar-width: none; }
-        .filter-btn { white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02); color: var(--text-muted); font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: 0.3s; }
-        .filter-btn.active { background: var(--gold-gradient); color: #000; border-color: transparent; }
-
-        /* QUICK LINKS */
-        .quick-link-item { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; background: rgba(255,255,255,0.02); border: 1px solid transparent; text-decoration: none; color: var(--text-main); transition: 0.2s; cursor: pointer; }
-        .quick-link-item:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); transform: translateX(5px); }
-        .ql-icon { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; font-size: 0.8rem; }
-        .ql-text { flex: 1; font-size: 0.75rem; font-weight: 500; }
-
-        /* FAQ */
-        .faq-item { background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 6px; overflow: hidden; transition: all 0.3s ease; }
-        .faq-summary { padding: 10px 12px; font-size: 0.8rem; font-weight: 600; }
-        .faq-answer { padding: 0 12px 12px 12px; font-size: 0.75rem; color: var(--text-muted); }
-
-        /* FOOTER */
-        .app-footer { margin-top: auto; padding: 25px; background: #0f172a; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; }
-        .social-links { display: flex; justify-content: center; gap: 20px; margin-bottom: 10px; }
-        .social-btn { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); display: grid; place-items: center; color: var(--text-muted); font-size: 1.1rem; text-decoration: none; transition: 0.3s; }
-        .social-btn:hover { background: var(--gold-gradient); color: #000; border-color: transparent; transform: translateY(-3px); }
-        .footer-copy { font-size: 0.7rem; color: var(--text-muted); opacity: 0.7; }
-
-        /* Modals */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 3000; display: none; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; }
-        .modal-overlay.open { display: flex; opacity: 1; }
-        .popup-content { background: #1e293b; border: 1px solid var(--border-color); padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; transform: scale(0.9); transition: transform 0.3s; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
-        .modal-overlay.open .popup-content { transform: scale(1); }
-        .close-popup { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 1.2rem; color: var(--text-muted); cursor: pointer; }
-
-        /* Loading Spinner */
-        .loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; margin-right: 5px; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 3000; display: none; justify-content: center; align-items: center; }
+        .modal-overlay.open { display: flex; }
+        .popup-content { background: #1e293b; border: 1px solid rgba(255,255,255,0.1); padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; position: relative; }
+        
+        .loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Floating Support */
-        .floating-support-btn {
-            position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; border-radius: 50%;
-            background: rgba(15, 23, 42, 0.9); border: 1px solid var(--gold-base); color: var(--gold-base); font-size: 1.5rem;
-            display: grid; place-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); cursor: pointer; z-index: 2500;
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); backdrop-filter: blur(5px);
-        }
-        .floating-support-btn:hover { transform: scale(1.1); box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); background: var(--gold-gradient); color: #000; }
-        .float-badge {
-            position: absolute; top: -2px; right: -2px; background: var(--danger); color: white;
-            font-size: 0.7rem; font-weight: 700; width: 22px; height: 22px; border-radius: 50%;
-            display: none; place-items: center; justify-content: center; border: 2px solid #0f172a; animation: pulse-red 2s infinite;
-        }
-        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-
-        @media (max-width: 992px) {
-            .global-search-container { display: none; }
-            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
-            main { margin-left: 0; padding: 15px 10px; width: 100%; }
-            .grid-layout, .hero-section { grid-template-columns: 1fr; }
-            .kpi-strip { grid-template-columns: 1fr 1fr; }
-            .hamburger { display: block; }
-            .floating-support-btn { bottom: 85px; right: 20px; }
-        }
+        
+        .floating-support-btn { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; border-radius: 50%; background: rgba(15,23,42,0.9); border: 1px solid var(--gold-base); color: var(--gold-base); display: grid; place-items: center; font-size: 1.5rem; cursor: pointer; z-index: 2500; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
+        .float-badge { position: absolute; top: -5px; right: -5px; width: 22px; height: 22px; background: #ef4444; border-radius: 50%; font-size: 0.7rem; color: white; display: none; place-items: center; justify-content: center; font-weight: 700; }
     </style>
 </head>
 <body>
@@ -434,25 +250,21 @@
     <header>
         <div class="header-left">
             <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
-            <a href="seeker-dashboard.html" class="logo">EAST<span>LINK</span></a>
+            <!-- UPDATED TITLE WITH COLORING -->
+            <a href="#" class="logo">EAST<span>LINK</span></a>
         </div>
-        <div class="global-search-container">
-            <input type="text" id="headerSearch" class="global-search-input" placeholder="Search...">
-            <div class="search-results-dropdown" id="headerResults"></div>
-        </div>
+        
         <div class="header-actions">
             <div class="icon-btn" onclick="handleActionWithSpinner(this, () => location.href='seeker-messages.html')">
-                <i class="fa-solid fa-envelope icon-msg"></i>
+                <i class="fas fa-comment-alt" style="color:#3b82f6;"></i>
                 <div class="notification-badge" id="msg-badge">0</div>
             </div>
             <div class="icon-btn" onclick="handleActionWithSpinner(this, () => location.href='seeker-notifications.html')">
-                <i class="fa-solid fa-bell icon-bell"></i>
+                <i class="fas fa-bell" style="color:#f59e0b;"></i>
                 <div class="notification-badge" id="notif-badge">0</div>
             </div>
-            <div class="profile-widget" onclick="handleActionWithSpinner(this, () => location.href='seeker-profile.html')">
-                <img src="" id="header-avatar-img" class="user-avatar" style="display:none;">
-                <div id="header-avatar-fallback" class="user-avatar">U</div>
-            </div>
+            <img src="" class="user-avatar" id="header-avatar-img" style="display:none;" onclick="location.href='seeker-profile.html'" alt="Profile">
+            <div class="user-avatar" id="header-avatar-fallback" onclick="location.href='seeker-profile.html'">U</div>
         </div>
     </header>
 
@@ -466,20 +278,20 @@
             <div class="nav-label">Job Hunt</div>
             <a href="seeker-applications.html" class="nav-item"><i class="fa-solid fa-file-signature"></i> Applied Jobs</a>
             <a href="seeker-jobs.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Jobs</a>
-            <a href="seeker-featured-jobs.html" class="nav-item link-std"><i class="fa-solid fa-star"></i> Featured Jobs</a>
-            <a href="seeker-urgentlyhiring.html" class="nav-item link-pro"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended</a>
-            <a href="seeker-guaranteed-jobs.html" class="nav-item link-pro"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs</a>
+            <a href="seeker-featured-jobs.html" class="nav-item"><i class="fa-solid fa-star"></i> Featured Jobs</a>
+            <a href="seeker-urgentlyhiring.html" class="nav-item"><i class="fa-solid fa-bolt" style="color:var(--gold-base);"></i> Recommended</a>
+            <a href="seeker-guaranteed-jobs.html" class="nav-item"><i class="fa-solid fa-shield-halved" style="color:var(--success);"></i> Guaranteed Jobs</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Finance</div>
             <a href="seeker-wallet.html" class="nav-item"><i class="fa-solid fa-wallet"></i> My Wallet</a>
             <a href="seeker-premium.html" class="nav-item"><i class="fa-solid fa-crown"></i> My Plan</a>
-            <a href="seeker-referrals.html" class="nav-item link-std"><i class="fa-solid fa-user-plus"></i> Invite & Earn</a>
-            <a href="seeker-invest.html" class="nav-item link-std"><i class="fa-solid fa-chart-line"></i> Invest</a>
+            <a href="seeker-referrals.html" class="nav-item"><i class="fa-solid fa-user-plus"></i> Invite & Earn</a>
+            <a href="seeker-invest.html" class="nav-item"><i class="fa-solid fa-chart-line"></i> Invest</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Resources</div>
-            <a href="seeker-resources.html" class="nav-item link-pro"><i class="fa-solid fa-book"></i> Resources</a>
+            <a href="seeker-resources.html" class="nav-item"><i class="fa-solid fa-book"></i> Resources</a>
         </div>
         <div class="nav-group">
             <div class="nav-label">Settings</div>
@@ -492,181 +304,140 @@
 
     <!-- MAIN CONTENT -->
     <main>
-        <!-- HERO SECTION: "THE GOLDEN HORIZON" -->
+        <!-- HERO SECTION -->
         <div class="hero-section">
             <div class="welcome-card animate__animated animate__fadeIn">
-                
-                <!-- Golden Greeting Container -->
                 <div id="welcome-msg-container" style="width: 100%; min-height: 80px; display: flex; align-items: center;">
                      <h1 style="color:rgba(255,255,255,0.1); font-size:2rem;">Loading...</h1>
                 </div>
                 
-                <!-- Profile Strength -->
                 <div class="profile-strength-container">
-                    <div class="strength-label">
-                        <span>Profile Strength</span>
-                        <span>85%</span>
-                    </div>
-                    <div class="strength-track">
-                        <div class="strength-fill"></div>
-                    </div>
+                    <div class="strength-label"><span>Profile Strength</span><span>85%</span></div>
+                    <div class="strength-track"><div class="strength-fill"></div></div>
                 </div>
 
                 <p id="hero-subtext">Your digital profile is active. Check out the latest opportunities curated for you.</p>
                 
                 <div class="hero-btn-row">
-                    <button onclick="handleActionWithSpinner(this, () => location.href='seeker-jobs.html')" class="btn-hero btn-hero-green">
-                        <i class="fas fa-briefcase"></i> Jobs
-                    </button>
-                    <button onclick="handleActionWithSpinner(this, () => location.href='seeker-international-jobs.html')" class="btn-hero btn-hero-yellow">
-                        <i class="fas fa-globe"></i> International
-                    </button>
+                    <button onclick="handleActionWithSpinner(this, () => location.href='seeker-jobs.html')" class="btn-hero btn-hero-green"><i class="fas fa-briefcase"></i> Jobs</button>
+                    <button onclick="handleActionWithSpinner(this, () => location.href='seeker-international-jobs.html')" class="btn-hero btn-hero-yellow"><i class="fas fa-globe"></i> International</button>
                 </div>
             </div>
         </div>
 
-        <!-- KPIs -->
-        <div class="kpi-strip animate__animated animate__zoomIn animate__delay-1s">
-            <div class="stat-card-3d stat-card-applied" onclick="handleActionWithSpinner(this, () => location.href='seeker-applications.html')">
-                <i class="fa-solid fa-paper-plane stat-icon" style="color:var(--success)"></i>
-                <div class="stat-label">Applied</div>
-                <div class="stat-value" id="stat-applied">0</div>
-                <div class="stat-sub">Active Applications</div>
+        <!-- KPI CARDS -->
+        <div class="kpi-strip reveal-on-scroll">
+            <div class="stat-card-3d" onclick="handleActionWithSpinner(this, () => location.href='seeker-applications.html')">
+                <div class="stat-content"><div class="stat-label">Applications</div><div class="stat-value" id="stat-applied">0</div></div>
+                <div class="stat-icon-container"><img src="assets/images/app.png" class="stat-3d-icon" alt="Applied"></div>
             </div>
-            <div class="stat-card-3d stat-card-plan" onclick="handleActionWithSpinner(this, () => location.href='seeker-premium.html')">
-                <i class="fa-solid fa-crown stat-icon" style="color:var(--gold-base)"></i>
-                <div class="stat-label">Plan</div>
-                <div class="stat-value" id="stat-plan" style="font-size:0.9rem">FREE</div>
-                <div class="stat-sub" style="color:var(--gold-base)">Upgrade Now</div>
+            <div class="stat-card-3d" onclick="handleActionWithSpinner(this, () => location.href='seeker-premium.html')">
+                <div class="stat-content"><div class="stat-label">Membership</div><div class="stat-value" id="stat-plan">FREE</div></div>
+                <div class="stat-icon-container"><img src="assets/images/membership.png" class="stat-3d-icon" alt="Plan"></div>
             </div>
-            <div class="stat-card-3d stat-card-wallet" onclick="handleActionWithSpinner(this, () => location.href='seeker-wallet.html')">
-                <i class="fa-solid fa-wallet stat-icon" style="color:var(--neon-purple)"></i>
-                <div class="stat-label">Wallet</div>
-                <div class="stat-value">KES <span id="stat-wallet">0</span></div>
-                <div class="stat-sub">Current Balance</div>
+            <div class="stat-card-3d" onclick="handleActionWithSpinner(this, () => location.href='seeker-wallet.html')">
+                <div class="stat-content"><div class="stat-label">Wallet Balance</div><div class="stat-value">KES <span id="stat-wallet">0</span></div></div>
+                <div class="stat-icon-container"><img src="assets/images/wallet.png" class="stat-3d-icon" alt="Wallet"></div>
             </div>
-            <div class="stat-card-3d stat-card-saved" onclick="handleActionWithSpinner(this, () => location.href='seeker-saved-jobs.html')">
-                <i class="fa-solid fa-bookmark stat-icon" style="color:#60a5fa"></i>
-                <div class="stat-label">Saved</div>
-                <div class="stat-value" id="stat-saved">0</div>
-                <div class="stat-sub">Favorites</div>
+            <div class="stat-card-3d" onclick="handleActionWithSpinner(this, () => location.href='seeker-saved-jobs.html')">
+                <div class="stat-content"><div class="stat-label">Saved Jobs</div><div class="stat-value" id="stat-saved">0</div></div>
+                <div class="stat-icon-container"><img src="assets/images/saved.png" class="stat-3d-icon" alt="Saved"></div>
             </div>
         </div>
+        
+        <!-- MOVING TESTIMONIAL TICKER (Between KPI and Grid) -->
+        <div class="testimonial-ticker-wrapper reveal-on-scroll">
+             <div class="testimonial-ticker-content" id="testimonial-ticker">
+                 <div class="testimonial-item">Loading testimonials...</div>
+             </div>
+        </div>
 
-        <div class="grid-layout animate__animated animate__fadeInUp animate__delay-1s">
+        <div class="grid-layout reveal-on-scroll">
             
-            <!-- LEFT COLUMN: JOBS + RECENT ACTIVITY -->
+            <!-- LEFT COLUMN -->
             <div style="min-width:0;">
-
-                <!-- Search Bar -->
                 <div class="search-bar-main">
                     <i class="fas fa-search"></i>
                     <input type="text" id="feed-search-input" placeholder="Search jobs...">
                 </div>
 
-                <!-- Filters -->
                 <div class="tier-filters">
                     <button class="filter-btn active" onclick="filterFeed('all', this)">All</button>
-                    <button class="filter-btn" onclick="filterFeed('standard', this)"><i class="fas fa-briefcase" style="color:var(--success)"></i> Standard</button>
-                    <button class="filter-btn" onclick="filterFeed('guaranteed', this)"><i class="fas fa-shield-halved" style="color:#ec4899;"></i> Guaranteed</button>
-                    <button class="filter-btn" onclick="filterFeed('featured', this)"><i class="fas fa-star" style="color:var(--gold-base)"></i> Featured</button>
-                    <button class="filter-btn" onclick="filterFeed('urgent', this)"><i class="fas fa-bolt" style="color:var(--neon-purple)"></i> Urgent</button>
+                    <button class="filter-btn" onclick="filterFeed('standard', this)">Standard</button>
+                    <button class="filter-btn" onclick="filterFeed('guaranteed', this)">Guaranteed</button>
+                    <button class="filter-btn" onclick="filterFeed('featured', this)">Featured</button>
+                    <button class="filter-btn" onclick="filterFeed('urgent', this)">Urgent</button>
                 </div>
 
-                <!-- Job Grid Container -->
                 <div id="job-feed-content">
                     <div style="height:150px; background:rgba(255,255,255,0.05); border-radius:16px; margin-bottom:20px; display:flex; align-items:center; justify-content:center;">
                         <span class="loading-spinner"></span> Loading Jobs...
                     </div>
                 </div>
 
-                <!-- View All -->
-                <div style="text-align:center; margin-top:20px; margin-bottom:30px;" id="view-all-container">
-                    <a href="seeker-jobs.html" id="view-all-link" style="display:inline-flex; align-items:center; gap:10px; padding:10px 25px; border-radius:30px; background:rgba(255,255,255,0.05); color:var(--gold-base); font-size:0.8rem; font-weight:600; text-decoration:none; border:1px solid rgba(255,255,255,0.1); transition:0.3s;">
+                <div style="text-align:center; margin:20px 0 30px 0;">
+                    <a href="seeker-jobs.html" style="display:inline-flex; align-items:center; gap:10px; padding:10px 25px; border-radius:30px; background:rgba(255,255,255,0.05); color:var(--gold-base); font-size:0.8rem; font-weight:600; text-decoration:none; border:1px solid rgba(255,255,255,0.1);">
                         View All Jobs <i class="fas fa-arrow-right"></i>
                     </a>
                 </div>
 
-                <!-- RECENT ACTIVITIES WIDGET -->
+                <!-- RECENT ACTIVITY -->
                 <div class="recent-activity-container">
-                    <h3 style="font-size:0.9rem; font-weight:700; color:var(--text-main); margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+                    <h3 style="font-size:0.95rem; font-weight:700; color:var(--text-main); margin-bottom:15px; display:flex; align-items:center; gap:8px;">
                         <i class="fa-solid fa-clock-rotate-left" style="color:var(--text-muted)"></i> Recent Activity
                     </h3>
                     <div class="glass-panel" id="recent-activities-panel" style="padding: 0;">
-                        <!-- Content injected via JS -->
                         <div style="padding:20px; text-align:center; color:var(--text-muted); font-size:0.8rem;">Loading activities...</div>
                     </div>
                 </div>
-
             </div>
 
-            <!-- RIGHT COLUMN: WIDGETS -->
-            <div style="display:flex; flex-direction:column; gap:15px;">
-                
-                <!-- Quick Actions Widget -->
-                <div class="glass-panel" style="padding:15px;">
-                    <h3 style="font-size:0.85rem; font-weight:700; margin-bottom:10px; color:var(--text-main);">Quick Actions</h3>
-                    <div style="display:flex; flex-direction:column; gap:6px;">
-                        
-                        <!-- AI Match -->
+            <!-- RIGHT COLUMN -->
+            <div style="display:flex; flex-direction:column; gap:20px;">
+                <div class="glass-panel" style="padding:20px;">
+                    <h3 style="font-size:0.9rem; font-weight:700; margin-bottom:15px; color:var(--text-main);">Quick Actions</h3>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
                         <div onclick="handleActionWithSpinner(this, goToAiMatch)" class="quick-link-item">
                             <div class="ql-icon" style="background:rgba(139, 92, 246, 0.1); color:var(--neon-purple); position:relative;">
                                 <i class="fas fa-robot"></i>
-                                <div id="ai-btn-badge" class="tool-badge" style="display:none; position:absolute; top:-5px; right:-5px; font-size:0.6rem; padding:2px 4px; border-radius:4px; background:var(--danger); color:white;">0</div>
+                                <div id="ai-btn-badge" class="float-badge" style="top:-5px; right:-5px;">0</div>
                             </div>
-                            <div class="ql-text">AI Match</div>
-                            <i class="fas fa-chevron-right" style="font-size:0.6rem; color:var(--text-muted);"></i>
+                            <div class="ql-text">AI Match</div><i class="fas fa-chevron-right" style="font-size:0.7rem; color:var(--text-muted);"></i>
                         </div>
-
-                        <!-- App Guide -->
+                        <div onclick="handleActionWithSpinner(this, () => location.href='seeker-community.html')" class="quick-link-item">
+                            <div class="ql-icon" style="background:rgba(236, 72, 153, 0.1); color:var(--pink-gradient);"><i class="fas fa-users"></i></div>
+                            <div class="ql-text">Community</div><i class="fas fa-chevron-right" style="font-size:0.7rem; color:var(--text-muted);"></i>
+                        </div>
                         <div onclick="handleActionWithSpinner(this, () => location.href='seeker-guide.html')" class="quick-link-item">
                             <div class="ql-icon" style="background:rgba(251, 191, 36, 0.1); color:var(--gold-base);"><i class="fas fa-book"></i></div>
-                            <div class="ql-text">App Guide</div>
-                            <i class="fas fa-chevron-right" style="font-size:0.6rem; color:var(--text-muted);"></i>
-                        </div>
-
-                        <div onclick="handleActionWithSpinner(this, () => location.href='seeker-profile.html')" class="quick-link-item">
-                            <div class="ql-icon" style="background:rgba(16, 185, 129, 0.1); color:var(--success);"><i class="fas fa-user-circle"></i></div>
-                            <div class="ql-text">Edit Profile</div>
-                            <i class="fas fa-chevron-right" style="font-size:0.6rem; color:var(--text-muted);"></i>
+                            <div class="ql-text">App Guide</div><i class="fas fa-chevron-right" style="font-size:0.7rem; color:var(--text-muted);"></i>
                         </div>
                         <div onclick="handleActionWithSpinner(this, () => location.href='seeker-wallet.html')" class="quick-link-item">
                             <div class="ql-icon" style="background:rgba(139, 92, 246, 0.1); color:var(--neon-purple);"><i class="fas fa-wallet"></i></div>
-                            <div class="ql-text">Top Up Wallet</div>
-                            <i class="fas fa-chevron-right" style="font-size:0.6rem; color:var(--text-muted);"></i>
-                        </div>
-                        <div onclick="handleActionWithSpinner(this, () => location.href='seeker-settings.html')" class="quick-link-item">
-                            <div class="ql-icon" style="background:rgba(255, 255, 255, 0.05); color:var(--text-muted);"><i class="fas fa-cog"></i></div>
-                            <div class="ql-text">Settings</div>
-                            <i class="fas fa-chevron-right" style="font-size:0.6rem; color:var(--text-muted);"></i>
+                            <div class="ql-text">Top Up Wallet</div><i class="fas fa-chevron-right" style="font-size:0.7rem; color:var(--text-muted);"></i>
                         </div>
                     </div>
                 </div>
 
-                <!-- COMPACT FAQ SECTION -->
-                <div class="glass-panel" style="padding:0; overflow:hidden; transition: all 0.3s ease;">
+                <!-- FAQ -->
+                <div class="glass-panel" style="padding:0; overflow:hidden;">
                     <details id="master-faq" style="width:100%;">
                         <summary style="padding:15px; cursor:pointer; font-weight:700; display:flex; justify-content:space-between; align-items:center; list-style:none; outline:none; color:var(--text-main); font-size:0.85rem;">
                             <div style="display:flex; align-items:center; gap:10px;">
-                                <i class="fa-solid fa-circle-question" style="color:var(--gold-base); font-size:1rem;"></i>
-                                <span>FAQ</span>
+                                <i class="fa-solid fa-circle-question" style="color:var(--gold-base); font-size:1rem;"></i><span>FAQ</span>
                             </div>
-                            <i class="fas fa-chevron-down" style="transition:0.3s; font-size:0.8rem; color:var(--text-muted);"></i>
+                            <i class="fas fa-chevron-down" style="font-size:0.8rem; color:var(--text-muted);"></i>
                         </summary>
-                        
                         <div class="faq-container" style="padding:0 15px 15px 15px; border-top:1px solid rgba(255,255,255,0.05);">
-                            <details class="faq-item"><summary class="faq-summary">Do I need to upload my CV?</summary><div class="faq-answer">No. EastLink uses a fully digital profile system.</div></details>
-                            <details class="faq-item"><summary class="faq-summary">Fees?</summary><div class="faq-answer">Standard: 330, Featured: 550, Urgent/Guaranteed: 850.</div></details>
-                            <details class="faq-item"><summary class="faq-summary">Processing fee?</summary><div class="faq-answer">Covers admin verification and secure handling.</div></details>
-                            <details class="faq-item"><summary class="faq-summary">Is placement guaranteed?</summary><div class="faq-answer">Only for Urgently Hiring and Guaranteed Jobs tiers.</div></details>
-                            <details class="faq-item"><summary class="faq-summary">How to apply?</summary><div class="faq-answer">Select job -> Apply -> Pay fee to Till 3076015 -> Submit code.</div></details>
+                            <details style="margin-bottom:8px;"><summary style="font-size:0.85rem; font-weight:600; cursor:pointer;">Do I need to upload my CV?</summary><div style="font-size:0.8rem; color:var(--text-muted); margin-top:5px;">No. EastLink uses a digital profile system.</div></details>
+                            <details style="margin-bottom:8px;"><summary style="font-size:0.85rem; font-weight:600; cursor:pointer;">Fees?</summary><div style="font-size:0.8rem; color:var(--text-muted); margin-top:5px;">Standard: 330, Featured: 550, Urgent/Guaranteed: 850.</div></details>
+                            <details style="margin-bottom:8px;"><summary style="font-size:0.85rem; font-weight:600; cursor:pointer;">Processing fee?</summary><div style="font-size:0.8rem; color:var(--text-muted); margin-top:5px;">Covers admin verification and handling.</div></details>
+                            <details style="margin-bottom:8px;"><summary style="font-size:0.85rem; font-weight:600; cursor:pointer;">How to apply?</summary><div style="font-size:0.8rem; color:var(--text-muted); margin-top:5px;">Select job -> Apply -> Pay fee to Till 3076015 -> Submit code.</div></details>
                         </div>
                     </details>
-                    <style> #master-faq[open] > summary > .fa-chevron-down { transform: rotate(180deg); color: var(--gold-base); } </style>
                 </div>
             </div> 
         </div> 
-
     </main>
 
     <!-- FLOATING SUPPORT BUTTON -->
@@ -677,6 +448,12 @@
 
     <!-- FOOTER -->
     <footer class="app-footer">
+        <div class="footer-quick-links">
+            <a href="about.html" class="footer-link">About Us</a>
+            <a href="terms.html" class="footer-link">Terms of Service</a>
+            <a href="privacy.html" class="footer-link">Privacy Policy</a>
+            <a href="contact.html" class="footer-link">Contact Support</a>
+        </div>
         <div class="social-links">
             <a href="#" id="link-whatsapp" class="social-btn" target="_blank"><i class="fa-brands fa-whatsapp" style="color: #25D366;"></i></a>
             <a href="https://www.tiktok.com/@eastlink.recruiters?_r=1&_t=ZS-93HzTPrZz16" id="link-tiktok" class="social-btn" target="_blank"><i class="fa-brands fa-tiktok" style="color: #ffffff;"></i></a>
@@ -685,37 +462,31 @@
         <p class="footer-copy">&copy; 2026 EastLink Recruiters. All rights reserved.</p>
     </footer>
 
-    <!-- UPGRADE MODAL -->
+    <!-- MODALS -->
     <div class="modal-overlay" id="upgradeModal">
         <div class="popup-content animate__animated animate__zoomIn">
-            <button class="close-popup" onclick="closeUpgradeModal()"><i class="fas fa-times"></i></button>
+            <button class="close-popup" onclick="closeUpgradeModal()" style="position:absolute; top:15px; right:20px; background:none; border:none; color:white; font-size:1.2rem; cursor:pointer;"><i class="fas fa-times"></i></button>
             <i class="fa-solid fa-crown" style="font-size: 3rem; color: var(--gold-base); margin-bottom: 15px;"></i>
             <h2 style="font-family: var(--font-head); margin-bottom: 10px; color:white;">Upgrade Required</h2>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px; line-height: 1.5;">
-                This feature is available for <span style="color: var(--success); font-weight: 700;">Standard</span> & <span style="color: var(--gold-base); font-weight: 700;">Pro</span> members only.
-            </p>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 25px;">This feature is for Pro members only.</p>
             <div style="display:flex; gap:10px; justify-content:center;">
                 <button onclick="closeUpgradeModal()" style="padding: 10px 20px; background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); border-radius: 12px; cursor: pointer;">Cancel</button>
-                <button onclick="handleActionWithSpinner(this, () => location.href='seeker-premium.html')" style="padding: 10px 25px; background: var(--gold-gradient); border: none; color: black; font-weight: 700; border-radius: 12px; cursor: pointer;">View Plans</button>
+                <button onclick="location.href='seeker-premium.html'" style="padding: 10px 25px; background: var(--gold-gradient); border: none; color: black; font-weight: 700; border-radius: 12px; cursor: pointer;">View Plans</button>
             </div>
         </div>
     </div>
 
-    <!-- PWA INSTALL POPUP -->
-    <div id="pwa-install-popup" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: #1e293b; border: 1px solid var(--gold-base); border-radius: 20px; padding: 20px; z-index: 3000; box-shadow: 0 10px 40px rgba(0,0,0,0.5); animation: slideUp 0.5s ease;">
+    <!-- PWA INSTALL -->
+    <div id="pwa-install-popup" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: #1e293b; border: 1px solid var(--gold-base); border-radius: 20px; padding: 20px; z-index: 3000; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
         <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
             <div style="width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000;"><i class="fas fa-download"></i></div>
-            <div>
-                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install App</div>
-                <div style="font-size:0.8rem; color:#94A3B8;">Add to home screen for quick access.</div>
-            </div>
+            <div><div style="font-weight:700; color:#fff; font-size:1rem;">Install App</div><div style="font-size:0.8rem; color:#94A3B8;">Add to home screen for quick access.</div></div>
         </div>
         <div style="display: flex; gap: 10px;">
             <button onclick="installPWA()" style="flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000;">Install</button>
             <button onclick="dismissPWA()" style="flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: var(--text-muted); cursor: pointer;">Later</button>
         </div>
     </div>
-    <style>@keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }</style>
 
     <!-- SCRIPTS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
@@ -725,16 +496,12 @@
         import { doc, getDoc, collection, query, where, getDocs, onSnapshot, limit, orderBy, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         // --- MAINTENANCE MODE CHECK ---
-        // This block checks Firebase for maintenance mode immediately on load
         try {
             const maintenanceDoc = await getDoc(doc(db, "site_settings", "maintenance"));
             if (maintenanceDoc.exists() && maintenanceDoc.data().enabled) {
-                // If maintenance is true, force redirect
                 window.location.href = "maintenance.html";
             }
-        } catch(e) { 
-            console.log("Maintenance check skipped/failed"); 
-        }
+        } catch(e) { console.log("Maintenance check skipped/failed"); }
 
         // GLOBAL STATE
         let userPlan = 'free';
@@ -743,7 +510,14 @@
         let bookmarks = new Set();
         let currentUserId = null;
 
-        // --- SPINNER HELPER ---
+        // --- OBSERVER ---
+        const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) entry.target.classList.add('active');
+            });
+        }, { threshold: 0.1 });
+
+        // --- UI HELPERS ---
         window.handleActionWithSpinner = (btn, action) => {
             if(btn.dataset.processing === "true") return;
             btn.dataset.processing = "true";
@@ -751,41 +525,33 @@
             btn.innerHTML = `<span class="loading-spinner"></span>`;
             setTimeout(() => {
                 if (typeof action === 'function') action();
-                setTimeout(() => {
-                    btn.innerHTML = originalContent;
-                    btn.dataset.processing = "false";
-                }, 500);
+                setTimeout(() => { btn.innerHTML = originalContent; btn.dataset.processing = "false"; }, 500);
             }, 1000);
         };
 
-        // --- UI HELPERS ---
         window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = 'block'; };
         window.closeSidebar = () => { document.getElementById('sidebar').classList.remove('active'); document.getElementById('overlay').style.display = 'none'; };
         window.logout = () => signOut(auth).then(() => window.location.href = 'signin.html');
         window.showUpgradeModal = () => document.getElementById('upgradeModal').classList.add('open');
         window.closeUpgradeModal = () => document.getElementById('upgradeModal').classList.remove('open');
-        
         window.goToAiMatch = async () => { window.location.href = 'seeker-job-match.html'; };
 
         // --- AUTH & INIT ---
         onAuthStateChanged(auth, async (user) => {
             if (!user) { window.location.href = 'signin.html'; return; }
             currentUserId = user.uid;
+            document.querySelectorAll('.reveal-on-scroll').forEach(el => scrollObserver.observe(el));
 
             try {
-                // User Data Listener
                 onSnapshot(doc(db, "users", user.uid), (userDoc) => {
                     if(userDoc.exists()) {
                         const data = userDoc.data();
                         userPlan = (data.plan || 'free').toLowerCase();
                         bookmarks = new Set(data.savedJobs || []);
                         initDashboardUI(data, user);
-                        // Refresh jobs if we have data to reflect saved status
                         if(allFetchedJobs.length > 0) renderJobs();
                     }
                 });
-
-                // Stats Listener (Applications)
                 onSnapshot(query(collection(db, "applications"), where("seekerId", "==", user.uid)), (snap) => {
                      const el = document.getElementById('stat-applied'); if(el) el.innerText = snap.size;
                 });
@@ -793,36 +559,28 @@
                 setupJobFeedListener(); 
                 setupRealtimeListeners(user.uid);
                 loadSocialLinks();
-                loadRecentActivities(user.uid);
+                loadRecentActivities(user.uid); 
+                loadTestimonials(); // Strictly Firestore
 
             } catch (error) { console.error(error); }
         });
 
         function initDashboardUI(data, user) {
             const fullName = data.fullName || data.displayName || 'Traveler';
-            
-            // Logic: Load FIRST Name Only
-            const names = fullName.trim().split(/\s+/);
-            const firstName = names[0]; // Always grab the first index
-
+            const firstName = fullName.trim().split(/\s+/)[0]; 
             const welcomeContainer = document.getElementById('welcome-msg-container');
             const hour = new Date().getHours();
             let greetingWord = "MORNING";
             if (hour >= 12 && hour < 18) greetingWord = "AFTERNOON";
             else if (hour >= 18) greetingWord = "EVENING";
 
-            // UPDATED GREETING LOGIC: Layered Motion System (Split Lines)
             if(welcomeContainer) { 
                 welcomeContainer.innerHTML = `
                     <div class="hero-text-block">
                         <span class="hero-greeting-line">GOOD</span>
                         <span class="hero-greeting-line">${greetingWord},</span>
-                        <div class="hero-username">
-                            <span class="hero-name-line"></span>
-                            ${firstName.toUpperCase()}
-                        </div>
-                    </div>
-                `; 
+                        <div class="hero-username"><span class="hero-name-line"></span>${firstName.toUpperCase()}</div>
+                    </div>`; 
             }
 
             const avatarImg = document.getElementById('header-avatar-img');
@@ -835,18 +593,19 @@
             if(document.getElementById('stat-saved')) document.getElementById('stat-saved').innerText = data.savedJobs ? data.savedJobs.length : 0;
             const planEl = document.getElementById('stat-plan'); if(planEl) planEl.innerText = userPlan.toUpperCase();
         }
-        
+
         function getRelativeTime(timestamp) {
             if (!timestamp) return 'Recently';
             const postedDate = timestamp.seconds ? new Date(timestamp.seconds * 1000) : new Date(timestamp);
-            const diffInSeconds = Math.floor((new Date() - postedDate) / 1000);
-            if (diffInSeconds < 60) return "Just now";
-            const diffInHours = Math.floor(diffInSeconds / 3600);
-            if (diffInHours < 24) return `${diffInHours}h ago`;
+            const now = new Date();
+            const diffInDays = Math.floor((now - postedDate) / (1000 * 3600 * 24));
+            if (diffInDays === 0) return "Today";
+            if (diffInDays === 1) return "Yesterday";
+            if (diffInDays < 7) return `${diffInDays} days ago`;
             return postedDate.toLocaleDateString();
         }
 
-        // --- JOB FEED LOGIC ---
+        // --- JOB FEED ---
         function setupJobFeedListener() {
             const q = query(collection(db, "jobs"), orderBy("postedAt", "desc"), limit(50));
             onSnapshot(q, (snapshot) => {
@@ -872,9 +631,8 @@
             const searchInput = document.getElementById('feed-search-input');
             const searchVal = searchInput ? searchInput.value.toLowerCase() : '';
 
-            let displayJobs = allFetchedJobs.filter(j => {
+            let filteredJobs = allFetchedJobs.filter(j => {
                 const matchesSearch = (j.title?.toLowerCase().includes(searchVal) || j.company?.toLowerCase().includes(searchVal));
-                
                 const isGuaranteed = j.isGuaranteed === true || j.listingType === 'guaranteed';
                 const isUrgent = j.isUrgent === true || j.listingType === 'urgent';
                 const isFeatured = j.isFeatured === true || j.listingType === 'featured';
@@ -886,34 +644,24 @@
                 if (activeTierFilter === 'featured') return matchesSearch && isFeatured;
                 if (activeTierFilter === 'urgent') return matchesSearch && isUrgent;
                 return false;
-            }).slice(0, 5); 
+            });
 
-            container.innerHTML = displayJobs.length ? '' : `<div style="text-align:center; padding:40px; color:var(--text-muted);">No jobs found matching your criteria.</div>`;
+            const displayJobs = filteredJobs.slice(0, 3);
+            container.innerHTML = displayJobs.length ? '' : `<div style="text-align:center; padding:40px; color:var(--text-muted);">No jobs found.</div>`;
             
             displayJobs.forEach((j, index) => {
                 let badgeClass = 'badge-free', badgeLabel = 'Standard', btnStyle = 'background: var(--success-gradient); color: white;';
                 if (j.isGuaranteed || j.listingType === 'guaranteed') { badgeClass = 'badge-guaranteed'; badgeLabel = 'Guaranteed'; btnStyle = 'background: var(--purple-gradient); color: white;'; }
                 else if (j.isUrgent || j.listingType === 'urgent') { badgeClass = 'badge-urgent'; badgeLabel = 'Urgent'; btnStyle = 'background: var(--pink-gradient); color: white;'; }
                 else if (j.isFeatured || j.listingType === 'featured') { badgeClass = 'badge-featured'; badgeLabel = 'Featured'; btnStyle = 'background: var(--gold-gradient); color: black;'; }
-
                 const isSaved = bookmarks.has(j.id);
-                
-                const logoHtml = j.employerLogo 
-                    ? `<img src="${j.employerLogo}" alt="logo">` 
-                    : `<div class="j-logo-text">${(j.company || 'C').charAt(0)}</div>`;
+                const logoHtml = j.employerLogo ? `<img src="${j.employerLogo}" alt="logo">` : `<div class="j-logo-text">${(j.company || 'C').charAt(0)}</div>`;
 
                 container.innerHTML += `
                 <div class="job-card-3d animate__animated animate__fadeInUp" style="animation-delay:${index * 0.1}s">
                     <div class="tier-badge ${badgeClass}">${badgeLabel}</div>
-                    <div class="job-head">
-                        <div class="j-logo">${logoHtml}</div>
-                        <div class="j-details"><h3>${j.title}</h3><p>${j.company}</p></div>
-                    </div>
-                    <div class="j-tags">
-                        <span class="j-tag">${j.location || 'Remote'}</span>
-                        <span class="j-tag">${j.type || 'Full Time'}</span>
-                        <span class="j-tag">${getRelativeTime(j.postedAt)}</span>
-                    </div>
+                    <div class="job-head"><div class="j-logo">${logoHtml}</div><div class="j-details"><h3>${j.title}</h3><p>${j.company}</p></div></div>
+                    <div class="j-tags"><span class="j-tag">${j.location || 'Remote'}</span><span class="j-tag">${j.type || 'Full Time'}</span><span class="j-tag" style="color:var(--gold-base);">${getRelativeTime(j.postedAt)}</span></div>
                     <div class="j-salary">${j.salary || 'Competitive'}</div>
                     <div class="job-actions">
                         <button class="btn-j-action btn-j-view" onclick="handleActionWithSpinner(this, () => location.href='seeker-job-details.html?id=${j.id}')">View</button>
@@ -924,41 +672,62 @@
             });
         }
         
-        // --- RECENT ACTIVITIES LOGIC ---
-        function loadRecentActivities(uid) {
+        // --- ACTIVITY LOADER ---
+        async function loadRecentActivities(uid) {
             const container = document.getElementById('recent-activities-panel');
             if(!container) return;
+            try {
+                let activities = [];
+                // Apps
+                try {
+                    const appsQ = query(collection(db, "applications"), where("seekerId", "==", uid), orderBy("appliedAt", "desc"), limit(3));
+                    const appsSnap = await getDocs(appsQ);
+                    appsSnap.forEach(doc => {
+                        const data = doc.data();
+                        activities.push({ type: 'application', title: `Applied to ${data.jobTitle || 'a job'}`, time: data.appliedAt, icon: 'fa-briefcase', link: 'seeker-applications.html' });
+                    });
+                } catch (e) {}
+                // Notifs
+                try {
+                    const notifQ = query(collection(db, "notifications"), where("userId", "==", uid), orderBy("createdAt", "desc"), limit(3));
+                    const notifSnap = await getDocs(notifQ);
+                    notifSnap.forEach(doc => {
+                        const data = doc.data();
+                        activities.push({ type: 'notification', title: data.title || data.message, time: data.createdAt, icon: 'fa-bell', link: 'seeker-notifications.html' });
+                    });
+                } catch (e) {}
 
-            // USING NOTIFICATIONS AS ACTIVITY FEED (Fallback)
-            const fallbackQ = query(collection(db, "notifications"), where("userId", "==", uid), orderBy("createdAt", "desc"), limit(3));
-            
-            onSnapshot(fallbackQ, (snap) => {
-                if(snap.empty) {
-                    container.innerHTML = `<div style="padding:20px; text-align:center; color:var(--text-muted); font-size:0.8rem;">No recent activity.</div>`;
-                    return;
-                }
-                
+                if (activities.length === 0) { container.innerHTML = `<div style="padding:20px; text-align:center; color:var(--text-muted); font-size:0.8rem;">No recent activity found.</div>`; return; }
+
+                activities.sort((a, b) => (b.time?.seconds || 0) - (a.time?.seconds || 0));
                 let html = '';
-                snap.forEach(d => {
-                    const data = d.data();
-                    let icon = 'fa-bell';
-                    // Simple icon mapping
-                    if(data.type?.includes('job')) icon = 'fa-briefcase';
-                    if(data.type?.includes('wallet') || data.type?.includes('payment')) icon = 'fa-wallet';
-                    if(data.type?.includes('security')) icon = 'fa-shield-halved';
-                    
-                    html += `
-                        <div class="activity-item">
-                            <div class="activity-icon"><i class="fa-solid ${icon}"></i></div>
-                            <div class="activity-details">
-                                <div class="act-title">${data.title || data.message}</div>
-                                <div class="act-time">${getRelativeTime(data.createdAt)}</div>
-                            </div>
-                        </div>
-                    `;
+                activities.slice(0, 3).forEach(item => {
+                    html += `<div class="activity-item" onclick="location.href='${item.link}'"><div class="activity-icon"><i class="fa-solid ${item.icon}"></i></div><div class="activity-details"><div class="act-title">${item.title}</div><div class="act-time">${getRelativeTime(item.time)}</div></div></div>`;
                 });
                 container.innerHTML = html;
-            });
+            } catch (e) { console.error(e); container.innerHTML = `<div style="padding:20px; text-align:center; color:var(--danger);">Error loading feed.</div>`; }
+        }
+        
+        // --- FIRESTORE TESTIMONIAL LOADER ---
+        function loadTestimonials() {
+            const container = document.getElementById('testimonial-ticker');
+            if(!container) return;
+            const q = query(collection(db, "testimonials"), limit(10));
+            getDocs(q).then((snap) => {
+                if(snap.empty) { document.querySelector('.testimonial-ticker-wrapper').style.display = 'none'; return; }
+                let items = [];
+                snap.forEach(doc => { const d = doc.data(); if(d.text || d.message) items.push(d); });
+                if(items.length === 0) { document.querySelector('.testimonial-ticker-wrapper').style.display = 'none'; return; }
+                
+                let html = '';
+                const loopItems = items.length < 5 ? [...items, ...items, ...items, ...items] : [...items, ...items]; 
+                loopItems.forEach(t => {
+                    const text = t.message || t.text || "";
+                    const name = t.name || t.userName || "Anonymous";
+                    html += `<div class="testimonial-item"><i class="fas fa-quote-left"></i> ${text} <strong>- ${name}</strong></div>`;
+                });
+                container.innerHTML = html;
+            }).catch(e => { document.querySelector('.testimonial-ticker-wrapper').style.display = 'none'; });
         }
 
         const searchInput = document.getElementById('feed-search-input');
@@ -967,19 +736,13 @@
         window.toggleSave = async (jobId, btn) => {
             if(!currentUserId) return;
             const isSaving = !bookmarks.has(jobId);
-            
             if(isSaving) { bookmarks.add(jobId); btn.className = "btn-j-action btn-j-saved"; btn.innerHTML = '<i class="fa-solid fa-check"></i>'; } 
             else { bookmarks.delete(jobId); btn.className = "btn-j-action btn-j-save"; btn.innerHTML = '<i class="fa-regular fa-bookmark"></i>'; }
-            
             try {
                 const ref = doc(db, "users", currentUserId);
                 await updateDoc(ref, { savedJobs: isSaving ? arrayUnion(jobId) : arrayRemove(jobId) });
                 document.getElementById('stat-saved').innerText = bookmarks.size;
-            } catch(e) {
-                console.error("Error saving job", e);
-                if(isSaving) { bookmarks.delete(jobId); btn.className = "btn-j-action btn-j-save"; btn.innerHTML = '<i class="fa-regular fa-bookmark"></i>'; } 
-                else { bookmarks.add(jobId); btn.className = "btn-j-action btn-j-saved"; btn.innerHTML = '<i class="fa-solid fa-check"></i>'; }
-            }
+            } catch(e) {}
         };
 
         async function loadSocialLinks() {
@@ -995,60 +758,30 @@
 
         // --- REALTIME BADGES ---
         function updateBadge(id, count) {
-            const el = document.getElementById(id);
-            if(!el) return;
+            const el = document.getElementById(id); if(!el) return;
             if (count > 0) {
-                el.innerText = count > 99 ? '99+' : count;
-                el.style.display = 'flex'; 
-                if(id === 'float-support-badge') el.style.display = 'grid'; 
-                el.classList.remove('animate__animated', 'animate__bounceIn');
-                void el.offsetWidth; 
-                el.classList.add('animate__animated', 'animate__bounceIn');
-            } else {
-                el.style.display = 'none';
-            }
+                el.innerText = count > 99 ? '99+' : count; el.style.display = id === 'float-support-badge' ? 'grid' : 'flex';
+                el.classList.remove('animate__animated', 'animate__bounceIn'); void el.offsetWidth; el.classList.add('animate__animated', 'animate__bounceIn');
+            } else { el.style.display = 'none'; }
         }
 
         function setupRealtimeListeners(uid) {
-            // 1. Notifications
             onSnapshot(query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false)), (snap) => {
                 updateBadge('notif-badge', snap.size);
                 const aiCount = snap.docs.filter(d => d.data().type === 'ai_match').length;
                 const aiBadge = document.getElementById('ai-btn-badge');
-                if(aiBadge) {
-                    if(aiCount > 0) { aiBadge.innerText = aiCount; aiBadge.style.display='flex'; } 
-                    else { aiBadge.style.display='none'; }
-                }
+                if(aiBadge) aiBadge.style.display = aiCount > 0 ? 'flex' : 'none';
             });
-
-            // 2. Messages
-            const chatQ = query(collection(db, "chats"), where("participants", "array-contains", uid));
-            onSnapshot(chatQ, (snap) => {
-                let count = 0;
-                snap.forEach(d => {
-                    const data = d.data();
-                    if(data.lastSenderId !== uid && (data.unreadCount > 0 || data.isRead === false)) {
-                        count += (data.unreadCount || 1);
-                    }
-                });
+            onSnapshot(query(collection(db, "chats"), where("participants", "array-contains", uid)), (snap) => {
+                let count = 0; snap.forEach(d => { const data = d.data(); if(data.lastSenderId !== uid && (data.unreadCount > 0 || data.isRead === false)) count += (data.unreadCount || 1); });
                 updateBadge('msg-badge', count);
             });
-
-            // 3. Support Tickets
-            const ticketQ = query(collection(db, "support_tickets"), where("userId", "==", uid), where("status", "!=", "closed"));
-            onSnapshot(ticketQ, (snap) => {
-                let unreadSupportCount = 0;
-                snap.forEach(d => {
-                    const t = d.data();
-                    if (t.lastSender !== 'user') {
-                        unreadSupportCount++;
-                    }
-                });
-                updateBadge('float-support-badge', unreadSupportCount);
+            onSnapshot(query(collection(db, "support_tickets"), where("userId", "==", uid), where("status", "!=", "closed")), (snap) => {
+                let count = 0; snap.forEach(d => { if (d.data().lastSender !== 'user') count++; });
+                updateBadge('float-support-badge', count);
             });
         }
 
-        // PWA
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; setTimeout(() => document.getElementById('pwa-install-popup').style.display = 'block', 3000); });
         window.installPWA = async () => { if(deferredPrompt) { deferredPrompt.prompt(); const {outcome} = await deferredPrompt.userChoice; if(outcome==='accepted') document.getElementById('pwa-install-popup').style.display = 'none'; deferredPrompt=null; }};

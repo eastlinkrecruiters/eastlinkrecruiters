@@ -152,7 +152,7 @@
         .info-text p, .info-text a { color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; }
         .info-text a:hover { color: var(--primary); }
 
-        /* Map */
+        /* Map (Removed as per request, style kept just in case you add it back later via CSS only) */
         .map-frame {
             width: 100%; height: 250px; border-radius: 16px; overflow: hidden; margin-top: auto;
             border: 1px solid var(--border-color); filter: grayscale(100%) invert(92%) contrast(83%);
@@ -254,17 +254,6 @@
 </head>
 <body>
 
-    <!-- PRELOADER -->
-    <div id="preloader" style="position:fixed; inset:0; background:var(--bg); z-index:9999; display:flex; justify-content:center; align-items:center; transition: opacity 0.5s ease;">
-        <div style="text-align:center;">
-            <img src="./assets/images/logo.png" style="width:70px; height:auto; margin-bottom:20px; filter: drop-shadow(0 0 15px var(--primary));">
-            <div style="width:150px; height:2px; background:rgba(255,255,255,0.1); overflow:hidden; border-radius:2px;">
-                <div style="width:100%; height:100%; background:var(--gold-gradient); animation:loading 1.5s infinite ease-in-out; transform-origin:left;"></div>
-            </div>
-            <style>@keyframes loading { 0% { transform: scaleX(0); } 50% { transform: scaleX(1); } 100% { transform: scaleX(0); transform-origin:right; } }</style>
-        </div>
-    </div>
-
     <!-- HEADER -->
     <header id="header">
         <div class="container nav-inner">
@@ -304,20 +293,15 @@
                 
                 <!-- Info Side -->
                 <div class="info-card" data-aos="fade-right">
-                    <div class="info-item">
-                        <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
-                        <div class="info-text">
-                            <h4>Visit Us</h4>
-                            <p>EastLink HQ, Westlands District<br>Nairobi, Kenya</p>
-                        </div>
-                    </div>
+                    
                     <div class="info-item">
                         <div class="info-icon"><i class="fas fa-phone-alt"></i></div>
                         <div class="info-text">
                             <h4>Call Us</h4>
-                            <p><a href="tel:+254781842387">+254 781 842 387</a><br><small style="color:var(--text-muted);">(Mon-Fri: 8am - 5pm)</small></p>
+                            <p><a href="tel:+254119524616">+254 119 524 616</a><br><small style="color:var(--text-muted);">(Mon-Fri: 8am - 5pm)</small></p>
                         </div>
                     </div>
+                    
                     <div class="info-item">
                         <div class="info-icon"><i class="fas fa-envelope"></i></div>
                         <div class="info-text">
@@ -326,13 +310,7 @@
                         </div>
                     </div>
 
-                    <!-- Embedded Map -->
-                    <div class="map-frame">
-                        <iframe 
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.25623874313!2d36.8043!3d-1.2685!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f173c0a1f9a0d%3A0x4a598163bd5002a9!2sWestlands%2C%20Nairobi!5e0!3m2!1sen!2ske!4v1700000000000!5m2!1sen!2ske" 
-                            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy">
-                        </iframe>
-                    </div>
+                    <!-- Map has been removed -->
                 </div>
 
                 <!-- Form Side -->
@@ -400,10 +378,7 @@
                     <div class="faq-answer">Create an Employer account, go to your dashboard, and select "Post a Job". You can choose between standard and premium posting options.</div>
                 </div>
 
-                <div class="faq-item" onclick="toggleFaq(this)">
-                    <div class="faq-question">Where are your offices located? <i class="fas fa-chevron-down faq-icon"></i></div>
-                    <div class="faq-answer">We are located in Westlands, Nairobi, Kenya. Visits are currently by appointment only to ensure the best service.</div>
-                </div>
+                <!-- Office Location FAQ removed as per request -->
             </div>
 
         </div>
@@ -591,19 +566,6 @@
         dismissBtn.addEventListener('click', () => { pwaPopup.style.display = 'none'; });
         window.addEventListener('appinstalled', () => { pwaPopup.style.display = 'none'; });
         // --- PWA LOGIC END ---
-    </script>
-    
-    <!-- SAFETY SCRIPT -->
-    <script>
-        function removePreloader() {
-            const preloader = document.getElementById('preloader');
-            if(preloader) {
-                preloader.style.opacity = '0';
-                setTimeout(() => preloader.style.display = 'none', 500);
-            }
-        }
-        window.addEventListener('load', removePreloader);
-        setTimeout(removePreloader, 3000); 
     </script>
 </body>
 </html>

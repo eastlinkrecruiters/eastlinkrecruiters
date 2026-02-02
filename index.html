@@ -729,7 +729,7 @@
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
         // ==========================================
-        // 1. PAGE ENTRY, PRELOADER & AUTH LOGIC
+        // 1. PAGE ENTRY, PRELOADER & AUTH LOGIC (UPDATED)
         // ==========================================
         
         const preloader = document.getElementById('preloader');
@@ -755,12 +755,14 @@
         }
 
         // --- AUTH CHECK & MAINTENANCE LOGIC ---
-        // This runs BEFORE revealing the page content
+        // This logic handles redirection only if logged in. 
+        // If logged out, it simply reveals the page.
         onSnapshot(doc(db, "site_settings", "config"), (docSnap) => {
             const maintenanceMode = docSnap.exists() ? docSnap.data().maintenanceMode : false;
 
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
+                    // USER IS LOGGED IN -> CHECK DASHBOARD REDIRECT
                     try {
                         const snap = await getDoc(doc(db, "users", user.uid));
                         if (snap.exists()) {
@@ -772,21 +774,24 @@
                                 return;
                             }
 
-                            // Smart Redirect to Dashboard
+                            // Only redirect to dashboard if the user explicitly navigated to index 
+                            // via a fresh load, usually we want to keep them logged in but 
+                            // redirect them to their specific dashboard.
                             if (role === 'employer') window.location.replace('employer-dashboard.html');
                             else if (role === 'admin' || role === 'owner') window.location.replace('admin-dashboard.html');
                             else window.location.replace('seeker-dashboard.html');
                             return; 
                         }
                     } catch(e) { console.error("Auth error", e); }
-                } 
-                
-                // If no user, check maintenance for guests
-                if (maintenanceMode) {
-                    window.location.replace('maintenance.html');
                 } else {
-                    // Safe to show page
-                    hidePreloaderAndAnimate();
+                    // USER IS LOGGED OUT (or Sign Out complete)
+                    // Just show the landing page. No redirect to signin.
+                    if (maintenanceMode) {
+                        window.location.replace('maintenance.html');
+                    } else {
+                        // Safe to show page content
+                        hidePreloaderAndAnimate();
+                    }
                 }
             });
         });
