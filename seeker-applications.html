@@ -440,9 +440,16 @@
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
         import { doc, getDoc, collection, query, where, getDocs, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
+        // Global Data Stores
         let allAppsData = []; 
+        let stdAppsData = [];
+        let gAppsData = [];
         let currentFilter = 'all'; 
-        let currentUserData = {}; // Store user data for PDF
+        let currentUserData = {};
+        
+        // Listener Unsubscribers
+        let unsubStd = null;
+        let unsubG = null;
 
         // --- SPINNER & HELPERS ---
         window.handleActionWithSpinner = (btn, action) => {
@@ -464,7 +471,12 @@
         window.logout = () => signOut(auth).then(() => window.location.href = 'signin.html');
         window.openExportModal = () => document.getElementById('exportModal').style.display = 'flex';
         window.closeModal = (id) => document.getElementById(id).style.display = 'none';
-        window.reloadApps = () => { if(auth.currentUser) loadApplications(auth.currentUser.uid); };
+        
+        // Manual Reload now just re-initializes listeners if needed, 
+        // but typically listeners handle updates automatically.
+        window.reloadApps = () => { 
+            if(auth.currentUser) initListeners(auth.currentUser.uid); 
+        };
 
         window.copyId = (id) => {
             navigator.clipboard.writeText(id).then(() => {
@@ -474,9 +486,11 @@
 
         onAuthStateChanged(auth, async (user) => {
             if(!user) return window.location.href = 'signin.html';
-            setupRealtimeListeners(user.uid);
             
-            // Load User Data for Profile & PDF
+            // 1. Notification Badges
+            setupRealtimeBadges(user.uid);
+            
+            // 2. Load User Profile
             try {
                 const uSnap = await getDoc(doc(db, "users", user.uid));
                 if(uSnap.exists()) {
@@ -488,45 +502,59 @@
                 }
             } catch(e) {}
             
-            loadApplications(user.uid);
+            // 3. Initialize Real-time Application Listeners
+            initListeners(user.uid);
         });
 
-        function setupRealtimeListeners(uid) {
+        function setupRealtimeBadges(uid) {
             onSnapshot(query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false)), 
                 s => { const el=document.getElementById('notif-badge'); if(el){ el.innerText = s.size>9?'9+':s.size; el.style.display=s.size>0?'flex':'none'; }});
             onSnapshot(query(collection(db, "messages"), where("receiverId", "==", uid), where("read", "==", false)), 
                 s => { const el=document.getElementById('msg-badge'); if(el){ el.innerText = s.size>9?'9+':s.size; el.style.display=s.size>0?'flex':'none'; }});
         }
 
-        // --- LOAD DATA ---
-        async function loadApplications(uid) {
-            const container = document.getElementById("all-applications-grid");
-            allAppsData = [];
-            
-            // Fetch Standard
-            try {
-                const q = query(collection(db, "applications"), where("seekerId", "==", uid));
-                const snap = await getDocs(q);
-                snap.forEach(doc => {
+        // --- REAL-TIME DATA LOADING ---
+        function initListeners(uid) {
+            // Unsubscribe previous listeners if existing
+            if(unsubStd) unsubStd();
+            if(unsubG) unsubG();
+
+            // 1. Listen to Standard Applications
+            const q = query(collection(db, "applications"), where("seekerId", "==", uid));
+            unsubStd = onSnapshot(q, (snapshot) => {
+                stdAppsData = snapshot.docs.map(doc => {
                     const d = doc.data();
                     let derivedType = 'Standard';
                     if(d.isFeatured) derivedType = 'Featured';
                     if(d.isUrgent) derivedType = 'Urgently Hiring';
-                    allAppsData.push({ id: doc.id, ...d, jobTypeDisplay: d.jobType || derivedType, isGuaranteed: false });
+                    return { id: doc.id, ...d, jobTypeDisplay: d.jobType || derivedType, isGuaranteed: false };
                 });
-            } catch(e) { console.error("Standard Apps Error:", e); }
+                combineAndRender();
+            }, (error) => {
+                console.error("Error listening to standard apps:", error);
+            });
 
-            // Fetch Guaranteed
-            try {
-                const qG = query(collection(db, "guaranteed_applications"), where("applicantId", "==", uid));
-                const snapG = await getDocs(qG);
-                snapG.forEach(doc => {
-                    allAppsData.push({ id: doc.id, ...doc.data(), jobTypeDisplay: "Guaranteed Placement", isGuaranteed: true, submissionMethod: 'portal' });
+            // 2. Listen to Guaranteed Applications
+            const qG = query(collection(db, "guaranteed_applications"), where("applicantId", "==", uid));
+            unsubG = onSnapshot(qG, (snapshot) => {
+                gAppsData = snapshot.docs.map(doc => {
+                    return { id: doc.id, ...doc.data(), jobTypeDisplay: "Guaranteed Placement", isGuaranteed: true, submissionMethod: 'portal' };
                 });
-            } catch(e) { console.error("Guaranteed Apps Error:", e); }
+                combineAndRender();
+            }, (error) => {
+                console.error("Error listening to guaranteed apps:", error);
+            });
+        }
 
+        function combineAndRender() {
+            // Merge both arrays
+            allAppsData = [...stdAppsData, ...gAppsData];
+            
+            // Sort by default (Newest first)
             allAppsData.sort((a, b) => (b.appliedAt?.seconds || 0) - (a.appliedAt?.seconds || 0));
-            renderApplications(allAppsData);
+            
+            // Re-apply current filter
+            filterApps(currentFilter);
         }
 
         // --- FILTER & SORT ---
@@ -585,16 +613,28 @@
                 else if (jTypeLower.includes('urgent')) { themeClass = 'card-urgent'; icon = 'fa-bolt'; typeLabel = 'Urgently Hiring'; }
                 else if (jTypeLower.includes('featured')) { themeClass = 'card-featured'; icon = 'fa-star'; typeLabel = 'Featured Job'; }
 
-                // Payment Status
+                // Payment Status Logic (Robust for Old Data)
                 const pay = data.payment || {};
                 let payStatusHTML = '<span style="color:#94A3B8;">N/A</span>';
+                
+                // If payment object exists and has amount
                 if(pay.amount) {
-                    if(pay.verified) payStatusHTML = '<span class="pay-status-verified">Verified <i class="fas fa-check-circle"></i></span>';
-                    else payStatusHTML = '<span class="pay-status-pending">Pending Ver. <i class="fas fa-clock"></i></span>';
-                } else if (data.isGuaranteed) payStatusHTML = '<span class="pay-status-pending">Pending Payment</span>';
-                else payStatusHTML = '<span style="color:#10B981;">Free</span>';
+                    if(pay.verified === true) {
+                        payStatusHTML = '<span class="pay-status-verified">Verified <i class="fas fa-check-circle"></i></span>';
+                    } else {
+                        // Includes cases where verified is false OR undefined
+                        payStatusHTML = '<span class="pay-status-pending">Pending Ver. <i class="fas fa-clock"></i></span>';
+                    }
+                } 
+                // Handle Guaranteed Jobs separately (usually paid)
+                else if (data.isGuaranteed) {
+                    payStatusHTML = '<span class="pay-status-pending">Pending Payment</span>';
+                }
+                else {
+                     payStatusHTML = '<span style="color:#10B981;">Free</span>';
+                }
 
-                // App Status
+                // App Status Logic
                 let appStatusHTML = `<span class="app-status-pending">${data.status || 'Pending'}</span>`;
                 if(status.includes('hired') || status.includes('shortlisted')) appStatusHTML = `<span class="app-status-hired">${data.status}</span>`;
                 if(status.includes('reject')) appStatusHTML = `<span class="app-status-rejected">${data.status}</span>`;
@@ -868,7 +908,7 @@
                 try { await deleteDoc(doc(db, "guaranteed_applications", docId)); } catch(e) {}
                 
                 Toastify({ text: "Action Successful", style: { background: "var(--success)" } }).showToast();
-                if(auth.currentUser) loadApplications(auth.currentUser.uid);
+                // No manual reload needed as listeners will auto-update
             } catch(e) { 
                 console.error(e); 
                 Toastify({ text: "Error updating application", style: { background: "var(--danger)" } }).showToast();
