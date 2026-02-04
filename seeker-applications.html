@@ -39,6 +39,7 @@
             
             --success: #10B981;
             --danger: #EF4444;
+            --info: #3B82F6;
             --sidebar-width: 260px; 
             --header-height: 70px;
             --radius: 16px;
@@ -203,8 +204,12 @@
         
         .pay-status-verified { color: var(--success); }
         .pay-status-pending { color: var(--theme-featured); }
-        .app-status-hired { color: var(--success); font-weight: 700; }
+        
+        /* New Status Styles */
+        .app-status-hired { color: var(--success); font-weight: 700; text-shadow: 0 0 10px rgba(16, 185, 129, 0.3); }
         .app-status-rejected { color: var(--danger); font-weight: 700; }
+        .app-status-received { color: var(--info); font-weight: 600; }
+        .app-status-shortlisted { color: var(--theme-featured); font-weight: 700; }
         .app-status-pending { color: var(--text-muted); font-style: italic; }
 
         .app-footer { 
@@ -219,8 +224,9 @@
             width: 32px; height: 32px; border-radius: 8px; font-size: 0.9rem; 
             cursor: pointer; transition: 0.2s; display: grid; place-items: center; color: var(--text-muted);
         }
-        .tool-btn:hover { background: var(--bg-hover); color: var(--text-main); transform: scale(1.1); }
+        .tool-btn:hover:not(:disabled) { background: var(--bg-hover); color: var(--text-main); transform: scale(1.1); }
         .tool-btn.btn-view:hover { color: var(--theme-featured); border-color: var(--theme-featured); }
+        .tool-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .copy-btn { font-size:0.7rem; cursor:pointer; color:var(--text-muted); margin-left:5px; transition:0.3s; }
         .copy-btn:hover { color:var(--text-main); }
@@ -352,9 +358,9 @@
             <div class="mgmt-group">
                 <select class="mgmt-select" id="statusFilter" onchange="filterApps(this.value)">
                     <option value="all">Filter: All Applications</option>
-                    <option value="active">Active (Pending/Review)</option>
-                    <option value="hired">Hired / Shortlisted</option>
-                    <option value="archived">Archived / Rejected</option>
+                    <option value="active">Active (Pending/Received)</option>
+                    <option value="hired">Shortlisted / Hired</option>
+                    <option value="archived">Rejected / Withdrawn</option>
                 </select>
             </div>
             
@@ -438,7 +444,7 @@
     <script type="module">
         import { auth, db } from './config.js';
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { doc, getDoc, collection, query, where, getDocs, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { doc, getDoc, collection, query, where, getDocs, deleteDoc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         // Global Data Stores
         let allAppsData = []; 
@@ -472,8 +478,6 @@
         window.openExportModal = () => document.getElementById('exportModal').style.display = 'flex';
         window.closeModal = (id) => document.getElementById(id).style.display = 'none';
         
-        // Manual Reload now just re-initializes listeners if needed, 
-        // but typically listeners handle updates automatically.
         window.reloadApps = () => { 
             if(auth.currentUser) initListeners(auth.currentUser.uid); 
         };
@@ -484,13 +488,55 @@
             });
         };
 
+        // --- PAYMENT VERIFICATION CHECK ---
+        async function verifyAndUpdatePayments(uid) {
+            try {
+                // Get all Verified Transactions for this user
+                const txSnap = await getDocs(query(collection(db, "transactions"), where("userId", "==", uid), where("verified", "==", true)));
+                if (txSnap.empty) return;
+
+                const txMap = {};
+                txSnap.forEach(t => {
+                    const d = t.data();
+                    if (d.txnCode) txMap[d.txnCode.trim()] = d;
+                });
+
+                // Helper to check and update list of docs
+                const checkDocs = async (collectionName, docs) => {
+                    const updates = [];
+                    docs.forEach(d => {
+                        const data = d.data();
+                        const pay = data.payment || {};
+                        const code = pay.txnCode ? pay.txnCode.trim() : null;
+                        
+                        // If we have a code, it matches a verified transaction, but app is not marked verified yet
+                        if (code && txMap[code] && pay.verified !== true) {
+                            updates.push(updateDoc(doc(db, collectionName, d.id), {
+                                "payment.verified": true,
+                                "payment.updatedAt": new Date()
+                            }));
+                        }
+                    });
+                    return Promise.all(updates);
+                };
+
+                // Check Standard
+                const appSnap = await getDocs(query(collection(db, "applications"), where("seekerId", "==", uid)));
+                await checkDocs("applications", appSnap);
+
+                // Check Guaranteed
+                const gSnap = await getDocs(query(collection(db, "guaranteed_applications"), where("applicantId", "==", uid)));
+                await checkDocs("guaranteed_applications", gSnap);
+
+            } catch (err) {
+                console.error("Error verifying payments:", err);
+            }
+        }
+
         onAuthStateChanged(auth, async (user) => {
             if(!user) return window.location.href = 'signin.html';
             
-            // 1. Notification Badges
-            setupRealtimeBadges(user.uid);
-            
-            // 2. Load User Profile
+            // 1. Load User Profile
             try {
                 const uSnap = await getDoc(doc(db, "users", user.uid));
                 if(uSnap.exists()) {
@@ -502,7 +548,10 @@
                 }
             } catch(e) {}
             
-            // 3. Initialize Real-time Application Listeners
+            setupRealtimeBadges(user.uid);
+
+            // 2. Verify Payments first, then load listeners
+            await verifyAndUpdatePayments(user.uid);
             initListeners(user.uid);
         });
 
@@ -515,45 +564,41 @@
 
         // --- REAL-TIME DATA LOADING ---
         function initListeners(uid) {
-            // Unsubscribe previous listeners if existing
             if(unsubStd) unsubStd();
             if(unsubG) unsubG();
 
-            // 1. Listen to Standard Applications
+            // 1. Standard Apps
             const q = query(collection(db, "applications"), where("seekerId", "==", uid));
             unsubStd = onSnapshot(q, (snapshot) => {
                 stdAppsData = snapshot.docs.map(doc => {
                     const d = doc.data();
-                    let derivedType = 'Standard';
+                    let derivedType = d.jobType || 'Standard Job';
                     if(d.isFeatured) derivedType = 'Featured';
                     if(d.isUrgent) derivedType = 'Urgently Hiring';
-                    return { id: doc.id, ...d, jobTypeDisplay: d.jobType || derivedType, isGuaranteed: false };
+                    return { id: doc.id, ...d, jobTypeDisplay: derivedType, isGuaranteed: false };
                 });
                 combineAndRender();
-            }, (error) => {
-                console.error("Error listening to standard apps:", error);
             });
 
-            // 2. Listen to Guaranteed Applications
+            // 2. Guaranteed Apps
             const qG = query(collection(db, "guaranteed_applications"), where("applicantId", "==", uid));
             unsubG = onSnapshot(qG, (snapshot) => {
                 gAppsData = snapshot.docs.map(doc => {
                     return { id: doc.id, ...doc.data(), jobTypeDisplay: "Guaranteed Placement", isGuaranteed: true, submissionMethod: 'portal' };
                 });
                 combineAndRender();
-            }, (error) => {
-                console.error("Error listening to guaranteed apps:", error);
             });
         }
 
         function combineAndRender() {
-            // Merge both arrays
+            // Merge both
             allAppsData = [...stdAppsData, ...gAppsData];
-            
-            // Sort by default (Newest first)
-            allAppsData.sort((a, b) => (b.appliedAt?.seconds || 0) - (a.appliedAt?.seconds || 0));
-            
-            // Re-apply current filter
+            // Sort Newest First
+            allAppsData.sort((a, b) => {
+                const timeA = a.appliedAt?.seconds || 0;
+                const timeB = b.appliedAt?.seconds || 0;
+                return timeB - timeA;
+            });
             filterApps(currentFilter);
         }
 
@@ -571,10 +616,24 @@
                 );
             }
 
-            if(type === 'all') filtered = baseList;
-            else if(type === 'active') filtered = baseList.filter(a => { const s = (a.status || '').toLowerCase(); return !s.includes('hired') && !s.includes('reject') && !s.includes('archived'); });
-            else if(type === 'hired') filtered = baseList.filter(a => { const s = (a.status || '').toLowerCase(); return s.includes('hired') || s.includes('shortlisted'); });
-            else if(type === 'archived') filtered = baseList.filter(a => { const s = (a.status || '').toLowerCase(); return s.includes('reject') || s.includes('archived'); });
+            if(type === 'all') {
+                filtered = baseList;
+            } else if(type === 'active') {
+                filtered = baseList.filter(a => { 
+                    const s = (a.status || 'pending').toLowerCase();
+                    return s === 'pending' || s === 'received';
+                });
+            } else if(type === 'hired') {
+                filtered = baseList.filter(a => { 
+                    const s = (a.status || '').toLowerCase(); 
+                    return s === 'shortlisted' || s === 'hired'; 
+                });
+            } else if(type === 'archived') {
+                filtered = baseList.filter(a => { 
+                    const s = (a.status || '').toLowerCase(); 
+                    return s === 'rejected' || s.includes('withdrawn'); 
+                });
+            }
             
             renderApplications(filtered);
         };
@@ -592,7 +651,7 @@
             filterApps(currentFilter);
         };
 
-        // --- RENDER LOGIC WITH THEMES ---
+        // --- ROBUST RENDER LOGIC ---
         function renderApplications(apps) {
             const container = document.getElementById("all-applications-grid");
             if (!apps || apps.length === 0) {
@@ -601,7 +660,7 @@
             }
 
             container.innerHTML = apps.map((data, idx) => {
-                const status = (data.status || 'Pending').toLowerCase();
+                const status = (data.status || 'pending').toLowerCase();
                 const d = data.appliedAt ? new Date(data.appliedAt.seconds * 1000).toLocaleDateString() : 'N/A';
                 
                 // Theme Logic
@@ -609,35 +668,48 @@
                 let icon = 'fa-briefcase';
                 let typeLabel = 'Standard Job';
                 const jTypeLower = (data.jobTypeDisplay || '').toLowerCase();
+
                 if(data.isGuaranteed || jTypeLower.includes('guaranteed')) { themeClass = 'card-guaranteed'; icon = 'fa-shield-halved'; typeLabel = 'Guaranteed Placement'; }
                 else if (jTypeLower.includes('urgent')) { themeClass = 'card-urgent'; icon = 'fa-bolt'; typeLabel = 'Urgently Hiring'; }
                 else if (jTypeLower.includes('featured')) { themeClass = 'card-featured'; icon = 'fa-star'; typeLabel = 'Featured Job'; }
 
-                // Payment Status Logic (Robust for Old Data)
+                // --- SMART PAYMENT STATUS ---
                 const pay = data.payment || {};
-                let payStatusHTML = '<span style="color:#94A3B8;">N/A</span>';
-                
-                // If payment object exists and has amount
-                if(pay.amount) {
-                    if(pay.verified === true) {
-                        payStatusHTML = '<span class="pay-status-verified">Verified <i class="fas fa-check-circle"></i></span>';
-                    } else {
-                        // Includes cases where verified is false OR undefined
-                        payStatusHTML = '<span class="pay-status-pending">Pending Ver. <i class="fas fa-clock"></i></span>';
-                    }
-                } 
-                // Handle Guaranteed Jobs separately (usually paid)
-                else if (data.isGuaranteed) {
-                    payStatusHTML = '<span class="pay-status-pending">Pending Payment</span>';
+                const amount = parseFloat(pay.amount || 0);
+                let payStatusHTML = '';
+
+                // 1. Explicitly Verified (Syncs with Admin Page)
+                if (pay.verified === true) {
+                    payStatusHTML = '<span class="pay-status-verified"><i class="fas fa-check-circle"></i> Verified</span>';
                 }
+                // 2. Free (No amount or amount is 0)
+                else if (amount === 0 || isNaN(amount)) {
+                    payStatusHTML = '<span style="color:#10B981;">Free</span>';
+                }
+                // 3. Paid but Pending Verification
                 else {
-                     payStatusHTML = '<span style="color:#10B981;">Free</span>';
+                    payStatusHTML = '<span class="pay-status-pending"><i class="fas fa-clock"></i> Pending Verification</span>';
                 }
 
-                // App Status Logic
-                let appStatusHTML = `<span class="app-status-pending">${data.status || 'Pending'}</span>`;
-                if(status.includes('hired') || status.includes('shortlisted')) appStatusHTML = `<span class="app-status-hired">${data.status}</span>`;
-                if(status.includes('reject')) appStatusHTML = `<span class="app-status-rejected">${data.status}</span>`;
+                // App Status Logic (Syncs with Admin Page)
+                let appStatusHTML = `<span class="app-status-pending">Pending Review</span>`;
+                if(status === 'received') appStatusHTML = `<span class="app-status-received"><i class="fas fa-envelope-open-text"></i> Received</span>`;
+                if(status === 'shortlisted') appStatusHTML = `<span class="app-status-shortlisted"><i class="fas fa-star"></i> Shortlisted</span>`;
+                if(status === 'hired') appStatusHTML = `<span class="app-status-hired"><i class="fas fa-handshake"></i> Hired</span>`;
+                if(status === 'rejected') appStatusHTML = `<span class="app-status-rejected"><i class="fas fa-ban"></i> Rejected</span>`;
+
+                // Action Buttons Logic
+                let actionButton = '';
+                if(status === 'pending') {
+                    // Only Allow Withdraw on Pending
+                    actionButton = `<button onclick="handleActionWithSpinner(this, () => window.manageApp('${data.id}', 'withdraw', ${data.isGuaranteed}))" class="tool-btn" title="Withdraw"><i class="fas fa-times"></i></button>`;
+                } else if (status === 'rejected') {
+                    // Allow Delete on Rejected
+                    actionButton = `<button onclick="handleActionWithSpinner(this, () => window.manageApp('${data.id}', 'delete', ${data.isGuaranteed}))" class="tool-btn" title="Delete"><i class="fas fa-trash"></i></button>`;
+                } else {
+                    // Locked for Received, Shortlisted, Hired
+                    actionButton = `<button disabled class="tool-btn" style="opacity:0.5; cursor:not-allowed;" title="Application Locked (In Progress)"><i class="fas fa-lock"></i></button>`;
+                }
 
                 return `
                 <div class="app-card ${themeClass} animate__animated animate__fadeInUp" style="animation-delay: ${idx * 0.05}s;">
@@ -654,7 +726,7 @@
                             <div class="info-val" style="text-transform:capitalize;">${appStatusHTML}</div>
                         </div>
                         <div class="info-item">
-                            <div class="info-label">Payment Status</div>
+                            <div class="info-label">Payment</div>
                             <div class="info-val">${payStatusHTML}</div>
                         </div>
                         <div class="info-item">
@@ -674,10 +746,7 @@
                         </div>
                         <div class="tools-container">
                             <button onclick="handleActionWithSpinner(this, () => window.viewDetails('${data.id}'))" class="tool-btn btn-view" title="View Full Info"><i class="fas fa-eye"></i></button>
-                            ${(status === 'pending' || status === 'new') ? 
-                                `<button onclick="handleActionWithSpinner(this, () => window.manageApp('${data.id}', 'withdraw'))" class="tool-btn" title="Withdraw"><i class="fas fa-times"></i></button>` : 
-                                `<button onclick="handleActionWithSpinner(this, () => window.manageApp('${data.id}', 'delete'))" class="tool-btn" title="Delete"><i class="fas fa-trash"></i></button>`
-                            }
+                            ${actionButton}
                         </div>
                     </div>
                 </div>`;
@@ -691,7 +760,25 @@
             
             const pay = app.payment || {};
             const d = app.appliedAt ? new Date(app.appliedAt.seconds * 1000).toLocaleDateString() : 'N/A';
+            const amt = parseFloat(pay.amount || 0);
+            const status = (app.status || 'pending').toLowerCase();
+
+            // Calculate verify status text for Modal
+            let verifyText = "Free Application";
+            let verifyColor = "var(--success)";
             
+            if (amt > 0) {
+                if (pay.verified === true) { verifyText = "Verified"; verifyColor = "var(--success)"; }
+                else { verifyText = "Pending Verification"; verifyColor = "var(--theme-featured)"; }
+            }
+            
+            // Status styling for Modal
+            let statusColor = "var(--text-muted)";
+            if(status === 'received') statusColor = "var(--info)";
+            if(status === 'shortlisted') statusColor = "var(--theme-featured)";
+            if(status === 'hired') statusColor = "var(--success)";
+            if(status === 'rejected') statusColor = "var(--danger)";
+
             const html = `
                 <div style="text-align:center; margin-bottom:20px;">
                     <h2 style="color:var(--text-main); font-size:1.3rem;">${app.jobTitle}</h2>
@@ -708,16 +795,16 @@
 
                 <div class="modal-section-title">Application Status</div>
                 <table class="modal-table">
-                    <tr><td>Current Status</td><td style="text-transform:uppercase; color:var(--theme-featured);">${app.status || 'Pending'}</td></tr>
+                    <tr><td>Current Status</td><td style="text-transform:uppercase; color:${statusColor}; font-weight:700;">${app.status || 'Pending'}</td></tr>
                     <tr><td>Submission Date</td><td>${d}</td></tr>
                     <tr><td>Method</td><td style="text-transform:capitalize;">${app.submissionMethod || 'Portal'}</td></tr>
                 </table>
 
                 <div class="modal-section-title">Payment Details</div>
                 <table class="modal-table">
-                    <tr><td>Amount Paid</td><td>${pay.amount ? 'KES '+pay.amount : 'Free/None'}</td></tr>
+                    <tr><td>Amount Paid</td><td>${amt > 0 ? 'KES '+amt : 'Free'}</td></tr>
                     <tr><td>Transaction Code</td><td>${pay.txnCode || 'N/A'}</td></tr>
-                    <tr><td>Verification Status</td><td style="color:${pay.verified ? 'var(--success)' : 'var(--theme-featured)'}">${pay.verified ? 'Verified' : (pay.amount ? 'Pending' : 'N/A')}</td></tr>
+                    <tr><td>Verification Status</td><td style="color:${verifyColor}; font-weight:700;">${verifyText}</td></tr>
                 </table>
             `;
             
@@ -764,6 +851,7 @@
                 const app = dataToPrint[0];
                 const d = app.appliedAt ? new Date(app.appliedAt.seconds*1000).toLocaleDateString() : 'N/A';
                 const pay = app.payment || {};
+                const amt = parseFloat(pay.amount || 0);
                 
                 // Determine Theme
                 let themeColor = colors.standard;
@@ -807,9 +895,9 @@
                     <h3 style="font-size:14px; color:#0F172A; border-bottom:1px solid #0F172A; padding-bottom:5px; margin-bottom:15px;">Payment Information</h3>
                     <table style="width:100%; font-size:12px; border-collapse:collapse;">
                         <tr style="background:#F1F5F9;"><td style="padding:10px; font-weight:bold;">Description</td><td style="padding:10px; font-weight:bold; text-align:right;">Details</td></tr>
-                        <tr><td style="padding:10px; border-bottom:1px solid #E2E8F0;">Transaction Amount</td><td style="padding:10px; border-bottom:1px solid #E2E8F0; text-align:right;">${pay.amount ? 'KES '+pay.amount : 'Free'}</td></tr>
+                        <tr><td style="padding:10px; border-bottom:1px solid #E2E8F0;">Transaction Amount</td><td style="padding:10px; border-bottom:1px solid #E2E8F0; text-align:right;">${amt > 0 ? 'KES '+amt : 'Free'}</td></tr>
                         <tr><td style="padding:10px; border-bottom:1px solid #E2E8F0;">M-Pesa / Trans. Code</td><td style="padding:10px; border-bottom:1px solid #E2E8F0; text-align:right;">${pay.txnCode || 'N/A'}</td></tr>
-                        <tr><td style="padding:10px; border-bottom:1px solid #E2E8F0;">Payment Verification</td><td style="padding:10px; border-bottom:1px solid #E2E8F0; text-align:right; font-weight:bold; color:${pay.verified ? '#10B981':'#F59E0B'}">${pay.verified ? 'Verified' : 'Pending'}</td></tr>
+                        <tr><td style="padding:10px; border-bottom:1px solid #E2E8F0;">Payment Verification</td><td style="padding:10px; border-bottom:1px solid #E2E8F0; text-align:right; font-weight:bold; color:${pay.verified ? '#10B981':'#F59E0B'}">${pay.verified ? 'Verified (Admin Approved)' : 'Pending Review'}</td></tr>
                     </table>
                 </div>
 
@@ -898,17 +986,14 @@
             closeModal('exportModal');
         };
 
-        window.manageApp = async (docId, actionType) => {
+        window.manageApp = async (docId, actionType, isGuaranteed) => {
             if(!confirm("Are you sure you want to perform this action?")) return;
             try {
-                // Attempt to delete from main applications collection
-                try { await deleteDoc(doc(db, "applications", docId)); } catch(e) {}
-                
-                // Attempt to delete from guaranteed applications collection (in case it's stored there)
-                try { await deleteDoc(doc(db, "guaranteed_applications", docId)); } catch(e) {}
-                
+                const collName = isGuaranteed ? "guaranteed_applications" : "applications";
+                if(actionType === 'delete' || actionType === 'withdraw') {
+                    await deleteDoc(doc(db, collName, docId));
+                }
                 Toastify({ text: "Action Successful", style: { background: "var(--success)" } }).showToast();
-                // No manual reload needed as listeners will auto-update
             } catch(e) { 
                 console.error(e); 
                 Toastify({ text: "Error updating application", style: { background: "var(--danger)" } }).showToast();

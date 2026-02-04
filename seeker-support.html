@@ -463,7 +463,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, query, where, addDoc, onSnapshot, serverTimestamp, orderBy, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, query, where, addDoc, onSnapshot, serverTimestamp, orderBy, updateDoc, deleteDoc, limit } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         // CONFIG
         const firebaseConfig = { apiKey: "AIzaSyCE_C6R4EyV7hip1yYrOaTzYac9Wrwh5Ys", authDomain: "eastlink-web.firebaseapp.com", projectId: "eastlink-web" };
@@ -544,7 +544,7 @@
             async greetUser() {
                 await simulateThinking("Initializing...");
                 const name = userData.fullName ? userData.fullName.split(' ')[0] : 'Guest';
-                renderMessage('bot', `Hello ${name}. how can I help you today .`, null, null);
+                renderMessage('bot', `Hello ${name}. How can I help you today?`, null, null);
                 this.sendMenu('root');
             }
 
@@ -597,9 +597,20 @@
                      this.sendMenu('root');
                      return;
                 }
+                
+                // EXPLICIT TALK TO AGENT
+                if (cleanText.includes('talk to an agent') || cleanText.includes('human support')) {
+                    await simulateThinking("Connecting to Human Agent...");
+                    const newTicketId = await createTicketSilently("User requested agent.");
+                    if (newTicketId) {
+                        activateLiveMode(newTicketId);
+                        addSystemMessage("Ticket created. An agent will join shortly.");
+                    }
+                    return;
+                }
 
-                // ESCALATION
-                await simulateThinking("Escalating to Human Agent...");
+                // UNKNOWN / ESCALATION
+                await simulateThinking("I didn't quite get that. Creating a ticket...");
                 const newTicketId = await createTicketSilently(text);
                 if (newTicketId) {
                     activateLiveMode(newTicketId);
@@ -609,9 +620,12 @@
             sendMenu(type) {
                 setTimeout(() => {
                     let options = [];
+                    // ALWAYS INCLUDE "Talk to an Agent"
                     if (type === 'root') options = ["💰 Fees & Payment", "📝 Application Help", "📄 CV/Profile Questions", "💎 Guaranteed Jobs", "💸 Refunds"];
                     else if (type === 'fees_followup') options = ["💎 Upgrade to Guaranteed", "👛 My Wallet", "🔙 Main Menu"];
                     else if (type === 'profile_followup') options = ["✏️ Edit Profile", "🔙 Main Menu"];
+                    
+                    options.push("🗣️ Talk to an Agent");
                     setChips(options);
                 }, 500);
             }
@@ -659,38 +673,22 @@
                 if(isFirstLoad && !activeTicketId) checkForOpenTicket(); 
             });
 
-            // GLOBAL BADGE COUNTER (Copy this block to other pages)
-            // It listens to all open tickets where lastSender != user and isReadByUser == false (implied by logic)
-            // NOTE: Firestore structure assumes 'isReadByAdmin'. We need a way to know if USER read it.
-            // Simplified Logic: Count tickets where lastSender is NOT 'user' AND we are not currently viewing it.
-            
-            // To make this robust, we'd ideally have 'unreadCount' on the ticket doc. 
-            // For now, we will query tickets where lastSender != user.
-            
+            // GLOBAL BADGE COUNTER
             const qBadge = query(collection(db, "support_tickets"), where("userId", "==", user.uid), where("status", "!=", "closed"));
             
             globalBadgeUnsubscribe = onSnapshot(qBadge, (snap) => {
                 let unreadCount = 0;
                 snap.forEach(d => {
                     const t = d.data();
-                    // If the last person to send was NOT the user, it might be unread.
-                    // Ideally, we check a flag 'isReadByUser'. 
-                    // Assuming if activeTicketId matches, we read it.
                     if (t.lastSender !== 'user') {
-                        // If we are on support page and this ticket is active, we read it instantly.
+                        // If we are looking at this specific ticket, it's technically read
                         if (activeTicketId === d.id && document.hasFocus()) {
-                            // It's read
+                            // Do nothing (read)
                         } else {
                             unreadCount++;
-                            // Trigger Notification if count increased and valid
-                            if(t.lastSender === 'admin' || t.lastSender === 'bot') {
-                                // Simple debounce check or timestamp check could be added here
-                                // For now, just show current state.
-                            }
                         }
                     }
                 });
-                
                 updateBadges(unreadCount);
             });
         });
@@ -701,29 +699,32 @@
                 if(el) {
                     el.innerText = count;
                     el.style.display = count > 0 ? 'flex' : 'none';
-                    // Sidebar badge specific styling
                     if(el.id === 'support-sidebar-badge') {
                         el.style.display = count > 0 ? 'inline-flex' : 'none';
                     }
                 }
             });
-
-            // Browser Notification Logic (Only if tab is hidden/background)
             if (count > 0 && document.visibilityState === 'hidden') {
                 showNotification("New Support Message", `You have ${count} unread message(s) from Support.`);
             }
         }
 
-        // Mark as read when focusing the window or the ticket
         window.addEventListener('focus', () => {
             if (activeTicketId && isLiveMode) {
-                // Technically we should update a 'read' status in DB here
-                updateBadges(0); // Client-side clear for instant feedback
+                updateBadges(0); 
             }
         });
 
+        // --- CHECK FOR EXISTING TICKET ---
         function checkForOpenTicket() {
-            const q = query(collection(db, "support_tickets"), where("userId", "==", currentUser.uid), where("status", "!=", "closed"));
+            // Priority: Find the most recently updated open ticket
+            const q = query(
+                collection(db, "support_tickets"), 
+                where("userId", "==", currentUser.uid), 
+                where("status", "!=", "closed"),
+                orderBy("lastUpdated", "desc"),
+                limit(1)
+            );
             
             onSnapshot(q, (snap) => {
                 if (!snap.empty) {
@@ -752,16 +753,20 @@
                     lastSender: 'user',
                     createdAt: serverTimestamp()
                 };
+                
+                // 1. Create Ticket
                 const ref = await addDoc(collection(db, "support_tickets"), ticketData);
-                // NOTE: We do NOT add a separate [SYSTEM] message here to keep chat clean.
-                // We only add the user's triggering message.
+                
+                // 2. Add Initial Message
                 await addDoc(collection(db, "support_tickets", ref.id, "messages"), {
                     text: description, sender: 'user', timestamp: serverTimestamp()
                 });
+                
                 return ref.id;
             } catch(e) { console.error("Ticket fail", e); return null; }
         }
 
+        // --- LIVE MODE (CONVERSATION) ---
         function activateLiveMode(ticketId) {
             if (activeTicketId === ticketId && isLiveMode) return;
             
@@ -770,11 +775,11 @@
             
             updateHeaderUI(true, ticketId);
             clearChips();
-            chatBox.innerHTML = '';
             
+            // Note: We don't clear chatBox here immediately to avoid flash.
+            // The snapshot listener below will repaint the chat accurately.
             const thinker = document.getElementById('thinking-bubble');
-            if(thinker) chatBox.appendChild(thinker);
-
+            
             // Watch Status
             if(ticketUnsubscribe) ticketUnsubscribe();
             ticketUnsubscribe = onSnapshot(doc(db, "support_tickets", ticketId), (docSnap) => {
@@ -784,32 +789,31 @@
                 }
             });
 
-            // Watch Messages
+            // Watch Messages (The Conversation Thread)
             if(messagesUnsubscribe) messagesUnsubscribe();
             const qMsg = query(collection(db, "support_tickets", ticketId, "messages"), orderBy('timestamp', 'asc'));
             
             messagesUnsubscribe = onSnapshot(qMsg, (snap) => {
-                const currentThinker = document.getElementById('thinking-bubble');
+                // Clear existing bot messages when live thread loads to avoid duplicates
                 chatBox.innerHTML = ''; 
-
+                
                 snap.forEach(doc => {
                     const m = doc.data();
                     let type = m.sender === 'user' ? 'user' : (m.sender === 'bot' ? 'bot' : 'admin');
                     renderMessage(type, m.text, m.timestamp, m.attachment, doc.id);
                 });
 
-                if(currentThinker) { 
-                    chatBox.appendChild(currentThinker); 
-                    currentThinker.style.display = 'none';
+                // Re-append thinking bubble at bottom hidden
+                if(thinker) { 
+                    chatBox.appendChild(thinker); 
+                    thinker.style.display = 'none';
                 }
-                scrollToBottom();
                 
-                // Clear notification/badge if user is looking at it
+                scrollToBottom();
                 if(document.hasFocus()) updateBadges(0); 
             });
         }
 
-        // --- CLOSING TICKET LOGIC ---
         window.closeTicketByUser = async () => {
              if(!activeTicketId || !confirm("Are you sure you want to close this ticket?")) return;
              await updateDoc(doc(db, "support_tickets", activeTicketId), {
@@ -817,7 +821,6 @@
                  closedBy: 'user',
                  closedAt: serverTimestamp()
              });
-             // UI handled by listener
         };
 
         function handleTicketClosure(ticketId) {
@@ -840,6 +843,9 @@
         async function sendMessageToFirestore(text, attachmentUrl = null) {
             if (!activeTicketId) return;
 
+            // Clear input immediately for UX
+            userInput.value = '';
+
             // EDIT MODE
             if (editMsgId) {
                 await updateDoc(doc(db, "support_tickets", activeTicketId, "messages", editMsgId), {
@@ -857,6 +863,8 @@
             }
 
             try {
+                // Optimistic Rendering is handled by the snapshot listener, 
+                // but we add the doc here.
                 await addDoc(collection(db, "support_tickets", activeTicketId, "messages"), {
                     text: finalBody, attachment: attachmentUrl, sender: 'user', timestamp: serverTimestamp()
                 });
@@ -882,7 +890,7 @@
                 iconEl.className = "fas fa-headset";
                 contEl.classList.remove('bot-mode'); contEl.classList.add('live-mode');
                 badge.style.display = 'block';
-                kebab.style.display = 'block'; // Show 3-dot menu
+                kebab.style.display = 'block';
                 tIdEl.innerText = '#' + tId.substring(0,4).toUpperCase();
             } else {
                 nameEl.innerText = "Support";
@@ -900,7 +908,11 @@
             
             div.className = `msg-row ${sideClass} animate__animated animate__fadeInUp`;
             
-            let html = (text||"").replace(/\n/g, '<br>');
+            // Safe HTML rendering for body
+            const contentDiv = document.createElement('div');
+            contentDiv.innerText = text || "";
+            let html = contentDiv.innerHTML.replace(/\n/g, '<br>');
+
             let mediaHtml = '';
             if(att) {
                 if(att.startsWith('data:image') || att.match(/\.(jpeg|jpg|gif|png)$/) != null) {
@@ -910,7 +922,6 @@
                 }
             }
 
-            // Time
             let timeStr = 'Now';
             if(ts && ts.seconds) timeStr = new Date(ts.seconds*1000).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
             else if(!ts && type === 'user') timeStr = 'Sending...';
@@ -981,7 +992,6 @@
         document.getElementById('btn-send').onclick = () => { 
             const v = userInput.value.trim(); 
             if(v || currentAttachment) { 
-                userInput.value = ''; 
                 bot.processMessage(v); 
             }
         };
@@ -1024,7 +1034,6 @@
             ctxMsgText = text;
             ctxIsUser = isUser;
 
-            // Show/Hide Edit & Delete based on user ownership
             document.getElementById('ctx-edit-btn').style.display = isUser ? 'flex' : 'none';
             document.getElementById('ctx-delete-btn').style.display = isUser ? 'flex' : 'none';
 
@@ -1032,7 +1041,6 @@
             menu.style.display = 'flex';
             
             let x = e.clientX; let y = e.clientY;
-            // Bounds check
             if (x + 180 > window.innerWidth) x = window.innerWidth - 190;
             if (y + 200 > window.innerHeight) y = e.clientY - 210;
             
@@ -1057,13 +1065,13 @@
         window.cancelReply = () => {
             replyToMsg = null;
             document.getElementById('reply-bar').style.display = 'none';
-            editMsgId = null; // Clear edit mode if it was active
+            editMsgId = null; 
         };
 
         window.editMsgAction = () => {
             if(!ctxIsUser) return;
             editMsgId = ctxMsgId;
-            userInput.value = ctxMsgText; // Load text into input
+            userInput.value = ctxMsgText; 
             userInput.focus();
             document.getElementById('msg-ctx-menu').style.display = 'none';
             Toastify({text: "Editing message...", style:{background:"var(--gold-base)"}}).showToast();
@@ -1074,7 +1082,6 @@
                 document.getElementById('msg-ctx-menu').style.display = 'none';
                 return;
             }
-            
             if(confirm("Delete this message?")) {
                 try {
                     await deleteDoc(doc(db, "support_tickets", activeTicketId, "messages", ctxMsgId));
