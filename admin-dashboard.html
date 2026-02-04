@@ -8,31 +8,31 @@
     <!-- PWA & Meta -->
     <link rel="manifest" href="./manifest.json">
     <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
-    <meta name="theme-color" content="#1e293b">
+    <meta name="theme-color" content="#0f172a">
     
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@800&family=Playfair+Display:ital,wght@0,600;1,600&family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
-    <!-- Chart.js -->
+    <!-- Chart.js (Kept for potential future use, though chart was removed) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         :root {
             /* Theme Variables */
             --bg-body: #0f172a;       
-            --bg-glass: rgba(30, 41, 59, 0.7);
-            --bg-solid: #1e293b;
-            --bg-card-dark: #111827;
+            --bg-glass: rgba(30, 41, 59, 0.65);
+            --bg-glass-hover: rgba(30, 41, 59, 0.85);
+            --border-glass: rgba(255, 255, 255, 0.08);
             
             --text-main: #F1F5F9;     
             --text-muted: #94A3B8; 
             
-            /* Gradients & Colors */
+            /* Professional Gradients */
             --gold-base: #fbbf24;
             --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
             
@@ -40,32 +40,24 @@
             --purple-gradient: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
             
             --success: #10B981;
-            --success-gradient: linear-gradient(135deg, #34d399 0%, #059669 100%);
+            --success-glow: rgba(16, 185, 129, 0.4);
             
             --danger: #EF4444;
-            --danger-gradient: linear-gradient(135deg, #f87171 0%, #dc2626 100%);
-            
-            --pink-gradient: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
-            
-            --ai-glow: #0ea5e9;
-            --ai-gradient: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
             
             --blue: #3B82F6;
             --sky: #38bdf8;
+            --sky-gradient: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
 
             --sidebar-width: 260px; 
             --header-height: 70px;
-            --radius: 16px;
+            --radius: 20px;
+            
             --font-head: 'Cinzel', serif;
             --font-body: 'Inter', sans-serif;
             --font-display: 'Space Grotesk', sans-serif;
             --font-mono: 'Space Mono', monospace;
             
-            /* Hero Fonts */
-            --font-hero-greeting: 'Outfit', sans-serif;
-            --font-hero-name: 'Playfair Display', serif;
-            
-            --ease-snap: cubic-bezier(0.34, 1.56, 0.64, 1); 
+            --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1); 
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -73,44 +65,49 @@
         body { 
             font-family: var(--font-body); 
             background-color: var(--bg-body); 
-            /* Fallback gradient if image fails */
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%), url('./assets/images/background.png');
-            background-blend-mode: overlay;
+            background-image: url('./assets/images/background.png');
+            background-attachment: fixed;
             background-size: cover;
             background-position: center;
-            background-attachment: fixed;
             color: var(--text-main); 
             min-height: 100vh; 
             overflow-x: hidden;
             display: flex; flex-direction: column;
         }
 
-        /* --- DASHBOARD LAYOUT COMPONENTS --- */
+        /* Dark overlay for contrast */
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background: rgba(15, 23, 42, 0.92); 
+            z-index: -5; pointer-events: none;
+        }
+
+        /* --- DASHBOARD COMPONENTS --- */
         .glass-panel {
             background: var(--bg-glass);
-            backdrop-filter: blur(12px) saturate(180%);
-            -webkit-backdrop-filter: blur(12px) saturate(180%);
-            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid var(--border-glass);
             border-radius: var(--radius);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             width: 100%;
-            transition: all 0.25s var(--ease-snap);
+            transition: all 0.3s var(--ease-smooth);
         }
         
         /* Header */
         header {
             position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
-            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-glass);
             display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 1000;
         }
         .header-left { display: flex; align-items: center; gap: 15px; }
         .logo { font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.3rem; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; }
         .logo span { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .admin-badge { 
-            font-family: var(--font-body); font-size: 0.6rem; background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 6px; 
-            margin-left: 10px; color: var(--text-muted); letter-spacing: 0.5px; font-weight: 600;
+            font-family: var(--font-mono); font-size: 0.65rem; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 6px; 
+            margin-left: 10px; color: var(--text-muted); letter-spacing: 1px; font-weight: 700;
         }
         .hamburger { font-size: 1.2rem; cursor: pointer; color: var(--text-muted); display: none; }
 
@@ -118,180 +115,170 @@
         .icon-btn { 
             width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; 
             cursor: pointer; background: rgba(255,255,255,0.03); position: relative; 
-            border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
+            border: 1px solid var(--border-glass); transition: 0.3s;
         }
         .icon-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); }
-        .icon-msg { color: #3b82f6; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.4)); }
-        .icon-bell { color: #f59e0b; font-size: 1.1rem; filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.4)); }
-
         .notification-badge { 
             position: absolute; top: -3px; right: -3px; width: 18px; height: 18px; 
             background: #ef4444; border: 2px solid #0f172a; border-radius: 50%; 
             font-size: 0.65rem; color: white; display: none; place-items: center; 
-            justify-content: center; font-weight: 700; box-shadow: 0 2px 5px rgba(0,0,0,0.5); z-index: 10;
+            justify-content: center; font-weight: 700; z-index: 10;
         }
         .profile-widget { width: 42px; height: 42px; position: relative; cursor: pointer; margin-left: 5px; }
-        .user-avatar { width: 100%; height: 100%; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-weight: 700; color: #000; font-size: 1.2rem; }
+        .user-avatar { width: 100%; height: 100%; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-weight: 700; color: #000; font-size: 1.2rem; border: 1px solid rgba(255,255,255,0.2); }
 
         /* Sidebar */
-        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: rgba(15, 23, 42, 0.95); border-right: 1px solid rgba(255,255,255,0.05); padding: 20px 0; overflow-y: auto; transition: transform 0.3s; z-index: 999; display: flex; flex-direction: column; backdrop-filter: blur(20px); }
-        .nav-group { padding: 0 24px; margin-bottom: 20px; }
-        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; margin-bottom: 8px; }
-        .nav-item { display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; border-radius: 10px; margin-bottom: 4px; cursor: pointer; transition: 0.2s; }
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: rgba(15, 23, 42, 0.95); border-right: 1px solid var(--border-glass); padding: 25px 0; overflow-y: auto; transition: transform 0.3s; z-index: 999; display: flex; flex-direction: column; backdrop-filter: blur(20px); }
+        .nav-group { padding: 0 24px; margin-bottom: 25px; }
+        .nav-label { font-size: 0.7rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 10px; letter-spacing: 1px; }
+        .nav-item { display: flex; align-items: center; padding: 12px 14px; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; border-radius: 12px; margin-bottom: 5px; cursor: pointer; transition: 0.2s; font-weight: 500; }
         .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.05); transform: translateX(5px); }
-        .nav-item.active { background: linear-gradient(90deg, rgba(251, 191, 36, 0.15) 0%, transparent 100%); color: var(--gold-base); font-weight: 600; border-left: 3px solid var(--gold-base); }
-        .nav-item i { width: 25px; text-align: center; margin-right: 10px; }
+        .nav-item.active { background: linear-gradient(90deg, rgba(217, 119, 6, 0.15) 0%, transparent 100%); color: var(--gold-base); font-weight: 700; border-left: 3px solid var(--gold-base); }
+        .nav-item i { width: 25px; text-align: center; margin-right: 10px; font-size: 1rem; }
         
         /* Layout */
-        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 25px; width: calc(100% - var(--sidebar-width)); flex: 1; }
-        .grid-layout { max-width: 1600px; margin: 0 auto; display: grid; grid-template-columns: 2.5fr 1fr; gap: 24px; }
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); flex: 1; display: flex; flex-direction: column; gap: 30px; }
+        .grid-layout { max-width: 1600px; margin: 0 auto; display: grid; grid-template-columns: 2.5fr 1fr; gap: 24px; width: 100%; }
         
         /* --- HERO SECTION --- */
-        .hero-section { grid-column: 1 / -1; margin-bottom: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .hero-section { width: 100%; }
         .welcome-card { 
             padding: 40px; 
             display: flex; flex-direction: column; justify-content: center; 
-            /* Fallback gradient if image fails */
-            background: linear-gradient(90deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.8)), url('./assets/images/welcomehero.png');
+            /* Subtle tech background */
+            background: linear-gradient(to right, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.8)), url('./assets/images/background.png');
             background-size: cover;
-            background-position: center;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid var(--border-glass);
             border-radius: var(--radius);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
-            min-height: 320px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4); 
+            min-height: 280px;
             position: relative; overflow: hidden;
         }
 
-        .analytics-card { 
-            padding: 25px; height: 320px; display: flex; flex-direction: column; 
-            background: var(--bg-glass); border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        /* Hero Text Animations */
-        @keyframes revealText {
-            0% { opacity: 0; transform: translateY(16px); filter: blur(10px); }
-            100% { opacity: 1; transform: translateY(0); filter: blur(0); }
-        }
-        @keyframes lightFlow {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-        @keyframes glowPulse {
-            0%, 100% { text-shadow: 0 0 20px rgba(251, 191, 36, 0); }
-            50% { text-shadow: 0 0 30px rgba(251, 191, 36, 0.2); }
-        }
-        @keyframes scaleLine {
-            0% { transform: scaleX(0); }
-            100% { transform: scaleX(1); }
+        /* Ambient glow in hero */
+        .welcome-card::after {
+            content: ''; position: absolute; top: -50%; right: -20%; width: 60%; height: 200%;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, transparent 70%);
+            transform: rotate(-15deg); pointer-events: none;
         }
 
         .hero-greeting { 
-            font-family: var(--font-hero-greeting);
-            font-weight: 800; line-height: 1; white-space: nowrap;
-            font-size: clamp(2rem, 5vw, 3.5rem); 
-            background: linear-gradient(110deg, #d97706 20%, #fbbf24 40%, #fff 50%, #fbbf24 60%, #d97706 80%);
-            background-size: 200% auto;
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
-            opacity: 0;
-            animation: revealText 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards, lightFlow 8s linear infinite 1.2s, glowPulse 12s ease-in-out infinite 1.2s; 
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800; line-height: 1.1; 
+            font-size: clamp(2rem, 4vw, 3rem); 
+            color: #fff; margin-bottom: 5px;
+            text-transform: uppercase; letter-spacing: -1px;
         }
-
-        .hero-username {
-            font-family: var(--font-hero-name);
-            font-weight: 600; font-style: italic; text-transform: uppercase;
-            color: #F8FAFC; opacity: 0; 
-            display: flex; align-items: center; margin-top: 8px;
-            font-size: clamp(1.2rem, 3.5vw, 1.8rem); letter-spacing: 0.1em;
-            animation: revealText 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards; animation-delay: 0.15s;
-        }
-
-        .hero-name-line {
-            display: block; width: 40px; height: 3px; background: #FBBF24; margin-right: 15px;
-            transform-origin: left; transform: scaleX(0);
-            animation: scaleLine 0.4s ease-out forwards; animation-delay: 0.2s;
+        .hero-date {
+            font-family: var(--font-mono); color: var(--gold-base);
+            font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;
+            margin-bottom: 20px; display: inline-block;
         }
 
         /* Hero Actions */
-        .hero-btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 25px; position: relative; z-index: 2; opacity: 0; animation: revealText 0.7s forwards; animation-delay: 0.3s; }
+        .hero-btn-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 25px; position: relative; z-index: 2; }
         .btn-action {
-            background: rgba(255,255,255,0.05); color: var(--text-main); 
-            padding: 10px 18px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); 
+            background: rgba(255,255,255,0.03); color: var(--text-main); 
+            padding: 12px 24px; border-radius: 12px; border: 1px solid var(--border-glass); 
             font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; 
-            justify-content: center; gap: 8px; font-size: 0.85rem; transition: 0.3s; 
+            justify-content: center; gap: 10px; font-size: 0.85rem; transition: 0.3s; 
+            backdrop-filter: blur(5px);
         }
         .btn-action:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); }
         
-        .btn-gold { background: var(--gold-gradient); color: black; border: none; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3); }
-        .btn-emerald { color: var(--success); border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.1); }
-        .btn-purple { color: var(--neon-purple); border-color: rgba(139, 92, 246, 0.3); background: rgba(139, 92, 246, 0.1); }
-        .btn-sky { color: var(--sky); border-color: rgba(56, 189, 248, 0.3); background: rgba(56, 189, 248, 0.1); }
+        .btn-gold { background: var(--gold-gradient); color: #0f172a; border: none; box-shadow: 0 4px 20px rgba(251, 191, 36, 0.25); }
+        .btn-gold:hover { background: #fff; box-shadow: 0 4px 25px rgba(255, 255, 255, 0.4); }
 
         /* --- KPI STAT CARDS --- */
-        .kpi-strip { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 24px; }
-        .stat-card-3d {
-            padding: 20px; border-radius: 14px; cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.05);
-            box-shadow: 0 6px 0px rgba(0,0,0,0.3), 0 8px 10px rgba(0,0,0,0.2); 
-            transition: transform 0.15s, box-shadow 0.15s;
-            position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; min-height: 120px;
-        }
-        .stat-card-3d:active { transform: translateY(4px); box-shadow: 0 2px 0px rgba(0,0,0,0.3); }
+        .kpi-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
         
-        .stat-card-users { background: #0f172a; border-top: 2px solid var(--blue); }
-        .stat-card-rev { background: #1e1b4b; border-top: 2px solid var(--success); }
-        .stat-card-apps { background: #2e1065; border-top: 2px solid var(--gold-base); }
-        .stat-card-intl { background: #172554; border-top: 2px solid var(--sky); }
+        .stat-card-3d {
+            padding: 24px; border-radius: 20px; cursor: pointer;
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid var(--border-glass);
+            position: relative; overflow: hidden; 
+            display: flex; flex-direction: column; justify-content: space-between; 
+            min-height: 140px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .stat-card-3d:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.7);
+            border-color: rgba(255,255,255,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
 
-        .stat-icon { position: absolute; top: 15px; right: 15px; font-size: 1.4rem; opacity: 0.6; }
-        .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 700; margin-bottom: 5px; }
-        .stat-value { font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; color: white; line-height: 1.1; }
-        .stat-sub { font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+        .stat-icon-bg {
+            position: absolute; top: -10px; right: -10px; font-size: 4rem; 
+            opacity: 0.05; transform: rotate(15deg); pointer-events: none; transition: 0.3s;
+        }
+        .stat-card-3d:hover .stat-icon-bg { transform: rotate(0deg) scale(1.1); opacity: 0.1; }
+
+        .stat-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 15px; }
+        .stat-icon-box { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; font-size: 1.1rem; }
+        
+        .stat-value { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: #fff; line-height: 1; letter-spacing: -0.5px; }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-top: 5px; letter-spacing: 0.5px; }
+        .stat-trend { font-size: 0.7rem; margin-top: 10px; display: flex; align-items: center; gap: 5px; opacity: 0.8; font-weight: 500; }
+
+        /* KPI Colors */
+        .kpi-users .stat-icon-box { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
+        .kpi-users:hover { border-color: rgba(59, 130, 246, 0.3); }
+
+        /* Investment KPI (Replaces Revenue) */
+        .kpi-invest .stat-icon-box { background: rgba(217, 119, 6, 0.15); color: #f59e0b; }
+        .kpi-invest .stat-value { color: #fbbf24; text-shadow: 0 0 20px rgba(251, 191, 36, 0.2); }
+        .kpi-invest:hover { border-color: rgba(245, 158, 11, 0.3); }
+
+        .kpi-apps .stat-icon-box { background: rgba(139, 92, 246, 0.15); color: var(--neon-purple); }
+        .kpi-apps:hover { border-color: rgba(139, 92, 246, 0.3); }
+        
+        .kpi-intl .stat-icon-box { background: rgba(56, 189, 248, 0.15); color: var(--sky); }
+        .kpi-intl:hover { border-color: rgba(56, 189, 248, 0.3); }
         
         /* --- ACTION GRID --- */
-        .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 25px; }
+        .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
         .action-box {
-            background: var(--bg-glass); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius);
-            padding: 20px; display: flex; flex-direction: column; transition: 0.3s; cursor: pointer;
-            backdrop-filter: blur(12px);
+            background: var(--bg-glass); border: 1px solid var(--border-glass); border-radius: var(--radius);
+            padding: 24px; display: flex; flex-direction: column; transition: 0.3s; cursor: pointer;
+            backdrop-filter: blur(12px); position: relative; overflow: hidden;
         }
-        .action-box:hover { transform: translateY(-5px); border-color: var(--gold-base); background: rgba(255,255,255,0.05); }
+        .action-box::before {
+            content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%); opacity: 0; transition: 0.3s;
+        }
+        .action-box:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.2); }
+        .action-box:hover::before { opacity: 1; }
+        
         .action-icon-lg { 
-            width: 45px; height: 45px; background: rgba(255,255,255,0.05); border-radius: 12px; 
-            display: grid; place-items: center; font-size: 1.2rem; margin-bottom: 15px; 
-            color: var(--text-main); border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; 
+            width: 50px; height: 50px; background: rgba(255,255,255,0.03); border-radius: 14px; 
+            display: grid; place-items: center; font-size: 1.4rem; margin-bottom: 15px; 
+            color: var(--text-muted); border: 1px solid var(--border-glass); transition: 0.3s; 
         }
-        .action-box:hover .action-icon-lg { background: var(--gold-gradient); color: #000; border-color: transparent; }
+        .action-box:hover .action-icon-lg { background: var(--text-main); color: #000; border-color: transparent; }
 
         /* --- FEED --- */
-        .feed-list { height: 100%; overflow-y: auto; max-height: 350px; padding-right: 5px; }
+        .feed-list { height: 100%; overflow-y: auto; max-height: 400px; padding-right: 5px; }
         .feed-list::-webkit-scrollbar { width: 4px; }
         .feed-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
         
-        .feed-item { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 12px; }
+        .feed-item { padding: 15px 0; border-bottom: 1px solid var(--border-glass); display: flex; align-items: center; gap: 15px; transition: 0.2s; }
+        .feed-item:hover { background: rgba(255,255,255,0.02); padding-left: 10px; border-radius: 8px; }
         .feed-item:last-child { border-bottom: none; }
-        .feed-icon { width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center; font-size: 0.8rem; flex-shrink: 0; }
-        .feed-content h4 { font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 2px; }
+        .feed-icon { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; font-size: 0.9rem; flex-shrink: 0; }
+        .feed-content h4 { font-size: 0.9rem; font-weight: 600; color: var(--text-main); margin-bottom: 3px; }
         .feed-content p { font-size: 0.75rem; color: var(--text-muted); }
-        .feed-time { margin-left: auto; font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono); }
-
-        /* Footer */
-        .app-footer { margin-top: auto; padding: 25px; background: #0f172a; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; }
-        .footer-copy { font-size: 0.7rem; color: var(--text-muted); opacity: 0.7; }
+        .feed-time { margin-left: auto; font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono); white-space: nowrap; }
 
         /* Loading Spinner */
         .loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; margin-right: 5px; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Overlay */
         .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index:998; display:none; }
 
         @media (max-width: 992px) {
             .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
-            main { margin-left: 0; padding: 15px 10px; width: 100%; }
-            .grid-layout, .hero-section { grid-template-columns: 1fr; }
-            .kpi-strip { grid-template-columns: 1fr 1fr; }
+            main { margin-left: 0; padding: 20px 15px; width: 100%; }
+            .grid-layout { grid-template-columns: 1fr; }
+            .kpi-strip { grid-template-columns: 1fr; }
             .hamburger { display: block; }
-            .analytics-card { height: auto; min-height: 250px; }
         }
     </style>
 </head>
@@ -307,20 +294,15 @@
         </div>
         
         <div class="header-actions">
-            <!-- Messages -->
-            <div class="icon-btn" onclick="handleActionWithSpinner(this, () => location.href='admin-support.html')">
-                <i class="fa-solid fa-envelope icon-msg"></i>
+            <div class="icon-btn" onclick="location.href='admin-support.html'">
+                <i class="fa-solid fa-envelope" style="color:#3b82f6;"></i>
                 <div class="notification-badge" id="msg-badge">0</div>
             </div>
-            
-            <!-- Notifications -->
-            <div class="icon-btn" onclick="handleActionWithSpinner(this, () => location.href='admin-notifications.html')">
-                <i class="fa-solid fa-bell icon-bell"></i>
+            <div class="icon-btn" onclick="location.href='admin-notifications.html'">
+                <i class="fa-solid fa-bell" style="color:#f59e0b;"></i>
                 <div class="notification-badge" id="notif-badge">0</div>
             </div>
-            
-            <!-- Profile -->
-            <div class="profile-widget" onclick="handleActionWithSpinner(this, () => location.href='admin-settings.html')">
+            <div class="profile-widget" onclick="location.href='admin-settings.html'">
                 <div class="user-avatar"><i class="fa-solid fa-user-shield"></i></div>
             </div>
         </div>
@@ -350,9 +332,9 @@
 
         <div class="nav-group">
             <div class="nav-label">Finance</div>
+            <a href="admin-investments.html" class="nav-item"><i class="fas fa-chart-line" style="color:var(--gold-base);"></i> Investments</a>
             <a href="admin-deposits.html" class="nav-item"><i class="fa-solid fa-arrow-down" style="color:var(--success);"></i> Deposits</a>
             <a href="admin-withdrawals.html" class="nav-item"><i class="fa-solid fa-arrow-up" style="color:var(--danger);"></i> Withdrawals</a>
-            <a href="admin-deposit-issues.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> Errors</a>
         </div>
 
         <div class="nav-group">
@@ -360,104 +342,108 @@
             <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
             <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
             <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
-            <a href="#" onclick="handleActionWithSpinner(this, logout)" class="nav-item" style="color:var(--danger); margin-top:20px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:20px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
         </div>
     </nav>
     <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
     <!-- MAIN CONTENT -->
     <main>
-        <!-- HERO SECTION: "THE GOLDEN HORIZON" -->
+        <!-- HERO SECTION (Updated to Full Width) -->
         <div class="hero-section">
             <div class="welcome-card animate__animated animate__fadeIn">
-                <!-- Golden Greeting Container -->
-                <div id="welcome-msg-container" style="width: 100%; min-height: 80px; display: flex; align-items: center; z-index: 2;">
-                     <div class="hero-text-block">
-                        <span class="hero-greeting">COMMAND CENTER</span>
-                        <div class="hero-username">
-                            <span class="hero-name-line"></span>
-                            <span id="current-date">LOADING...</span>
-                        </div>
-                    </div>
-                </div>
-
-                <p style="color:var(--text-muted); font-size:0.9rem; margin-top: 15px; margin-bottom: 20px; z-index: 2; position:relative; max-width: 500px;" class="animate__animated animate__fadeInUp animate__delay-1s">
-                    System performance metrics and real-time administrative insights are ready.
+                <span id="current-date" class="hero-date">LOADING...</span>
+                <h1 class="hero-greeting">Command Center</h1>
+                
+                <p style="color:var(--text-muted); font-size:1rem; margin-bottom: 25px; max-width: 600px; line-height: 1.6;">
+                    System performance metrics, real-time administrative insights, and financial overviews are ready for review.
                 </p>
                 
                 <div class="hero-btn-row">
-                    <button class="btn-action btn-gold" onclick="handleActionWithSpinner(this, () => location.href='admin-post-job.html')">
-                        <i class="fas fa-pen-to-square"></i> Post Job
+                    <button class="btn-action btn-gold" onclick="location.href='admin-investments.html'">
+                        <i class="fas fa-chart-line"></i> Manage Investments
                     </button>
-                    <!-- UPDATED BUTTON -->
-                    <button class="btn-action btn-emerald" onclick="handleActionWithSpinner(this, () => location.href='admin-list.html')">
-                        <i class="fas fa-list-ul"></i> APP LIST
+                    <button class="btn-action" onclick="location.href='admin-post-job.html'">
+                        <i class="fas fa-plus"></i> Post Job
                     </button>
-                    <!-- END UPDATE -->
-                    <button class="btn-action btn-purple" onclick="handleActionWithSpinner(this, () => location.href='admin-interviews.html')">
-                        <i class="fas fa-calendar-check"></i> Interviews
+                    <button class="btn-action" onclick="location.href='admin-list.html'">
+                        <i class="fas fa-list-ul"></i> App List
                     </button>
-                    <button class="btn-action btn-sky" onclick="handleActionWithSpinner(this, () => location.href='admin-international.html')">
+                    <button class="btn-action" onclick="location.href='admin-international.html'">
                         <i class="fas fa-globe"></i> International
                     </button>
                 </div>
             </div>
-            
-            <!-- Analytics Chart Card -->
-            <div class="analytics-card animate__animated animate__zoomIn animate__delay-1s">
-                <div style="display:flex; justify-content:space-between; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
-                    <h3 style="font-size:0.9rem; font-weight:700; color:var(--text-main);">USER DEMOGRAPHICS</h3>
-                    <span style="font-size:0.8rem; color:var(--text-muted);">Role Distribution</span>
-                </div>
-                <div style="flex:1; position:relative; min-height: 0;">
-                    <canvas id="userChart"></canvas>
-                </div>
-            </div>
         </div>
 
-        <!-- KPI Strip -->
+        <!-- KPI Strip (Replaced Revenue with Investments) -->
         <div class="kpi-strip animate__animated animate__fadeInUp animate__delay-1s">
-            <!-- Registered Users -->
-            <div class="stat-card-3d stat-card-users" onclick="handleActionWithSpinner(this, () => location.href='admin-users.html')">
-                <i class="fas fa-users stat-icon" style="color:var(--blue)"></i>
-                <div class="stat-label">TOTAL USERS</div>
-                <div class="stat-value" id="stat-users">0</div>
-                <div class="stat-sub">Registered Accounts</div>
+            
+            <!-- 1. Registered Users -->
+            <div class="stat-card-3d kpi-users" onclick="location.href='admin-users.html'">
+                <i class="fas fa-users stat-icon-bg"></i>
+                <div class="stat-header">
+                    <div class="stat-icon-box"><i class="fas fa-users"></i></div>
+                </div>
+                <div>
+                    <div class="stat-value" id="stat-users">0</div>
+                    <div class="stat-label">Total Users</div>
+                    <div class="stat-trend" style="color:var(--blue);"><i class="fas fa-arrow-up"></i> Active Accounts</div>
+                </div>
             </div>
             
-            <!-- Revenue -->
-            <div class="stat-card-3d stat-card-rev" onclick="handleActionWithSpinner(this, () => location.href='admin-deposits.html')">
-                <i class="fas fa-coins stat-icon" style="color:var(--success)"></i>
-                <div class="stat-label">REVENUE</div>
-                <div class="stat-value" id="stat-rev" style="font-size: 1.3rem; color:var(--success);">Ksh 0</div>
-                <div class="stat-sub">Lifetime Deposits</div>
+            <!-- 2. INVESTMENTS (NEW) -->
+            <div class="stat-card-3d kpi-invest" onclick="location.href='admin-investments.html'">
+                <i class="fas fa-coins stat-icon-bg"></i>
+                <div class="stat-header">
+                    <div class="stat-icon-box"><i class="fas fa-chart-line"></i></div>
+                </div>
+                <div>
+                    <div class="stat-value" id="stat-investments">KES 0</div>
+                    <div class="stat-label">Investment Volume</div>
+                    <div class="stat-trend" style="color:#f59e0b;">
+                        <i class="fas fa-briefcase"></i> <span id="stat-investments-sub">Loading...</span>
+                    </div>
+                </div>
             </div>
 
-            <!-- Total Applications -->
-            <div class="stat-card-3d stat-card-apps" onclick="handleActionWithSpinner(this, () => location.href='admin-candidates.apps.html')">
-                <i class="fas fa-file-contract stat-icon" style="color:var(--gold-base)"></i>
-                <div class="stat-label">APPLICATIONS</div>
-                <div class="stat-value" id="stat-apps">0</div>
-                <div class="stat-sub">All Submissions</div>
+            <!-- 3. Total Applications -->
+            <div class="stat-card-3d kpi-apps" onclick="location.href='admin-candidates-apps.html'">
+                <i class="fas fa-file-contract stat-icon-bg"></i>
+                <div class="stat-header">
+                    <div class="stat-icon-box"><i class="fas fa-file-signature"></i></div>
+                </div>
+                <div>
+                    <div class="stat-value" id="stat-apps">0</div>
+                    <div class="stat-label">Total Applications</div>
+                    <div class="stat-trend" style="color:var(--neon-purple);"><i class="fas fa-clock"></i> Lifetime Submissions</div>
+                </div>
             </div>
             
-            <!-- International -->
-            <div class="stat-card-3d stat-card-intl" onclick="handleActionWithSpinner(this, () => location.href='admin-international.html')">
-                <i class="fas fa-globe-americas stat-icon" style="color:var(--sky)"></i>
-                <div class="stat-label">INTERNATIONAL</div>
-                <div class="stat-value" style="font-size: 1.2rem;">MANAGE</div>
-                <div class="stat-sub" style="color:var(--sky);">Overseas Jobs</div>
+            <!-- 4. International -->
+            <div class="stat-card-3d kpi-intl" onclick="location.href='admin-international.html'">
+                <i class="fas fa-globe-americas stat-icon-bg"></i>
+                <div class="stat-header">
+                    <div class="stat-icon-box"><i class="fas fa-plane-departure"></i></div>
+                </div>
+                <div>
+                    <div class="stat-value" style="font-size:1.5rem;">GLOBAL</div>
+                    <div class="stat-label">International Jobs</div>
+                    <div class="stat-trend" style="color:var(--sky);"><i class="fas fa-cog"></i> Manage Listings</div>
+                </div>
             </div>
         </div>
 
         <div class="grid-layout animate__animated animate__fadeInUp animate__delay-1s">
             
             <!-- LEFT COLUMN: ACTIVITY FEED -->
-            <div>
+            <div style="min-width: 0;">
                 <div class="glass-panel" style="padding:25px; height: 100%;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:15px;">
-                        <h3 style="font-size:0.9rem; font-weight:700; color:var(--text-main);"><i class="fa-solid fa-tower-broadcast" style="color:var(--success); margin-right:8px;"></i> LIVE ACTIVITY</h3>
-                        <div style="font-size:0.65rem; color:var(--success); font-weight:800; background:rgba(16,185,129,0.1); padding:4px 10px; border-radius:30px; border:1px solid rgba(16,185,129,0.3);">ONLINE</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid var(--border-glass); padding-bottom:15px;">
+                        <h3 style="font-size:0.9rem; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:10px;">
+                            <i class="fa-solid fa-tower-broadcast" style="color:var(--success);"></i> Live Activity Feed
+                        </h3>
+                        <div style="font-size:0.65rem; color:var(--success); font-weight:800; background:rgba(16,185,129,0.1); padding:4px 10px; border-radius:30px; border:1px solid rgba(16,185,129,0.2);">SYSTEM ONLINE</div>
                     </div>
 
                     <div class="feed-list" id="feed-list">
@@ -472,138 +458,89 @@
             <div style="display:flex; flex-direction:column; gap:20px;">
                 
                 <!-- Approvals Widget -->
-                <div class="glass-panel" style="padding:20px;">
-                    <h3 style="font-size:0.8rem; font-weight:700; color:var(--neon-purple); margin-bottom:15px; text-transform: uppercase;">Approvals</h3>
-                    <div class="action-box" onclick="location.href='admin-jobs-mod.html'" style="padding:15px; min-height:auto; border-color: rgba(139, 92, 246, 0.3);">
-                        <div style="display:flex; align-items:center; gap:15px;">
-                            <div style="background:rgba(139, 92, 246, 0.1); width:35px; height:35px; border-radius:8px; display:grid; place-items:center; color:var(--neon-purple);"><i class="fas fa-check-double"></i></div>
-                            <div>
-                                <div style="font-weight:700; font-size:0.85rem;">Job Approvals</div>
-                                <div style="font-size:0.7rem; color:var(--text-muted);">Verify posted jobs</div>
-                            </div>
+                <div class="glass-panel" style="padding:25px;">
+                    <h3 style="font-size:0.75rem; font-weight:700; color:var(--text-muted); margin-bottom:15px; text-transform: uppercase; letter-spacing:1px;">Quick Actions</h3>
+                    
+                    <div class="feed-item" onclick="location.href='admin-jobs-mod.html'" style="cursor:pointer; padding:12px; background:rgba(255,255,255,0.02); border-radius:12px; border:1px solid var(--border-glass);">
+                        <div class="feed-icon" style="background:rgba(139, 92, 246, 0.15); color:var(--neon-purple);"><i class="fas fa-check-double"></i></div>
+                        <div class="feed-content">
+                            <h4>Job Approvals</h4>
+                            <p>Verify posted jobs</p>
                         </div>
+                        <i class="fas fa-chevron-right" style="margin-left:auto; color:var(--text-muted); font-size:0.8rem;"></i>
+                    </div>
+
+                    <div class="feed-item" onclick="location.href='admin-support.html'" style="cursor:pointer; padding:12px; background:rgba(255,255,255,0.02); border-radius:12px; border:1px solid var(--border-glass); margin-top:10px;">
+                        <div class="feed-icon" style="background:rgba(251, 191, 36, 0.15); color:var(--gold-base);"><i class="fas fa-headset"></i></div>
+                        <div class="feed-content">
+                            <h4>Support Tickets</h4>
+                            <p>Resolve issues</p>
+                        </div>
+                         <i class="fas fa-chevron-right" style="margin-left:auto; color:var(--text-muted); font-size:0.8rem;"></i>
                     </div>
                 </div>
 
-                <!-- Support Widget -->
-                <div class="glass-panel" style="padding:20px;">
-                     <h3 style="font-size:0.8rem; font-weight:700; color:var(--gold-base); margin-bottom:15px; text-transform: uppercase;">Support</h3>
-                     <div class="action-box" onclick="location.href='admin-support.html'" style="padding:15px; min-height:auto; border-color: rgba(251, 191, 36, 0.3);">
-                        <div style="display:flex; align-items:center; gap:15px;">
-                            <div style="background:rgba(251, 191, 36, 0.1); width:35px; height:35px; border-radius:8px; display:grid; place-items:center; color:var(--gold-base);"><i class="fas fa-headset"></i></div>
-                            <div>
-                                <div style="font-weight:700; font-size:0.85rem;">Ticket System</div>
-                                <div style="font-size:0.7rem; color:var(--text-muted);">Resolve user issues</div>
-                            </div>
+                <!-- Testimonials Teaser -->
+                <div class="glass-panel" style="padding:25px; cursor: pointer; border-color: rgba(251, 191, 36, 0.3); transition: transform 0.3s;" onclick="location.href='admin-testimonials.html'" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <div style="color:var(--gold-base); font-size:1.2rem; margin-bottom:5px;"><i class="fas fa-quote-left"></i></div>
+                            <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-main);">Testimonials</h3>
+                        </div>
+                        <div style="background: var(--gold-gradient); width: 35px; height: 35px; border-radius: 50%; display: grid; place-items: center; color: #000; box-shadow:0 0 10px rgba(251, 191, 36, 0.4);">
+                            <i class="fas fa-arrow-right"></i>
                         </div>
                     </div>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top:10px;">Manage user success stories.</p>
                 </div>
-
             </div>
         </div>
 
         <!-- Quick Access Grid -->
         <div class="action-grid animate__animated animate__fadeInUp" style="animation-delay: 0.5s;">
-            <div class="action-box" onclick="window.location.href='admin-users.html'">
-                <div class="action-icon-lg" style="color:var(--blue);"><i class="fas fa-user-cog"></i></div>
-                <h3 style="font-size:0.9rem; margin-bottom:5px; font-weight:700;">User Management</h3>
-                <p style="font-size:0.75rem; color:var(--text-muted);">Edit roles, verify users.</p>
+            <div class="action-box" onclick="location.href='admin-users.html'">
+                <div class="action-icon-lg"><i class="fas fa-user-cog"></i></div>
+                <h3 style="font-size:1rem; margin-bottom:5px; font-weight:700;">User Management</h3>
+                <p style="font-size:0.8rem; color:var(--text-muted);">Edit roles, verify users.</p>
             </div>
 
-            <div class="action-box" onclick="window.location.href='admin-plans.html'">
-                <div class="action-icon-lg" style="color:var(--success);"><i class="fas fa-credit-card"></i></div>
-                <h3 style="font-size:0.9rem; margin-bottom:5px; font-weight:700;">Plan Management</h3>
-                <p style="font-size:0.75rem; color:var(--text-muted);">Update pricing & features.</p>
+            <div class="action-box" onclick="location.href='admin-plans.html'">
+                <div class="action-icon-lg"><i class="fas fa-tags"></i></div>
+                <h3 style="font-size:1rem; margin-bottom:5px; font-weight:700;">Plan Management</h3>
+                <p style="font-size:0.8rem; color:var(--text-muted);">Update pricing & features.</p>
             </div>
 
-            <div class="action-box" onclick="window.location.href='admin-blogs.html'">
-                <div class="action-icon-lg" style="color:var(--text-main);"><i class="fas fa-newspaper"></i></div>
-                <h3 style="font-size:0.9rem; margin-bottom:5px; font-weight:700;">Content Manager</h3>
-                <p style="font-size:0.75rem; color:var(--text-muted);">Publish blogs & news.</p>
+            <div class="action-box" onclick="location.href='admin-blogs.html'">
+                <div class="action-icon-lg"><i class="fas fa-newspaper"></i></div>
+                <h3 style="font-size:1rem; margin-bottom:5px; font-weight:700;">Content Manager</h3>
+                <p style="font-size:0.8rem; color:var(--text-muted);">Publish blogs & news.</p>
             </div>
 
-            <div class="action-box" onclick="window.location.href='admin-settings.html'">
-                <div class="action-icon-lg" style="color:var(--danger);"><i class="fas fa-sliders"></i></div>
-                <h3 style="font-size:0.9rem; margin-bottom:5px; font-weight:700;">System Config</h3>
-                <p style="font-size:0.75rem; color:var(--text-muted);">Global settings & maintenance.</p>
-            </div>
-        </div>
-
-        <!-- NEW TESTIMONIALS SECTION -->
-        <div class="glass-panel animate__animated animate__fadeInUp" style="margin-top: 25px; padding: 25px; cursor: pointer; border-color: rgba(251, 191, 36, 0.3); transition: transform 0.3s;" onclick="window.location.href='admin-testimonials.html'" onmouseover="this.style.transform='scale(1.01)'" onmouseout="this.style.transform='scale(1)'">
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; align-items: center; gap: 20px;">
-                    <div style="width: 50px; height: 50px; background: rgba(251, 191, 36, 0.1); border-radius: 12px; display: grid; place-items: center; color: var(--gold-base); font-size: 1.5rem;">
-                        <i class="fas fa-quote-left"></i>
-                    </div>
-                    <div>
-                        <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 5px;">Manage Testimonials</h3>
-                        <p style="font-size: 0.85rem; color: var(--text-muted);">Review, approve, and highlight user success stories.</p>
-                    </div>
-                </div>
-                <div style="background: var(--gold-gradient); width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: #000;">
-                    <i class="fas fa-arrow-right"></i>
-                </div>
+            <div class="action-box" onclick="location.href='admin-settings.html'">
+                <div class="action-icon-lg"><i class="fas fa-sliders"></i></div>
+                <h3 style="font-size:1rem; margin-bottom:5px; font-weight:700;">System Config</h3>
+                <p style="font-size:0.8rem; color:var(--text-muted);">Global settings & maintenance.</p>
             </div>
         </div>
 
     </main>
 
     <!-- FOOTER -->
-    <footer class="app-footer">
-        <p class="footer-copy">&copy; 2026 EastLink Recruitment Solutions. Internal System.</p>
+    <footer style="margin-top:auto; padding:30px; text-align:center; border-top:1px solid var(--border-glass); background:#0f172a;">
+        <p style="font-size:0.8rem; color:var(--text-muted); opacity:0.7;">&copy; 2026 EastLink Recruitment Solutions. Secure Admin Environment.</p>
     </footer>
 
-    <!-- PWA INSTALL POPUP -->
-    <div id="pwa-install-popup" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: #1e293b; border: 1px solid var(--gold-base); border-radius: 20px; padding: 20px; z-index: 3000; box-shadow: 0 10px 40px rgba(0,0,0,0.5); animation: slideUp 0.5s ease;">
-        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
-            <div style="width: 50px; height: 50px; border-radius: 12px; background: var(--gold-gradient); display: grid; place-items: center; font-size: 1.5rem; color: #000;"><i class="fas fa-download"></i></div>
-            <div>
-                <div style="font-weight:700; color:#fff; font-size:1rem; margin-bottom:4px;">Install Admin App</div>
-                <div style="font-size:0.8rem; color:#94A3B8;">Add to home screen for quick access.</div>
-            </div>
-        </div>
-        <div style="display: flex; gap: 10px;">
-            <button onclick="installPWA()" style="flex: 2; padding: 10px; background: var(--gold-gradient); border: none; border-radius: 10px; font-weight: 700; cursor: pointer; color: #000;">Install</button>
-            <button onclick="dismissPWA()" style="flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: var(--text-muted); cursor: pointer;">Later</button>
-        </div>
-    </div>
-    <style>@keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }</style>
-
+    <!-- SCRIPTS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-
     <script type="module">
         import { auth, db } from './config.js'; 
         import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
         import { collection, getDocs, getCountFromServer, query, where, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-        // --- SPINNER HELPER ---
-        window.handleActionWithSpinner = (btn, action) => {
-            if(btn.dataset.processing === "true") return;
-            btn.dataset.processing = "true";
-            const originalContent = btn.innerHTML;
-            btn.innerHTML = `<span class="loading-spinner"></span>`;
-            setTimeout(() => {
-                if (typeof action === 'function') action();
-                setTimeout(() => {
-                    btn.innerHTML = originalContent;
-                    btn.dataset.processing = "false";
-                }, 500);
-            }, 1000);
-        };
-
-        // --- UI UTILS ---
-        window.toggleSidebar = () => { 
-            document.getElementById('sidebar').classList.toggle('active'); 
-            document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none';
-        };
+        // UI Interactions
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none'; };
+        window.logout = () => { if(confirm("Confirm Log Out?")) signOut(auth).then(() => window.location.href = 'signin.html'); };
         
-        window.logout = () => {
-            if(confirm("Confirm Log Out?")) {
-                signOut(auth).then(() => window.location.href = 'signin.html');
-            }
-        };
-
         // Date Display
         document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' }).toUpperCase();
 
@@ -622,53 +559,49 @@
             // 1. Users Stats
             try {
                 const usersColl = collection(db, "users");
-                const totalUsers = (await getCountFromServer(usersColl)).data().count;
-                document.getElementById('stat-users').innerText = totalUsers.toLocaleString();
+                const snapshot = await getCountFromServer(usersColl);
+                document.getElementById('stat-users').innerText = snapshot.data().count.toLocaleString();
+            } catch (e) { console.error("Users Error:", e); }
 
-                const seekersCount = (await getCountFromServer(query(usersColl, where("role", "==", "seeker")))).data().count;
-                const employersCount = (await getCountFromServer(query(usersColl, where("role", "==", "employer")))).data().count;
+            // 2. INVESTMENTS STAT (NEW) - Replaces Revenue
+            try {
+                // Fetch all investments to calculate total volume (Active + Redeemed + Paid Out)
+                const invQ = query(collection(db, "investments"));
+                const invSnap = await getDocs(invQ);
+                
+                let totalInvestedVolume = 0;
+                let activePortfolios = 0;
 
-                initChart(seekersCount, employersCount);
+                invSnap.forEach(doc => {
+                    const data = doc.data();
+                    const status = (data.status || "").toLowerCase();
+                    const amt = parseFloat(data.amount || 0);
+
+                    if (['active', 'redeemed', 'paid_out'].includes(status)) {
+                        totalInvestedVolume += amt;
+                    }
+                    if (status === 'active') {
+                        activePortfolios++;
+                    }
+                });
+
+                document.getElementById('stat-investments').innerText = `KES ${totalInvestedVolume.toLocaleString()}`;
+                document.getElementById('stat-investments-sub').innerText = `${activePortfolios} Active Portfolios`;
+
             } catch (e) {
-                console.error("Users Error:", e);
-                initChart(0, 0); // Don't crash, show empty chart
+                console.error("Investment Stat Error:", e);
+                document.getElementById('stat-investments').innerText = "KES 0";
+                document.getElementById('stat-investments-sub').innerText = "Error loading data";
             }
 
-            // 2. Total Applications
+            // 3. Total Applications
             try {
                 const appsColl = collection(db, "applications");
                 const snapshot = await getCountFromServer(appsColl);
                 document.getElementById('stat-apps').innerText = snapshot.data().count.toLocaleString();
             } catch (e) { 
-                console.log("Apps Count Skipped (Collection might vary):", e);
-                document.getElementById('stat-apps').innerText = "0"; // Safe default
-            }
-
-            // 3. Revenue (Total Deposits)
-            try {
-                // Remove limit to calculate full revenue, or keep limit if heavy
-                const txQ = query(collection(db, "transactions"), orderBy("timestamp", "desc"), limit(500)); 
-                const txSnap = await getDocs(txQ);
-                let rev = 0;
-
-                txSnap.forEach(d => {
-                    const data = d.data();
-                    const type = (data.type || "").toLowerCase();
-                    const status = (data.status || "").toLowerCase();
-                    
-                    if ((status === 'success' || status === 'completed') && 
-                        (type === 'deposit' || type === 'payment')) {
-                            
-                            let rawAmount = String(data.amount || "0").replace(/,/g, '');
-                            const val = parseFloat(rawAmount);
-                            if(!isNaN(val)) rev += val;
-                    }
-                });
-                
-                document.getElementById('stat-rev').innerText = "Ksh " + rev.toLocaleString();
-            } catch (e) {
-                console.error("Revenue Error:", e);
-                document.getElementById('stat-rev').innerText = "Ksh 0";
+                console.log("Apps Count Skipped:", e);
+                document.getElementById('stat-apps').innerText = "0"; 
             }
         }
 
@@ -677,99 +610,61 @@
             const allEvents = [];
 
             try {
-                // A. FETCH USERS (Try JoinedAt first, fallback to CreatedAt)
-                let userQ;
-                try {
-                    // Try sorting by joinedAt
-                    userQ = query(collection(db, "users"), orderBy("joinedAt", "desc"), limit(5));
-                    const userSnap = await getDocs(userQ);
-                    userSnap.forEach(d => processUserDoc(d, allEvents));
-                } catch(err) {
-                    // Fallback to createdAt if joinedAt fails
-                    console.log("Sort by joinedAt failed, trying createdAt...");
-                    userQ = query(collection(db, "users"), orderBy("createdAt", "desc"), limit(5));
-                    const userSnap = await getDocs(userQ);
-                    userSnap.forEach(d => processUserDoc(d, allEvents));
-                }
+                // Fetch recent Users
+                const userQ = query(collection(db, "users"), orderBy("createdAt", "desc"), limit(5));
+                const userSnap = await getDocs(userQ);
+                userSnap.forEach(d => {
+                    const u = d.data();
+                    allEvents.push({
+                        type: 'user', 
+                        title: u.role === 'employer' ? 'Company Registered' : 'New User Joined',
+                        desc: u.fullName || u.companyName || u.email, 
+                        time: u.createdAt,
+                        icon: 'fa-user-plus', color: 'var(--blue)', bg: 'rgba(59,130,246,0.1)'
+                    });
+                });
 
-                // B. FETCH TRANSACTIONS (Try Timestamp first, fallback to Date)
-                let txQ;
-                try {
-                    txQ = query(collection(db, "transactions"), orderBy("timestamp", "desc"), limit(5));
-                    const txSnap = await getDocs(txQ);
-                    txSnap.forEach(d => processTxDoc(d, allEvents));
-                } catch(err) {
-                    console.log("Sort by timestamp failed, trying date...");
-                    txQ = query(collection(db, "transactions"), orderBy("date", "desc"), limit(5));
-                    const txSnap = await getDocs(txQ);
-                    txSnap.forEach(d => processTxDoc(d, allEvents));
-                }
+                // Fetch recent Investments (To show investment activity in feed)
+                const invQ = query(collection(db, "investments"), orderBy("startDate", "desc"), limit(5));
+                const invSnap = await getDocs(invQ);
+                invSnap.forEach(d => {
+                    const i = d.data();
+                    allEvents.push({
+                        type: 'invest',
+                        title: 'New Investment',
+                        desc: `${i.planName} - KES ${i.amount}`,
+                        time: i.startDate,
+                        icon: 'fa-chart-line', color: 'var(--gold-base)', bg: 'rgba(251, 191, 36, 0.1)'
+                    });
+                });
 
-                // C. RENDER
                 renderFeed(list, allEvents);
 
             } catch(e) { 
-                console.error("Global Feed Error:", e);
-                list.innerHTML = '<div style="padding:20px; text-align:center; opacity:0.5; font-size:0.8rem;">Could not load feed. Check console.</div>';
+                console.error("Feed Error:", e);
+                list.innerHTML = '<div style="padding:20px; text-align:center; opacity:0.5; font-size:0.8rem;">Could not load feed.</div>';
             }
-        }
-
-        // --- FEED HELPERS ---
-        function processUserDoc(d, eventsArray) {
-            const u = d.data();
-            eventsArray.push({
-                type: 'user', 
-                title: u.role === 'employer' ? 'Company Registered' : 'New Seeker',
-                desc: u.fullName || u.companyName || 'User', 
-                time: u.joinedAt || u.createdAt,
-                icon: 'fa-user-plus', color: 'var(--blue)', bg: 'rgba(59,130,246,0.1)'
-            });
-        }
-
-        function processTxDoc(d, eventsArray) {
-            const t = d.data();
-            let title = 'Transaction', color = 'var(--text-muted)', bg = 'rgba(255,255,255,0.05)';
-            const type = (t.type || "").toLowerCase();
-
-            if(type === 'deposit') { title = 'Deposit'; color = 'var(--success)'; bg = 'rgba(16,185,129,0.1)'; }
-            else if(type === 'withdrawal') { title = 'Withdrawal'; color = 'var(--danger)'; bg = 'rgba(239,68,68,0.1)'; }
-            
-            eventsArray.push({
-                type: 'tx', title: title, desc: `Amount: Ksh ${t.amount} (${t.status})`,
-                time: t.timestamp || t.date, 
-                icon: 'fa-exchange-alt', color: color, bg: bg
-            });
         }
 
         function renderFeed(list, allEvents) {
             // Sort merged events by time descending
             allEvents.sort((a, b) => {
-               // Handle Firestore Timestamp OR Standard Date strings safely
-               let tA = 0, tB = 0;
-               if(a.time && a.time.seconds) tA = a.time.seconds;
-               else if(a.time) tA = new Date(a.time).getTime() / 1000;
-
-               if(b.time && b.time.seconds) tB = b.time.seconds;
-               else if(b.time) tB = new Date(b.time).getTime() / 1000;
-
+               let tA = a.time?.seconds || (new Date(a.time).getTime()/1000) || 0;
+               let tB = b.time?.seconds || (new Date(b.time).getTime()/1000) || 0;
                return tB - tA;
             });
 
-            const displayEvents = allEvents.slice(0, 8); // Top 8 events
-
+            const displayEvents = allEvents.slice(0, 8);
             list.innerHTML = '';
+            
             if(!displayEvents.length) {
                 list.innerHTML = '<div style="padding:20px; text-align:center; opacity:0.5; font-size:0.8rem;">No recent activity.</div>';
                 return;
             }
 
-            // Render HTML
             displayEvents.forEach(ev => {
-                let jsDate = new Date();
-                if(ev.time && ev.time.seconds) jsDate = new Date(ev.time.seconds * 1000);
-                else if(ev.time) jsDate = new Date(ev.time);
-
-                const timeAgo = timeSince(jsDate);
+                const jsDate = ev.time?.seconds ? new Date(ev.time.seconds * 1000) : new Date(ev.time);
+                const timeStr = jsDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 
                 list.innerHTML += `
                     <div class="feed-item animate__animated animate__fadeInLeft">
@@ -778,102 +673,33 @@
                             <h4>${ev.title}</h4>
                             <p>${ev.desc}</p>
                         </div>
-                        <div class="feed-time">${timeAgo}</div>
+                        <div class="feed-time">${timeStr}</div>
                     </div>
                 `;
             });
         }
 
-        function initChart(seekers, employers) {
-            const ctx = document.getElementById('userChart').getContext('2d');
-            const themeColor = '#F8FAFC'; 
-            
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Seekers', 'Employers'],
-                    datasets: [{
-                        data: [seekers, employers],
-                        backgroundColor: ['#3B82F6', '#f59e0b'],
-                        borderColor: '#1e293b',
-                        borderWidth: 2, 
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { position: 'bottom', labels: { color: themeColor, font: {family: "'Inter', sans-serif", size: 10} } } 
-                    },
-                    cutout: '70%'
-                }
-            });
-        }
-
         function initBadges() {
-            // Real-time listener for Pending Transactions
+            // Live Listeners for Badges
             try {
                 const txQ = query(collection(db, "transactions"), where("status", "==", "pending"));
                 onSnapshot(txQ, (snap) => {
-                    const count = snap.size;
-                    const badge = document.getElementById('notif-badge');
-                    if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
-                    else badge.style.display = 'none';
+                    const b = document.getElementById('notif-badge');
+                    if(snap.size > 0) { b.innerText = snap.size; b.style.display = 'flex'; }
+                    else b.style.display = 'none';
                 });
-            } catch(e) { console.log("Badge Error (Tx):", e); }
-            
-            // Real-time listener for Open Tickets
-            try {
+                
                 const msgQ = query(collection(db, "support_tickets"), where("status", "==", "open"));
-                 onSnapshot(msgQ, (snap) => {
-                    const count = snap.size;
-                    const badge = document.getElementById('msg-badge');
-                    if(count > 0) { badge.innerText = count; badge.style.display = 'flex'; }
-                    else badge.style.display = 'none';
+                onSnapshot(msgQ, (snap) => {
+                    const b = document.getElementById('msg-badge');
+                    if(snap.size > 0) { b.innerText = snap.size; b.style.display = 'flex'; }
+                    else b.style.display = 'none';
                 });
-            } catch(e) { console.log("Badge Error (Tickets):", e); }
+            } catch(e) { console.log("Badge Error:", e); }
         }
-
-        function timeSince(date) {
-            const seconds = Math.floor((new Date() - date) / 1000);
-            let interval = seconds / 31536000;
-            if (interval > 1) return Math.floor(interval) + "y";
-            interval = seconds / 2592000; if (interval > 1) return Math.floor(interval) + "mo";
-            interval = seconds / 86400; if (interval > 1) return Math.floor(interval) + "d";
-            interval = seconds / 3600; if (interval > 1) return Math.floor(interval) + "h";
-            interval = seconds / 60; if (interval > 1) return Math.floor(interval) + "m";
-            return "Just now";
-        }
-
-        // --- PWA LOGIC ---
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            if(!localStorage.getItem('pwaDismissed')) {
-                document.getElementById('pwa-install-popup').style.display = 'block';
-            }
-        });
-
-        window.installPWA = async () => {
-            if (!deferredPrompt) return;
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                document.getElementById('pwa-install-popup').style.display = 'none';
-            }
-            deferredPrompt = null;
-        };
-
-        window.dismissPWA = () => {
-            document.getElementById('pwa-install-popup').style.display = 'none';
-            localStorage.setItem('pwaDismissed', 'true');
-        };
-
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("./service-worker.js")
-                .catch(e => console.log("SW Fail:", e));
-        }
+        
+        // PWA Registration
+        if ('serviceWorker' in navigator) { window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js')); }
     </script>
 </body>
 </html>
