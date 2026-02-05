@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Applications Command | EastLink Admin</title>
+    
+    <!-- PWA & Meta -->
+    <link rel="manifest" href="./manifest.json">
+    <link rel="icon" type="image/svg+xml" href="./assets/images/favicon.svg">
+    <meta name="theme-color" content="#0f172a">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+        :root {
+            /* Advanced Theme Variables */
+            --bg-body: #020617;       
+            --bg-glass: rgba(15, 23, 42, 0.6);
+            --bg-glass-strong: rgba(15, 23, 42, 0.85);
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(255, 255, 255, 0.15);
+            
+            --text-main: #F8FAFC;     
+            --text-muted: #94A3B8;
+            --text-dim: #64748B;
+            
+            --gold-base: #FBBF24;
+            --gold-glow: rgba(251, 191, 36, 0.2);
+            --gold-gradient: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);
+            
+            --success: #10B981;
+            --success-glow: rgba(16, 185, 129, 0.15);
+            --danger: #EF4444;
+            --danger-glow: rgba(239, 68, 68, 0.15);
+            --blue: #3B82F6;
+
+            --sidebar-width: 260px; 
+            --header-height: 70px;
+            --radius: 12px;
+            
+            --font-head: 'Cinzel', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-display: 'Outfit', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            
+            --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.15);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            font-family: var(--font-body); 
+            background-color: var(--bg-body); 
+            background: radial-gradient(circle at 15% 50%, rgba(56, 189, 248, 0.08), transparent 25%),
+                        radial-gradient(circle at 85% 30%, rgba(251, 191, 36, 0.05), transparent 25%),
+                        url('./assets/images/background.png'); 
+            background-size: cover; background-attachment: fixed;
+            color: var(--text-main); 
+            min-height: 100vh; 
+            display: flex; flex-direction: column;
+        }
+
+        /* --- HEADER & SIDEBAR --- */
+        header {
+            position: fixed; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: rgba(2, 6, 23, 0.9); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 1000;
+        }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .logo { font-family: var(--font-head); font-weight: 700; color: var(--text-main); font-size: 1.2rem; text-decoration: none; display: flex; align-items: center; letter-spacing: 0.5px; }
+        .logo span { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .admin-badge { 
+            font-family: var(--font-body); font-size: 0.65rem; background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-subtle); padding: 2px 8px; border-radius: 4px; 
+            margin-left: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;
+        }
+        .hamburger { font-size: 1.2rem; cursor: pointer; color: var(--text-muted); display: none; }
+
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .icon-btn { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 8px; cursor: pointer; background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); transition: 0.2s; color: var(--text-muted); }
+        .icon-btn:hover { background: rgba(255,255,255,0.08); color: var(--text-main); }
+        .profile-widget { width: 38px; height: 38px; cursor: pointer; margin-left: 5px; }
+        .user-avatar { width: 100%; height: 100%; border-radius: 10px; background: var(--gold-gradient); display: grid; place-items: center; font-weight: 700; color: #000; font-size: 1.1rem; }
+
+        /* Sidebar */
+        .sidebar { position: fixed; top: var(--header-height); left: 0; width: var(--sidebar-width); height: calc(100vh - var(--header-height)); background: rgba(2, 6, 23, 0.95); border-right: 1px solid var(--border-subtle); padding: 20px 0; overflow-y: auto; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 999; display: flex; flex-direction: column; backdrop-filter: blur(20px); }
+        .nav-group { padding: 0 20px; margin-bottom: 24px; }
+        .nav-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-dim); font-weight: 700; margin-bottom: 10px; letter-spacing: 1px; padding-left: 10px; }
+        .nav-item { display: flex; align-items: center; padding: 10px 14px; color: var(--text-muted); text-decoration: none; font-size: 0.85rem; border-radius: 8px; margin-bottom: 2px; cursor: pointer; transition: 0.2s; font-weight: 500; }
+        .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.04); }
+        .nav-item.active { background: linear-gradient(90deg, rgba(251, 191, 36, 0.1) 0%, transparent 100%); color: var(--gold-base); font-weight: 600; border-left: 2px solid var(--gold-base); }
+        .nav-item i { width: 24px; text-align: center; margin-right: 10px; font-size: 0.9rem; }
+        .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter: blur(4px); z-index:998; display:none; }
+
+        /* --- CONTENT AREA --- */
+        main { margin-left: var(--sidebar-width); margin-top: var(--header-height); padding: 30px; width: calc(100% - var(--sidebar-width)); min-height: 100vh; }
+
+        .page-header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .page-title h1 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; margin-bottom: 4px; color: var(--text-main); letter-spacing: -0.5px; }
+        .page-title p { color: var(--text-muted); font-size: 0.85rem; }
+
+        .btn-master-report {
+            padding: 8px 16px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; 
+            cursor: pointer; background: transparent; color: var(--gold-base); border: 1px solid var(--gold-base);
+            transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;
+        }
+        .btn-master-report:hover { background: var(--gold-glow); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(251, 191, 36, 0.1); }
+
+        /* Filter Bar */
+        .filter-bar { display: grid; grid-template-columns: 2fr repeat(3, 1fr) auto; gap: 12px; margin-bottom: 30px; background: var(--bg-glass); padding: 15px; border-radius: var(--radius); border: 1px solid var(--border-subtle); align-items: center; }
+        .search-box { position: relative; width: 100%; }
+        .search-box input, select { width: 100%; padding: 10px 12px 10px 36px; background: rgba(2, 6, 23, 0.5); border: 1px solid var(--border-subtle); border-radius: 8px; color: var(--text-main); font-family: var(--font-body); font-size: 0.85rem; transition: 0.2s; }
+        .search-box input:focus, select:focus { border-color: var(--gold-base); background: rgba(2, 6, 23, 0.8); }
+        .search-box input { padding-left: 36px; }
+        select { padding-left: 12px; cursor: pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 10px center; background-size: 14px; }
+        .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 0.8rem; }
+        
+        .btn-danger-action {
+            padding: 10px 16px; background: rgba(239, 68, 68, 0.05); color: var(--danger); 
+            border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; font-weight: 600; 
+            font-size: 0.8rem; cursor: pointer; transition: 0.2s; white-space: nowrap; height: 100%; display: flex; align-items: center; gap: 6px;
+        }
+        .btn-danger-action:hover { background: var(--danger-glow); border-color: var(--danger); }
+
+        /* Application Grid */
+        .apps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        
+        .app-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%);
+            border: 1px solid var(--border-subtle); border-radius: 12px;
+            overflow: hidden; transition: all 0.3s ease; display: flex; flex-direction: column;
+            position: relative; box-shadow: var(--shadow-card);
+        }
+        .app-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); border-color: var(--border-highlight); background: rgba(30, 41, 59, 0.6); }
+        
+        .card-header { padding: 16px; display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px solid var(--border-subtle); }
+        .applicant-info { display: flex; gap: 12px; align-items: center; }
+        .app-avatar { width: 42px; height: 42px; border-radius: 10px; object-fit: cover; background: #000; border: 1px solid var(--border-subtle); }
+        .app-name-box h4 { font-size: 0.95rem; font-weight: 600; color: var(--text-main); margin-bottom: 2px; font-family: var(--font-display); }
+        .app-name-box p { font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono); display: flex; align-items: center; gap: 6px; }
+
+        .app-type-badge { font-size: 0.55rem; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; border: 1px solid transparent; }
+        .badge-guaranteed { background: rgba(16, 185, 129, 0.1); color: var(--success); border-color: rgba(16, 185, 129, 0.2); }
+        .badge-standard { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border-color: var(--border-subtle); }
+
+        .status-pill { font-size: 0.6rem; font-weight: 700; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .pill-pending { background: rgba(255,255,255,0.08); color: var(--text-muted); }
+        .pill-hired { background: var(--success-glow); color: var(--success); box-shadow: 0 0 10px rgba(16, 185, 129, 0.1); }
+        .pill-rejected { background: var(--danger-glow); color: var(--danger); }
+        .pill-shortlisted { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
+
+        .card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+        
+        .job-meta { display: flex; flex-direction: column; gap: 4px; }
+        .job-title { font-size: 1rem; font-weight: 600; color: white; font-family: var(--font-display); line-height: 1.3; }
+        .company-name { font-size: 0.8rem; color: var(--text-dim); display: flex; align-items: center; gap: 6px; }
+
+        .info-row { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text-muted); }
+        .info-row i { color: var(--text-dim); width: 14px; text-align: center; }
+
+        .payment-box { 
+            background: rgba(0,0,0,0.2); border: 1px solid var(--border-subtle); 
+            border-radius: 8px; padding: 10px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .pay-status-btn { 
+            font-size: 0.65rem; padding: 4px 10px; border-radius: 4px; cursor: pointer; border: none; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s;
+        }
+        .pay-pending { background: rgba(251, 191, 36, 0.1); color: var(--gold-base); border: 1px solid rgba(251, 191, 36, 0.3); }
+        .pay-approved { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .pay-approved:hover { background: rgba(16, 185, 129, 0.2); }
+
+        .progress-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .progress-btn { padding: 8px; border-radius: 6px; border: 1px solid var(--border-subtle); background: transparent; color: var(--text-muted); font-size: 0.7rem; cursor: pointer; transition: 0.2s; font-weight: 500; }
+        .progress-btn:hover:not(:disabled) { background: rgba(255,255,255,0.05); color: var(--text-main); border-color: var(--text-muted); }
+        .progress-btn.active { background: var(--gold-gradient); color: #000; border: none; font-weight: 700; box-shadow: 0 4px 10px rgba(251, 191, 36, 0.2); }
+        
+        .action-row { display: flex; gap: 8px; margin-top: 5px; }
+        .btn-hire { flex: 1; background: var(--success-glow); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); padding: 8px; border-radius: 6px; font-weight: 600; font-size: 0.7rem; cursor: pointer; }
+        .btn-hire:hover { background: rgba(16, 185, 129, 0.25); }
+        .btn-reject-card { flex: 1; background: transparent; color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px; border-radius: 6px; font-weight: 600; font-size: 0.7rem; cursor: pointer; transition: 0.2s; }
+        .btn-reject-card:hover { background: var(--danger-glow); border-color: var(--danger); }
+
+        .card-actions { padding: 12px 16px; background: rgba(0,0,0,0.15); border-top: 1px solid var(--border-subtle); }
+        .btn-view-details {
+            width: 100%; text-align: center; font-weight: 600; padding: 10px; border-radius: 6px;
+            background: rgba(255,255,255,0.03); color: var(--text-main); border: 1px solid var(--border-subtle);
+            cursor: pointer; transition: 0.2s; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-view-details:hover { background: rgba(255,255,255,0.08); border-color: var(--text-muted); }
+
+        /* --- VIEW MODAL --- */
+        .view-modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px);
+            z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .modal-glass {
+            background: #0f172a; width: 100%; max-width: 750px; max-height: 90vh;
+            border-radius: 16px; border: 1px solid var(--border-subtle);
+            display: flex; flex-direction: column; box-shadow: 0 50px 100px -20px rgba(0,0,0,0.7);
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.02); }
+        .modal-header h3 { font-family: var(--font-head); font-size: 1.1rem; color: var(--text-main); letter-spacing: 0.5px; }
+        .close-modal { background: none; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; transition: 0.2s; }
+        .close-modal:hover { color: var(--gold-base); transform: rotate(90deg); }
+        
+        .modal-body { padding: 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 24px; }
+        
+        .modal-section-title { 
+            font-size: 0.7rem; text-transform: uppercase; color: var(--gold-base); font-weight: 700; 
+            margin-bottom: 12px; letter-spacing: 1.2px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 6px; 
+        }
+        .details-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .detail-item label { display: block; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 4px; }
+        .detail-item span { color: var(--text-main); font-size: 0.9rem; font-weight: 500; font-family: var(--font-display); }
+        
+        .text-block { 
+            background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px; border: 1px solid var(--border-subtle); 
+            font-size: 0.85rem; line-height: 1.6; color: var(--text-muted); white-space: pre-wrap; font-family: var(--font-body);
+        }
+        
+        .modal-footer { padding: 20px 24px; background: rgba(0,0,0,0.2); border-top: 1px solid var(--border-subtle); display: flex; justify-content: flex-end; }
+        .btn-export-full { 
+            background: var(--gold-gradient); color: black; border: none; padding: 10px 24px; border-radius: 8px; 
+            font-weight: 700; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; 
+            transition: 0.3s; box-shadow: 0 4px 15px rgba(251,191,36,0.2); 
+        }
+        .btn-export-full:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(251,191,36,0.3); }
+
+        .loading-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Pagination */
+        .pagination-bar { margin-top: 30px; display: flex; justify-content: center; gap: 12px; align-items: center; padding-bottom: 50px; }
+        .page-btn { background: var(--bg-glass); color: var(--text-main); border: 1px solid var(--border-subtle); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
+        .page-btn:hover:not(:disabled) { border-color: var(--gold-base); }
+        .page-btn:disabled { opacity: 0.4; cursor: default; }
+
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); } .sidebar.active { transform: translateX(0); }
+            main { margin-left: 0; padding: 15px; width: 100%; margin-top: var(--header-height); }
+            .filter-bar { grid-template-columns: 1fr; gap: 10px; }
+            .hamburger { display: block; }
+            .details-grid { grid-template-columns: 1fr; }
+            .page-title h1 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-left">
+            <i class="fas fa-bars hamburger" onclick="toggleSidebar()"></i>
+            <a href="admin-dashboard.html" class="logo">
+                EAST<span>LINK</span> <span class="admin-badge">ADMIN</span>
+            </a>
+        </div>
+        <div class="header-actions">
+            <div class="icon-btn" onclick="location.href='admin-support.html'"><i class="fa-solid fa-envelope"></i></div>
+            <div class="icon-btn" onclick="location.href='admin-notifications.html'"><i class="fa-solid fa-bell"></i></div>
+            <div class="profile-widget" onclick="location.href='admin-settings.html'">
+                <div class="user-avatar"><i class="fa-solid fa-user-shield"></i></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-group">
+            <div class="nav-label">Analytics</div>
+            <a href="admin-dashboard.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+        </div>
+        
+        <div class="nav-group">
+            <div class="nav-label">User Management</div>
+            <a href="admin-users.html" class="nav-item"><i class="fa-solid fa-users"></i> Manage Users</a>
+            <a href="admin-plans.html" class="nav-item"><i class="fa-solid fa-tags"></i> Manage Plans</a>
+            <a href="admin-referrals.html" class="nav-item"><i class="fa-solid fa-share-nodes"></i> Referrals</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Jobs & Service</div>
+            <a href="admin-jobs-mod.html" class="nav-item"><i class="fa-solid fa-briefcase"></i> Job Approvals</a>
+            <!-- Active Page -->
+            <a href="admin-candidates-apps.html" class="nav-item active"><i class="fa-solid fa-file-signature"></i> Applications</a>
+            <a href="admin-guaranteed-jobs.html" class="nav-item" style="color:var(--success);"><i class="fa-solid fa-certificate"></i> Guaranteed Jobs</a>
+            <a href="admin-post-guaranteed.html" class="nav-item"><i class="fa-solid fa-plus-circle"></i> Post Guaranteed</a>
+            <a href="admin-post-job.html" class="nav-item"><i class="fa-solid fa-pen-to-square"></i> Post Job</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">Finance</div>
+            <a href="admin-deposits.html" class="nav-item"><i class="fa-solid fa-arrow-down" style="color:var(--success);"></i> Deposits</a>
+            <a href="admin-withdrawals.html" class="nav-item"><i class="fa-solid fa-arrow-up" style="color:var(--danger);"></i> Withdrawals</a>
+            <a href="admin-deposit-issues.html" class="nav-item"><i class="fas fa-exclamation-triangle"></i> Errors</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-label">System</div>
+            <a href="admin-blogs.html" class="nav-item"><i class="fa-solid fa-blog"></i> Blogs & News</a>
+            <a href="admin-support.html" class="nav-item"><i class="fa-solid fa-headset"></i> Support</a>
+            <a href="admin-broadcasts.html" class="nav-item"><i class="fa-solid fa-bullhorn"></i> Broadcasts</a>
+            <a href="#" onclick="logout()" class="nav-item" style="color:var(--danger); margin-top:20px;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
+        </div>
+    </nav>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <div class="page-header animate__animated animate__fadeIn">
+            <div class="page-title">
+                <h1>Applications Command</h1>
+                <p>Manage candidate workflows, verify payments, and access detailed profiles.</p>
+            </div>
+            <button class="btn-master-report" onclick="exportFullReport()">
+                <i class="fas fa-file-pdf"></i> Master Report
+            </button>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar animate__animated animate__fadeInUp">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search Applicant, Email, Code..." onkeyup="debounceFilter()">
+            </div>
+            <select id="statusFilter" onchange="filterApps()">
+                <option value="all">Status: All</option>
+                <option value="pending">Pending</option>
+                <option value="received">Received</option>
+                <option value="shortlisted">Shortlisted</option>
+                <option value="hired">Hired</option>
+                <option value="rejected">Rejected</option>
+            </select>
+            <select id="typeFilter" onchange="filterApps()">
+                <option value="all">Type: All</option>
+                <option value="guaranteed">Guaranteed</option>
+                <option value="standard">Standard</option>
+            </select>
+            <select id="paymentFilter" onchange="filterApps()">
+                <option value="all">Payment: Any</option>
+                <option value="approved">Approved</option>
+                <option value="pending">Pending Payment</option>
+            </select>
+            
+            <!-- DELETE ALL REJECTED BUTTON -->
+            <button class="btn-danger-action" onclick="deleteAllRejected(this)">
+                <i class="fas fa-trash-can"></i> Flush Rejected
+            </button>
+        </div>
+
+        <!-- Grid -->
+        <div class="apps-grid" id="appsGrid">
+            <div style="grid-column:1/-1; text-align:center; padding:50px; color:var(--text-muted);">
+                <span class="loading-spinner" style="width:20px; height:20px;"></span> Loading Applications...
+            </div>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="pagination-bar" id="paginationBar" style="display:none;">
+            <button class="page-btn" id="prevBtn" onclick="changePage(-1)">Previous</button>
+            <span id="pageIndicator" style="font-size:0.85rem; color:var(--text-muted);">Page 1</span>
+            <button class="page-btn" id="nextBtn" onclick="changePage(1)">Next</button>
+        </div>
+    </main>
+
+    <!-- VIEW DETAILS MODAL -->
+    <div id="viewModal" class="view-modal">
+        <div class="modal-glass">
+            <div class="modal-header">
+                <h3>Application Details</h3>
+                <button class="close-modal" onclick="closeViewModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content Injected via JS -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-export-full" id="modalDownloadBtn">
+                    <i class="fas fa-file-pdf"></i> Download Official Profile
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST & FIREBASE -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module">
+        import { auth, db } from './config.js'; 
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { collection, getDocs, getDoc, doc, query, orderBy, updateDoc, addDoc, serverTimestamp, deleteDoc, runTransaction, where, documentId } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+        // --- GLOBAL UTILS ---
+        window.toggleSidebar = () => { document.getElementById('sidebar').classList.toggle('active'); document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('active') ? 'block' : 'none'; };
+        window.logout = () => { if(confirm("Log out?")) signOut(auth).then(() => location.href='signin.html'); };
+        
+        window.handleActionWithSpinner = (btn, action) => {
+            if(btn.dataset.processing === "true") return;
+            btn.dataset.processing = "true";
+            const original = btn.innerHTML;
+            btn.innerHTML = `<span class="loading-spinner"></span>`;
+            setTimeout(async () => {
+                await action();
+                btn.innerHTML = original;
+                btn.dataset.processing = "false";
+            }, 300);
+        };
+
+        // Privacy Helper - With Email Logic
+        function maskString(str, type) {
+            if(!str) return 'N/A';
+            if(type === 'phone') {
+                if(str.length < 8) return str;
+                return str.substring(0, 4) + ' *** ' + str.substring(str.length - 3);
+            }
+            if(type === 'email') {
+                const parts = str.split('@');
+                if(parts.length !== 2) return str;
+                return parts[0].substring(0, 3) + '***@' + parts[1];
+            }
+            if(type === 'id') {
+                if(str.length < 5) return '***';
+                return str.substring(0, 2) + '****' + str.substring(str.length - 2);
+            }
+            return str;
+        }
+
+        // --- APP STATE ---
+        let allApplications = [];
+        let filteredApps = [];
+        let currentPage = 1;
+        const itemsPerPage = 12;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { location.href = 'signin.html'; return; }
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if(userDoc.exists() && ['admin','owner'].includes(userDoc.data().role)) {
+                loadApps();
+            } else {
+                document.body.innerHTML = "<h2 style='color:white;text-align:center;padding:50px;'>Access Denied.</h2>";
+            }
+        });
+
+        // --- UPDATED LOAD FUNCTION: FETCHES EMAILS VIA USER JOIN ---
+        async function loadApps() {
+            const grid = document.getElementById('appsGrid');
+            try {
+                // 1. Fetch all applications
+                const [stdSnap, gtdSnap] = await Promise.all([
+                    getDocs(query(collection(db, "applications"), orderBy("appliedAt", "desc"))),
+                    getDocs(query(collection(db, "guaranteed_applications"), orderBy("appliedAt", "desc")))
+                ]);
+
+                let rawApps = [];
+                let userIds = new Set();
+
+                // 2. Process Initial Data and Collect User IDs
+                const processRaw = (d, type) => {
+                    const data = d.data();
+                    const uid = data.seekerId || data.applicantId || data.userId;
+                    if(uid) userIds.add(uid);
+                    
+                    return { 
+                        id: d.id, 
+                        ...data,
+                        uid: uid, 
+                        appType: type, 
+                        rawDate: data.appliedAt,
+                        paymentVerified: data.payment?.verified === true
+                    };
+                };
+
+                stdSnap.forEach(d => rawApps.push(processRaw(d, 'standard')));
+                gtdSnap.forEach(d => rawApps.push(processRaw(d, 'guaranteed')));
+
+                // 3. Fetch User Profiles to get Emails (Batching to avoid limits)
+                const uniqueIds = Array.from(userIds);
+                const userMap = {};
+                const chunkSize = 10;
+                
+                for (let i = 0; i < uniqueIds.length; i += chunkSize) {
+                    const chunk = uniqueIds.slice(i, i + chunkSize);
+                    if(chunk.length === 0) continue;
+                    
+                    const q = query(collection(db, "users"), where(documentId(), 'in', chunk));
+                    const userSnaps = await getDocs(q);
+                    userSnaps.forEach(u => {
+                        userMap[u.id] = u.data(); 
+                    });
+                }
+
+                // 4. Merge Data
+                allApplications = rawApps.map(app => {
+                    const userProfile = userMap[app.uid] || {};
+                    const finalEmail = app.seekerEmail || app.applicantEmail || userProfile.email || 'N/A';
+                    const finalPhone = app.seekerPhone || app.applicantPhone || userProfile.phoneNumber || 'N/A';
+                    const finalName = app.applicantName || app.seekerName || userProfile.fullName || 'Unknown';
+
+                    return {
+                        ...app,
+                        email: finalEmail,
+                        seekerPhone: finalPhone,
+                        applicantName: finalName
+                    };
+                });
+                
+                allApplications.sort((a, b) => (b.rawDate?.seconds || 0) - (a.rawDate?.seconds || 0));
+                filteredApps = [...allApplications];
+                renderGrid();
+                
+            } catch (e) {
+                console.error("Loading Error:", e);
+                grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:#ef4444;"><h3>Error</h3><p>${e.message}</p></div>`;
+            }
+        }
+
+        let debounceTimer;
+        window.debounceFilter = () => { clearTimeout(debounceTimer); debounceTimer = setTimeout(window.filterApps, 300); };
+
+        window.filterApps = () => {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const statusF = document.getElementById('statusFilter').value;
+            const typeF = document.getElementById('typeFilter').value;
+            const payF = document.getElementById('paymentFilter').value;
+
+            filteredApps = allApplications.filter(app => {
+                const s = (app.status || 'pending').toLowerCase();
+                const txn = (app.payment?.txnCode || '').toLowerCase();
+                const name = (app.applicantName || app.seekerName || '').toLowerCase();
+                const email = (app.email || '').toLowerCase();
+                const job = (app.jobTitle || '').toLowerCase();
+                
+                const matchSearch = name.includes(search) || email.includes(search) || txn.includes(search) || job.includes(search) || app.id.includes(search);
+                let matchStatus = (statusF === 'all') || (s === statusF);
+                let matchType = (typeF === 'all') || (app.appType === typeF);
+                let payStatus = app.paymentVerified ? 'approved' : 'pending';
+                let matchPay = (payF === 'all') || (payStatus === payF);
+
+                return matchSearch && matchStatus && matchType && matchPay;
+            });
+            currentPage = 1;
+            renderGrid();
+        };
+
+        window.renderGrid = () => {
+            const grid = document.getElementById('appsGrid');
+            const pgBar = document.getElementById('paginationBar');
+            
+            if(filteredApps.length === 0) {
+                grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px; opacity:0.5;">No applications found matching your criteria.</div>`;
+                pgBar.style.display = 'none';
+                return;
+            }
+
+            const totalPages = Math.ceil(filteredApps.length / itemsPerPage);
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageData = filteredApps.slice(start, end);
+
+            grid.innerHTML = pageData.map(app => createCard(app)).join('');
+
+            pgBar.style.display = 'flex';
+            document.getElementById('pageIndicator').innerText = `Page ${currentPage} of ${totalPages}`;
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+        };
+
+        window.changePage = (dir) => { currentPage += dir; renderGrid(); window.scrollTo({top:0, behavior:'smooth'}); };
+
+        window.deleteAllRejected = async (btn) => {
+            const rejectedApps = allApplications.filter(app => app.status === 'rejected');
+            if (rejectedApps.length === 0) {
+                Toastify({text: "No rejected applications found.", style:{background:"var(--blue)"}}).showToast();
+                return;
+            }
+
+            if (!confirm(`Permanently delete ALL ${rejectedApps.length} rejected applications? This cannot be undone.`)) return;
+
+            handleActionWithSpinner(btn, async () => {
+                let deletedCount = 0;
+                try {
+                    for (const app of rejectedApps) {
+                        const coll = app.appType === 'guaranteed' ? 'guaranteed_applications' : 'applications';
+                        await deleteDoc(doc(db, coll, app.id));
+                        deletedCount++;
+                    }
+                    allApplications = allApplications.filter(app => app.status !== 'rejected');
+                    Toastify({text: `Success! Flushed ${deletedCount} applications.`, style:{background:"var(--success)"}}).showToast();
+                    filterApps();
+                } catch (e) {
+                    console.error(e);
+                    Toastify({text: "Error during deletion.", style:{background:"var(--danger)"}}).showToast();
+                }
+            });
+        };
+
+        function createCard(app) {
+            const status = (app.status || 'pending').toLowerCase();
+            const payStatus = app.paymentVerified ? 'Approved' : 'Pending';
+            const payClass = app.paymentVerified ? 'pay-approved' : 'pay-pending';
+            const txn = app.payment?.txnCode || 'N/A';
+            
+            let dateStr = 'N/A';
+            if(app.rawDate) {
+                const d = new Date(app.rawDate.seconds * 1000);
+                dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            }
+
+            const jobTitle = app.jobTitle || 'General Application';
+            
+            const isRejected = status === 'rejected';
+            const isHired = status === 'hired';
+            const lockButtons = isRejected || isHired; 
+
+            const typeBadge = app.appType === 'guaranteed' 
+                ? `<span class="app-type-badge badge-guaranteed">Gtd</span>` 
+                : `<span class="app-type-badge badge-standard">Std</span>`;
+
+            let actionRowHtml = '';
+            if (isRejected) {
+                actionRowHtml = `<button class="btn-reject-card" style="width:100%" onclick="setStatus(this,'${app.id}','${app.appType}','rejected', true)"><i class="fas fa-trash"></i> DELETE PERMANENTLY</button>`;
+            } else if (status === 'shortlisted') {
+                 actionRowHtml = `
+                    <button class="btn-hire" onclick="setStatus(this,'${app.id}','${app.appType}','hired')">HIRE NOW</button>
+                    <button class="btn-reject-card" onclick="setStatus(this,'${app.id}','${app.appType}','rejected')">REJECT</button>
+                 `;
+            } else if (status === 'hired') {
+                actionRowHtml = ``; // No actions if hired
+            } else {
+                actionRowHtml = `<button class="btn-reject-card" style="width:100%" onclick="setStatus(this,'${app.id}','${app.appType}','rejected')">REJECT CANDIDATE</button>`;
+            }
+
+            return `
+            <div class="app-card status-${status} animate__animated animate__fadeIn">
+                <div class="card-header">
+                    <div class="applicant-info">
+                        <img src="${app.applicantPhoto || './assets/images/default-avatar.png'}" class="app-avatar" onerror="this.src='./assets/images/default-avatar.png'">
+                        <div class="app-name-box">
+                            <h4 style="display:flex; align-items:center;">
+                                ${app.applicantName || app.seekerName}
+                                ${typeBadge}
+                            </h4>
+                            <p>${maskString(app.email, 'email')}</p>
+                        </div>
+                    </div>
+                    <span class="status-pill pill-${status}">${status.replace('_',' ')}</span>
+                </div>
+
+                <div class="card-body">
+                    <div class="job-meta">
+                        <div class="job-title">${jobTitle}</div>
+                        <div class="company-name"><i class="fas fa-building"></i> ${app.company || 'EastLink'}</div>
+                        <div class="info-row"><i class="far fa-clock"></i> ${dateStr}</div>
+                    </div>
+                    
+                    <div class="payment-box">
+                        <div>
+                            <div style="font-size:0.65rem; color:var(--text-muted); text-transform:uppercase;">Code</div>
+                            <div style="font-weight:700; color:var(--text-main); font-family:var(--font-mono); font-size:0.85rem;">${txn}</div>
+                        </div>
+                        <button class="pay-status-btn ${payClass}" 
+                            onclick="togglePayment(this, '${app.id}', '${app.appType}', ${app.paymentVerified})">
+                            ${payStatus}
+                        </button>
+                    </div>
+
+                    <div class="progress-controls">
+                        <button class="progress-btn ${status==='received'?'active':''}" ${lockButtons?'disabled':''} onclick="setStatus(this,'${app.id}','${app.appType}','received')">Received</button>
+                        <button class="progress-btn ${status==='shortlisted'?'active':''}" ${lockButtons?'disabled':''} onclick="setStatus(this,'${app.id}','${app.appType}','shortlisted')">Shortlist</button>
+                    </div>
+
+                    <div class="action-row">
+                         ${actionRowHtml}
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    <button class="btn-view-details" onclick="openViewModal('${app.id}')">
+                        <i class="fas fa-eye"></i> View Full Details
+                    </button>
+                </div>
+            </div>
+            `;
+        }
+
+        // --- NEW MODAL LOGIC WITH EMAIL ---
+        window.openViewModal = (id) => {
+            const app = allApplications.find(a => a.id === id);
+            if(!app) return;
+
+            const modalBody = document.getElementById('modalBody');
+            
+            // Format Data
+            const name = app.applicantName || app.seekerName;
+            const phone = app.seekerPhone || app.applicantPhone || 'N/A';
+            const email = app.email || 'N/A'; 
+            const idNum = app.seekerNationalId || app.applicantIdNumber || 'N/A';
+            const age = app.seekerAge || app.applicantAge || 'N/A';
+            const loc = app.seekerLocation || app.applicantLocation || 'N/A';
+            const date = app.rawDate ? new Date(app.rawDate.seconds * 1000).toLocaleString() : 'N/A';
+            
+            modalBody.innerHTML = `
+                <!-- Applicant -->
+                <div>
+                    <div class="modal-section-title">Candidate Information</div>
+                    <div class="details-grid">
+                        <div class="detail-item"><label>Full Name</label><span>${name}</span></div>
+                        <div class="detail-item"><label>Email Address</label><span style="text-transform:lowercase">${email}</span></div>
+                        <div class="detail-item"><label>Phone Number</label><span>${phone}</span></div>
+                        <div class="detail-item"><label>National ID</label><span>${idNum}</span></div>
+                        <div class="detail-item"><label>Age</label><span>${age} Years</span></div>
+                        <div class="detail-item"><label>Location</label><span>${loc}</span></div>
+                    </div>
+                </div>
+
+                <!-- Job -->
+                <div>
+                    <div class="modal-section-title">Application & Job</div>
+                    <div class="details-grid">
+                        <div class="detail-item"><label>Job Title</label><span>${app.jobTitle}</span></div>
+                        <div class="detail-item"><label>Company</label><span>${app.company || 'EastLink'}</span></div>
+                        <div class="detail-item"><label>Application Type</label><span style="color:var(--gold-base)">${app.appType.toUpperCase()}</span></div>
+                        <div class="detail-item"><label>Applied On</label><span>${date}</span></div>
+                    </div>
+                </div>
+
+                <!-- Payment -->
+                <div>
+                    <div class="modal-section-title">Payment Verification</div>
+                    <div class="details-grid" style="background:rgba(16, 185, 129, 0.05); padding:12px; border-radius:8px; border:1px solid rgba(16,185,129,0.1);">
+                        <div class="detail-item"><label>Transaction Code</label><span style="font-family:var(--font-mono); color:#34d399;">${app.payment?.txnCode || 'N/A'}</span></div>
+                        <div class="detail-item"><label>Amount Paid</label><span>KES ${app.payment?.amount || 0}</span></div>
+                        <div class="detail-item"><label>Status</label><span>${app.paymentVerified ? 'VERIFIED' : 'PENDING'}</span></div>
+                        <div class="detail-item"><label>Method</label><span>M-Pesa Buy Goods</span></div>
+                    </div>
+                </div>
+
+                <!-- Experience -->
+                <div>
+                    <div class="modal-section-title">Professional Summary / Experience</div>
+                    <div class="text-block">${app.seekerExp || "No detailed experience provided."}</div>
+                </div>
+            `;
+
+            // Attach Download Event
+            const btn = document.getElementById('modalDownloadBtn');
+            btn.onclick = () => exportSinglePDF(id);
+
+            document.getElementById('viewModal').style.display = 'flex';
+        };
+
+        window.closeViewModal = () => {
+            document.getElementById('viewModal').style.display = 'none';
+        };
+
+        // --- RESTORED PAYMENT LOGIC (Referral Bonus & Undo) ---
+        window.togglePayment = async (btn, id, type, currentStatus) => {
+            const coll = type === 'guaranteed' ? 'guaranteed_applications' : 'applications';
+            const appRef = doc(db, coll, id);
+
+            if(currentStatus) {
+                if(!confirm("Undo payment approval?")) return;
+                handleActionWithSpinner(btn, async () => {
+                    try {
+                        await updateDoc(appRef, { "payment.verified": false });
+                        Toastify({text: "Payment status undone.", style:{background:"var(--blue)"}}).showToast();
+                        const app = allApplications.find(a => a.id === id);
+                        if(app) app.paymentVerified = false;
+                        renderGrid();
+                    } catch (e) { console.error(e); }
+                });
+                return;
+            }
+
+            if(!confirm("Approve Payment? This action may trigger referral bonuses.")) return;
+            handleActionWithSpinner(btn, async () => {
+                try {
+                    await runTransaction(db, async (transaction) => {
+                        const appDoc = await transaction.get(appRef);
+                        if (!appDoc.exists()) throw "Application does not exist!";
+                        const appData = appDoc.data();
+                        const seekerId = appData.seekerId || appData.applicantId; 
+                        const seekerRef = doc(db, "users", seekerId);
+                        const seekerDoc = await transaction.get(seekerRef);
+                        const seekerData = seekerDoc.exists() ? seekerDoc.data() : {};
+                        
+                        if (seekerData.referredBy && !seekerData.referralCommissionGenerated) {
+                            const referrerId = seekerData.referredBy;
+                            const referrerRef = doc(db, "users", referrerId);
+                            const referrerDoc = await transaction.get(referrerRef);
+                            if (referrerDoc.exists()) {
+                                const bonusAmount = (type === 'guaranteed') ? 1000 : 500;
+                                const newRefBalance = (referrerDoc.data().referralCommissionBalance || 0) + bonusAmount;
+                                transaction.update(referrerRef, { referralCommissionBalance: newRefBalance });
+                                transaction.set(doc(collection(db, "referral_earnings")), {
+                                    referrerId, referredUserId: seekerId, amount: bonusAmount, jobType: type, applicationId: id, createdAt: serverTimestamp()
+                                });
+                                transaction.update(seekerRef, { referralCommissionGenerated: bonusAmount });
+                                transaction.set(doc(collection(db, "notifications")), {
+                                    userId: referrerId, title: "Referral Bonus Earned!", message: `You earned KES ${bonusAmount}!`, type: "commission", read: false, timestamp: serverTimestamp()
+                                });
+                            }
+                        }
+                        transaction.update(appRef, { "payment.verified": true });
+                    });
+                    Toastify({text: "Payment Verified!", style:{background:"var(--success)"}}).showToast();
+                    const app = allApplications.find(a => a.id === id);
+                    if(app) app.paymentVerified = true;
+                    renderGrid();
+                } catch (e) { console.error(e); Toastify({text: "Error verifying payment.", style:{background:"var(--danger)"}}).showToast(); }
+            });
+        };
+
+        window.setStatus = async (btn, id, type, newStatus, forceDelete = false) => {
+            if(btn.disabled) return;
+            if (newStatus === 'rejected' || forceDelete) {
+                if(!confirm(`PERMANENTLY DELETE application?`)) return;
+                handleActionWithSpinner(btn, async () => {
+                    const coll = type === 'guaranteed' ? 'guaranteed_applications' : 'applications';
+                    await deleteDoc(doc(db, coll, id));
+                    allApplications = allApplications.filter(app => app.id !== id);
+                    Toastify({text: "Deleted", style:{background:"var(--danger)"}}).showToast();
+                    filterApps();
+                });
+            } else {
+                if(!confirm(`Update status to ${newStatus}?`)) return;
+                handleActionWithSpinner(btn, async () => {
+                    const coll = type === 'guaranteed' ? 'guaranteed_applications' : 'applications';
+                    await updateDoc(doc(db, coll, id), { status: newStatus, updatedAt: serverTimestamp() });
+                    Toastify({text: `Status: ${newStatus}`, style:{background:"var(--gold-gradient)", color:"black"}}).showToast();
+                    const app = allApplications.find(a => a.id === id);
+                    if(app) app.status = newStatus;
+                    renderGrid(); 
+                });
+            }
+        };
+
+        const getBase64ImageFromUrl = async (imageUrl) => {
+            try {
+                const res = await fetch(imageUrl);
+                const blob = await res.blob();
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.readAsDataURL(blob);
+                });
+            } catch (e) { return null; }
+        };
+
+        window.exportSinglePDF = async (id) => {
+            const app = allApplications.find(a => a.id === id);
+            if(!app) return;
+
+            const btn = document.getElementById('modalDownloadBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="loading-spinner"></span> Generating...`;
+
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                doc.setFillColor(2, 6, 23); 
+                doc.rect(0, 0, 210, 40, 'F');
+                
+                const logoData = await getBase64ImageFromUrl('./assets/images/logo.png');
+                if(logoData) {
+                    doc.addImage(logoData, 'PNG', 15, 8, 20, 20); 
+                    doc.setFont("helvetica", "bold"); doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.text("EASTLINK", 40, 22);
+                } else {
+                    doc.setFont("helvetica", "bold"); doc.setTextColor(251, 191, 36); doc.setFontSize(22); doc.text("EASTLINK RECRUITERS", 15, 25);
+                }
+
+                doc.setFontSize(10); doc.setTextColor(200, 200, 200);
+                doc.text("Official Candidate Profile & Application Record", 150, 22, {align: 'right'});
+                doc.line(15, 38, 195, 38); 
+
+                let y = 55;
+                doc.setTextColor(0,0,0); doc.setFontSize(14); doc.setFont("helvetica", "bold"); doc.text("APPLICATION DETAILS", 15, y); y += 8;
+                doc.setDrawColor(200, 200, 200); doc.setFillColor(241, 245, 249); doc.rect(15, y, 180, 25, 'FD');
+                
+                doc.setFontSize(10); doc.setFont("helvetica", "bold"); doc.text("Job Title:", 20, y+8);
+                doc.setFont("helvetica", "normal"); doc.text(app.jobTitle || 'N/A', 50, y+8);
+                doc.setFont("helvetica", "bold"); doc.text("Company:", 20, y+16);
+                doc.setFont("helvetica", "normal"); doc.text(app.company || 'EastLink', 50, y+16);
+                doc.setFont("helvetica", "bold"); doc.text("Status:", 120, y+8);
+                doc.setFont("helvetica", "normal"); doc.text(app.status.toUpperCase(), 140, y+8);
+                doc.setFont("helvetica", "bold"); doc.text("Type:", 120, y+16);
+                doc.setFont("helvetica", "normal"); doc.text(app.appType.toUpperCase(), 140, y+16);
+
+                y += 40;
+                const name = app.applicantName || app.seekerName;
+                const phone = maskString(app.seekerPhone || app.applicantPhone, 'phone');
+                const email = app.email || 'N/A'; // Full email in PDF
+                const idNum = maskString(app.seekerNationalId || app.applicantIdNumber, 'id');
+                
+                doc.setFontSize(14); doc.setFont("helvetica", "bold"); doc.text("CANDIDATE INFORMATION", 15, y); y += 8;
+                doc.setDrawColor(200, 200, 200); doc.rect(15, y, 180, 50, 'S');
+                
+                doc.setFontSize(11);
+                doc.text(`Name:`, 20, y+10); doc.setFont("helvetica", "normal"); doc.text(name, 50, y+10);
+                doc.setFont("helvetica", "bold"); doc.text(`Email:`, 20, y+20); doc.setFont("helvetica", "normal"); doc.text(email, 50, y+20);
+                doc.setFont("helvetica", "bold"); doc.text(`Phone:`, 20, y+30); doc.setFont("helvetica", "normal"); doc.text(phone, 50, y+30);
+                doc.setFont("helvetica", "bold"); doc.text(`ID No:`, 20, y+40); doc.setFont("helvetica", "normal"); doc.text(idNum, 50, y+40);
+                
+                let dateTxt = 'N/A'; if(app.rawDate) dateTxt = new Date(app.rawDate.seconds * 1000).toLocaleDateString();
+                doc.setFont("helvetica", "bold"); doc.text(`App ID:`, 120, y+10); doc.setFont("helvetica", "normal"); doc.text(app.id.substring(0,8), 140, y+10);
+                doc.setFont("helvetica", "bold"); doc.text(`Applied:`, 120, y+20); doc.setFont("helvetica", "normal"); doc.text(dateTxt, 140, y+20);
+
+                y += 65;
+                doc.setFontSize(14); doc.setFont("helvetica", "bold"); doc.text("EXPERIENCE SUMMARY", 15, y); y += 5;
+                const expText = doc.splitTextToSize(app.seekerExp || "No detailed experience provided.", 180);
+                doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.text(expText, 15, y+5);
+
+                const pageHeight = doc.internal.pageSize.height;
+                doc.setFillColor(241, 245, 249); doc.rect(0, pageHeight - 40, 210, 40, 'F');
+                doc.setFont("courier", "bold"); doc.setFontSize(12); doc.text("PAYMENT VERIFICATION", 15, pageHeight - 25);
+                doc.setFontSize(10); doc.setFont("courier", "normal");
+                const payTxt = app.paymentVerified ? "VERIFIED & APPROVED" : "PENDING VERIFICATION";
+                doc.text(`STATUS: ${payTxt}`, 15, pageHeight - 18);
+                doc.text(`TXN ID: ${app.payment?.txnCode || 'N/A'}`, 15, pageHeight - 12);
+                doc.text(`AMOUNT: KES ${app.payment?.amount || 0}`, 120, pageHeight - 12);
+
+                doc.save(`${name.replace(/\s+/g,'_')}_EastLink_Profile.pdf`);
+                btn.innerHTML = originalText;
+            } catch(e) {
+                console.error(e);
+                btn.innerHTML = originalText;
+                Toastify({text: "Error generating PDF", style:{background:"var(--danger)"}}).showToast();
+            }
+        };
+
+        window.exportFullReport = async () => {
+            if(!filteredApps.length) return alert("No data to export");
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFillColor(2, 6, 23); doc.rect(0, 0, 210, 30, 'F');
+            doc.setTextColor(255, 255, 255); doc.setFontSize(16); doc.text("Master Application Report", 15, 15);
+            doc.setFontSize(9); doc.text(`Generated: ${new Date().toLocaleString()}`, 15, 22);
+            
+            const tableData = filteredApps.map(a => [
+                a.id.substring(0,8),
+                a.applicantName || a.seekerName,
+                a.email || 'N/A', // Email in master report
+                a.jobTitle,
+                a.status.toUpperCase(),
+                a.appType === 'guaranteed' ? 'G' : 'S',
+                a.paymentVerified ? 'Paid' : 'Pending'
+            ]);
+
+            doc.autoTable({
+                head: [['ID', 'Name', 'Email', 'Job', 'Status', 'Type', 'Pay']],
+                body: tableData,
+                startY: 35,
+                theme: 'grid',
+                headStyles: { fillColor: [2, 6, 23], textColor: [251, 191, 36] },
+                styles: { fontSize: 7, cellPadding: 2 }
+            });
+
+            doc.save("EastLink_Master_Report.pdf");
+        };
+
+    </script>
+</body>
+</html>

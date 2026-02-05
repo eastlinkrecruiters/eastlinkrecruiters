@@ -34,7 +34,7 @@
             --purple-gradient: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
             --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
             --deep-navy: #020617;
-            --glass: blur(16px); /* Increased blur for better transparency feel */
+            --glass: blur(16px);
             --text: #ffffff;
             --text-muted: #94a3b8;   
             --border-color: rgba(255, 255, 255, 0.08); 
@@ -53,7 +53,7 @@
             overflow-x: hidden;
             min-height: 100vh;
             position: relative;
-            opacity: 0; /* Hidden by default until preloader finishes */
+            opacity: 0; /* Hidden by default until Auth check finishes */
             transition: opacity 0.8s ease-out;
         }
 
@@ -70,7 +70,7 @@
 
         body::after {
             content: ''; position: fixed; inset: 0;
-            background: rgba(2, 6, 23, 0.2); /* Reduced opacity for more visibility */
+            background: rgba(2, 6, 23, 0.2); 
             z-index: -4; pointer-events: none;
         }
 
@@ -80,21 +80,6 @@
 
         .container { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
         .section { padding: 4rem 0; position: relative; z-index: 2; } 
-
-        /* PRELOADER */
-        #preloader {
-            position: fixed; inset: 0; background: #020617; z-index: 9999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 0.5s ease, visibility 0.5s;
-        }
-        .loader-logo { font-family: 'Cinzel', serif; font-size: 2rem; font-weight: 800; margin-bottom: 20px; letter-spacing: 2px; }
-        .loader-logo span { color: #f59e0b; }
-        .spinner {
-            width: 40px; height: 40px; border: 3px solid rgba(245, 158, 11, 0.3);
-            border-radius: 50%; border-top-color: #f59e0b;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
 
         /* Scroll Progress */
         #scroll-progress {
@@ -113,6 +98,57 @@
         }
         #back-to-top.visible { opacity: 1; pointer-events: all; }
         #back-to-top:hover { background: #a855f7; color: #fff; transform: translateY(-5px); }
+
+        /* =========================================
+           ADVANCED PWA INSTALL POPUP
+           ========================================= */
+        #pwa-install-banner {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 9999;
+            padding: 12px 20px;
+            display: none; /* Hidden by default */
+            flex-direction: row; align-items: center; justify-content: space-between;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .pwa-content { display: flex; align-items: center; gap: 15px; }
+        .pwa-logo { width: 45px; height: 45px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); }
+        .pwa-text h4 { font-family: 'Cinzel', serif; font-size: 1rem; color: #fff; margin-bottom: 2px; }
+        .pwa-text p { font-size: 0.8rem; color: var(--text-muted); line-height: 1.2; margin: 0; }
+        
+        .pwa-actions { display: flex; align-items: center; gap: 10px; }
+        
+        .btn-pwa-install {
+            background: var(--gold-gradient);
+            color: #000; border: none; padding: 8px 20px; border-radius: 30px;
+            font-weight: 700; font-size: 0.85rem; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+            transition: 0.3s;
+        }
+        .btn-pwa-install:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5); }
+
+        .btn-pwa-close {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);
+            color: var(--text-muted); width: 32px; height: 32px; border-radius: 50%;
+            display: grid; place-items: center; cursor: pointer; transition: 0.3s;
+        }
+        .btn-pwa-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+        @media (max-width: 600px) {
+            #pwa-install-banner { flex-direction: column; align-items: flex-start; gap: 15px; padding: 20px; }
+            .pwa-actions { width: 100%; justify-content: space-between; }
+            .btn-pwa-install { flex-grow: 1; text-align: center; }
+        }
+
 
         /* =========================================
            HERO SECTION
@@ -218,32 +254,32 @@
 
         .btn-hero-primary {
             position: relative; 
-            padding: 12px 28px; /* Reduced padding */
+            padding: 12px 28px; 
             border-radius: 50px;
             background: var(--purple-gradient);
             color: white; font-weight: 700; border: none; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             line-height: 1.2; text-align: center; 
-            min-width: 130px; min-height: 52px; /* Reduced size */
+            min-width: 130px; min-height: 52px; 
             box-shadow: 0 10px 25px -5px rgba(168, 85, 247, 0.4); transition: 0.3s;
         }
-        .btn-hero-primary span { font-size: 0.95rem; } /* Reduced text size */
+        .btn-hero-primary span { font-size: 0.95rem; } 
         .btn-hero-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 30px -5px rgba(168, 85, 247, 0.6); }
         .btn-hero-primary i { position: absolute; right: 15px; font-size: 0.8rem; }
 
         .btn-hero-secondary {
             position: relative; 
-            padding: 12px 28px; /* Reduced padding */
+            padding: 12px 28px; 
             border-radius: 50px;
-            background: rgba(15, 23, 42, 0.4); /* More transparent */
+            background: rgba(15, 23, 42, 0.4); 
             border: 1px solid rgba(255, 255, 255, 0.15);
             color: white; font-weight: 600; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             line-height: 1.2; text-align: center; 
-            min-width: 130px; min-height: 52px; /* Reduced size */
+            min-width: 130px; min-height: 52px; 
             backdrop-filter: blur(5px); transition: 0.3s;
         }
-        .btn-hero-secondary span { font-size: 0.95rem; } /* Reduced text size */
+        .btn-hero-secondary span { font-size: 0.95rem; } 
         .btn-hero-secondary:hover { border-color: #f59e0b; background: rgba(2, 6, 23, 0.7); transform: translateY(-3px); }
         .btn-hero-secondary i { position: absolute; left: 15px; font-size: 0.8rem; color: #fff; }
 
@@ -257,7 +293,7 @@
             border-bottom: 1px solid transparent;
         }
         header.scrolled {
-            background: rgba(2, 6, 23, 0.85); /* Increased transparency (was 0.95) */
+            background: rgba(2, 6, 23, 0.85); 
             backdrop-filter: blur(16px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -275,7 +311,6 @@
             background: var(--gold-text);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            /* Fallback for non-webkit */
             color: #f59e0b; 
         }
 
@@ -313,7 +348,7 @@
         
         /* Ticker */
         .ticker-strip {
-            background: rgba(15, 23, 42, 0.6); /* More transparent */
+            background: rgba(15, 23, 42, 0.6); 
             border-top: 1px solid var(--border-color); 
             border-bottom: 1px solid var(--border-color);
             padding: 12px 0; backdrop-filter: blur(15px); 
@@ -328,7 +363,7 @@
         /* Search */
         .search-strip { padding: 2rem 0; position: relative; z-index: 5; }
         .search-container {
-            background: rgba(15, 23, 42, 0.5); /* More transparent */
+            background: rgba(15, 23, 42, 0.5); 
             backdrop-filter: blur(20px); border: 1px solid var(--border-color);
             border-radius: 100px; padding: 6px 8px; display: flex; align-items: center; justify-content: space-between;
             max-width: 800px; margin: 0 auto; box-shadow: 0 15px 40px rgba(0,0,0,0.3);
@@ -349,7 +384,7 @@
 
         /* Job Cards - More Transparent */
         .job-card {
-            background: rgba(17, 24, 39, 0.5); /* Reduced opacity (was 0.7) */
+            background: rgba(17, 24, 39, 0.5); 
             border: 1px solid rgba(255,255,255,0.08);
             border-radius: 20px; padding: 24px; position: relative;
             display: flex; flex-direction: column; min-height: 280px;
@@ -384,7 +419,7 @@
 
         /* Process & Industries - Glass Effect */
         .glass-card {
-            background: rgba(15, 23, 42, 0.3); /* Significantly clearer glass (was 0.45) */
+            background: rgba(15, 23, 42, 0.3); 
             backdrop-filter: var(--glass);
             border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; transition: 0.3s;
             position: relative; overflow: hidden;
@@ -456,10 +491,19 @@
 </head>
 <body>
 
-    <!-- PRELOADER -->
-    <div id="preloader">
-        <div class="loader-logo">EAST<span>LINK</span></div>
-        <div class="spinner"></div>
+    <!-- PWA INSTALL BANNER -->
+    <div id="pwa-install-banner">
+        <div class="pwa-content">
+            <img src="./assets/images/logo.png" alt="EastLink Logo" class="pwa-logo">
+            <div class="pwa-text">
+                <h4>Install EastLink App</h4>
+                <p>Get instant access to top jobs with our native app.</p>
+            </div>
+        </div>
+        <div class="pwa-actions">
+            <button id="pwa-install-btn" class="btn-pwa-install">Install Now</button>
+            <button id="pwa-close-btn" class="btn-pwa-close"><i class="fas fa-times"></i></button>
+        </div>
     </div>
 
     <!-- Scroll Progress -->
@@ -729,21 +773,57 @@
         import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
         // ==========================================
-        // 1. PAGE ENTRY, PRELOADER & AUTH LOGIC (UPDATED)
+        // 0. PWA SERVICE WORKER REGISTRATION
         // ==========================================
-        
-        const preloader = document.getElementById('preloader');
-
-        function hidePreloaderAndAnimate() {
-            preloader.style.opacity = '0';
-            setTimeout(() => {
-                preloader.style.visibility = 'hidden';
-                document.body.style.opacity = '1';
-                triggerHeroAnimations();
-            }, 500);
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js')
+                    .then(reg => console.log('SW Registered', reg))
+                    .catch(err => console.log('SW Registration Failed', err));
+            });
         }
 
-        // Trigger animations after preloader is gone
+        // PWA Install Prompt Logic
+        let deferredPrompt;
+        const pwaBanner = document.getElementById('pwa-install-banner');
+        const installBtn = document.getElementById('pwa-install-btn');
+        const closeBtn = document.getElementById('pwa-close-btn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            deferredPrompt = e;
+            // Show the custom UI
+            pwaBanner.style.display = 'flex';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('User accepted the PWA prompt');
+                }
+                deferredPrompt = null;
+                pwaBanner.style.display = 'none';
+            }
+        });
+
+        closeBtn.addEventListener('click', () => {
+            pwaBanner.style.display = 'none';
+        });
+
+
+        // ==========================================
+        // 1. PAGE ENTRY & AUTH LOGIC (NO PRELOADER)
+        // ==========================================
+
+        function showLandingPage() {
+            document.body.style.opacity = '1';
+            triggerHeroAnimations();
+        }
+
+        // Trigger animations immediately
         function triggerHeroAnimations() {
             setTimeout(() => { document.querySelector('.hero-word-1').classList.add('enter-stage-1'); }, 100);
             setTimeout(() => { document.querySelector('.hero-word-2').classList.add('enter-stage-2'); }, 300);
@@ -755,8 +835,6 @@
         }
 
         // --- AUTH CHECK & MAINTENANCE LOGIC ---
-        // This logic handles redirection only if logged in. 
-        // If logged out, it simply reveals the page.
         onSnapshot(doc(db, "site_settings", "config"), (docSnap) => {
             const maintenanceMode = docSnap.exists() ? docSnap.data().maintenanceMode : false;
 
@@ -774,9 +852,7 @@
                                 return;
                             }
 
-                            // Only redirect to dashboard if the user explicitly navigated to index 
-                            // via a fresh load, usually we want to keep them logged in but 
-                            // redirect them to their specific dashboard.
+                            // Redirect logged-in users immediately
                             if (role === 'employer') window.location.replace('employer-dashboard.html');
                             else if (role === 'admin' || role === 'owner') window.location.replace('admin-dashboard.html');
                             else window.location.replace('seeker-dashboard.html');
@@ -784,13 +860,12 @@
                         }
                     } catch(e) { console.error("Auth error", e); }
                 } else {
-                    // USER IS LOGGED OUT (or Sign Out complete)
-                    // Just show the landing page. No redirect to signin.
+                    // USER IS LOGGED OUT
                     if (maintenanceMode) {
                         window.location.replace('maintenance.html');
                     } else {
-                        // Safe to show page content
-                        hidePreloaderAndAnimate();
+                        // Safe to show landing page content
+                        showLandingPage();
                     }
                 }
             });
